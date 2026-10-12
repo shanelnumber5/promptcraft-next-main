@@ -1,0 +1,46 @@
+# PromptCraft Next
+
+A discussion design module: explore the lemonade example, enter your teaching context, clarify the assignment with Babbage, revise and review your directions, and save an assignment guide. Professor Pixel closes the module with the learning takeaway.
+
+## Run locally
+
+On Windows, open **start-local.cmd** and visit **http://127.0.0.1:3080** in Chrome. The launcher uses installed Node or VS Code's bundled runtime. With Node 22 or newer, use `npm start`. VS Code Live Server also works. There is no build step and no runtime package dependency.
+
+Progress saves in this browser under `promptcraft_next_opening_v1`. Existing saves remain compatible. Different browser addresses have separate saved progress.
+
+Use **Restart module** in the header to begin again. A confirmation lets you keep your work or clear the module's saved answers, assignment setup, draft, and conversation. Download your guide first if you want to keep it. Restart preserves your selected live or Dev testing mode.
+
+## Babbage and Dev testing
+
+The browser connects to the existing server at `https://promptcraft-test.netlify.app/.netlify/functions/babbage`. Its API key stays on that backend. No local key is needed; the local server only serves the app's static files. Private environment files are ignored and excluded from static serving.
+
+On the drafting step, select **Check assignment details**, answer clarification questions, then select **Generate revision**. Teacher context and answers are sent to the Babbage service and OpenAI when you send a turn. Suggestions enter your draft only when you choose **Use these directions in my draft**. Changes to the assignment invalidate outdated suggestions and approval.
+
+Select **Use Dev testing fallback**, or open `?mockBabbage=1`, to test without AI calls. Results are labeled **Dev testing fallback — simulated Babbage; no API call**. Switching modes resets the conversation. Live errors never silently substitute simulated output.
+
+The adapter uses the existing backend's `scenario1` request format. It maps `feedback_summary`, `input_quality`, `revised_discussion_prompt`, and `revision_review.why_these_changes` into the clarification and revision workflow. The original backend repository is separate and unchanged.
+
+## Guide and completion
+
+Review the before and after, complete the three assignment checks, and go to your assignment guide. Preview it at any time; downloading requires an approved current revision. The downloaded HTML includes its logo, illustrations, and styles, so it can be opened offline and printed or saved as PDF. Finish the module for Professor Pixel's recap.
+
+Desktop and tablet introductions fit the viewport, including their answer choices and navigation. Portrait tablets use a landscape-shaped smartboard with dialogue above the speaking character. Landscape tablets and Nest Hub displays place the board between the characters, matching the desktop classroom. Maya stays on the left and Pixel on the right. Phones show only the current speaker and scroll as needed. Text is at least 16px (12pt).
+
+## Edit the project
+
+Use [the project map](docs/project-map.md) to find the file for a specific change. Source is organized by feature under `src/features`, reusable renderers under `src/shared`, and app navigation and persistence under `src/app`. Styles are grouped under `src/styles`.
+
+## Checks and formatting
+
+```sh
+npm test
+npm run test:browser
+```
+
+Unit checks cover persistence, draft ownership, navigation, guide formatting, the active Babbage adapter, static server protection, and repository references. Browser checks cover the complete flow on desktop, short desktop, and phone. They mock Babbage and make no live AI calls. Browser tests use an installed Chrome; set `PC_CHROME_EXECUTABLE` to use another Chromium browser.
+
+Optional live check: set `RUN_LIVE_BABBAGE=1` and run `node tests/manual/babbage-smoke.cjs`. This sends fictional sample data to the deployed service and reports status and output lengths only.
+
+For consistent formatting, install development dependencies with `npm install`, then use `npm run format` or `npm run format:check`. Prettier is the only development dependency. Editor indentation is defined in `.editorconfig`.
+
+Generated screenshots and browser profiles belong in the ignored `artifacts/` directory. They are not app source and can be cleared after closing the test browser. API keys must never be added to browser code or committed files.

@@ -1,0 +1,218 @@
+/* Desktop keeps the characters in the room; smaller screens use one speaker panel. */
+.speaker-panel {
+  display: contents;
+}
+.pixel-suggests-frame {
+  position: relative;
+  align-self: center;
+  flex: 0 0 76px;
+  height: 110px;
+  overflow: hidden;
+}
+.pixel-suggests-frame .pixel-suggests-portrait {
+  position: absolute;
+  top: 0;
+  left: 40%;
+  width: auto;
+  height: 200px;
+  max-width: none;
+  transform: translateX(-50%);
+}
+@media (max-width: 1180px), (max-height: 820px) {
+  .classroom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background-size: cover;
+    background-position: center;
+  }
+  .smartboard {
+    position: relative;
+    inset: auto;
+    flex: none;
+    align-self: center;
+    width: 100%;
+    max-width: 1000px;
+    height: auto;
+    max-height: none;
+    margin: 0;
+  }
+  .board-screen {
+    flex: none;
+    min-width: 0;
+    min-height: 0;
+    padding: 18px 20px;
+  }
+  .speaker-panel {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr);
+    align-items: center;
+    width: 100%;
+    max-width: 1000px;
+    padding: 12px 20px 0 12px;
+    gap: 16px;
+    border: 1px solid #93620c;
+    border-radius: 18px;
+    background: #fff4d5;
+    box-shadow: 0 4px 14px #081a3626;
+    overflow: hidden;
+  }
+  .speaker-panel .speech-bubble {
+    grid-column: 2;
+    grid-row: 1;
+    position: relative;
+    inset: auto;
+    align-self: center;
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 8px 0 20px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+  }
+  .speaker-panel .cast {
+    position: relative;
+    inset: auto;
+    grid-column: 1;
+    grid-row: 1;
+    align-self: end;
+    display: block;
+    width: 100%;
+    height: 170px;
+    max-width: none;
+    overflow: hidden;
+  }
+  .speaker-panel .character:not(.is-speaking) {
+    display: none;
+  }
+  .speaker-panel .character.is-speaking {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+  }
+  .speaker-panel .character img {
+    top: 0;
+    bottom: auto;
+    left: 50%;
+    height: 250px;
+    width: auto;
+    transform: translateX(-50%);
+  }
+  .speaker-panel .character--right img {
+    left: 40%;
+  }
+  .speaker-panel .character figcaption {
+    display: none;
+  }
+  .speaker-panel:has(.speech-bubble--right) {
+    grid-template-columns: minmax(0, 1fr) 140px;
+    padding: 12px 12px 0 20px;
+  }
+  .speaker-panel:has(.speech-bubble--right) .speech-bubble {
+    grid-column: 1;
+  }
+  .speaker-panel:has(.speech-bubble--right) .cast {
+    grid-column: 2;
+  }
+  .service-flow {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .chapter-line {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 6px 16px;
+  }
+  .summary-tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .scene-actions,
+  .setup-actions {
+    flex-wrap: wrap;
+  }
+  .scene-actions .nav-button,
+  .setup-actions .nav-button {
+    height: auto;
+    min-height: 50px;
+    max-width: 100%;
+  }
+}
+@media (max-width: 700px) {
+  .babbage-prompt:has(.pixel-suggests-portrait) {
+    display: flow-root;
+    padding: 14px;
+  }
+  .pixel-suggests-frame {
+    float: left;
+    width: 76px;
+    height: 110px;
+    margin: 0 12px 8px 0;
+  }
+  .babbage-prompt:has(.pixel-suggests-portrait) p {
+    padding-bottom: 0;
+    font-size: 16px;
+  }
+  .classroom {
+    padding: 14px 12px;
+    gap: 12px;
+  }
+  .board-screen {
+    padding: 14px;
+  }
+  .speaker-panel {
+    grid-template-columns: 86px minmax(0, 1fr);
+    gap: 10px;
+    padding: 10px 12px 0 0;
+    border-radius: 16px;
+  }
+  .speaker-panel .cast {
+    height: 150px;
+  }
+  .speaker-panel .character img {
+    height: 235px;
+  }
+  .speaker-panel .speech-bubble {
+    padding: 4px 0 14px;
+  }
+  .speaker-panel:has(.speech-bubble--right) {
+    grid-template-columns: minmax(0, 1fr) 86px;
+    padding: 10px 0 0 12px;
+  }
+  .speech-bubble h2 {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+  .speech-bubble p {
+    font-size: 16px;
+    line-height: 1.45;
+  }
+  .service-flow,
+  .summary-tabs {
+    grid-template-columns: 1fr;
+  }
+  .service-flow--roles li {
+    display: grid;
+    grid-template-columns: 70px minmax(0, 1fr);
+    text-align: left;
+  }
+  .service-flow--roles li > .lemonade-visual {
+    grid-row: 1 / 3;
+  }
+  .dialogue {
+    padding: 16px 14px;
+  }
+  .board-stand-visual {
+    float: none;
+    width: 120px;
+    margin: 0 auto 12px;
+  }
+}
+
