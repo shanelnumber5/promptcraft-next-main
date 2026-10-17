@@ -90,26 +90,26 @@ export const discussionOpening = {
         'Their first plan assigns Alex to payments and drinks, and Sam to supplies. Where might it get stuck?',
       board: firstPlan,
       choice: {
-        question: 'Which concern would help the group test this plan?',
+        question: 'Which reply best helps the group examine its reasoning before changing the plan?',
         options: [
           {
             id: 'roles',
-            label: 'Alex handles both service steps while Sam may have nothing to restock.',
+            label: 'If several customers arrive while supplies are full, what happens when Alex handles both payment and pouring? How could Sam help?',
             correct: true,
             feedback:
-              "That's a specific concern. A peer could ask whether Sam can help serve when the supplies are full.",
+              'This tests a specific choice against the supplied facts. The group must explain whether its division of work can handle a rush. The discussion has a job: examine the reasoning behind a decision.',
           },
           {
             id: 'drink',
-            label: 'They should sell a different drink.',
+            label: 'Have Alex take payments and Sam pour drinks. That division of work will make service faster.',
             feedback:
-              'That could be a different project. For this plan, look at the two helpers and what customers need them to do.',
+              'This offers a plausible solution, but assumes it will be faster without testing it. A stronger reply identifies when the original plan might struggle and asks the group to examine that concern.',
           },
           {
             id: 'length',
-            label: 'The plan needs a longer description.',
+            label: 'Explain the payment, pouring, and restocking steps in more detail so readers can understand the plan.',
             feedback:
-              'More words may not solve the problem. Look for a choice that affects how the stand works.',
+              'Clearer steps could help readers, but this reply does not identify a concern the group needs to reason through. Ask how a specific choice holds up under the customer situation.',
           },
         ],
       },
@@ -120,7 +120,7 @@ export const discussionOpening = {
       title: 'Give a peer question a useful job',
       speaker: 'pixel',
       dialogue:
-        'Another group names a choice, explains a concern, and asks a question the first group can use. What does their question help the group reconsider?',
+        'Another group connects a choice to a possible problem and asks the planners to examine it. Now consider what the assignment must require for that question to affect their learning.',
       board: {
         label: "Another group's question",
         title: 'Could the second helper serve?',
@@ -128,24 +128,26 @@ export const discussionOpening = {
           '“If three customers arrive together, Alex has to take each payment and pour each drink. Could Sam help serve while the supplies are full?”',
       },
       choice: {
-        question: 'What decision does the question help them examine?',
+        question: 'Which follow-up requirement would make students use this peer question to deepen their reasoning?',
         options: [
           {
             id: 'roles',
-            label: 'How the two helpers share the work.',
-            correct: true,
-            feedback: 'Yes. The reply has a job: test one part of the plan.',
+            label: 'Summarize the peer question and describe why feedback is useful when planning a stand.',
+            feedback:
+              'A summary shows students read the question, but they can still avoid examining their own plan. Require them to connect the concern to their decision and explain their response.',
           },
           {
             id: 'words',
-            label: 'How many words their post contains.',
-            feedback: 'The question is about the helper roles, not the length of the post.',
+            label: 'Use the concern about a customer rush to revise or defend the helper roles, explaining the reasons for that decision.',
+            correct: true,
+            feedback:
+              'This makes peer input part of the reasoning students must show. They connect a specific concern to their plan and explain a revision or defense. A required reply alone does not create that connection.',
           },
           {
             id: 'agree',
-            label: 'Whether everyone agrees with the group.',
+            label: 'Change the helper roles to match the peer suggestion and describe the new plan.',
             feedback:
-              'Agreement is not the goal. A useful question can help the group examine a choice.',
+              'Following a suggestion is not enough to show learning. Students need to evaluate it and explain why they changed the plan. Keeping the original roles can also be worthwhile if their reasons address the concern.',
           },
         ],
       },
@@ -159,6 +161,30 @@ export const discussionOpening = {
       dialogue:
         'They propose different roles and explain why. This is a plan to test, not proof that service will be faster. A group could also defend its original choice if it addresses the concern.',
       board: revisedPlan,
+      choice: {
+        question: 'Which response best shows that the group used peer input to examine its decision?',
+        options: [
+          {
+            id: 'changed',
+            label: 'We moved Sam to pouring because the other group recommended sharing service work. Our revised plan uses their suggestion.',
+            feedback:
+              'This names the suggestion and a change, but leaves the reasoning unstated. Why does the change address the rush, and what still needs testing?',
+          },
+          {
+            id: 'proven',
+            label: 'We split payment and pouring after the peer raised the rush. Both helpers now serve customers, so we know the line will move faster.',
+            feedback:
+              'This connects the change to the concern, but treats an untested plan as proof. The group still needs to consider the order handoff and what happens when supplies run low.',
+          },
+          {
+            id: 'reasoned',
+            label: 'The peer’s rush question exposed a possible delay: Alex does both service steps. We split the roles to let both helpers serve, and will test the order handoff and restocking during a rush.',
+            correct: true,
+            feedback:
+              'This links the peer concern, the decision, and the reasons for it, while naming what remains uncertain. The learning is visible in how students evaluate and use the contribution, not simply in whether they change their answer.',
+          },
+        ],
+      },
     },
     {
       id: 'student-after',

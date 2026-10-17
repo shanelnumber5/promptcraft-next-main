@@ -1,5 +1,5 @@
 // Scenario content for the guided teacher setup. Shared form rendering lives elsewhere.
-export const teacherSetup = {
+const setupSections = {
   id: 'discussion-teacher-setup',
   title: 'Your assignment',
   steps: [
@@ -119,6 +119,34 @@ export const teacherSetup = {
     },
   ],
   summaryTitle: 'Here’s what we’ll work with.',
+};
+
+// Keep each screen focused while retaining the original assignment/example step.
+const [classSection, assignmentSection, limitsSection] = setupSections.steps;
+export const teacherSetup = {
+  ...setupSections,
+  steps: [
+    classSection,
+    { ...assignmentSection, fields: assignmentSection.fields.slice(0, 1) },
+    {
+      id: 'learning',
+      title: 'Your learning goal',
+      intro: 'Focus on one skill or understanding this discussion should develop.',
+      fields: assignmentSection.fields.slice(1),
+    },
+    {
+      id: 'time',
+      title: 'Time for the discussion',
+      intro: 'Set a realistic workload and a time window for the exchange.',
+      fields: limitsSection.fields.slice(0, 2),
+    },
+    {
+      ...limitsSection,
+      title: 'Requirements to keep',
+      intro: 'Choose the work mode and list requirements the revision needs to preserve.',
+      fields: limitsSection.fields.slice(2),
+    },
+  ].map((step, index) => ({ ...step, label: `Step ${index + 1} of 5` })),
 };
 
 export const teacherSetupDefaults = () => ({

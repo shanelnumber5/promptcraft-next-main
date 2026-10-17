@@ -8,6 +8,21 @@ const assert = require('node:assert/strict');
     '../../src/features/design/content.js'
   );
   const { teacherSetup } = await import('../../src/features/setup/content.js');
+  assert.equal(teacherSetup.steps.length, 5);
+  const legacySetupRecords = new Map();
+  const legacySetupStorage = {
+    getItem: (key) => legacySetupRecords.get(key),
+    setItem: (key, value) => legacySetupRecords.set(key, value),
+  };
+  const legacySetup = initialState(scenario);
+  delete legacySetup.setupContentVersion;
+  legacySetup.phase = 'setup';
+  legacySetup.setupStep = 2;
+  legacySetup.teacher.directions = 'Original directions stay here.';
+  saveState(legacySetup, legacySetupStorage);
+  const restoredSetup = loadState(scenario, legacySetupStorage);
+  assert.equal(restoredSetup.setupStep, 3, 'Old limits screen maps to the shorter time screen');
+  assert.equal(restoredSetup.teacher.directions, legacySetup.teacher.directions);
   const { createGuide, downloadGuide } = await import('../../src/features/design/guide.js');
   const unrelated = {
     revision: teacherSetup.steps[1].example.directions,
@@ -34,6 +49,23 @@ const assert = require('node:assert/strict');
   assert.ok(currentGuide.includes('<h4>Week 8: Independent-Samples t-Test Report</h4>'));
   const { renderDesign } = await import('../../src/features/design/screen.js');
   const { renderAssignmentDirections } = await import('../../src/shared/directions.js');
+  const { renderDirectionsEditor } = await import('../../src/shared/directions-editor.js');
+  const { renderDesignRationale } = await import('../../src/shared/design-evidence.js');
+  const { renderReviewDirections } = await import('../../src/shared/review-directions.js');
+  const reviewBlocks = renderReviewDirections('### Assignment\nIntroduction\n### First post\n1. Explain a choice.\n   - Use evidence.\n### Reply\n1. Test a choice.\n### Follow-up\n1. Revise or defend.\n<script>bad</script>');
+  assert.equal((reviewBlocks.match(/class="review-document-block/g) || []).length, 4);
+  assert(reviewBlocks.includes('<ul><li>Use evidence.</li></ul></li>'));
+  assert(reviewBlocks.indexOf('First post') < reviewBlocks.indexOf('Reply'));
+  assert(!reviewBlocks.includes('<script>'));
+  const formattedEditor = renderDirectionsEditor('```markdown\n### Peer exchange\n1) __Compare:__ Explain your choice.\n```');
+  assert.ok(formattedEditor.includes('contenteditable="true"'));
+  assert.ok(formattedEditor.includes('<h4>Peer exchange</h4>'));
+  assert.ok(formattedEditor.includes('<strong>Compare:</strong>'));
+  assert.ok(!formattedEditor.includes('```'));
+  assert.ok(!formattedEditor.includes('<textarea'));
+  const citedReason = renderDesignRationale('Use feedback (Carless & Boud, 2018): https://doi.org/10.1080/02602938.2018.1463354.');
+  assert.ok(citedReason.includes('href="https://doi.org/10.1080/02602938.2018.1463354"'));
+  assert.ok(!renderDesignRationale('[Unverified](https://unverified.example)').includes('<a '));
   const report = renderAssignmentDirections(
     '## Week 8: t-Test Report\n\n**Due:** Sunday\n\n### Peer exchange\n1. **First post:** Explain your choice.\n   Use your own output.\n2. Test a peer’s interpretation.\n\n<script>bad</script>',
   );
@@ -65,6 +97,9 @@ const assert = require('node:assert/strict');
   assert.ok(!guide.includes('<script>'), 'Downloaded guide escapes user text');
   assert.ok(guide.includes('Alex takes payment'));
   assert.ok(guide.includes('Sam serves drinks'));
+  assert.ok(guide.includes('href="#design-sources"'));
+  assert.ok(guide.includes('Carless, D., &amp; Boud, D. (2018)'));
+  assert.ok(guide.includes('fictional illustration'));
   assert.ok(guide.includes('not proof of faster service'));
   assert.ok(
     createGuide({ revision: 'Draft', reason: '' }, { approved: false }).includes(
@@ -81,6 +116,14 @@ const assert = require('node:assert/strict');
     'Example appears first',
   );
   assert.ok(guide.includes('href="#change-reason"'), 'Contents include the reason when entered');
+  const originalOnlyGuide = createGuide(
+    { revision: '', reason: '', sourceDirections: 'Original assignment with <script>quoted text</script>' },
+    { teacher: { directions: 'Original assignment with <script>quoted text</script>' }, approved: false },
+  );
+  assert.ok(originalOnlyGuide.includes('href="#original-assignment"'));
+  assert.ok(originalOnlyGuide.includes('id="original-assignment"'));
+  assert.ok(originalOnlyGuide.includes('Original assignment with &lt;script&gt;quoted text&lt;/script&gt;'));
+  assert.ok(!originalOnlyGuide.includes('<script>'));
   assert.ok(!createGuide({ revision: 'Draft', reason: '' }).includes('href="#change-reason"'));
   assert.ok(
     createGuide({ revision: 'Draft', reason: '' }, { logo: 'data:image/svg+xml,test' }).includes(
@@ -215,6 +258,8 @@ const assert = require('node:assert/strict');
   click('design-next');
   assert.match(app.innerHTML, /Choose a job for the reply/);
   input('exchange', 'evidence');
+  click('design-next');
+  assert.equal(saved().designPanel, 'notes');
   input('notes', 'Use evidence to reconsider a choice.');
   click('design-next');
   assert.match(app.innerHTML, /Draft one manageable change/);
@@ -242,6 +287,8 @@ const assert = require('node:assert/strict');
     beforeRepeat,
     'Repeated starter click does not duplicate exchange',
   );
+  click('design-next');
+  assert.equal(saved().designPanel, 'reason');
   click('design-next');
   assert.match(app.innerHTML, /Original assignment/);
   assert.match(app.innerHTML, /Revised assignment/);
@@ -271,11 +318,12 @@ const assert = require('node:assert/strict');
   assert.equal(saved().finalCheck.approved, false, 'Draft edits invalidate approval');
   assert.equal(saved().finalCheck.instructions, false);
   click('design-next');
+  click('design-next');
   click('edit-context');
   assert.match(app.innerHTML, /Here’s what we’ll work with/);
   click('start-design');
   assert.equal(saved().designStep, 3, 'Returning from setup preserves design position');
-  for (let i = 0; i < 4; i++) click('design-back');
+  for (let i = 0; i < 10 && saved().phase === 'design'; i++) click('design-back');
   assert.equal(saved().phase, 'summary', 'Back from first design step returns to summary');
   assert.equal(saved().teacher.directions, original);
   const bad = {

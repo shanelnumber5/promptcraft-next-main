@@ -1,4 +1,111 @@
 /* Desktop keeps the characters in the room; smaller screens use one speaker panel. */
+.suggested-next {
+  outline: 3px solid #e8af27;
+  outline-offset: 4px;
+  box-shadow: 0 0 0 7px #e8af2726, 0 0 22px #e8af2799;
+}
+.suggested-next:focus-visible {
+  outline-color: #007cac;
+}
+.draft-section {
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid #8da7ba;
+  border-radius: 12px;
+  background: #f8fbfd;
+}
+.directions-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+.directions-toolbar button {
+  padding: 8px 12px;
+  font-size: 16px;
+}
+.directions-editor {
+  min-height: 240px;
+  padding: 18px;
+  border: 2px solid #8da7ba;
+  border-radius: 8px;
+  background: #fff;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+}
+.directions-editor:focus {
+  outline: 3px solid #007cac;
+  outline-offset: 2px;
+}
+.directions-editor > :first-child {
+  margin-top: 0;
+}
+.design-evidence {
+  padding: 12px 0;
+  margin-top: 12px;
+  border-top: 1px solid #8da7ba;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.design-evidence summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+.design-evidence li + li {
+  margin-top: 16px;
+}
+.design-evidence p {
+  margin: 8px 0;
+}
+.design-evidence a {
+  color: #005f88;
+  text-decoration: underline;
+}
+.smartboard:has(.design-evidence[open]) .board-screen {
+  overflow-y: auto;
+}
+.draft-section > summary,
+.babbage-history > summary,
+.babbage-mode-actions > summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--navy);
+  padding: 4px 0;
+}
+.draft-section[open] > summary {
+  margin-bottom: 16px;
+}
+.question-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 16px 8px 8px;
+}
+.answer-guidance {
+  min-height: 24px;
+}
+.babbage-mode-actions,
+.babbage-history {
+  margin-top: 20px;
+}
+.guide-preview-loading {
+  padding: 20px;
+}
+.setup-step--assignment .setup-fields {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto;
+}
+.setup-step--assignment #directions {
+  height: clamp(180px, 30dvh, 340px);
+}
+.setup-step--learning .setup-fields {
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (forced-colors: active) {
+  .suggested-next {
+    outline-color: Highlight;
+  }
+}
 .speaker-panel {
   display: contents;
 }
@@ -19,7 +126,21 @@
   transform: translateX(-50%);
 }
 @media (max-width: 1180px), (max-height: 820px) {
+  body:has(.experience) {
+    height: auto;
+    min-height: 100dvh;
+    overflow: auto;
+  }
+  body:has(.experience) #app {
+    flex: none;
+  }
+  .experience {
+    height: auto;
+    min-height: 0;
+  }
   .classroom {
+    flex: none;
+    overflow: visible;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -44,6 +165,11 @@
     min-width: 0;
     min-height: 0;
     padding: 18px 20px;
+    overflow: visible;
+  }
+  .dialogue {
+    flex: none;
+    height: auto;
   }
   .speaker-panel {
     display: grid;
@@ -146,6 +272,14 @@
   }
 }
 @media (max-width: 700px) {
+  .choice-list {
+    grid-template-columns: 1fr;
+  }
+  .scene-actions .navigation-hint {
+    flex-basis: 100%;
+    order: 3;
+    text-align: center;
+  }
   .babbage-prompt:has(.pixel-suggests-portrait) {
     display: flow-root;
     padding: 14px;

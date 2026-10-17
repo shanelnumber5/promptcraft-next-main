@@ -4,6 +4,7 @@ import { teacherSetup } from '../setup/content.js';
 import { escapeHTML as e } from '../../shared/html.js';
 import { discussionOpening } from '../opening/content.js';
 import { lemonadeVisual, planVisuals } from '../../shared/lemonade-visuals.js';
+import { renderDesignEvidence, renderDesignRationale } from '../../shared/design-evidence.js';
 
 function lemonadeExample() {
   const scene = (id) => discussionOpening.scenes.find((item) => item.id === id);
@@ -20,7 +21,7 @@ function lemonadeExample() {
 
 let logoPromise;
 export function loadGuideLogo() {
-  return (logoPromise ??= fetch(new URL('../../../assets/brand/babbage-mark.svg', import.meta.url))
+  return (logoPromise ??= fetch(new URL('../../../assets/brand/babbage-mark.svg', import.meta.url), { signal: AbortSignal.timeout(5000) })
     .then((response) => {
       if (!response.ok) throw Error('Logo unavailable');
       return response.text();
@@ -44,6 +45,12 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
   const sections = [
     { id: 'lemonade-example', title: 'Worked example: lemonade stand', body: lemonadeExample() },
   ];
+  if (teacher?.directions?.trim())
+    sections.push({
+      id: 'original-assignment',
+      title: 'Your original assignment',
+      body: `<section class="assignment"><div class="assignment-banner"><h2>Your original assignment</h2></div><div class="assignment-content"><p>The directions you supplied, kept separately from your revision.</p><div class="assignment-directions">${renderAssignmentDirections(teacher.directions)}</div></div></section>`,
+    });
   if (teacher && !design.revision.trim())
     sections.push({
       id: 'assignment-pending',
@@ -54,8 +61,13 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
     sections.push({
       id: 'your-assignment',
       title: 'Your revised discussion board',
-      body: `<section class="assignment"><div class="assignment-banner"><span>Your course · ${approved ? 'Approved version' : 'Draft'}</span><h2>Your revised discussion board</h2></div><div class="assignment-content">${design.revision.trim() ? `<h3 id="revised-directions">Revised directions</h3><div class="assignment-directions">${renderAssignmentDirections(design.revision, { approved })}</div>` : ''}${design.reason.trim() ? `<aside class="rationale"><h3 id="change-reason">Why I made this change</h3><p>${e(design.reason)}</p></aside>` : ''}</div></section>`,
+      body: `<section class="assignment"><div class="assignment-banner"><span>Your course · ${approved ? 'Approved version' : 'Draft'}</span><h2>Your revised discussion board</h2></div><div class="assignment-content">${design.revision.trim() ? `<h3 id="revised-directions">Revised directions</h3><div class="assignment-directions">${renderAssignmentDirections(design.revision, { approved })}</div>` : ''}${design.reason.trim() ? `<aside class="rationale"><h3 id="change-reason">Why I made this change</h3><div class="design-rationale">${renderDesignRationale(design.reason)}</div></aside>` : ''}</div></section>`,
     });
+  sections.push({
+    id: 'design-sources',
+    title: 'Course-design sources',
+    body: `<section><h2>Course-design sources</h2>${renderDesignEvidence(undefined, { expanded: true })}</section>`,
+  });
   const contents = sections
     .map(
       (section) =>
@@ -67,7 +79,7 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
 <style>${guideStyles}</style></head>
 
 
-<body><main><header><div class="guide-brand">${logo ? `<img src="${e(logo)}" alt="PromptCraft Babbage emblem">` : ''}<div><div class="wordmark">Prompt<span>Craft</span></div><small>The Prompt Lab · Great Falls College MSU</small></div></div><h1>Assignment guide</h1><p>${approved ? 'Your approved version' : 'Draft preview · Not yet approved'}</p><p>Start with the lemonade example, then review your own assignment. This guide grows as you add your directions and reason for the change. Download it whenever you are ready.</p></header><nav class="toc" aria-labelledby="contents-title"><h2 id="contents-title">Discussion boards</h2><p class="toc-topic">Give the discussion a job</p><ol>${contents}</ol></nav>${sections.map((section) => `<div class="guide-section" id="${section.id}">${section.body}</div>`).join('')}</main></body></html>`;
+<body><main><header><div class="guide-brand">${logo ? `<img src="${e(logo)}" alt="PromptCraft Babbage emblem">` : ''}<div><div class="wordmark">Prompt<span>Craft</span></div><small>The Prompt Lab · Great Falls College MSU</small></div></div><h1>Assignment guide</h1><p>${approved ? 'Your approved version' : 'Draft preview · Not yet approved'}</p><p>Review the worked example, your original assignment, and your revision. Your original directions stay available while you develop the new version.</p></header><nav class="toc" aria-labelledby="contents-title"><h2 id="contents-title">Discussion boards</h2><p class="toc-topic">Give the discussion a job</p><ol>${contents}</ol></nav>${sections.map((section) => `<div class="guide-section" id="${section.id}">${section.body}</div>`).join('')}</main></body></html>`;
 }
 
 export function downloadGuide(design, options) {

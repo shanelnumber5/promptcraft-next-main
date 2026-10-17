@@ -5,6 +5,7 @@ export const conversationDefaults = () => ({
   history: [],
   questions: [],
   answers: {},
+  questionIndex: 0,
   ready: false,
   mode: 'live',
 });

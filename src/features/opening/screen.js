@@ -31,17 +31,29 @@ export function renderChoices(choice, answer) {
 }
 
 export function renderScene(scenario, scene, state, index, options = {}) {
+  const stage = options.stage ?? state.storyStage ?? 'dialogue';
+  const showingBoard = stage !== 'dialogue';
+  const showingQuestion = stage === 'question' && !!scene.choice;
   const answer = state.answers[scene.id];
-  const ready = !scene.choice || scene.choice.options.some((o) => o.id === answer && o.correct);
+  const ready = !showingQuestion || scene.choice.options.some((o) => o.id === answer && o.correct);
   const isLast = index === scenario.scenes.length - 1;
+  const boardContent = options.boardContent ?? '';
+  const nextAction = !showingBoard ? 'reveal-board' : scene.choice && !showingQuestion ? 'reveal-question' : isLast ? 'start-setup' : 'next';
+  const nextLabel = !showingBoard ? 'View smartboard' : scene.choice && !showingQuestion ? 'See the question' : isLast ? 'Set up my assignment' : 'Continue';
   const cast = Object.values(scenario.characters).map((c) => ({
     ...c,
     src: scene.portraits?.[c.id] || c.src,
   }));
   const navigation =
     options.navigation ??
-    `<nav class="scene-actions" aria-label="Story navigation"><button type="button" class="nav-button nav-button--back" data-action="back"${index === 0 ? ' disabled' : ''}><span aria-hidden="true">←</span><span>Back</span></button><span class="navigation-hint">${!ready ? 'Use the feedback to find a useful concern.' : isLast ? 'Opening complete' : 'Take your time. Nothing is timed.'}</span><button type="button" class="primary nav-button nav-button--next" data-action="${isLast ? 'start-setup' : 'next'}"${!ready ? ' disabled' : ''}><span>${isLast ? 'Set up my assignment' : 'Continue'}</span><span aria-hidden="true">→</span></button></nav>`;
+    `<nav class="scene-actions" aria-label="Story navigation"><button type="button" class="nav-button nav-button--back" data-action="back"${index === 0 && !showingBoard ? ' disabled' : ''}><span aria-hidden="true">←</span><span>Back</span></button><span class="navigation-hint">${!showingBoard ? 'Read the dialogue, then continue to the board.' : !ready ? 'Choose a response, then use the feedback to reconsider.' : 'Continue when you are ready.'}</span><button type="button" class="primary nav-button nav-button--next" data-action="${nextAction}"${!ready ? ' disabled' : ''}><span>${nextLabel}</span><span aria-hidden="true">→</span></button></nav>`;
   const progressLabel =
     options.progressLabel ?? scene.part + ' · ' + (index + 1) + ' of ' + scenario.scenes.length;
-  return `<section class="experience${options.className ? ' ' + e(options.className) : ''}" aria-label="${e(scenario.title)}"><div class="chapter-line"><span>${e(scenario.title)}</span><span>${e(progressLabel)}</span></div><h1 id="${e(options.titleId ?? 'scene-title')}" class="sr-only" tabindex="-1">${e(scene.title)}</h1><div class="classroom">${renderBoard(scene.board, { afterContent: options.boardContent })}<div class="speaker-panel"><section class="speech-bubble speech-bubble--${e(scenario.characters[scene.speaker].side)}" aria-labelledby="speaker-label"><h2 id="speaker-label">${e(scenario.characters[scene.speaker].name)}</h2><p>${e(scene.dialogue)}</p></section><div class="cast">${cast.map((c) => renderCharacter(c, c.id === scene.speaker)).join('')}</div></div></div><section class="dialogue" aria-label="Activity and story navigation">${renderChoices(scene.choice, answer)}${isLast && options.showHandoff !== false ? `<div class="handoff"><strong>Your assignment comes next</strong><p>${e(scenario.endNote)}</p></div>` : ''}${navigation}</section>${options.designNotice ? '<p class="design-notice" role="status"></p>' : ''}<p class="save-notice" role="status">${e(state.saveNotice || '')}</p></section>`;
+  const speaker = cast.find((c) => c.id === scene.speaker);
+  const content = showingQuestion
+    ? renderBoard({ label: 'Think it through · Back returns to the plan', title: scene.board.title }, { afterContent: renderChoices(scene.choice, answer) })
+    : showingBoard
+    ? renderBoard(scene.board, { afterContent: boardContent + (isLast && options.showHandoff !== false ? `<div class="handoff"><strong>Your assignment comes next</strong><p>${e(scenario.endNote)}</p></div>` : '') })
+    : `<div class="speaker-panel"><div class="cast">${renderCharacter(speaker, true)}</div><section class="speech-bubble speech-bubble--${e(speaker.side)}" aria-labelledby="speaker-label"><span class="eyebrow">${e(scene.part)}</span><h2 id="speaker-label">${e(speaker.name)}</h2><p>${e(scene.dialogue)}</p></section></div>`;
+  return `<section class="experience focused-scene focus--${e(stage)} camera--${e(speaker.side)}${options.className ? ' ' + e(options.className) : ''}" aria-label="${e(scenario.title)}"><div class="chapter-line"><span>${e(scenario.title)}</span><span>${e(progressLabel)} · ${showingQuestion ? 'Question' : showingBoard ? 'Smartboard' : 'Dialogue'}</span></div><h1 id="${e(options.titleId ?? 'scene-title')}" class="sr-only" tabindex="-1">${e(scene.title)}</h1><div class="classroom">${content}</div><section class="dialogue" aria-label="Story navigation">${navigation}</section>${options.designNotice ? '<p class="design-notice" role="status"></p>' : ''}<p class="save-notice" role="status">${e(state.saveNotice || '')}</p></section>`;
 }

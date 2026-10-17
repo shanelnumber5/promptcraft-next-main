@@ -8,6 +8,8 @@ import {
   devBabbageTurn,
 } from './babbage-client.js';
 import { syncDraftAssignment } from './content.js';
+import { answerIssue } from './input-quality.js';
+import { highlightNextAction } from '../../shared/next-action.js';
 
 // Keeps asynchronous conversation work separate from app navigation.
 export function createDesignController({ app, getState, ai, render, saveSafely, syncFinalCheck }) {
@@ -20,7 +22,29 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
     const send = app.querySelector('[data-action="send-clarification"]');
     if (send)
       send.disabled =
-        ai.pending || state.babbage.questions.some((q) => !state.babbage.answers[q.id]?.trim());
+        ai.pending || (state.babbage.mode !== 'dev' && ai.configured !== true) ||
+        state.babbage.questions.some((q) => answerIssue(state.babbage.answers[q.id] || ''));
+    const next = app.querySelector('[data-action="next-question"]');
+    const issue = answerIssue(control.value);
+    if (next) next.disabled = ai.pending || Boolean(issue);
+    const guidance = app.querySelector('.answer-guidance');
+    if (guidance) guidance.textContent = issue;
+    highlightNextAction(app, state, ai);
+  }
+
+  function moveQuestion(delta) {
+    const state = getState();
+    const current = state.babbage.questions[state.babbage.questionIndex || 0];
+    if (ai.pending || !current) return;
+    if (delta > 0 && answerIssue(state.babbage.answers[current.id] || '')) return;
+    state.babbage.questionIndex = Math.max(0, Math.min(
+      state.babbage.questions.length - 1, (state.babbage.questionIndex || 0) + delta,
+    ));
+    saveSafely();
+    render();
+    const control = app.querySelector('[data-clarification-answer]');
+    control?.focus({ preventScroll: true });
+    control?.closest('.babbage-questions')?.scrollIntoView({ block: 'nearest', behavior: 'instant' });
   }
 
   function syncBabbage() {
@@ -32,7 +56,7 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
       ai.suggestion = null;
       app.querySelector('.ai-suggestion')?.remove();
       const panel = app.querySelector('.ai-panel');
-      if (panel) panel.outerHTML = renderAiPanel(state, ai);
+      if (panel) panel.outerHTML = renderAiPanel(state, ai, { compact: true });
     }
   }
 
@@ -46,7 +70,7 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
     if (sendAnswers) {
       if (
         !state.babbage.questions.length ||
-        state.babbage.questions.some((q) => !state.babbage.answers[q.id]?.trim())
+        state.babbage.questions.some((q) => answerIssue(state.babbage.answers[q.id] || ''))
       )
         return;
       const answers = state.babbage.questions.map((q) => ({
@@ -115,7 +139,7 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
           .slice(0, 2);
         turn.questions.unshift({
           id: 'ai-use',
-          text: 'How much AI use are you comfortable allowing students in this assignment? For example: none, help with ideas or feedback, or AI-generated drafts. What must students do themselves, and should they explain how they used AI? If you are unsure, say what concerns you.',
+          text: 'What student AI use should this assignment allow? You can say none, ideas or feedback only, drafting with limits, or describe what you are unsure about.',
           field: 'aiUse',
         });
         turn.ready = false;
@@ -134,9 +158,11 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
         },
       ].slice(-20);
       state.babbage.questions = turn.questions;
+      state.babbage.questionIndex = 0;
       state.babbage.answers = {};
       state.babbage.ready = turn.ready;
       ai.suggestion = turn.suggestion;
+      state.designReadPage = 0;
       if (intent === 'revise') ai.error = turn.message;
       ai.stage = 'complete';
       updateLoadingStage(app, ai.stage);
@@ -170,5 +196,5 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
     }
     if (state.phase === 'design' && !ai.pending) render();
   }
-  return { updateClarificationAnswer, syncBabbage, askBabbage, refreshBabbageConnection };
+  return { updateClarificationAnswer, moveQuestion, syncBabbage, askBabbage, refreshBabbageConnection };
 }

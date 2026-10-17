@@ -95,7 +95,7 @@ export const designSteps = [
   {
     title: 'Check your assignment',
     intro:
-      'Read your revised directions, return to the three checks, then select Go to assignment guide. Use Edit directions if anything needs changing.',
+      'Read your revised directions, return to the three checks, then select Assignment guide. Use Edit directions if anything needs changing.',
   },
 ];
 export const finalCheckItems = [

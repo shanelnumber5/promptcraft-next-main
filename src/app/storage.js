@@ -1,4 +1,5 @@
 import { teacherSetupDefaults, teacherSetup } from '../features/setup/content.js';
+import { designPanels } from '../features/design/panels.js';
 import { conversationDefaults, assignmentContext } from '../features/design/babbage-client.js';
 import {
   designDefaults,
@@ -19,11 +20,16 @@ export function initialState(scenario) {
     contentVersion: scenario.contentVersion,
     phase: 'opening',
     sceneId: scenario.scenes[0].id,
+    storyStage: 'dialogue',
     answers: {},
     completed: false,
     setupStep: 0,
+    setupContentVersion: 2,
     teacher: teacherSetupDefaults(),
     designStep: 0,
+    designPanel: 'concern',
+    designReadPage: 0,
+    designReturnPanel: '',
     design: designDefaults(),
     finalCheck: finalCheckDefaults(),
     babbage: conversationDefaults(),
@@ -112,9 +118,10 @@ export function loadState(scenario, storage = window.localStorage) {
       ? saved.phase
       : 'opening';
     if (phase === 'closing' && !finalCheck.approved) phase = 'design';
+    const savedSetupStep = saved.setupContentVersion !== 2 && saved.setupStep === 2 ? 3 : saved.setupStep;
     const setupStep = Math.max(
       0,
-      Math.min(2, Number.isInteger(saved.setupStep) ? saved.setupStep : 0),
+      Math.min(teacherSetup.steps.length - 1, Number.isInteger(savedSetupStep) ? savedSetupStep : 0),
     );
     const babbage = conversationDefaults();
     if (saved.babbage?.context === assignmentContext({ teacher, design })) {
@@ -154,6 +161,10 @@ export function loadState(scenario, storage = window.localStorage) {
           saved.babbage.answers[q.id].length <= 24000
         )
           babbage.answers[q.id] = saved.babbage.answers[q.id];
+      babbage.questionIndex = Math.max(
+        0,
+        Math.min(babbage.questions.length - 1, Number.isInteger(saved.babbage.questionIndex) ? saved.babbage.questionIndex : 0),
+      );
       babbage.ready =
         saved.babbage.ready === true &&
         babbage.questions.length === 0 &&
@@ -164,12 +175,16 @@ export function loadState(scenario, storage = window.localStorage) {
       ...fresh,
       phase,
       sceneId: saved.sceneId,
+      storyStage: ['board', 'question'].includes(saved.storyStage) ? saved.storyStage : 'dialogue',
       answers,
       completed: saved.completed === true,
       setupStep,
       teacher,
       design,
       designStep,
+      designPanel: designPanels[designStep]?.includes(saved.designPanel) ? saved.designPanel : designPanels[designStep]?.[0] || '',
+      designReadPage: Number.isInteger(saved.designReadPage) ? Math.max(0, Math.min(100, saved.designReadPage)) : 0,
+      designReturnPanel: designPanels[designStep]?.includes(saved.designReturnPanel) ? saved.designReturnPanel : '',
       finalCheck,
       babbage,
     };
