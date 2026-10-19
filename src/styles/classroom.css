@@ -1,0 +1,610 @@
+/* The opening uses the available screen, with the cast layered into the room. */
+body:has(.experience) {
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+body:has(.experience) .app-header {
+  flex: 0 0 auto;
+  padding: 10px 20px;
+}
+body:has(.experience) .app-footer {
+  display: none;
+}
+body:has(.experience) #app {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+.experience {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.chapter-line {
+  flex: 0 0 auto;
+  padding: 8px 20px;
+}
+.classroom {
+  flex: 1;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.smartboard {
+  min-height: 0;
+
+  max-width: 850px;
+
+  margin: 0 auto;
+  padding: 8px 8px 0;
+  display: flex;
+  flex-direction: column;
+}
+.board-screen {
+  flex: 1;
+  min-height: 0;
+  padding: 16px 20px;
+}
+.board-heading h2 {
+  font-size: clamp(22px, 2vw, 30px);
+  margin: 5px 0 12px;
+}
+.board-text,
+.board-quote {
+  font-size: 18px;
+  margin: 8px 0 12px;
+  line-height: 1.4;
+}
+.facts {
+  font-size: 17px;
+  margin: 8px 0;
+}
+.facts li + li {
+  margin-top: 5px;
+}
+.board-note {
+  font-size: 16px;
+  margin-top: 10px;
+  padding-top: 8px;
+}
+.service-flow {
+  gap: 8px;
+  margin: 8px 0;
+}
+.service-flow li {
+  padding: 10px;
+  gap: 5px;
+}
+.service-flow strong {
+  font-size: 17px;
+}
+.service-flow li > span:last-child {
+  font-size: 16px;
+  line-height: 1.35;
+}
+.board-frame {
+  flex: 0 0 auto;
+  padding: 4px 7px;
+}
+.speech-bubble {
+  flex: 0 0 auto;
+
+  margin-top: 14px;
+  margin-bottom: 20px;
+}
+.speech-bubble--left {
+  align-self: flex-start;
+  margin-left: -8%;
+  margin-right: auto;
+}
+.speech-bubble--right {
+  align-self: flex-end;
+  margin-left: auto;
+  margin-right: -8%;
+}
+.speech-bubble h2 {
+  font-size: 17px;
+  margin-bottom: 4px;
+}
+
+.cast {
+  position: absolute;
+  inset: 0;
+  height: auto;
+  display: block;
+}
+.character {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 22%;
+  height: min(75%, 450px);
+  margin: 0;
+}
+.character--right {
+  left: auto;
+  right: 0;
+  width: 23%;
+}
+
+.character figcaption {
+  bottom: 10px;
+  font-size: 16px;
+}
+.dialogue {
+  padding: 12px 20px;
+}
+.choices legend {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+.choice-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.choice {
+  font-size: 16px;
+  padding: 10px;
+  line-height: 1.35;
+}
+.feedback {
+  font-size: 16px;
+  min-height: 0;
+  padding: 8px 0;
+}
+.choices ~ .scene-actions,
+.handoff ~ .scene-actions {
+  padding-top: 10px;
+}
+.scene-actions {
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+.navigation-hint {
+  width: auto;
+  order: initial;
+  font-size: 16px;
+}
+.nav-button {
+  min-height: 46px;
+  padding: 8px 16px;
+  font-size: 17px;
+}
+.handoff {
+  padding: 8px 14px;
+  margin-bottom: 10px;
+}
+.handoff p {
+  font-size: 16px;
+  line-height: 1.4;
+  margin-top: 4px;
+}
+@media (max-height: 800px) and (min-width: 900px) {
+  .classroom {
+    padding-top: 8px;
+    padding-left: 20%;
+    padding-right: 20%;
+  }
+  .smartboard {
+    max-height: 70%;
+  }
+  .board-screen {
+    padding: 10px 16px;
+  }
+  .board-heading h2 {
+    font-size: 23px;
+    margin-bottom: 8px;
+  }
+  .eyebrow {
+    font-size: 16px;
+  }
+  .board-note {
+    font-size: 16px;
+    margin-top: 7px;
+    padding-top: 6px;
+  }
+  .board-text,
+  .board-quote,
+  .facts {
+    font-size: 16px;
+  }
+  .service-flow li {
+    padding: 7px;
+  }
+  .service-flow strong {
+    font-size: 16px;
+  }
+  .service-flow li > span:last-child {
+    font-size: 16px;
+  }
+  .speech-bubble {
+    margin-top: 10px;
+    margin-bottom: 16px;
+  }
+
+  .dialogue {
+    padding: 9px 16px;
+  }
+  .choice {
+    font-size: 16px;
+    padding: 8px;
+  }
+  .feedback {
+    font-size: 16px;
+    padding: 6px 0;
+  }
+}
+@media (max-width: 899px) {
+  .smartboard {
+    max-height: none;
+    flex: 1;
+  }
+  .speech-bubble {
+    margin-top: 10px;
+    margin-bottom: 12px;
+  }
+  .speech-bubble--left {
+    margin-left: 0;
+  }
+  .speech-bubble--right {
+    margin-right: 0;
+  }
+
+  .character {
+    width: 30%;
+    height: 125px;
+  }
+  .character--right {
+    width: 30%;
+  }
+
+  .character figcaption {
+    font-size: 16px;
+    padding: 3px 6px;
+    bottom: 4px;
+  }
+  .board-screen {
+    padding: 12px;
+  }
+  .service-flow {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .service-flow li {
+    padding: 7px;
+  }
+  .service-flow strong {
+    font-size: 16px;
+  }
+  .service-flow li > span:last-child {
+    font-size: 16px;
+  }
+  .navigation-hint {
+    display: none;
+  }
+  .chapter-line {
+    flex-direction: row;
+    font-size: 16px;
+    padding: 6px 12px;
+  }
+  .dialogue {
+    padding: 10px 12px;
+  }
+  .choice-list {
+    gap: 6px;
+  }
+  .choice {
+    gap: 6px;
+    padding: 7px;
+    font-size: 16px;
+  }
+  .choice input {
+    width: 18px;
+    height: 18px;
+    flex-basis: 18px;
+  }
+  .choices legend {
+    font-size: 16px;
+  }
+  .feedback {
+    font-size: 16px;
+    padding: 6px 0;
+  }
+}
+@media (max-width: 600px) {
+  body:has(.experience) .app-header {
+    padding: 8px 12px;
+    flex-wrap: nowrap;
+  }
+  .brand small {
+    display: none;
+  }
+  .brand img {
+    width: 32px;
+    height: 32px;
+  }
+  .brand strong {
+    font-size: 21px;
+  }
+  .chapter-line {
+    font-size: 16px;
+    gap: 8px;
+  }
+  .board-heading h2 {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+  .eyebrow {
+    font-size: 16px;
+  }
+  .lemonade-icon {
+    display: none;
+  }
+  .board-text,
+  .board-quote,
+  .facts {
+    font-size: 16px;
+    line-height: 1.35;
+  }
+  .board-note {
+    font-size: 16px;
+    margin-top: 6px;
+    padding-top: 6px;
+  }
+  .speech-bubble h2 {
+    font-size: 16px;
+  }
+  .speech-bubble p {
+    font-size: 16px;
+    line-height: 1.35;
+  }
+  .handoff p {
+    font-size: 16px;
+  }
+  .nav-button {
+    font-size: 16px;
+    padding: 7px 12px;
+  }
+  .scene-actions .primary {
+    margin-left: auto;
+  }
+}
+
+/* Match portrait framing without speech bubble tails. */
+.character--right {
+  height: min(75%, 450px);
+}
+.character--right {
+  overflow: visible;
+}
+.character--right img {
+  height: 120%;
+  bottom: -28%;
+}
+
+@media (max-width: 899px) {
+  .character--right {
+    height: 125px;
+  }
+  .character--right img {
+    height: 120%;
+    bottom: -28%;
+  }
+}
+
+/* Carry the brand colors through the board and story controls. */
+.smartboard {
+  background: var(--navy);
+  border-color: var(--navy-deep);
+}
+.board-screen {
+  background: #e9f5fb;
+  border-color: #70c8ef;
+}
+.board-frame {
+  color: #fff;
+}
+.board-light {
+  background: var(--sky);
+}
+.board-note {
+  border-color: #829db2;
+}
+.service-flow li {
+  background: #fff;
+  border-color: #829db2;
+}
+.chapter-line > span:last-child,
+.navigation-hint {
+  font-weight: 700;
+  color: var(--navy);
+}
+.nav-button--back {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+}
+.nav-button--back:hover:enabled {
+  background: #1d3c70;
+  border-color: #1d3c70;
+}
+.nav-button--next {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+.nav-button > span[aria-hidden='true'] {
+  width: 32px;
+  height: 32px;
+  font-size: 28px;
+  font-weight: 700;
+}
+.nav-button--back > span[aria-hidden='true'] {
+  background: #ffffff20;
+  color: #fff;
+}
+.nav-button--next > span[aria-hidden='true'] {
+  background: #fff;
+  color: var(--blue-dark);
+}
+.nav-button--back:disabled {
+  background: #263b5a;
+  border-color: #263b5a;
+  color: #d0dbea;
+}
+.nav-button--back:disabled > span[aria-hidden='true'] {
+  color: #d0dbea;
+}
+
+/* Warm dialogue treatment complements the blue smartboard. */
+.speech-bubble {
+  background: #fff4d5;
+  border-color: #93620c;
+  box-shadow: 0 4px 14px #081a3633;
+}
+.speech-bubble h2 {
+  color: #765009;
+}
+.speech-bubble p {
+  color: var(--navy-deep);
+}
+
+/* Preserve classroom proportions and foreground character layering. */
+.classroom {
+  isolation: isolate;
+}
+
+.cast {
+  z-index: 3;
+}
+
+/* Reserve the activity area so questions never resize or reposition the room. */
+.dialogue {
+  height: 220px;
+  flex: 0 0 220px;
+  display: flex;
+  flex-direction: column;
+}
+.scene-actions {
+  margin-top: auto;
+}
+.classroom {
+  padding: 12px 28%;
+}
+.smartboard {
+  flex: none;
+  width: 100%;
+  height: calc(100% - 24px);
+  max-height: none;
+}
+.speech-bubble {
+  position: absolute;
+
+  width: 26%;
+  max-width: 480px;
+  margin: 0;
+  padding: 14px 16px;
+}
+.speech-bubble--left {
+  left: 1%;
+  right: auto;
+  margin: 0;
+}
+.speech-bubble--right {
+  right: 1%;
+  left: auto;
+  margin: 0;
+}
+.speech-bubble p {
+  font-size: 17px;
+  line-height: 1.4;
+}
+.character,
+.character--right {
+  height: min(75%, 450px);
+}
+@media (max-height: 800px) and (min-width: 900px) {
+  .dialogue {
+    height: 210px;
+    flex-basis: 210px;
+  }
+  .classroom {
+    padding: 8px 28%;
+  }
+  .smartboard {
+    height: calc(100% - 16px);
+  }
+  .speech-bubble {
+    padding: 10px 12px;
+  }
+  .speech-bubble p {
+    font-size: 16px;
+    line-height: 1.35;
+  }
+}
+@media (max-width: 899px) {
+  .dialogue {
+    height: 220px;
+    flex-basis: 220px;
+  }
+  .classroom {
+    padding: 0 12px;
+  }
+  .speech-bubble {
+    width: 92%;
+    max-width: none;
+    padding: 10px 14px;
+  }
+  .speech-bubble--left {
+    left: 12px;
+    right: auto;
+  }
+  .speech-bubble--right {
+    right: 12px;
+    left: auto;
+  }
+  .speech-bubble p {
+    font-size: 16px;
+    line-height: 1.35;
+  }
+  .smartboard {
+    position: absolute;
+    top: 155px;
+    bottom: 110px;
+    width: calc(100% - 24px);
+    height: auto;
+  }
+  .character,
+  .character--right {
+    height: 125px;
+  }
+}
+
+/* Anchor dialogue above each portrait; longer lines grow upward. */
+.speech-bubble {
+  top: auto;
+  bottom: calc(min(75%, 450px) - 8px);
+  height: auto;
+  max-height: none;
+}
+@media (max-height: 800px) and (min-width: 900px) {
+  .speech-bubble {
+    top: auto;
+    bottom: calc(min(75%, 450px) - 8px);
+  }
+}
+@media (max-width: 899px) {
+  .speech-bubble {
+    top: auto;
+    bottom: 117px;
+  }
+}
