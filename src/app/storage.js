@@ -124,9 +124,10 @@ export function loadState(scenario, storage = window.localStorage) {
       Math.min(teacherSetup.steps.length - 1, Number.isInteger(savedSetupStep) ? savedSetupStep : 0),
     );
     const babbage = conversationDefaults();
+    // Mode is a preference, even when an outdated conversation must be discarded.
+    babbage.mode = saved.babbage?.mode === 'dev' ? 'dev' : 'live';
     if (saved.babbage?.context === assignmentContext({ teacher, design })) {
       babbage.context = saved.babbage.context;
-      babbage.mode = saved.babbage.mode === 'dev' ? 'dev' : 'live';
       babbage.history = Array.isArray(saved.babbage.history)
         ? saved.babbage.history
             .filter(

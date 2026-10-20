@@ -17,6 +17,7 @@ const mime = {
 const auditRecords = [];
 let failNextAi = false;
 let babbageCalls = 0;
+const mayaRequests = [];
 const aiFixture = {
   revision:
     '### Peer exchange\n\n1. **First post:** Explain a recommendation.\n2. **Reply:** Compare a classmate’s evidence.\n   - Explain what it reveals.\n3. **Follow-up:** Revise or defend your recommendation.',
@@ -35,6 +36,16 @@ const server = http.createServer((req, res) => {
     req.on('data', (chunk) => chunks.push(chunk));
     req.on('end', () => {
       const body = JSON.parse(Buffer.concat(chunks).toString());
+      const isMaya = body.system.startsWith('You are Maya,');
+      if (isMaya) mayaRequests.push(body);
+      const current = isMaya ? JSON.parse(body.messages.at(-2).content) : {};
+      const mayaResponse = current.design?.revision.includes('Follow-up due Sunday.')
+        ? 'The new directions say “Follow-up due Sunday.” That answers my earlier timing question. I still need to compare a classmate’s evidence and explain what I learned from it, but now I can plan when to return to the discussion.'
+        : current.design?.revision.includes('Choose a metaphor')
+        ? '“Choose a metaphor in the poem” gives me somewhere to start. Before, I could just agree with two people. Now I need two lines to explain my reading, so I have something specific to discuss. Which poem are we using?'
+        : current.design?.revision.includes('Compare two t-test outputs')
+          ? 'Now I need to “Compare two t-test outputs” and have someone check an assumption instead of just replying twice. I can see what I would work on with a classmate. Where do I get the outputs?'
+          : 'The old directions let me finish and reply twice. Now I need to “Compare a classmate’s evidence” and explain what it reveals. That gives me a reason to read carefully. I would want to know when the follow-up is due before I plan my week.';
       const intent = JSON.parse(body.messages.at(-1).content).request_intent;
       const answered = body.messages.some(
         (turn) => turn.role === 'user' && turn.content.includes('clarification_answers'),
@@ -44,12 +55,12 @@ const server = http.createServer((req, res) => {
       const data = {
         status: 'ok',
         analysis: {
-          feedback_summary: answered
+          feedback_summary: isMaya ? mayaResponse : answered
             ? 'You can generate a revision.'
             : 'Please clarify the follow-up.',
           input_quality: {
-            usable: answered,
-            concerns: answered ? [] : ['What should students do after receiving a reply?'],
+            usable: isMaya || answered,
+            concerns: isMaya || answered ? [] : ['What should students do after receiving a reply?'],
           },
           revised_discussion_prompt: intent === 'revise' ? aiFixture.revision : '',
           revision_review: { why_these_changes: intent === 'revise' ? aiFixture.reason : '' },
@@ -155,6 +166,44 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       evaluate(
         'document.querySelector(' + JSON.stringify('[data-action="' + action + '"]') + ').click()',
       );
+    const key = async (key, code, virtualKey, modifiers = 0) => {
+      for (const type of ['keyDown', 'keyUp'])
+        await send('Input.dispatchKeyEvent', { type, key, code, windowsVirtualKeyCode: virtualKey, modifiers,
+          ...(type === 'keyDown' && ['Enter', ' '].includes(key) ? { text: key === 'Enter' ? '\r' : ' ', unmodifiedText: key === 'Enter' ? '\r' : ' ' } : {}),
+        });
+    };
+    const keyboardReach = async (selector) => {
+      for (let i = 0; i < 45; i++) {
+        if (await evaluate(`document.activeElement.matches(${JSON.stringify(selector)})`)) return;
+        await key('Tab', 'Tab', 9);
+      }
+      throw Error('Keyboard could not reach ' + selector + ': ' + JSON.stringify(await evaluate('({active:document.activeElement.outerHTML.slice(0,240),title:document.querySelector("h1")?.textContent,actions:[...document.querySelectorAll("[data-action]")].map(el=>({action:el.dataset.action,disabled:el.disabled}))})')));
+    };
+    const keyboardActivate = async (action) => {
+      await keyboardReach(`[data-action="${action}"]`);
+      await key('Enter', 'Enter', 13);
+    };
+    const accessibleScreen = async (label) => {
+      const issues = await evaluate(`(() => {
+        const issues = [];
+        const ids = [...document.querySelectorAll('[id]')].map(el => el.id);
+        if (new Set(ids).size !== ids.length) issues.push('Duplicate IDs');
+        for (const el of document.querySelectorAll('[aria-labelledby], [aria-describedby], [aria-controls]'))
+          for (const attr of ['aria-labelledby', 'aria-describedby', 'aria-controls'])
+            for (const id of (el.getAttribute(attr) || '').split(/\\s+/).filter(Boolean))
+              if (!document.getElementById(id)) issues.push('Missing ' + attr + ': ' + id);
+        for (const el of document.querySelectorAll('input:not([type=hidden]), textarea, [role=textbox]'))
+          if (!el.labels?.length && !el.getAttribute('aria-label') && !el.getAttribute('aria-labelledby'))
+            issues.push('Unnamed input: ' + (el.id || el.name));
+        if (document.querySelector('[tabindex]:not([tabindex="0"]):not([tabindex="-1"])'))
+          issues.push('Unexpected positive tab order');
+        return issues;
+      })()`);
+      assert.deepEqual(issues, [], label + ' labels and ARIA references');
+      const { nodes } = await send('Accessibility.getFullAXTree');
+      for (const node of nodes.filter(node => !node.ignored && ['button', 'textbox', 'radio', 'checkbox', 'tab', 'dialog'].includes(node.role?.value)))
+        assert(node.name?.value?.trim(), label + ' accessible name: ' + node.role.value);
+    };
     const fill = async (name, value) =>
       name === 'revision' ? evaluate(
         `(async () => {
@@ -252,11 +301,51 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       await waitFor(
         '!!document.querySelector("#scene-title") || !!document.querySelector("#setup-title")',
       );
-      const state = initialState(scenario);
-      state.phase = 'summary';
-      state.teacher.directions = 'Explain a recommendation. Reply to two classmates.';
-      state.teacher.learningGoal = 'Compare evidence and explain a choice.';
-      state.teacher.mustStay = 'Keep the topic and due date.';
+      // Walk the actual opening and handoff instead of beginning only from a seeded summary.
+      await evaluate('localStorage.removeItem("promptcraft_next_opening_v1"); location.reload()');
+      await waitFor('!!document.querySelector("#scene-title")');
+      await evaluate('document.querySelector("#scene-title").focus()');
+      for (const scene of scenario.scenes) {
+        assert.equal(await evaluate('document.querySelector("#scene-title").textContent'), scene.title);
+        await keyboardActivate('reveal-board');
+        if (scene.choice) {
+          await keyboardActivate('reveal-question');
+          await keyboardReach('input[name="scene-choice"]');
+          await key(' ', 'Space', 32);
+          const correct = scene.choice.options.find(option => option.correct).id;
+          for (let i = 0; i < scene.choice.options.length; i++) {
+            if (await evaluate('document.activeElement.value') === correct) break;
+            await key('ArrowRight', 'ArrowRight', 39);
+          }
+          assert.equal(await evaluate('document.querySelector("input:checked").value'), correct);
+          assert(await evaluate('document.querySelector("#choice-feedback").getAttribute("aria-live") === "polite"'));
+          await accessibleScreen(device + ' playable choice');
+        }
+        await keyboardActivate(scene.id === scenario.scenes.at(-1).id ? 'start-setup' : 'next');
+        assert(['scene-title', 'setup-title'].includes(await evaluate('document.activeElement.id')), 'Navigation moves focus to the new screen heading');
+      }
+      await fill('subject', 'Environmental science');
+      await fill('learnerLevel', 'First-year college');
+      await accessibleScreen(device + ' course setup');
+      await keyboardActivate('setup-next');
+      await fill('directions', 'Explain a recommendation. Reply to two classmates.');
+      await keyboardActivate('setup-next');
+      await fill('learningGoal', 'Compare evidence and explain a choice.');
+      await keyboardActivate('setup-next');
+      await fill('workTime', '60 minutes');
+      await fill('daysAvailable', 'One week');
+      await keyboardActivate('setup-next');
+      await fill('mustStay', 'Keep the topic and due date.');
+      await keyboardActivate('setup-next');
+      await keyboardReach('[data-summary-section="0"]');
+      await key('ArrowRight', 'ArrowRight', 39);
+      assert.equal(await evaluate('document.activeElement.dataset.summarySection'), '1');
+      await key('End', 'End', 35);
+      assert.equal(await evaluate('document.activeElement.dataset.summarySection'), '4');
+      await key('Home', 'Home', 36);
+      assert.equal(await evaluate('document.activeElement.dataset.summarySection'), '0');
+      await accessibleScreen(device + ' editable summary');
+      const state = await evaluate('JSON.parse(localStorage.getItem("promptcraft_next_opening_v1"))');
       state.design.previousRevision = '## Earlier assignment\n\n1. Explain a different recommendation.\n2. Compare two examples.\n\nKeep this earlier topic separate from the current directions.';
       await evaluate(
         'localStorage.setItem("promptcraft_next_opening_v1",' +
@@ -391,6 +480,8 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
         await goBabbage();
         await click('ask-ai');
         await waitFor('!!document.querySelector("[data-clarification-answer]")');
+        assert(await evaluate('document.activeElement.matches("[data-clarification-answer]")'), 'Babbage completion focuses the clarification answer');
+        await accessibleScreen(device + ' Babbage clarification');
         assert(
           await evaluate('!document.querySelector("[data-action=apply-ai]")'),
           'No revision before clarification',
@@ -429,8 +520,10 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       assert.equal(await evaluate('JSON.parse(localStorage.getItem("promptcraft_next_opening_v1")).design.revision'), beforeAi);
       await click('generate-ai');
       await evaluate('document.querySelector("[data-design-panel=revision]").click()');
+      await evaluate('document.querySelector("#revision").focus()');
       await fill('revision', 'My newer draft.');
       await waitFor('document.querySelector(".ai-status").textContent.includes("changed while")');
+      assert.equal(await evaluate('document.activeElement.id'), 'revision', 'A delayed response preserves editor focus');
       assert.equal(
         await evaluate('JSON.parse(localStorage.getItem("promptcraft_next_opening_v1")).design.revision'),
         'My newer draft.',
@@ -487,6 +580,47 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       await assertGuidedFit();
       assert.equal(await evaluate('document.querySelector("#reason").value'), aiFixture.reason);
       await shot(device + '-draft-reason');
+      await accessibleScreen(device + ' final rationale');
+      const savedBeforeMaya = await evaluate('localStorage.getItem("promptcraft_next_opening_v1")');
+      await keyboardActivate('hear-maya');
+      assert.equal(await evaluate('document.activeElement.hasAttribute("data-maya-close")'), true);
+      await key('Tab', 'Tab', 9);
+      assert.equal(await evaluate('document.activeElement.hasAttribute("data-maya-ask")'), true, 'Maya has a logical keyboard order');
+      await key('Enter', 'Enter', 13);
+      await waitFor('document.querySelector("[data-maya-status]").textContent.includes("ready below")');
+      assert(await evaluate('document.querySelector("[data-maya-response]").textContent.includes("Compare a classmate’s evidence")'));
+      assert(await evaluate('document.querySelector("[data-maya-status]").getAttribute("aria-live") === "polite"'));
+      await accessibleScreen(device + ' Maya response');
+      await shot(device + '-maya-response');
+      // Native modal focus is trapped; Shift+Tab from Close wraps within the dialog.
+      await evaluate('document.querySelector("[data-maya-close]").focus()');
+      await key('Tab', 'Tab', 9, 8);
+      assert(await evaluate('!!document.activeElement.closest(".maya-dialog")'));
+      await key('Escape', 'Escape', 27);
+      await waitFor('!document.querySelector(".maya-dialog")');
+      assert.equal(await evaluate('document.activeElement.dataset.action'), 'hear-maya');
+      assert.equal(await evaluate('localStorage.getItem("promptcraft_next_opening_v1")'), savedBeforeMaya, 'Maya does not change saved work or approval');
+      await keyboardActivate('hear-maya');
+      assert(await evaluate('document.querySelector("[data-maya-status]").textContent.includes("earlier response")'));
+      // Explicit preview makes no network call and is never represented as Maya's analysis.
+      const callsBeforePreview = babbageCalls;
+      await evaluate('document.querySelector("[data-maya-preview]").click()');
+      assert.equal(babbageCalls, callsBeforePreview);
+      assert(await evaluate('document.querySelector("[data-maya-status]").textContent.includes("no AI interpretation")'));
+      await evaluate('document.querySelector("[data-maya-close]").click()');
+      await waitFor('!document.querySelector(".maya-dialog")');
+      await click('design-back');
+      const revisedAfterMaya = await evaluate('JSON.parse(localStorage.getItem("promptcraft_next_opening_v1")).design.revision');
+      await fill('revision', revisedAfterMaya + '\n\nFollow-up due Sunday.');
+      await click('design-next');
+      await click('hear-maya');
+      assert.equal(await evaluate('document.querySelector("[data-maya-response]").textContent'), '', 'An edited draft does not reuse the earlier response');
+      await evaluate('document.querySelector("[data-maya-ask]").click()');
+      await waitFor('document.querySelector("[data-maya-status]").textContent.includes("ready below")');
+      assert(await evaluate('document.querySelector("[data-maya-response]").textContent.includes("answers my earlier timing question")'));
+      assert(mayaRequests.at(-1).messages.some(turn => turn.role === 'assistant' && turn.content.includes('when the follow-up is due')), 'The next reading includes relevant earlier student feedback');
+      await evaluate('document.querySelector("[data-maya-close]").click()');
+      await waitFor('!document.querySelector(".maya-dialog")');
       assert.equal(
         await evaluate(
           'JSON.parse(localStorage.getItem("promptcraft_next_opening_v1")).teacher.directions',
@@ -618,6 +752,22 @@ Check that your post, peer reply, and follow-up meet the original topic, word-co
       await evaluate('document.querySelector(".guide-preview button").click()');
       await waitFor('!document.querySelector(".guide-preview")');
       await click('approve-version');
+      const downloadPath = path.join(root, 'artifacts/downloads', device + '-' + Date.now());
+      fs.mkdirSync(downloadPath, { recursive: true });
+      await send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath });
+      await click('download-guide');
+      let downloaded;
+      for (let i = 0; i < 100; i++) {
+        downloaded = fs.readdirSync(downloadPath).find(file => file.endsWith('.html'));
+        if (downloaded) break;
+        await pause(50);
+      }
+      assert(downloaded, 'Approved Course Guide downloads');
+      const guideHTML = fs.readFileSync(path.join(downloadPath, downloaded), 'utf8');
+      assert(guideHTML.includes('Approved milestone'));
+      assert(guideHTML.includes('Compare evidence and explain a choice.'));
+      assert(guideHTML.includes('Students use a reply to reconsider their reasons.'));
+      assert(guideHTML.includes('data:image/svg+xml'), 'Downloaded guide includes its offline logo');
       await evaluate('location.reload()');
       await waitFor('!!document.querySelector("[data-action=approve-version]")');
       assert(
@@ -704,6 +854,55 @@ Check that your post, peer reply, and follow-up meet the original topic, word-co
         false,
         'Clarification resolves unsure learning goal',
       );
+      for (const [name, original, revision, phrase] of [
+        ['statistics', 'Write a t-test report and reply twice.', 'Compare two t-test outputs. Ask a peer to check one assumption, then revise or defend the interpretation.', 'check an assumption'],
+        ['poetry', 'Describe a poem and agree or disagree with two classmates.', 'Choose a metaphor in the poem. Compare a classmate’s reading with two lines from the poem, then revise or defend your interpretation.', 'two lines'],
+      ]) {
+        const mayaState = initialState(scenario);
+        mayaState.phase = 'design';
+        mayaState.designStep = 2;
+        mayaState.designPanel = 'reason';
+        mayaState.teacher.directions = original;
+        mayaState.design.sourceDirections = original;
+        mayaState.design.revision = revision;
+        await evaluate('localStorage.setItem("promptcraft_next_opening_v1",' + JSON.stringify(JSON.stringify(mayaState)) + ');location.reload()');
+        await waitFor('!!document.querySelector("[data-action=hear-maya]")');
+        const savedMayaAssignment = await evaluate('localStorage.getItem("promptcraft_next_opening_v1")');
+        await click('hear-maya');
+        await evaluate('document.querySelector("[data-maya-ask]").click()');
+        await waitFor('document.querySelector("[data-maya-status]").textContent.includes("ready below")');
+        assert(await evaluate('document.querySelector("[data-maya-response]").textContent.includes(' + JSON.stringify(phrase) + ')'));
+        await shot(device + '-maya-' + name);
+        await evaluate('document.querySelector("[data-maya-close]").click()');
+      await waitFor('!document.querySelector(".maya-dialog")');
+        assert.equal(await evaluate('localStorage.getItem("promptcraft_next_opening_v1")'), savedMayaAssignment);
+        await evaluate('location.reload()');
+        await waitFor('!!document.querySelector("[data-action=hear-maya]")');
+        await click('hear-maya');
+        assert.equal(await evaluate('document.querySelector("[data-maya-response]").textContent'), '', 'Refresh does not restore an obsolete Maya reading');
+        failNextAi = true;
+        await evaluate('document.querySelector("[data-maya-ask]").click()');
+        await waitFor('document.querySelector("[data-maya-status]").textContent.includes("usage limit")');
+        assert.equal(await evaluate('document.querySelector("[data-maya-response]").textContent'), '', 'Service errors do not create pretend student feedback');
+        await evaluate('document.querySelector("[data-maya-ask]").click()');
+        await evaluate('document.querySelector("[data-maya-close]").click()');
+      await waitFor('!document.querySelector(".maya-dialog")');
+        await pause(300);
+        assert.equal(await evaluate('!!document.querySelector(".maya-dialog")'), false, 'Closing cancels the pending response');
+        if (name === 'poetry') {
+          // A stale conversation must not change a deliberately selected offline mode.
+          await evaluate('(() => {const s=JSON.parse(localStorage.getItem("promptcraft_next_opening_v1"));s.babbage.mode="dev";s.babbage.context="outdated";localStorage.setItem("promptcraft_next_opening_v1",JSON.stringify(s));location.reload()})()');
+          await waitFor('!!document.querySelector("[data-action=hear-maya]")');
+          const beforeDevMaya = babbageCalls;
+          await click('hear-maya');
+          await evaluate('document.querySelector("[data-maya-ask]").click()');
+          assert(await evaluate('document.querySelector("[data-maya-response]").textContent.includes("Choose a metaphor")'));
+          assert(await evaluate('document.querySelector("[data-maya-status]").textContent.includes("no AI interpretation")'));
+          assert.equal(babbageCalls, beforeDevMaya, 'Maya Dev preview makes no API calls');
+          await evaluate('document.querySelector("[data-maya-close]").click()');
+      await waitFor('!document.querySelector(".maya-dialog")');
+        }
+      }
       const opening = initialState(scenario);
       opening.sceneId = 'spot-hole';
       opening.storyStage = 'board';
@@ -874,7 +1073,7 @@ Check that your post, peer reply, and follow-up meet the original topic, word-co
         await evaluate('document.documentElement.scrollWidth<=innerWidth+1'),
         'Restart action fits the header',
       );
-      console.log(device + ' PASS: design flow, starter, edits, Back, reload, responsive layout.');
+      console.log(device + ' PASS: keyboard opening-to-guide flow, Babbage accept/adapt/reject, Maya readings and revisions, labels/AX tree, guide download, resume/reset, responsive layout. Mocked AI only.');
     }
     assert.deepEqual(errors, []);
     fs.writeFileSync(path.join(output, 'responsive-audit.json'), JSON.stringify({browser: 'Chrome', viewports: [...new Set(auditRecords.map(record => `${record.width}×${record.height}`))], screenshots: auditRecords.length, checks: ['Horizontal overflow', 'Button text clipping', 'Dialog overflow', 'Workflow navigation and persistence', 'Story content bounds', 'Summary and guided card width'], screens: auditRecords}, null, 2));

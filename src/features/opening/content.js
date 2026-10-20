@@ -29,7 +29,7 @@ export const discussionOpening = {
   contentVersion: 1,
   title: 'Give the discussion a job',
   endNote:
-    'In the next build, you will bring one discussion from your course. Babbage will help you identify a gap, explore possibilities, and build a before-and-after example using your topic.',
+    'Now bring one discussion from your course. Identify a gap, explore possibilities with Babbage if you choose, and build a before-and-after example using your topic.',
   characters: {
     maya: {
       id: 'maya',

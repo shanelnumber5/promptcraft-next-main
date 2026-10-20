@@ -55,8 +55,8 @@ export const designSteps = [
       },
       {
         id: 'notes',
-        label: 'How would this kind of reply help students learn?',
-        help: 'Explain how the reply could address the problem you described.',
+        label: 'Optional: What might this reply help students notice?',
+        help: 'Make a short prediction before drafting, or leave this blank. You can reconsider it later; your final rationale will explain the change you actually chose.',
         type: 'textarea',
         placeholder:
           'For example, a question could help students notice a weakness in their explanation.',

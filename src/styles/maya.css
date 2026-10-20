@@ -1,0 +1,48 @@
+.maya-dialog {
+  width: min(720px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  overflow: auto;
+  border: 2px solid var(--gold);
+  border-radius: 14px;
+  color: var(--ink);
+  background: var(--paper);
+  font-size: 16px;
+}
+.maya-dialog::backdrop { background: rgb(8 26 54 / 70%); }
+.maya-dialog header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 3px solid var(--gold);
+  background: var(--navy);
+  color: white;
+}
+.maya-dialog header img { object-fit: contain; }
+.maya-dialog h2 { margin: 0; font-size: 23px; }
+.maya-dialog header p { margin: 4px 0 0; }
+.maya-dialog header button { margin-left: auto; }
+.maya-body { padding: 16px; }
+.maya-body > p:first-child { margin-top: 0; }
+.maya-body [data-maya-response]:not(:empty) {
+  padding: 16px;
+  border-left: 4px solid var(--gold);
+  background: var(--gold-pale);
+  line-height: 1.6;
+}
+.maya-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+.maya-actions button { white-space: normal; }
+@media (max-width: 600px) {
+  .maya-dialog header {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 12px;
+  }
+  .maya-dialog header img { width: 48px; height: 60px; }
+  .maya-dialog h2 { font-size: 20px; line-height: 1.3; }
+  .maya-dialog header p { font-size: 16px; line-height: 1.35; }
+  .maya-dialog header button { padding: 6px 12px; min-height: 44px; }
+}

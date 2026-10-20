@@ -25,9 +25,20 @@ import { openReferences } from '../shared/reference-dialog.js';
 import { highlightNextAction } from '../shared/next-action.js';
 import { renderAssignmentDirections } from '../shared/directions.js';
 import { serializeDirectionsEditor, formatDirectionsEditor } from '../shared/directions-editor.js';
+import { openMayaDialog } from '../features/design/maya-dialog.js';
 
 const app = document.getElementById('app');
 app.addEventListener('submit', (event) => event.preventDefault());
+app.addEventListener('keydown', (event) => {
+  const tab = event.target.closest('[data-summary-section]');
+  if (!tab || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+  event.preventDefault();
+  const tabs = [...app.querySelectorAll('[data-summary-section]')];
+  const index = tabs.indexOf(tab);
+  const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1
+    : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+  tabs[next]?.click();
+});
 let state,
   summarySection = 0;
 const ai = { configured: null, pending: false, suggestion: null, error: '', context: '' };
@@ -384,6 +395,10 @@ app.addEventListener('click', async (event) => {
   else if (action === 'previous-question') moveQuestion(-1);
   else if (action === 'send-clarification') await askBabbage('clarify', true);
   else if (action === 'generate-ai') await askBabbage('revise');
+  else if (action === 'hear-maya') {
+    if (ai.pending || !state.design.revision.trim()) return;
+    openMayaDialog(state, event.target.closest('[data-action]'));
+  }
   else if (action === 'toggle-dev') {
     if (ai.pending) return;
     state.babbage = {

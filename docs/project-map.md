@@ -16,6 +16,7 @@ Open `index.html` to run the app. Use this map to edit it.
 | Conversation lifecycle and stale-response protection        | `src/features/design/controller.js`                         |
 | Existing endpoint, request/response adapter, Dev simulation | `src/features/design/babbage-client.js`                     |
 | Instructions sent to Babbage                                | `src/features/design/babbage-prompt.js`                     |
+| Maya's grounded student prompt and optional reading dialog | `src/features/design/maya-client.js`, `maya-dialog.js`      |
 | Loading status and mechanical illustration                  | `src/features/design/loading.js`, `loading-illustration.js` |
 | Guide content and HTML download                             | `src/features/design/guide.js`                              |
 | Guide modal and its focus handling                          | `src/features/design/guide-preview.js`                      |

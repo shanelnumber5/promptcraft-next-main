@@ -40,3 +40,7 @@ Use recoverable Git checkpoints. Do not deploy without approval.
 ## First increment validation
 
 All four unit suites pass, including added guide milestone checks for escaping, approval labels, missing legacy notes, and links to the actual chosen directions. The mocked Chrome workflow passed desktop, wide-review, short-desktop, portrait tablet, medium-window, landscape tablet, and phone. The exhaustive viewport sweep was stopped after those first six passing sizes; the phone-only run then completed successfully. Desktop and phone rationale screenshots were visually reviewed. No live AI call or deployment was made. The complete viewport matrix was not run to completion.
+
+## Subsequent stabilization
+
+The later [Scenario 1 stabilization report](scenario1-stabilization.md) records the optional course-specific Maya reading, early-prediction clarification, focus/state fixes, Babbage prompt version, and current test results. Live service availability and generated-response quality are separate from mocked workflow validation.

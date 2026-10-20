@@ -20,6 +20,10 @@ On the drafting step, select **Check assignment details**, answer clarification 
 
 Select **Use Dev testing fallback**, or open `?mockBabbage=1`, to test without AI calls. Results are labeled **Dev testing fallback — simulated Babbage; no API call**. Switching modes resets the conversation. Live errors never silently substitute simulated output.
 
+The rationale screen offers **Hear Maya’s first read (optional)**. Maya uses her approved student profile to read your original and revised directions, including relevant earlier readings in this session. Close her response to keep working; she never edits or approves your assignment. Readings are not saved across refresh. Dev mode and the explicit offline alternative show excerpts only, without AI interpretation. Live Maya calls use the same service as Babbage and share the assignment and design context as disclosed in the dialog.
+
+The early reply reflection is an optional prediction before drafting. The final rationale explains the change you actually chose and what you will look for in student work. You can leave the prediction blank.
+
 The adapter uses the existing backend's `scenario1` request format. It maps `feedback_summary`, `input_quality`, `revised_discussion_prompt`, and `revision_review.why_these_changes` into the clarification and revision workflow. The original backend repository is separate and unchanged.
 
 ## Guide and completion
@@ -42,6 +46,8 @@ npm run test:browser
 ```
 
 Unit checks cover persistence, draft ownership, navigation, guide formatting, the active Babbage adapter, static server protection, and repository references. Browser checks cover the complete flow on desktop, short desktop, and phone. They mock Babbage and make no live AI calls. Browser tests use an installed Chrome; set `PC_CHROME_EXECUTABLE` to use another Chromium browser.
+
+Set `PC_BROWSER_DEVICE` to a comma-separated list such as `desktop,short-desktop,tablet,phone,small-phone` for targeted browser validation. Checks include keyboard navigation, accessibility-tree names, Maya's mocked readings, approved guide downloads, and resume/reset. Live Maya checks are opt-in: set `RUN_LIVE_MAYA=1` and run `node tests/manual/maya-smoke.cjs`. Review its fictional outputs for student voice and substantive differences; automated grounding alone does not establish response quality. See the [Scenario 1 stabilization report](docs/scenario1-stabilization.md) for actual results and service limits.
 
 Optional live check: set `RUN_LIVE_BABBAGE=1` and run `node tests/manual/babbage-smoke.cjs`. This sends fictional sample data to the deployed service and reports status and output lengths only.
 
