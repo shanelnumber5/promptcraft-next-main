@@ -8,7 +8,7 @@ import { renderDesignRationale } from '../../shared/design-evidence.js';
 import { renderPagedDirections } from '../../shared/paged-directions.js';
 export const aiContext = assignmentContext;
 
-function renderQuestion(conversation, available, pending, compact = false) {
+export function renderQuestion(conversation, available, pending, compact = false) {
   const index = Math.max(0, Math.min(conversation.questionIndex || 0, conversation.questions.length - 1));
   const question = conversation.questions[index];
   const answer = conversation.answers[question.id] || '';

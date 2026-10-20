@@ -1,4 +1,4 @@
-import { renderWorkspace, renderDraftPreview } from './screen.js';
+import { renderWorkspace, renderDraftPreview, workspacePreview } from './screen.js';
 import { readWorkspace, freshWorkspace, saveWorkspace, resetWorkspace } from './storage.js';
 import { findIdea } from '../idea-lab/ideas.js';
 import { createDesignController } from '../design/controller.js';
@@ -15,7 +15,7 @@ import { openReferences } from '../../shared/reference-dialog.js';
 export function mountWorkspace(app, params) {
   const restored = readWorkspace();
   let state = restored.state, readError = restored.error;
-  let designPage = 'start';
+  let designPage = state.design.revision.trim() ? 'draft' : 'start', partnerPage = 'work', reviewPage = state.finalCheck.approved ? 'guide' : 'rationale';
   const ai = { pending: false, configured: null, suggestion: null, error: '', context: '' };
   if (params.get('mockBabbage') === '1') state.babbage.mode = 'dev';
   const idea = findIdea(params.get('adapt'));
@@ -45,7 +45,7 @@ export function mountWorkspace(app, params) {
     if (state.finalCheck.context !== context) state.finalCheck = { ...finalCheckDefaults(), context };
   };
   const render = ({ focus = false } = {}) => {
-    app.innerHTML = renderWorkspace(state, ai, readError, designPage);
+    app.innerHTML = renderWorkspace(state, ai, readError, designPage, partnerPage, reviewPage);
     if (focus) document.getElementById('setup-title')?.focus({ preventScroll: true });
   };
   const controller = createDesignController({ app, getState: () => state, ai, render, saveSafely, syncFinalCheck });
@@ -90,7 +90,13 @@ export function mountWorkspace(app, params) {
       if (typeof start === 'number') target?.setSelectionRange(start, end);
     }
     const preview = app.querySelector('[data-live-preview]');
-    if (preview) preview.innerHTML = renderDraftPreview(state.design.revision);
+    if (preview) {
+      const model = workspacePreview(state, designPage);
+      preview.innerHTML = renderDraftPreview(model.text, model.empty);
+      app.querySelector('[data-preview-label]').textContent = model.label;
+    }
+    const useStarting = app.querySelector('[data-action=use-starting]');
+    if (useStarting) { useStarting.hidden = Boolean(state.design.revision.trim()); useStarting.disabled = !state.teacher.directions.trim(); }
     updateApproval();
   }
   app.addEventListener('submit', event => event.preventDefault());
@@ -127,7 +133,7 @@ export function mountWorkspace(app, params) {
     const mode = state.babbage.mode;
     if (!resetWorkspace()) { state.saveNotice = 'This browser could not reset the workspace.'; updateApproval(); return; }
     state = freshWorkspace();
-    designPage = 'start';
+    designPage = 'start'; partnerPage = 'work'; reviewPage = 'rationale';
     state.babbage.mode = mode;
     readError = '';
     Object.assign(ai, { pending: false, suggestion: null, error: '', context: '' });
@@ -135,6 +141,10 @@ export function mountWorkspace(app, params) {
     render({ focus: true });
   }
   app.addEventListener('click', async event => {
+    const partner = event.target.closest('[data-partner-page]');
+    if (partner) { partnerPage = partner.dataset.partnerPage; render(); document.getElementById('ai-title')?.focus({ preventScroll: true }); return; }
+    const review = event.target.closest('[data-review-page]');
+    if (review) { reviewPage = review.dataset.reviewPage; render(); document.getElementById('review-title')?.focus({ preventScroll: true }); return; }
     const page = event.target.closest('[data-design-page]');
     if (page) { designPage = page.dataset.designPage; render(); document.getElementById('design-page-title')?.focus({ preventScroll: true }); return; }
     const tab = event.target.closest('[data-workspace-panel]');
@@ -144,7 +154,12 @@ export function mountWorkspace(app, params) {
     const action = event.target.closest('[data-action]')?.dataset.action;
     if (action === 'reset-workspace') return reset();
     if (readError) return;
-    if (action === 'ask-ai') await controller.askBabbage();
+    if (action === 'edit-draft') { designPage = 'draft'; setPanel('revision'); document.getElementById('revision')?.focus(); }
+    else if (action === 'use-starting') {
+      if (state.design.revision.trim() || !state.teacher.directions.trim()) return;
+      state.design.revision = state.teacher.directions; state.design.sourceDirections = state.teacher.directions;
+      syncFinalCheck(); controller.syncBabbage(); designPage = 'draft'; setPanel('revision'); document.getElementById('revision')?.focus();
+    } else if (action === 'ask-ai') { partnerPage = 'work'; await controller.askBabbage(); }
     else if (action === 'next-question') controller.moveQuestion(1);
     else if (action === 'previous-question') controller.moveQuestion(-1);
     else if (action === 'send-clarification') await controller.askBabbage('clarify', true);
@@ -153,7 +168,7 @@ export function mountWorkspace(app, params) {
     else if (action === 'toggle-dev') {
       if (ai.pending) return;
       state.babbage = { ...conversationDefaults(), mode: state.babbage.mode === 'dev' ? 'live' : 'dev', context: assignmentContext(state) };
-      ai.suggestion = null; ai.error = '';
+      ai.suggestion = null; ai.error = ''; partnerPage = 'work';
       saveSafely(); render();
       if (state.babbage.mode === 'live') await controller.refreshBabbageConnection();
     } else if (action === 'apply-ai') {
@@ -165,17 +180,17 @@ export function mountWorkspace(app, params) {
       designPage = 'draft';
       setPanel('revision');
       document.getElementById('revision')?.focus();
-    } else if (action === 'dismiss-ai') { ai.suggestion = null; ai.error = 'Your draft is unchanged.'; render(); app.querySelector('[data-action="generate-ai"]')?.focus(); }
+    } else if (action === 'dismiss-ai') { ai.suggestion = null; ai.error = 'Your draft is unchanged.'; partnerPage = 'work'; render(); app.querySelector('[data-action="generate-ai"]')?.focus(); }
     else if (action === 'hear-maya' && state.design.revision.trim() && !ai.pending) openMayaDialog(state, event.target.closest('[data-action]'));
     else if (action === 'restore-earlier') {
       state.design.revision = state.design.previousRevision;
       state.design.reason = state.design.previousReason;
       syncFinalCheck(); controller.syncBabbage(); saveSafely(); render();
-    } else if (action === 'edit-context') setPanel('revision');
+    } else if (action === 'edit-context') { designPage = 'start'; setPanel('revision'); }
     else if (action === 'preview-guide') openGuidePreview(state, app);
     else if (action === 'approve-version' && finalCheckReady(state)) {
       state.finalCheck.approved = state.finalCheck.completed = true;
-      saveSafely(); updateApproval();
+      reviewPage = 'guide'; saveSafely(); render(); document.getElementById('review-title')?.focus({ preventScroll: true });
     } else if (action === 'download-guide' && finalCheckReady(state) && state.finalCheck.approved) {
       const context = assignmentContext(state);
       const logo = await loadGuideLogo();

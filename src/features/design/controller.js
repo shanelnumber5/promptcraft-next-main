@@ -56,7 +56,10 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
       ai.suggestion = null;
       app.querySelector('.ai-suggestion')?.remove();
       const panel = app.querySelector('.ai-panel');
-      if (panel) panel.outerHTML = renderAiPanel(state, ai, { compact: true });
+      if (panel) {
+        if (state.workspace) render();
+        else panel.outerHTML = renderAiPanel(state, ai, { compact: true });
+      }
     }
   }
 

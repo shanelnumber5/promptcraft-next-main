@@ -380,3 +380,68 @@ body[data-app-view]:not([data-app-view='play']) select { font-family: var(--font
 .workspace-page fieldset { padding: 4px 10px 6px; }
 .workspace-page fieldset legend { font-size: 14px; line-height: 1.4; }
 .workspace-page fieldset label { font-size: 14px; line-height: 1.4; padding: 2px 0; margin-right: 12px; }
+
+/* Babbage and Review share the same focused two-pane workspace. */
+.use-starting { margin-top: 10px; min-height: 36px; padding: 6px 12px; font-size: 14px; }
+.partner-card.ai-panel { border: 1px solid #dce5ef; padding: 0; margin: 0; }
+.workspace-shell .partner-heading.ai-panel-heading { display: flex; justify-content: flex-start; gap: 12px; align-items: center; border: 0; border-radius: 20px 20px 0 0; padding: 14px 18px; }
+.workspace-shell .partner-heading h2 { font-size: 21px; margin: 0; color: white; }
+.partner-heading img { flex-shrink: 0; }
+.partner-mode { font-size: 12px; color: #dceafa; }
+.partner-nav { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 18px 0; }
+.partner-nav button { font-size: 13px; min-height: 32px; padding: 4px 9px; border-color: #d0ddeb; background: #f4f7fb; }
+.partner-content { padding: 12px 18px; }
+.partner-content h3 { margin: 0 0 10px; font-size: 20px; }
+.partner-content p { font-size: 16px; line-height: 1.5; margin: 0 0 12px; }
+.partner-content .ai-status:empty { display: none; }
+.partner-content .babbage-questions { padding: 0; border: 0; margin: 0; background: transparent; }
+.partner-content .babbage-questions h3 { font-size: 14px; color: #405674; margin: 0 0 6px; }
+.partner-content .babbage-questions label { font-size: 16px; line-height: 1.4; display: block; margin: 0 0 8px; }
+.partner-content .babbage-questions textarea { width: 100%; height: 72px; min-height: 72px !important; margin: 0 0 6px; }
+.partner-content .answer-guidance { font-size: 13px; margin: 0 0 8px; }
+.partner-content .question-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.partner-content button { font-size: 14px; padding: 6px 12px; min-height: 38px; }
+.partner-actions { padding: 0 18px 18px; display: flex; flex-wrap: wrap; gap: 8px; }
+.partner-actions button { font-size: 14px; min-height: 40px; padding: 8px 12px; }
+.partner-content .babbage-loading { padding: 10px; margin: 0; }
+.partner-content .babbage-loading svg { max-height: 90px; }
+.partner-content .babbage-loading-copy > p { display: none; }
+.partner-content .babbage-loading-heading { font-size: 16px; }
+.partner-turn { padding: 12px 0; border-top: 1px solid #dce5ef; }
+.partner-turn strong { font-size: 14px; }
+.partner-turn p { white-space: pre-line; }
+.preview-source { font-size: 13px; color: #405674; }
+.workspace-reason { display: flex; flex-direction: column; }
+.workspace-reason > label { font-size: 16px; font-weight: 700; }
+.workspace-reason .field-help { font-size: 14px; line-height: 1.4; margin: 6px 0 12px; }
+.workspace-reason textarea { width: 100%; min-height: 120px; padding: 12px; border: 1px solid #9eb5d0; border-radius: 10px; font: inherit; resize: vertical; }
+.maya-invitation { margin-top: 14px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.maya-invitation button { font-size: 14px; min-height: 38px; padding: 6px 12px; }
+.maya-invitation span { font-size: 12px; color: #405674; }
+.review-actions { flex-wrap: wrap; }
+.review-content > p { font-size: 16px; line-height: 1.5; }
+.workspace-checks { display: grid; gap: 12px; }
+.workspace-check { display: flex; align-items: flex-start; gap: 10px; font-size: 15px; line-height: 1.35; }
+.workspace-check input { flex-shrink: 0; margin-top: 3px; width: 18px !important; height: 18px !important; }
+.workspace-check strong, .workspace-check span > span, .workspace-check small { display: block; }
+.workspace-check strong { margin-bottom: 3px; font-size: 16px; }
+.workspace-check small { color: #405674; margin-top: 4px; font-size: 13px; }
+.review-content .final-check-status { margin: 12px 0 0; font-size: 13px; color: #405674; }
+.course-guide-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 24px 0; }
+.course-guide-actions button { font-size: 16px; min-height: 44px; padding: 8px 14px; }
+@media (min-width: 1000px) and (min-height: 680px) {
+  .review-card .workspace-reason textarea { height: 110px; min-height: 90px; }
+  .review-layout .workspace-checks { gap: 10px; }
+  .review-layout .workspace-check span > span { font-size: 14px; }
+  .review-layout .workspace-check small { max-height: 36px; overflow: auto; }
+}
+@media (max-width: 700px) {
+  .partner-nav { padding-left: 14px; padding-right: 14px; }
+  .partner-content { padding: 14px; }
+  .partner-actions { padding: 0 14px 14px; }
+  .workspace-shell .partner-heading h2 { font-size: 20px; }
+}
+
+.workspace-shell--focused .design-notice:not(:empty), .workspace-shell--focused .save-notice:not(:empty) { padding: 0; margin: 10px 0 0; font-size: 12px; line-height: 1.5; }
+.workspace-shell--focused:has(.design-notice:not(:empty)) .workspace-privacy,
+.workspace-shell--focused:has(.save-notice:not(:empty)) .workspace-privacy { display: none; }
