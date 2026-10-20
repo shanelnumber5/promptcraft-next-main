@@ -1,12 +1,16 @@
 # PromptCraft Next
 
-A discussion design module: explore the lemonade example, enter your teaching context, clarify the assignment with Babbage, revise and review your directions, and save an assignment guide. Professor Pixel closes the module with the learning takeaway.
+PromptCraft offers a guided discussion-design scenario and a private assignment workspace. Explore the lemonade example with Professor Pixel, create an assignment from your own starting point, or browse Babbage’s Idea Lab for an illustrative activity to adapt.
 
 ## Run locally
 
 On Windows, open **start-local.cmd** and visit **http://127.0.0.1:3080** in Chrome. The launcher uses installed Node or VS Code's bundled runtime. With Node 22 or newer, use `npm start`. VS Code Live Server also works. There is no build step and no runtime package dependency.
 
-Progress saves in this browser under `promptcraft_next_opening_v1`. Existing saves remain compatible. Different browser addresses have separate saved progress.
+Guided progress saves under `promptcraft_next_opening_v1`; existing saves remain compatible. The separate assignment workspace saves under `promptcraft_assignment_workspace_v1`. `promptcraft_entry_v1` remembers which path to resume. Different browser addresses have separate saved progress.
+
+Fresh visits show the entry menu. Returning visits resume a valid saved path; **Home** offers **Continue Where You Left Off** and both paths. Direct links use `?view=play`, `?view=workspace`, and `?view=lab`. The Idea Lab contains 12 AI-assisted illustrative starters with search, category filtering, and details. **Adapt with Babbage** opens the private workspace without changing Scenario 1 progress or making an AI call automatically.
+
+In the workspace, use **Design**, **Babbage**, and **Review & Course Guide** to move freely. Bring an existing assignment or an idea, edit the draft, consider Maya, and review the final design. Selecting different gallery inspiration keeps your starting material and draft while resetting outdated conversation and approval. Reopening the same idea preserves approval. **Reset workspace** clears only that workspace. It currently holds one design; export a guide before deliberately replacing it. Unapplied AI suggestions and Maya readings remain session-only.
 
 Use **Restart module** in the header to begin again. A confirmation lets you keep your work or clear the module's saved answers, assignment setup, draft, and conversation. Download your guide first if you want to keep it. Restart preserves your selected live or Dev testing mode.
 
@@ -43,6 +47,7 @@ Use [the project map](docs/project-map.md) to find the file for a specific chang
 ```sh
 npm test
 npm run test:browser
+npm run test:lab
 ```
 
 Unit checks cover persistence, draft ownership, navigation, guide formatting, the active Babbage adapter, static server protection, and repository references. Browser checks cover the complete flow on desktop, short desktop, and phone. They mock Babbage and make no live AI calls. Browser tests use an installed Chrome; set `PC_CHROME_EXECUTABLE` to use another Chromium browser.
@@ -50,6 +55,8 @@ Unit checks cover persistence, draft ownership, navigation, guide formatting, th
 Set `PC_BROWSER_DEVICE` to a comma-separated list such as `desktop,short-desktop,tablet,phone,small-phone` for targeted browser validation. Checks include keyboard navigation, accessibility-tree names, Maya's mocked readings, approved guide downloads, and resume/reset. Live Maya checks are opt-in: set `RUN_LIVE_MAYA=1` and run `node tests/manual/maya-smoke.cjs`. Review its fictional outputs for student voice and substantive differences; automated grounding alone does not establish response quality. See the [Scenario 1 stabilization report](docs/scenario1-stabilization.md) for actual results and service limits.
 
 Optional live check: set `RUN_LIVE_BABBAGE=1` and run `node tests/manual/babbage-smoke.cjs`. This sends fictional sample data to the deployed service and reports status and output lengths only.
+
+`test:lab` reuses the mocked Chrome harness to check gallery/adaptation, existing assignments and starting ideas, Babbage and Maya, guide download, isolated saves, recovery, keyboard access, and sampled AA text contrast at desktop, tablet, phone, and small-phone sizes. No live AI call is made. See the [Idea Lab implementation and results](docs/idea-lab-implementation.md), [original Idea Lab brief](docs/briefs/idea-lab-request.md), and [original gameplay brief](docs/briefs/gameplay-refinement-request.md).
 
 For consistent formatting, install development dependencies with `npm install`, then use `npm run format` or `npm run format:check`. Prettier is the only development dependency. Editor indentation is defined in `.editorconfig`.
 

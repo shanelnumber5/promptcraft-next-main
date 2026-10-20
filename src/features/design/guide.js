@@ -67,7 +67,9 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
     sections.push({
       id: 'assignment-pending',
       title: 'Your assignment · revision needed',
-      body: '<section class="assignment"><div class="assignment-banner"><h2>Your current assignment needs a revision</h2></div><div class="assignment-content"><p>Return to Draft one manageable change. Write revised directions or generate a suggestion, then choose Use these directions in my draft. Review and approve that version before downloading your guide.</p></div></section>',
+      body: workspace
+        ? '<section class="assignment"><div class="assignment-banner"><h2>Your assignment design is still in progress</h2></div><div class="assignment-content"><p>Use the Design tab to write directions, or collaborate with Babbage and choose a suggestion to edit. Return to Review &amp; Course Guide to explain and approve your design before downloading.</p></div></section>'
+        : '<section class="assignment"><div class="assignment-banner"><h2>Your current assignment needs a revision</h2></div><div class="assignment-content"><p>Return to Draft one manageable change. Write revised directions or generate a suggestion, then choose Use these directions in my draft. Review and approve that version before downloading your guide.</p></div></section>',
     });
   if (design.revision.trim() || design.reason.trim())
     sections.push({

@@ -19,6 +19,7 @@ export function mountWorkspace(app, params) {
   if (params.get('mockBabbage') === '1') state.babbage.mode = 'dev';
   const idea = findIdea(params.get('adapt'));
   if (idea && !readError) {
+    const changedInspiration = state.workspace.ideaId !== idea.id;
     state.workspace.ideaId = idea.id;
     if (!state.teacher.directions.trim()) {
       state.workspace.sourceKind = 'idea';
@@ -26,8 +27,10 @@ export function mountWorkspace(app, params) {
       state.design.sourceDirections = state.teacher.directions;
     }
     state.designPanel = 'babbage';
-    state.babbage = { ...conversationDefaults(), mode: state.babbage.mode };
-    state.finalCheck = finalCheckDefaults();
+    if (changedInspiration) {
+      state.babbage = { ...conversationDefaults(), mode: state.babbage.mode };
+      state.finalCheck = finalCheckDefaults();
+    }
     saveWorkspace(state);
   }
   if (params.has('adapt')) {

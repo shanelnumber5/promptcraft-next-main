@@ -11,6 +11,25 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
   };
   const fillId = async (id, value, type = 'input') => evaluate(`(() => {const el=document.getElementById(${JSON.stringify(id)}); el.value=${JSON.stringify(value)};el.dispatchEvent(new Event(${JSON.stringify(type)},{bubbles:true}));})()`);
   const closeMaya = async () => { await evaluate('document.querySelector("[data-maya-close]").click()'); await waitFor('!document.querySelector(".maya-dialog")'); };
+  const contrast = async () => {
+    const issues = await evaluate(`(() => {
+      const parse = color => (color.match(/[\\d.]+/g) || []).map(Number);
+      const luminance = rgb => rgb.slice(0,3).map(v => v/255).map(v => v <= .04045 ? v/12.92 : ((v+.055)/1.055)**2.4).reduce((sum,v,i) => sum+v*[.2126,.7152,.0722][i],0);
+      const issues = [];
+      for (const el of document.querySelectorAll('.entry-shell h1, .idea-label, .idea-tags span, .action-link, .workspace-tabs button, .workspace-shell .setup-field > label')) {
+        if (!el.getBoundingClientRect().height || el.disabled) continue;
+        let node=el, background;
+        while(node) { const rgb=parse(getComputedStyle(node).backgroundColor); if(rgb.length===3 || rgb[3]===1) {background=rgb;break;} node=node.parentElement; }
+        if(!background) background=[255,255,255];
+        const style=getComputedStyle(el), a=luminance(parse(style.color)), b=luminance(background);
+        const ratio=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+        const large=parseFloat(style.fontSize)>=24 || (parseFloat(style.fontSize)>=18.66 && parseInt(style.fontWeight)>=700);
+        if(ratio < (large ? 3 : 4.5)) issues.push(el.textContent.trim().slice(0,50)+': '+ratio.toFixed(2));
+      }
+      return issues;
+    })()`);
+    assert.deepEqual(issues, [], 'New visible text meets AA contrast thresholds');
+  };
   for (const [device, width, height] of [['desktop', 1440, 1000], ['tablet', 768, 1024], ['phone', 390, 844], ['small-phone', 320, 568]].filter(([device]) => !process.env.PC_BROWSER_DEVICE || process.env.PC_BROWSER_DEVICE.split(',').includes(device))) {
     await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 600 });
     await goto('?view=home');
@@ -18,6 +37,7 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await waitFor('!!document.querySelector("#entry-title")');
     assert(!await evaluate('document.body.textContent.includes("Continue Where You Left Off")'));
     await accessibleScreen(device + ' entry');
+    await contrast();
     await shot('lab-' + device + '-home');
     const guided = initialState(scenario);
     guided.sceneId = 'meet-plan'; guided.storyStage = 'board';
@@ -34,6 +54,7 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await fillId('idea-search', 'shift');
     assert.equal(await evaluate('document.querySelectorAll(".idea-card").length'), 1);
     await accessibleScreen(device + ' gallery search');
+    await contrast();
     await shot('lab-' + device + '-filtered');
     await follow('.idea-card a[href*="shift-change"]');
     await waitFor('document.querySelector("#entry-title")?.textContent.includes("Shift-Change")');
@@ -52,6 +73,7 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await fill('mustStay', 'Use a fictional staffing case and preserve the existing rubric.');
     await fillId('student-needs', 'Flexible timing and readable materials; no special software.');
     await accessibleScreen(device + ' workspace design');
+    await contrast();
     await shot('lab-' + device + '-design');
     await keyboardReach('[data-workspace-panel="revision"]');
     await key('ArrowRight', 'ArrowRight', 39);
@@ -112,6 +134,9 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await evaluate('location.reload()');
     await waitFor('!!document.querySelector("[data-action=download-guide]")');
     assert(await evaluate('!document.querySelector("[data-action=download-guide]").disabled'), 'Approval survives refresh');
+    await goto('?view=workspace&adapt=shift-change');
+    await waitFor('!!document.querySelector(".workspace-shell")');
+    assert(await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.finalCheck.approved'), 'Reopening the same inspiration does not discard approval');
     await goto('?view=home');
     assert(await evaluate('document.querySelector(".resume-card a").href.includes("view=workspace")'));
     await follow('.resume-card a');
@@ -140,6 +165,15 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await evaluate('document.querySelector("[data-action=confirm-restart]").click()');
     await waitFor('!!document.querySelector("#revision")');
     assert.equal(await evaluate('localStorage.getItem("promptcraft_next_opening_v1")'), guidedRaw);
+    assert.equal(await evaluate('document.querySelector("input[name=sourceKind]:checked").value'), 'existing');
+    await fill('directions', 'Existing assignment: compare two recommendations.');
+    await fill('revision', 'My independent recommendation report.');
+    await fill('directions', 'Existing assignment updated: compare three recommendations.');
+    assert.equal(await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.design.revision'), '', 'A changed baseline archives the previous draft');
+    assert.equal(await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.design.previousRevision'), 'My independent recommendation report.');
+    await evaluate('document.querySelector(".workspace-draft details summary").click()');
+    await click('restore-earlier');
+    assert.equal(await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.design.revision'), 'My independent recommendation report.');
     await evaluate('localStorage.setItem("promptcraft_assignment_workspace_v1","{broken");location.reload()');
     await waitFor('!!document.querySelector("[data-action=reset-workspace]")');
     assert.equal(await evaluate('localStorage.getItem("promptcraft_assignment_workspace_v1")'), '{broken');
