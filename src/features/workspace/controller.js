@@ -128,7 +128,7 @@ export function mountWorkspace(app, params) {
     formatDirectionsEditor(editor, 'insertHTML', renderAssignmentDirections((event.clipboardData || event.dataTransfer).getData('text/plain')));
   });
   async function reset() {
-    if (!(await confirmRestart({ title: 'Reset this assignment workspace?', description: 'This clears only the private workspace, including its draft, inspiration, and conversation. Scenario 1 progress stays saved.', confirmLabel: 'Reset workspace' }))) return;
+    if (!(await confirmRestart({ title: 'Reset this discussion workspace?', description: 'This clears only the private workspace, including its draft, inspiration, and conversation. Scenario 1 progress stays saved.', confirmLabel: 'Reset workspace' }))) return;
     ai.requestController?.abort();
     const mode = state.babbage.mode;
     if (!resetWorkspace()) { state.saveNotice = 'This browser could not reset the workspace.'; updateApproval(); return; }

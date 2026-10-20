@@ -128,7 +128,7 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     const request = apiRequests.at(-1);
     assert.equal(request.analysis_type, 'scenario1');
     assert.equal(JSON.parse(request.messages[0].content).workspace.idea.id, 'shift-change');
-    assert(request.system.includes('Do not force a forum'));
+    assert(request.system.includes('This prototype supports discussion forum activities only'));
     await evaluate('(() => {const el=document.querySelector("[data-clarification-answer]");el.value="Keep the case, existing rubric, and 60 minute workload.";el.dispatchEvent(new Event("input",{bubbles:true}));})()');
     await click('send-clarification');
     await waitFor('!!document.querySelector("[data-action=generate-ai]")');

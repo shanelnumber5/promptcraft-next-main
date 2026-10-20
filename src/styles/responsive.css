@@ -1,8 +1,8 @@
 /* Desktop keeps the characters in the room; smaller screens use one speaker panel. */
 .suggested-next {
-  outline: 3px solid #e8af27;
-  outline-offset: 4px;
-  box-shadow: 0 0 0 7px #e8af2726, 0 0 22px #e8af2799;
+  outline: 2px solid #a9740d;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px #edaa0029;
 }
 .suggested-next:focus-visible {
   outline-color: #007cac;
@@ -349,4 +349,3 @@
     margin: 0 auto 12px;
   }
 }
-

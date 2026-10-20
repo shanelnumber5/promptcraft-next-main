@@ -7,8 +7,32 @@ const assert = require('node:assert/strict');
   const { starterDraft, removeRepeatedStarterExchanges } = await import(
     '../../src/features/design/content.js'
   );
+  const { instructions } = await import('../../src/features/design/babbage-prompt.js');
   const { teacherSetup } = await import('../../src/features/setup/content.js');
+  const { renderTeacherStep, renderTeacherSummary } = await import(
+    '../../src/features/setup/screen.js'
+  );
   assert.equal(teacherSetup.steps.length, 5);
+  const previewTeacher = {
+    ...initialState(scenario).teacher,
+    directions: '### First post\nDescribe your recommendation.',
+  };
+  const setupPreviews = teacherSetup.steps.map((_, index) =>
+    renderTeacherStep(teacherSetup, index, previewTeacher),
+  );
+  const summaryPreviews = teacherSetup.steps.map((_, index) =>
+    renderTeacherSummary(teacherSetup, previewTeacher, '', index),
+  );
+  for (const screen of [...setupPreviews, ...summaryPreviews]) {
+    assert.match(screen, /Discussion-board design/);
+    assert.match(screen, /not an all-in-one replacement/);
+    assert.match(screen, /data-setup-live-preview/);
+    assert.match(screen, /<h4>First post<\/h4>/);
+  }
+  assert.match(teacherSetup.steps[1].intro, /discussion board belongs/);
+  assert.match(instructions, /one bounded discussion-board component within the larger assignment/);
+  assert.match(instructions, /distinctive, feasible forum mechanism that fits this course/);
+  assert.match(instructions, /not an all-in-one replacement/);
   const legacySetupRecords = new Map();
   const legacySetupStorage = {
     getItem: (key) => legacySetupRecords.get(key),
@@ -51,7 +75,7 @@ const assert = require('node:assert/strict');
     'Guide excludes an unrelated earlier draft',
   );
   assert.ok(!protectedGuide.includes('Old example reason.'));
-  assert.ok(protectedGuide.includes('Your current assignment needs a revision'));
+  assert.ok(protectedGuide.includes('Your discussion-board component is still in progress'));
   assert.throws(() => downloadGuide(unrelated, { teacher: currentTeacher }), /current assignment/);
   const currentGuide = createGuide(
     {
@@ -88,6 +112,20 @@ const assert = require('node:assert/strict');
   assert.ok(report.includes('<strong>First post:</strong>'));
   assert.ok(report.includes('<br>Use your own output.'));
   assert.ok(!report.includes('<script>'));
+  const structuredDiscussion = renderAssignmentDirections(
+    'First post: Explain your recommendation.\n\nPeer reply:\nCompare the recommendation with course evidence.\n\nFollow-up: Revise or defend your choice.',
+  );
+  assert.ok(
+    structuredDiscussion.includes('<h4>First post</h4><p>Explain your recommendation.</p>'),
+  );
+  assert.ok(
+    structuredDiscussion.includes(
+      '<h4>Peer reply</h4><p>Compare the recommendation with course evidence.</p>',
+    ),
+  );
+  assert.ok(
+    structuredDiscussion.includes('<h4>Follow-up</h4><p>Revise or defend your choice.</p>'),
+  );
   const nestedReport = renderAssignmentDirections(
     'Week 8 Forum: Independent-Samples *t*-Test\nStep 1: Post your analysis plan\n1. Question\n2. Variable\n3. Groups\n4. Assumption check:\n- Independence\n- Output checks\n1. Current decision\n2. AI disclosure\nStep 2: Investigate a classmate',
   );
@@ -277,7 +315,7 @@ const assert = require('node:assert/strict');
   assert.equal(saved().designPanel, 'notes');
   input('notes', 'Use evidence to reconsider a choice.');
   click('design-next');
-  assert.match(app.innerHTML, /Draft one manageable change/);
+  assert.match(app.innerHTML, /Design one focused discussion-board activity/);
   click('use-starter');
   assert.match(saved().design.revision, /Compare a classmate/);
   assert.equal(
@@ -306,12 +344,12 @@ const assert = require('node:assert/strict');
   assert.equal(saved().designPanel, 'reason');
   click('design-next');
   assert.match(app.innerHTML, /Original assignment/);
-  assert.match(app.innerHTML, /Revised assignment/);
+  assert.match(app.innerHTML, /Discussion-board directions/);
   assert.match(app.innerHTML, /My edited draft/);
   assert.equal(saved().phase, 'design');
   assert.equal(saved().designStep, 3, 'Reload restores review and draft');
   click('design-next');
-  assert.match(app.innerHTML, /Check your assignment/);
+  assert.match(app.innerHTML, /Check your discussion-board component/);
   const check = (key, checked) =>
     handlers.change({
       target: {

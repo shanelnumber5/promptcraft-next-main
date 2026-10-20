@@ -64,22 +64,22 @@ export const designSteps = [
     ],
   },
   {
-    title: 'Draft one manageable change',
+    title: 'Design one focused discussion-board activity',
     intro:
-      'Write what students should post, how they should reply, and what they should do with the reply they receive.',
+      'Use the course context and learning goal to create a distinctive forum exchange. This is one component of the larger assignment, not an all-in-one replacement.',
     prompt:
-      'Keep the requirements listed below. You can write your own directions or add the starter. If you use the starter, remove any old instructions that no longer fit.',
+      'Design one feasible discussion-board component for the larger assignment, not a replacement for every task. Use the subject, learners, learning goal, original directions, and time limits to make the exchange feel specific to this course. Give the first post, peer reply, and follow-up connected jobs so classmates’ contributions matter to the learning goal. Keep required elements. You can write your own directions or adapt the starter; remove old instructions that conflict.',
     fields: [
       {
         id: 'revision',
-        label: 'Revised assignment directions',
-        help: 'Include instructions for the first post, the reply, and the follow-up. Your original directions stay saved separately.',
+        label: 'Discussion-board directions',
+        help: 'Write the first post, a purposeful peer reply, and a follow-up that uses the exchange. Keep this forum component focused; the larger assignment directions stay saved separately.',
         type: 'textarea',
-        placeholder: 'Write the complete instructions students will receive.',
+        placeholder: 'Describe the focused forum exchange students will complete.',
       },
       {
         id: 'reason',
-        label: 'How will the revised assignment help students learn?',
+        label: 'How will this forum exchange help students learn?',
         help: 'Briefly explain your choice and what you will look for in student work to see whether it helped. If Babbage helped, say what you kept, adapted, or questioned. A short, specific explanation is enough.',
         type: 'textarea',
         placeholder:
@@ -90,12 +90,12 @@ export const designSteps = [
   {
     title: 'Review your before and after',
     intro:
-      'Compare the two versions. Check that the new directions are clear and keep your required elements.',
+      'Compare the original assignment with your focused discussion-board component. Check that the forum directions are clear, purposeful, and preserve your requirements.',
   },
   {
-    title: 'Check your assignment',
+    title: 'Check your discussion-board component',
     intro:
-      'Read your revised directions, return to the three checks, then select Assignment guide. Use Edit directions if anything needs changing.',
+      'Read the forum directions in the context of the larger assignment, complete the three checks, then select Assignment guide. Use Edit directions if anything needs changing.',
   },
 ];
 export const finalCheckItems = [

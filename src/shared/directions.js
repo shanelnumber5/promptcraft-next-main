@@ -47,10 +47,14 @@ export function renderAssignmentDirections(text, { approved = false, links = [] 
     }
   };
   for (const line of source.split(/\r?\n/)) {
-    const heading =
+    const discussionHeading = line.match(
+        /^\s*((?:first|initial|opening|main|original)\s+post|(?:peer|classmate)\s+(?:reply|response)|reply(?:\s+to\s+a\s+classmate)?|follow[- ]?up|reflection|discussion question|what to submit|how to reply)\s*:?\s*(.*)$/i,
+      ),
+      heading =
         line.match(/^\s{0,3}#{1,6}\s+(.+?)(?:\s+#+)?\s*$/) ||
         line.match(/^(Step\s+\d+\s*:\s*.+)$/i) ||
-        line.match(/^(Week\s+\d+\s+Forum\s*:\s*.+)$/i),
+        line.match(/^(Week\s+\d+\s+Forum\s*:\s*.+)$/i) ||
+        (discussionHeading && [line, discussionHeading[1]]),
       number = line.match(/^\s*(\d+)[.)]\s+(.*)$/),
       bullet = line.match(/^\s*[-*•]\s+(.*)$/);
     if (!line.trim()) {
@@ -62,6 +66,7 @@ export function renderAssignmentDirections(text, { approved = false, links = [] 
       parts.push(
         `<h4>${inline(heading ? heading[1] : approved ? 'Peer exchange' : 'Peer exchange (draft)')}</h4>`,
       );
+      if (discussionHeading?.[2]) parts.push(`<p>${inline(discussionHeading[2])}</p>`);
     } else if (bullet && kind === 'ol' && items.length) {
       nested.push(`<li>${inline(bullet[1])}</li>`);
     } else if (number || bullet) {

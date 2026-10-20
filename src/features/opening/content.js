@@ -215,7 +215,7 @@ export const discussionOpening = {
           { title: 'Question', detail: 'Test a specific part.' },
           { title: 'Respond', detail: 'Revise or defend with reasons.' },
         ],
-        note: 'One manageable change to one assignment.',
+        note: 'One manageable change to one discussion forum.',
       },
     },
   ],

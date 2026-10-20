@@ -15,7 +15,7 @@ export function buildMayaRequest(state, previous = []) {
   const request = buildBabbageRequest(state, 'clarify');
   return {
     ...request,
-    system: mayaInstructions + (state.workspace ? '\nThis is the private assignment workspace. If workspace.sourceKind is idea, teacher.directions is a starting idea, not an earlier assignment students completed. Describe how the current draft develops that idea rather than inventing a before-and-after experience. A gallery idea is optional inspiration. You may read any type of assignment; do not expect a forum or peer replies unless the directions call for them.' : ''),
+    system: mayaInstructions + (state.workspace ? '\nThis is the private discussion-design workspace. If workspace.sourceKind is idea, teacher.directions is a starting idea, not an earlier assignment students completed. Describe how the current forum draft develops that idea rather than inventing a before-and-after experience. A gallery idea is optional inspiration. Existing directions may provide context, but the current design is a discussion forum; respond to its actual post, peer exchange, and follow-up requirements.' : ''),
     max_output_tokens: 1800,
     messages: [
       ...previous.slice(-2).flatMap((reading) => [

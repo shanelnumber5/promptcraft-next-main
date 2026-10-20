@@ -1,14 +1,14 @@
 // Scenario content for the guided teacher setup. Shared form rendering lives elsewhere.
 const setupSections = {
   id: 'discussion-teacher-setup',
-  title: 'Your assignment',
+  title: 'Discussion board assignment',
   steps: [
     {
       id: 'class',
       label: 'Step 1 of 3',
       title: 'Your class',
       intro:
-        'Bring one assignment you’d like to improve. Open its directions in your course so you can refer to them.',
+        'We’ll use your course context to shape one focused discussion-board activity that supports your larger assignment.',
       fields: [
         {
           id: 'subject',
@@ -43,8 +43,9 @@ const setupSections = {
     {
       id: 'assignment',
       label: 'Step 2 of 3',
-      title: 'Your assignment',
-      intro: 'Use the current version. You will be able to review everything before moving on.',
+      title: 'Original assignment directions',
+      intro:
+        'Share the larger assignment for context. We’ll design one focused forum component that supports it, not replace it.',
       example: {
         title: 'Example for exploring without an assignment',
         directions:
@@ -55,11 +56,11 @@ const setupSections = {
       fields: [
         {
           id: 'directions',
-          label: 'Paste the current assignment directions',
-          help: 'Copy the instructions students receive, including any requirements for posts and replies.',
+          label: 'Paste the larger assignment directions',
+          help: 'These directions provide context. We’ll create a bounded discussion-board component that supports the assignment, not an all-in-one replacement.',
           type: 'textarea',
           rows: 9,
-          placeholder: 'Paste the directions exactly as students see them.',
+          placeholder: 'Paste the current assignment directions for context.',
         },
         {
           id: 'learningGoal',
@@ -76,7 +77,8 @@ const setupSections = {
       id: 'limits',
       label: 'Step 3 of 3',
       title: 'Your limits',
-      intro: 'Practical limits help keep a revision realistic for you and your students.',
+      intro:
+        'Practical limits help keep the discussion-board component realistic for you and your students.',
       fields: [
         {
           id: 'workTime',
@@ -96,8 +98,8 @@ const setupSections = {
         },
         {
           id: 'workMode',
-          label: 'Do students work on their own or in groups?',
-          help: 'Choose how students complete the main assignment, even if they also reply to classmates.',
+          label: 'How do students complete the larger assignment?',
+          help: 'Choose individual or group work for the larger assignment. The discussion-board component can still include peer exchange.',
           type: 'radio',
           options: [
             ['individual', 'Individual'],
@@ -131,22 +133,29 @@ export const teacherSetup = {
     {
       id: 'learning',
       title: 'Your learning goal',
-      intro: 'Focus on one skill or understanding this discussion should develop.',
+      intro:
+        'Choose one skill or understanding a focused discussion-board exchange can advance within the larger assignment.',
       fields: assignmentSection.fields.slice(1),
     },
     {
       id: 'time',
       title: 'Time for the discussion',
-      intro: 'Set a realistic workload and a time window for the exchange.',
+      intro:
+        'Set realistic limits for this discussion-board component, keeping the larger assignment and student workload in view.',
       fields: limitsSection.fields.slice(0, 2),
     },
     {
       ...limitsSection,
       title: 'Requirements to keep',
-      intro: 'Choose the work mode and list requirements the revision needs to preserve.',
+      intro:
+        'Choose how students complete the larger assignment and list what the discussion-board component must preserve.',
       fields: limitsSection.fields.slice(2),
     },
-  ].map((step, index) => ({ ...step, label: `Step ${index + 1} of 5` })),
+  ].map((step, index) => ({
+    ...step,
+    tabLabel: ['Class', 'Directions', 'Learning goal', 'Time', 'Requirements'][index],
+    label: `Step ${index + 1} of 5`,
+  })),
 };
 
 export const teacherSetupDefaults = () => ({

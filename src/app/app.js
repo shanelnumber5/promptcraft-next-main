@@ -249,6 +249,11 @@ function updateDesignField(control) {
   if (copy) copy.disabled = !state.design.revision.trim();
   const review = app.querySelector('[data-action="design-next"]');
   if (review && state.designStep === 2 && ['revision', 'reason'].includes(currentDesignPanel(state))) review.disabled = !state.design.revision.trim();
+  const livePreview = app.querySelector('[data-guided-live-preview]');
+  if (livePreview && control.name === 'revision')
+    livePreview.innerHTML = state.design.revision.trim()
+      ? renderAssignmentDirections(state.design.revision)
+      : '<p class="guided-preview-empty">Your formatted directions will appear here as you write.</p>';
   if (ai.suggestion && ai.context !== aiContext(state)) {
     ai.suggestion = null;
     ai.error = 'Your draft changed. Ask Babbage again to use the latest version.';
@@ -303,6 +308,11 @@ function updateTeacherField(control) {
   syncDraftAssignment(state.teacher, state.design);
   syncFinalCheck();
   syncBabbage();
+  const livePreview = app.querySelector('[data-setup-live-preview]');
+  if (livePreview && control.name === 'directions')
+    livePreview.innerHTML = state.teacher.directions.trim()
+      ? renderAssignmentDirections(state.teacher.directions)
+      : '<p class="setup-preview-empty">Your discussion directions will appear here as you enter them.</p>';
 }
 function syncFinalCheck() {
   const context = finalCheckContext(state.teacher, state.design);

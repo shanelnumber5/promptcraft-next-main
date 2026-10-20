@@ -1,18 +1,18 @@
 # PromptCraft Next
 
-PromptCraft offers a guided discussion-design scenario and a private assignment workspace. Explore the lemonade example with Professor Pixel, create an assignment from your own starting point, or browse Babbage’s Idea Lab for an illustrative activity to adapt.
+PromptCraft offers a guided discussion-design scenario and a private discussion forum workspace. Explore the lemonade example with Professor Pixel, design a forum from your own starting point, or browse Babbage’s Idea Lab for an illustrative forum starter to adapt. Other activity formats are not developed in this prototype.
 
 ## Run locally
 
 On Windows, open **start-local.cmd** and visit **http://127.0.0.1:3080** in Chrome. The launcher uses installed Node or VS Code's bundled runtime. With Node 22 or newer, use `npm start`. VS Code Live Server also works. There is no build step and no runtime package dependency.
 
-Guided progress saves under `promptcraft_next_opening_v1`; existing saves remain compatible. The separate assignment workspace saves under `promptcraft_assignment_workspace_v1`. `promptcraft_entry_v1` remembers which path to resume. Different browser addresses have separate saved progress.
+Guided progress saves under `promptcraft_next_opening_v1`; existing saves remain compatible. The separate forum workspace saves under `promptcraft_assignment_workspace_v1`. `promptcraft_entry_v1` remembers which path to resume. Different browser addresses have separate saved progress.
 
-Fresh visits show the entry menu. Returning visits resume a valid saved path; **Home** offers **Continue Where You Left Off** and both paths. Direct links use `?view=play`, `?view=workspace`, and `?view=lab`. The Idea Lab contains 12 AI-assisted illustrative starters with search, category filtering, and details. **Adapt with Babbage** opens the private workspace without changing Scenario 1 progress or making an AI call automatically.
+Fresh visits show Home. Saved progress can be continued there; direct links use `?view=play`, `?view=workspace`, and `?view=lab`. The Idea Lab contains 12 AI-assisted illustrative forum starters with search, category filtering, and details. Each is structured around an initial post, a purposeful peer reply, and a follow-up. **Adapt with Babbage** opens the private workspace without changing Scenario 1 progress or making an AI call automatically.
 
-In the workspace, use **Design**, **Babbage**, and **Review & Course Guide** to move freely. Bring an existing assignment or an idea, edit the draft, consider Maya, and review the final design. Selecting different gallery inspiration keeps your starting material and draft while resetting outdated conversation and approval. Reopening the same idea preserves approval. **Reset workspace** clears only that workspace. It currently holds one design; export a guide before deliberately replacing it. Unapplied AI suggestions and Maya readings remain session-only.
+In the workspace, use **Design**, **Babbage**, and **Review & Course Guide** to move freely. Bring existing directions or an idea as starting material for a forum, edit the draft, consider Maya, and review the design. Selecting different gallery inspiration keeps your starting material and draft while resetting outdated conversation and approval. Reopening the same idea preserves approval. **Reset workspace** clears only that workspace. It currently holds one design; export a guide before deliberately replacing it. Unapplied AI suggestions and Maya readings remain session-only.
 
-Use **Restart module** in the header to begin again. A confirmation lets you keep your work or clear the module's saved answers, assignment setup, draft, and conversation. Download your guide first if you want to keep it. Restart preserves your selected live or Dev testing mode.
+Use **Restart module** in the header to begin again. A confirmation lets you keep your work or clear the module's saved answers, discussion setup, draft, and conversation. Download your guide first if you want to keep it. Restart preserves your selected live or Dev testing mode.
 
 ## Babbage and Dev testing
 
@@ -34,7 +34,7 @@ The adapter uses the existing backend's `scenario1` request format. It maps `fee
 
 Review the before and after, complete the three assignment checks, and go to your assignment guide. Preview it at any time; downloading requires an approved current revision. The downloaded HTML includes its logo, illustrations, and styles, so it can be opened offline and printed or saved as PDF. Finish the module for Professor Pixel's recap.
 
-The Scenario 1 milestone collects your existing challenge, learning goal, chosen directions, and explanation into the guide. Use the explanation to say why you chose the change and what evidence you will look for in student work. Older saves remain valid; missing notes are labeled rather than inferred.
+The Scenario 1 milestone collects your existing challenge, learning goal, chosen directions, and explanation into the guide. It designs one focused, course-specific discussion-board component within the larger assignment—not an all-in-one replacement. The forum exchange should connect an initial post, a purposeful peer contribution, and a follow-up to the learning goal and the course context. Use the explanation to say why you chose the change and what evidence you will look for in student work. Older saves remain valid; missing notes are labeled rather than inferred.
 
 Desktop and tablet introductions fit the viewport, including their answer choices and navigation. Portrait tablets use a landscape-shaped smartboard with dialogue above the speaking character. Landscape tablets and Nest Hub displays place the board between the characters, matching the desktop classroom. Maya stays on the left and Pixel on the right. Phones show only the current speaker and scroll as needed. Text is at least 16px (12pt).
 

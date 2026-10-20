@@ -66,16 +66,16 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
   if (teacher && !design.revision.trim())
     sections.push({
       id: 'assignment-pending',
-      title: 'Your assignment · revision needed',
+      title: workspace ? 'Your assignment · design in progress' : 'Discussion-board component · design in progress',
       body: workspace
         ? '<section class="assignment"><div class="assignment-banner"><h2>Your assignment design is still in progress</h2></div><div class="assignment-content"><p>Use the Design tab to write directions, or collaborate with Babbage and choose a suggestion to edit. Return to Review &amp; Course Guide to explain and approve your design before downloading.</p></div></section>'
-        : '<section class="assignment"><div class="assignment-banner"><h2>Your current assignment needs a revision</h2></div><div class="assignment-content"><p>Return to Draft one manageable change. Write revised directions or generate a suggestion, then choose Use these directions in my draft. Review and approve that version before downloading your guide.</p></div></section>',
+        : '<section class="assignment"><div class="assignment-banner"><h2>Your discussion-board component is still in progress</h2></div><div class="assignment-content"><p>Return to Design one focused discussion-board activity. Write a bounded forum exchange that supports the larger assignment, or generate a suggestion to adapt. This component is not an all-in-one replacement. Review and approve your directions before downloading the guide.</p></div></section>',
     });
   if (design.revision.trim() || design.reason.trim())
     sections.push({
       id: 'your-assignment',
       title: chosenTitle,
-      body: `<section class="assignment"><div class="assignment-banner"><span>Your course · ${approved ? 'Approved version' : 'Draft'}</span><h2>${e(chosenTitle)}</h2></div><div class="assignment-content">${design.revision.trim() ? `<h3 id="revised-directions">Revised directions</h3><div class="assignment-directions">${renderAssignmentDirections(design.revision, { approved })}</div>` : ''}${design.reason.trim() ? `<aside class="rationale"><h3 id="change-reason">Why I made this change</h3><div class="design-rationale">${renderDesignRationale(design.reason)}</div></aside>` : ''}</div></section>`,
+      body: `<section class="assignment"><div class="assignment-banner"><span>Your course · ${approved ? 'Approved version' : 'Draft'}</span><h2>${e(chosenTitle)}</h2></div><div class="assignment-content">${design.revision.trim() ? `<h3 id="revised-directions">Discussion-board directions</h3><div class="assignment-directions">${renderAssignmentDirections(design.revision, { approved })}</div>` : ''}${design.reason.trim() ? `<aside class="rationale"><h3 id="change-reason">Why I made this change</h3><div class="design-rationale">${renderDesignRationale(design.reason)}</div></aside>` : ''}</div></section>`,
     });
   sections.push({
     id: 'design-sources',
@@ -85,7 +85,7 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
   const contents = sections
     .map(
       (section) =>
-        `<li><a href="#${section.id}">${e(section.title)}</a>${section.id === 'your-assignment' ? `<ul>${design.revision.trim() ? '<li><a href="#revised-directions">Revised directions</a></li>' : ''}${design.reason.trim() ? '<li><a href="#change-reason">Reason for the change</a></li>' : ''}</ul>` : ''}</li>`,
+        `<li><a href="#${section.id}">${e(section.title)}</a>${section.id === 'your-assignment' ? `<ul>${design.revision.trim() ? '<li><a href="#revised-directions">Discussion-board directions</a></li>' : ''}${design.reason.trim() ? '<li><a href="#change-reason">Reason for the change</a></li>' : ''}</ul>` : ''}</li>`,
     )
     .join('');
   return `<!doctype html>
@@ -93,7 +93,7 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
 <style>${guideStyles}</style></head>
 
 
-<body><main><header><div class="guide-brand">${logo ? `<img src="${e(logo)}" alt="PromptCraft Babbage emblem">` : ''}<div><div class="wordmark">Prompt<span>Craft</span></div><small>The Prompt Lab · Great Falls College MSU</small></div></div><h1>${workspace ? 'Course Guide · Your assignment' : 'Assignment guide'}</h1><p>${approved ? 'Your approved version' : 'Draft preview · Not yet approved'}</p><p>${workspace ? 'Your private record of the starting point, chosen design, and reasons behind your decisions.' : 'Review the worked example, your original assignment, and your revision. Your original directions stay available while you develop the new version.'}</p></header><nav class="toc" aria-labelledby="contents-title"><h2 id="contents-title">${workspace ? 'Your design' : 'Discussion boards'}</h2><p class="toc-topic">${workspace ? 'Create an Assignment' : 'Give the discussion a job'}</p><ol>${contents}</ol></nav>${sections.map((section) => `<div class="guide-section" id="${section.id}">${section.body}</div>`).join('')}</main></body></html>`;
+<body><main><header><div class="guide-brand">${logo ? `<img src="${e(logo)}" alt="PromptCraft Babbage emblem">` : ''}<div><div class="wordmark">Prompt<span>Craft</span></div><small>The Prompt Lab · Great Falls College MSU</small></div></div><h1>${workspace ? 'Course Guide · Your discussion forum' : 'Discussion guide'}</h1><p>${approved ? 'Your approved version' : 'Draft preview · Not yet approved'}</p><p>${workspace ? 'Your private record of the starting point, chosen forum design, and reasons behind your decisions.' : 'Review the worked example, your original discussion, and your revision. Your original directions stay available while you develop the new version.'}</p></header><nav class="toc" aria-labelledby="contents-title"><h2 id="contents-title">${workspace ? 'Your forum design' : 'Discussion boards'}</h2><p class="toc-topic">${workspace ? 'Create a Discussion Forum' : 'Give the discussion a job'}</p><ol>${contents}</ol></nav>${sections.map((section) => `<div class="guide-section" id="${section.id}">${section.body}</div>`).join('')}</main></body></html>`;
 }
 
 export function downloadGuide(design, options) {
