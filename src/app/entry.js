@@ -6,6 +6,7 @@ const requested = params.get('view');
 const resume = resumePath();
 // Root visits preserve the existing automatic resume behavior. Home remains explicit.
 const view = ['home', 'play', 'lab', 'workspace'].includes(requested) ? requested : resume || 'home';
+document.body.dataset.appView = view;
 const app = document.getElementById('app');
 const restart = document.querySelector('[data-action="restart-module"]');
 if (params.get('mockBabbage') === '1') document.addEventListener('click', event => {

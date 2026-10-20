@@ -46,6 +46,9 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     const requestsBeforeBrowse = apiRequests.length;
     await goto('?view=lab');
     assert.equal(await evaluate('document.querySelectorAll(".idea-card").length'), 12);
+    await evaluate('document.fonts.ready.then(() => Promise.all([...document.images].map(image => image.decode().catch(() => {})))).then(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))');
+    await evaluate('new Promise(resolve => setTimeout(resolve, 250))');
+    await shot('lab-' + device + '-gallery');
     await fillId('idea-category', 'Responsible AI', 'change');
     assert.equal(await evaluate('document.querySelectorAll(".idea-card").length'), 2);
     await fillId('idea-search', 'no-matching-activity');
