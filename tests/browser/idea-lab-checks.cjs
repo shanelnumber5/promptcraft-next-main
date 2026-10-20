@@ -16,7 +16,7 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
       const parse = color => (color.match(/[\\d.]+/g) || []).map(Number);
       const luminance = rgb => rgb.slice(0,3).map(v => v/255).map(v => v <= .04045 ? v/12.92 : ((v+.055)/1.055)**2.4).reduce((sum,v,i) => sum+v*[.2126,.7152,.0722][i],0);
       const issues = [];
-      for (const el of document.querySelectorAll('.entry-shell h1, .idea-label, .idea-tags span, .action-link, .workspace-tabs button, .workspace-shell .setup-field > label')) {
+      for (const el of document.querySelectorAll('.entry-shell h1, .workspace-shell .ai-panel-heading h2, .workspace-shell .babbage-eyebrow, .idea-label, .idea-tags span, .action-link, .workspace-tabs button, .workspace-shell .setup-field > label')) {
         if (!el.getBoundingClientRect().height || el.disabled) continue;
         let node=el, background;
         while(node) { const rgb=parse(getComputedStyle(node).backgroundColor); if(rgb.length===3 || rgb[3]===1) {background=rgb;break;} node=node.parentElement; }
@@ -49,6 +49,9 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await evaluate('document.fonts.ready.then(() => Promise.all([...document.images].map(image => image.decode().catch(() => {})))).then(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))');
     await evaluate('new Promise(resolve => setTimeout(resolve, 250))');
     await shot('lab-' + device + '-gallery');
+    await evaluate('document.querySelector(".idea-grid").scrollIntoView()');
+    await shot('lab-' + device + '-cards');
+    await evaluate('scrollTo(0, 0)');
     await fillId('idea-category', 'Responsible AI', 'change');
     assert.equal(await evaluate('document.querySelectorAll(".idea-card").length'), 2);
     await fillId('idea-search', 'no-matching-activity');
@@ -98,6 +101,7 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await click('generate-ai');
     await waitFor('!!document.querySelector("[data-action=apply-ai]")');
     await accessibleScreen(device + ' workspace Babbage');
+    await contrast();
     await shot('lab-' + device + '-suggestion');
     await click('apply-ai');
     await waitFor('!!document.querySelector("#revision")');

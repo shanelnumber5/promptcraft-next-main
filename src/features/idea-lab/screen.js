@@ -2,9 +2,24 @@ import { ideas, ideaTags, filterIdeas, findIdea } from './ideas.js';
 import { labIcon, campusSignature, riverLines, ideaVisual } from '../../shared/lab-visuals.js';
 import { escapeHTML as e } from '../../shared/html.js';
 
+// Short browsing copy; full learning purposes and steps remain in activity details.
+const previews = {
+  'decision-clinic': ['A defended decision, revised after peer feedback.', 'Students need practice explaining a choice, not just sharing opinions.'],
+  'failure-file': ['A diagnosis and one proposed repair.', 'Students jump to solutions before understanding what went wrong.'],
+  'two-audiences': ['Two explanations of one concept, with notes on their choices.', 'Students know the content but struggle to explain it to different people.'],
+  'evidence-detectives': ['An evidence trail and a qualified conclusion.', 'Students accept convincing claims without checking their support.'],
+  'shift-change': ['A workplace plan adjusted to a new constraint.', 'Students need practice balancing fairness, resources, and competing needs.'],
+  'artifact-story': ['A creative artifact annotated with three design decisions.', 'You want creative work to reveal students’ reasoning.'],
+  'ai-cross-exam': ['A fact-checked AI answer with corrections.', 'Students need to question AI output and verify its claims.'],
+  'constraint-remix': ['Two versions of a solution and an explanation of the tradeoff.', 'Students can repeat a solution but need practice adapting it.'],
+  'museum-of-misconceptions': ['A small exhibit correcting a common misconception.', 'A persistent misunderstanding needs more than another explanation.'],
+  'community-brief': ['A concise recommendation supported by evidence.', 'Students need to turn course knowledge into something an audience can use.'],
+  'question-upgrade': ['A stronger inquiry question, with reasons for the change.', 'Discussion questions stop at recall or lead to predictable answers.'],
+  'human-ai-editors': ['A revised artifact and reasons for accepting or rejecting feedback.', 'Students need to judge suggestions while keeping ownership of their work.'],
+};
 export function renderIdeaCards(query = '', tag = '') {
   const matches = filterIdeas(query, tag);
-  return { count: matches.length, html: matches.map(item => `<article class="idea-card">${ideaVisual(item, ideas.indexOf(item))}<div class="idea-card-content"><span class="idea-label">Illustrative starter · AI-assisted</span><h2><a href="?view=lab&amp;idea=${e(item.id)}">${e(item.title)}</a></h2><p>${e(item.summary)}</p><p><strong>Learning purpose:</strong> ${e(item.purpose)}</p><p class="idea-tags">${item.tags.map(tag => `<span>${e(tag)}</span>`).join('')}</p><a class="action-link" href="?view=lab&amp;idea=${e(item.id)}">Explore this idea ${labIcon('arrow')}</a></div></article>`).join('') || '<p>No ideas match yet. Try a broader search or choose All categories.</p>' };
+  return { count: matches.length, html: matches.map(item => `<article class="idea-card">${ideaVisual(item, ideas.indexOf(item))}<div class="idea-card-content"><h2><a href="?view=lab&amp;idea=${e(item.id)}">${e(item.title)}</a></h2><p class="idea-summary">${e(item.summary)}</p><dl class="idea-preview"><div><dt>Students make</dt><dd>${e(previews[item.id][0])}</dd></div><div><dt>Use it when</dt><dd>${e(previews[item.id][1])}</dd></div></dl><p class="idea-tags">${item.tags.slice(0, 2).map(tag => `<span>${e(tag)}</span>`).join('')}</p><span class="idea-label">AI-assisted starter</span><a class="action-link" href="?view=lab&amp;idea=${e(item.id)}">Explore this idea ${labIcon('arrow')}</a></div></article>`).join('') || '<p>No ideas match yet. Try a broader search or choose All categories.</p>' };
 }
 export function renderGallery(query = '', tag = '') {
   const results = renderIdeaCards(query, tag);

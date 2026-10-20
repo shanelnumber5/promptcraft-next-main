@@ -21,3 +21,15 @@ Navigation, saved-state keys and structures, AI prompts and request infrastructu
 - Browser AI responses are mocked. No live AI-service or output-quality result is claimed; this presentation work respects the existing Netlify service pause. No hands-on screen-reader speech test or comprehensive WCAG audit was performed.
 
 The refreshed appearance and new entry-page wording may affect engagement and path selection in comparisons across versions. Record this presentation checkpoint separately from the previously documented Babbage prompt refinements; neither requires changing the research event schema.
+
+## Follow-up: mechanical graphics and clearer browsing
+
+Replaced generic small interface icons with custom SVG calculating-engine modules: drive wheels, numbered-drum-style linkages, punched tape, and brass-colored housings. The workspace Babbage header uses this machine treatment instead of the raster portrait mark; guided character artwork and official college artwork remain intact. The Home aside now reads “These ideas are otterly worth a look.”
+
+Idea Lab cards now show the activity in plain language, what students make, and when an educator might choose it. Full purposes and steps remain in the detail view. The banner is shorter, tags are limited to two per card, and the decorative card header takes less space. All 12 starters retain their original IDs and underlying assignment content.
+
+The workspace keeps starting material, course, learning goal, and draft visible. Optional improvement/context questions are expandable, repeated editor labels are reduced visually while retaining the accessible name, and helper copy is shorter. Arial with sans-serif fallbacks replaces Manrope on these entry/workspace surfaces; heading weights and sizes are reduced. The original self-hosted Manrope asset/license remains available from the earlier checkpoint.
+
+Fixed the reported Babbage title contrast: `.workspace-shell h2` had overridden the dark panel’s white heading. A more specific white heading rule resolves that conflict. Browser contrast checks now include the Babbage heading and run while its panel is visible.
+
+Verification after the follow-up: `npm.cmd test` passed all six suites; `node tests/browser/idea-lab.test.cjs` passed the complete workflow at 1440×1000, 768×1024, 390×844, and 320×568; `git diff --check` passed. Final desktop gallery/card/workspace and mobile layouts were visually inspected. The browser harness now waits for local gallery images/fonts and a short paint interval before capturing the gallery and adds scrolled card screenshots. AI remains mocked. The complete guided browser suite was not rerun in this follow-up; its shared renderer retains the original non-workspace branch, and the unit suites passed. No AI prompts, save structures, research collection, or deployment changed.
