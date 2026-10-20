@@ -36,7 +36,7 @@ export function initialState(scenario) {
     saveNotice: '',
   };
 }
-export function loadState(scenario, storage = window.localStorage) {
+export function loadState(scenario, storage = window.localStorage, workspace = null) {
   const fresh = initialState(scenario);
   try {
     const saved = JSON.parse(storage.getItem(STORAGE_KEY) || 'null');
@@ -126,7 +126,7 @@ export function loadState(scenario, storage = window.localStorage) {
     const babbage = conversationDefaults();
     // Mode is a preference, even when an outdated conversation must be discarded.
     babbage.mode = saved.babbage?.mode === 'dev' ? 'dev' : 'live';
-    if (saved.babbage?.context === assignmentContext({ teacher, design })) {
+    if (saved.babbage?.context === assignmentContext({ teacher, design, ...(workspace ? { workspace } : {}) })) {
       babbage.context = saved.babbage.context;
       babbage.history = Array.isArray(saved.babbage.history)
         ? saved.babbage.history
@@ -188,6 +188,7 @@ export function loadState(scenario, storage = window.localStorage) {
       designReturnPanel: designPanels[designStep]?.includes(saved.designReturnPanel) ? saved.designReturnPanel : '',
       finalCheck,
       babbage,
+      ...(workspace ? { workspace } : {}),
     };
   } catch {
     return {
