@@ -24,6 +24,21 @@ const assert = require('node:assert/strict');
   assert.equal(restoredSetup.setupStep, 3, 'Old limits screen maps to the shorter time screen');
   assert.equal(restoredSetup.teacher.directions, legacySetup.teacher.directions);
   const { createGuide, downloadGuide } = await import('../../src/features/design/guide.js');
+  const milestoneDesign = {
+    concern: 'Replies miss <evidence>',
+    revision: 'Compare a peer claim with course evidence.',
+    reason: 'I adapted the AI idea. I will look for evidence-based revisions.',
+    sourceDirections: 'Reply twice.',
+  };
+  const milestoneTeacher = { directions: 'Reply twice.', learningGoal: 'Evaluate claims & evidence' };
+  const milestone = createGuide(milestoneDesign, { teacher: milestoneTeacher });
+  assert(milestone.includes('Approved milestone'));
+  assert(milestone.includes('Replies miss &lt;evidence&gt;'));
+  assert(milestone.includes('Evaluate claims &amp; evidence'));
+  assert(milestone.includes(milestoneDesign.reason));
+  assert(milestone.includes('href="#revised-directions"'));
+  assert(createGuide(milestoneDesign, { teacher: milestoneTeacher, approved: false }).includes('Draft milestone · awaiting your approval'));
+  assert(createGuide({ revision: 'Legacy revision', reason: '' }, { teacher: milestoneTeacher }).includes('Not recorded in this saved version.'));
   const unrelated = {
     revision: teacherSetup.steps[1].example.directions,
     reason: 'Old example reason.',

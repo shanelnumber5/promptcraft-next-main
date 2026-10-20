@@ -36,3 +36,7 @@ The first increment changes guide presentation and instructional wording only. I
 4. Recover and audit the research logger and consent contract before integrating any incremental event collection. Validate meaningful decision records without treating word count as reasoning quality.
 
 Use recoverable Git checkpoints. Do not deploy without approval.
+
+## First increment validation
+
+All four unit suites pass, including added guide milestone checks for escaping, approval labels, missing legacy notes, and links to the actual chosen directions. The mocked Chrome workflow passed desktop, wide-review, short-desktop, portrait tablet, medium-window, landscape tablet, and phone. The exhaustive viewport sweep was stopped after those first six passing sizes; the phone-only run then completed successfully. Desktop and phone rationale screenshots were visually reviewed. No live AI call or deployment was made. The complete viewport matrix was not run to completion.

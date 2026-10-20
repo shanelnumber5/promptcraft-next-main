@@ -45,6 +45,12 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
   const sections = [
     { id: 'lemonade-example', title: 'Worked example: lemonade stand', body: lemonadeExample() },
   ];
+  if (teacher && design.revision.trim())
+    sections.push({
+      id: 'decision-milestone',
+      title: 'Scenario 1 · Start With the Learning',
+      body: `<section><h2>Scenario 1 · Start With the Learning</h2><p>${approved ? 'Approved milestone' : 'Draft milestone · awaiting your approval'}</p><h3>Instructional challenge</h3><p>${e(design.concern || 'Not recorded in this saved version.')}</p><h3>Learning goal</h3><p>${e(teacher.learningGoal || 'Not recorded in this saved version.')}</p><h3>Chosen improvement</h3><p>Your complete chosen directions appear in <a href="#revised-directions">Your revised discussion board</a>.</p><h3>Why I chose it and how I will recognize progress</h3>${design.reason?.trim() ? renderDesignRationale(design.reason) : '<p>Not recorded in this saved version.</p>'}<p>This is your design expectation. Look for evidence in student work when you try the activity; approval does not establish that learning improved.</p></section>`,
+    });
   if (teacher?.directions?.trim())
     sections.push({
       id: 'original-assignment',

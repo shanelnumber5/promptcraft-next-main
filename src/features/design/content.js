@@ -80,7 +80,7 @@ export const designSteps = [
       {
         id: 'reason',
         label: 'How will the revised assignment help students learn?',
-        help: 'Explain why your new directions are better for the learning goal you entered.',
+        help: 'Briefly explain your choice and what you will look for in student work to see whether it helped. If Babbage helped, say what you kept, adapted, or questioned. A short, specific explanation is enough.',
         type: 'textarea',
         placeholder:
           'For example, students must explain whether a classmate’s question changed their thinking.',

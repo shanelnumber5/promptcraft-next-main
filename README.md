@@ -12,6 +12,8 @@ Use **Restart module** in the header to begin again. A confirmation lets you kee
 
 ## Babbage and Dev testing
 
+Current development testing is not formal participant research. Live Babbage and Dev fallback select how AI assistance runs; neither enrolls a participant or records research consent. This checkout saves browser progress but has no participant research event logger. See the [gameplay and research audit](docs/gameplay-research-audit.md) for the preservation plan and study integration limits.
+
 The browser connects to the existing server at `https://promptcraft-test.netlify.app/.netlify/functions/babbage`. Its API key stays on that backend. No local key is needed; the local server only serves the app's static files. Private environment files are ignored and excluded from static serving.
 
 On the drafting step, select **Check assignment details**, answer clarification questions, then select **Generate revision**. Teacher context and answers are sent to the Babbage service and OpenAI when you send a turn. Suggestions enter your draft only when you choose **Use these directions in my draft**. Changes to the assignment invalidate outdated suggestions and approval.
@@ -23,6 +25,8 @@ The adapter uses the existing backend's `scenario1` request format. It maps `fee
 ## Guide and completion
 
 Review the before and after, complete the three assignment checks, and go to your assignment guide. Preview it at any time; downloading requires an approved current revision. The downloaded HTML includes its logo, illustrations, and styles, so it can be opened offline and printed or saved as PDF. Finish the module for Professor Pixel's recap.
+
+The Scenario 1 milestone collects your existing challenge, learning goal, chosen directions, and explanation into the guide. Use the explanation to say why you chose the change and what evidence you will look for in student work. Older saves remain valid; missing notes are labeled rather than inferred.
 
 Desktop and tablet introductions fit the viewport, including their answer choices and navigation. Portrait tablets use a landscape-shaped smartboard with dialogue above the speaking character. Landscape tablets and Nest Hub displays place the board between the characters, matching the desktop classroom. Maya stays on the left and Pixel on the right. Phones show only the current speaker and scroll as needed. Text is at least 16px (12pt).
 
