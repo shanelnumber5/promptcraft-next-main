@@ -11,6 +11,11 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
   };
   const fillId = async (id, value, type = 'input') => evaluate(`(() => {const el=document.getElementById(${JSON.stringify(id)}); el.value=${JSON.stringify(value)};el.dispatchEvent(new Event(${JSON.stringify(type)},{bubbles:true}));})()`);
   const closeMaya = async () => { await evaluate('document.querySelector("[data-maya-close]").click()'); await waitFor('!document.querySelector(".maya-dialog")'); };
+  const designFits = async width => {
+    if (width < 1000) return;
+    assert(await evaluate('document.documentElement.scrollHeight <= innerHeight + 1'), 'Design fits desktop height');
+    assert(await evaluate('document.querySelector(".design-page-fields").scrollHeight <= document.querySelector(".design-page-fields").clientHeight + 1'), 'Design fields fit without internal scrolling');
+  };
   const contrast = async () => {
     const issues = await evaluate(`(() => {
       const parse = color => (color.match(/[\\d.]+/g) || []).map(Number);
@@ -30,7 +35,7 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     })()`);
     assert.deepEqual(issues, [], 'New visible text meets AA contrast thresholds');
   };
-  for (const [device, width, height] of [['desktop', 1440, 1000], ['tablet', 768, 1024], ['phone', 390, 844], ['small-phone', 320, 568]].filter(([device]) => !process.env.PC_BROWSER_DEVICE || process.env.PC_BROWSER_DEVICE.split(',').includes(device))) {
+  for (const [device, width, height] of [['desktop', 1440, 1000], ['short-desktop', 1280, 720], ['tablet', 768, 1024], ['phone', 390, 844], ['small-phone', 320, 568]].filter(([device]) => !process.env.PC_BROWSER_DEVICE || process.env.PC_BROWSER_DEVICE.split(',').includes(device))) {
     await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 600 });
     await goto('?view=home');
     await evaluate('localStorage.clear();location.reload()');
@@ -72,18 +77,31 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     assert(await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).workspace.sourceKind === "idea"'));
     await panel('revision');
     await fill('subject', 'Office Management & Supervision');
-    await fill('learningGoal', 'Explain a fair staffing decision with evidence.');
+    await shot('lab-' + device + '-starting-point');
+    await designFits(width);
     assert.equal(await evaluate('document.querySelectorAll(".workspace-shell details").length'), 0, 'Workspace fields are visible sections');
-    await fill('aiUse', 'Students may ask AI for feedback, but must explain and verify their own decisions.');
-    await fill('workTime', '60 minutes');
-    await fill('mustStay', 'Use a fictional staffing case and preserve the existing rubric.');
+    await evaluate('document.querySelector("[data-design-page=learners]").click()');
+    await fill('learningGoal', 'Explain a fair staffing decision with evidence.');
     await fillId('student-needs', 'Flexible timing and readable materials; no special software.');
+    await shot('lab-' + device + '-learners');
+    await designFits(width);
+    await evaluate('document.querySelector("[data-design-page=time]").click()');
+    await fill('workTime', '60 minutes');
+    await evaluate('document.querySelector("[data-design-page=requirements]").click()');
+    await fill('aiUse', 'Students may ask AI for feedback, but must explain and verify their own decisions.');
+    await fill('mustStay', 'Use a fictional staffing case and preserve the existing rubric.');
     await accessibleScreen(device + ' workspace design');
     await contrast();
     await shot('lab-' + device + '-design');
-    await evaluate('document.querySelector(".workspace-settings").scrollIntoView()');
-    await shot('lab-' + device + '-context-sections');
-    await evaluate('scrollTo(0, 0)');
+    await designFits(width);
+    await evaluate('document.querySelector("[data-design-page=draft]").click()');
+    assert.equal(await evaluate('document.querySelectorAll("[data-editor-command]").length'), 0);
+    await fill('revision', '### Test assignment\n\n1. Compare two options.\n2. Explain your decision.');
+    assert(await evaluate('document.querySelector("[data-live-preview] h4").textContent === "Test assignment"'));
+    assert.equal(await evaluate('document.querySelectorAll("[data-live-preview] li").length'), 2);
+    await shot('lab-' + device + '-live-preview');
+    await designFits(width);
+    await fill('revision', '');
     await keyboardReach('[data-workspace-panel="revision"]');
     await key('ArrowRight', 'ArrowRight', 39);
     assert.equal(await evaluate('document.activeElement.dataset.workspacePanel'), 'babbage');
@@ -174,15 +192,21 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await click('restart-module');
     assert(await evaluate('document.querySelector("#restart-description").textContent.includes("Scenario 1 progress stays saved")'));
     await evaluate('document.querySelector("[data-action=confirm-restart]").click()');
-    await waitFor('!!document.querySelector("#revision")');
+    await waitFor('!!document.querySelector("#directions")');
     assert.equal(await evaluate('localStorage.getItem("promptcraft_next_opening_v1")'), guidedRaw);
     assert.equal(await evaluate('document.querySelector("input[name=sourceKind]:checked").value'), 'existing');
     await fill('directions', 'Existing assignment: compare two recommendations.');
+    await evaluate('document.querySelector("[data-design-page=draft]").click()');
     await fill('revision', 'My independent recommendation report.');
+    await evaluate('document.querySelector("[data-design-page=requirements]").click()');
+    await evaluate('document.querySelector("[data-design-page=time]").click()');
+    await evaluate('document.querySelector("[data-design-page=learners]").click()');
+    await evaluate('document.querySelector("[data-design-page=start]").click()');
     await fill('directions', 'Existing assignment updated: compare three recommendations.');
     assert.equal(await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.design.revision'), '', 'A changed baseline archives the previous draft');
     assert.equal(await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.design.previousRevision'), 'My independent recommendation report.');
     assert.equal(await evaluate('document.querySelectorAll(".workspace-shell details").length'), 0);
+    await evaluate('document.querySelector("[data-design-page=draft]").click()');
     await click('restore-earlier');
     assert.equal(await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.design.revision'), 'My independent recommendation report.');
     await evaluate('localStorage.setItem("promptcraft_assignment_workspace_v1","{broken");location.reload()');
@@ -190,7 +214,7 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     assert.equal(await evaluate('localStorage.getItem("promptcraft_assignment_workspace_v1")'), '{broken');
     await click('reset-workspace');
     await evaluate('document.querySelector("[data-action=confirm-restart]").click()');
-    await waitFor('!!document.querySelector("#revision")');
+    await waitFor('!!document.querySelector("#directions")');
     await evaluate('window.restoreSetItem=Storage.prototype.setItem;Storage.prototype.setItem=function(key,value){if(key==="promptcraft_assignment_workspace_v1")throw Error("quota");return window.restoreSetItem.call(this,key,value)}');
     await fill('directions', 'Keep this idea in memory while storage is unavailable.');
     assert(await evaluate('document.querySelector(".save-notice").textContent.includes("could not save")'));

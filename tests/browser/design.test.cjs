@@ -213,7 +213,8 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       name === 'revision' ? evaluate(
         `(async () => {
           const { renderAssignmentDirections } = await import('/src/shared/directions.js');
-          const editor = document.querySelector('[data-assignment-editor]');
+          const editor = document.querySelector('[data-assignment-editor], textarea#revision');
+          if (editor.tagName === 'TEXTAREA') { editor.value = ${JSON.stringify(value)}; editor.dispatchEvent(new Event('input', {bubbles:true})); return; }
           editor.innerHTML = renderAssignmentDirections(${JSON.stringify(value)});
           editor.dispatchEvent(new Event('input', {bubbles:true}));
         })()`,

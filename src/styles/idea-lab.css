@@ -319,3 +319,64 @@ body[data-app-view]:not([data-app-view='play']) select { font-family: var(--font
   body[data-app-view]:not([data-app-view='play']) .brand strong { font-size: 23px; letter-spacing: -.8px; }
   .gallery-return { width: 100%; flex-shrink: 1; font-size: 16px; }
 }
+
+/* Focused design pages: one small form and a live student-facing preview. */
+.workspace-design--focused { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 20px; }
+.workspace-design--focused .workspace-context { display: flex; flex-direction: column; gap: 0; }
+.workspace-page, .workspace-live { padding: 20px; min-height: 0; }
+.design-page-heading, .workspace-live > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.design-page-heading h2, .workspace-live h2 { margin: 0; font-size: 22px; }
+.design-page-heading > span { color: #405674; font-size: 14px; white-space: nowrap; }
+.design-page-fields { flex: 1; min-height: 0; }
+.workspace-page .setup-field { margin: 6px 0 !important; }
+.workspace-page .setup-field > label, .workspace-writing > label { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+.workspace-page .setup-field .field-help { font-size: 13px; margin: 2px 0 6px; }
+.workspace-page textarea { font-size: 16px; line-height: 1.4; min-height: 52px !important; width: 100%; border: 1px solid #9eb5d0; border-radius: 10px; padding: 10px; resize: vertical; }
+.workspace-page input[type='text'] { min-height: 40px; padding: 8px 10px !important; }
+.workspace-page .unsure { font-size: 13px; margin-top: 4px; }
+.workspace-page input[type='checkbox'] { width: 16px; height: 16px; }
+.design-page-nav { display: flex; justify-content: space-between; gap: 10px; margin-top: 16px; }
+.design-page-nav button { padding: 8px 12px; font-size: 14px; min-height: 42px; }
+.workspace-live { display: flex; flex-direction: column; background: #e9f0f7; }
+.workspace-live > header button { background: white; padding: 6px 12px; font-size: 14px; min-height: 36px; white-space: nowrap; }
+.assignment-paper { flex: 1; min-height: 0; padding: 28px; background: white; border: 1px solid #cedbea; border-top: 5px solid var(--blue); border-radius: 5px; overflow: auto; box-shadow: 0 4px 12px #001f5b08; }
+.assignment-paper-label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #405674; margin-bottom: 20px; }
+.assignment-paper .assignment-directions { font-size: 17px; line-height: 1.65; }
+.assignment-paper h4 { font-size: 23px; color: var(--navy); padding-bottom: 10px; border-bottom: 1px solid #dce5ef; }
+.assignment-paper .assignment-steps > li { margin-bottom: 14px; }
+.preview-empty { color: #405674; font-size: 17px; }
+.workspace-writing { display: flex; flex-direction: column; height: 100%; }
+.workspace-writing #revision { flex: 1; min-height: 160px !important; resize: none; font: inherit; line-height: 1.55; }
+.workspace-privacy { font-size: 12px !important; margin: 10px 0 0 !important; color: #405674; }
+.workspace-shell--focused .save-notice:empty, .workspace-shell--focused .design-notice:empty { display: none; }
+@media (min-width: 1000px) and (min-height: 680px) {
+  body[data-app-view='workspace']:has(.workspace-shell--focused) .app-header { padding-top: 10px; padding-bottom: 10px; }
+  body[data-app-view='workspace']:has(.workspace-shell--focused) #app { padding: 16px 40px 10px; }
+  body[data-app-view='workspace']:has(.workspace-shell--focused) .app-footer { display: none; }
+  .workspace-shell--focused .workspace-heading { margin-bottom: 12px; }
+  .workspace-shell--focused .workspace-heading h1 { font-size: 32px; margin: 2px 0; }
+  .workspace-shell--focused .workspace-heading .eyebrow { display: none; }
+  .workspace-shell--focused .workspace-heading .action-link { padding: 8px 14px; }
+  .workspace-shell--focused .workspace-tabs { margin-bottom: 12px; padding: 4px; }
+  .workspace-shell--focused .workspace-tabs button { padding: 8px 16px; }
+  .workspace-design--focused { height: calc(100dvh - 286px); min-height: 340px; }
+  .workspace-design--focused > section { height: 100%; }
+  .design-page-fields { overflow: auto; }
+  .workspace-page .field-help { display: none; }
+  .workspace-page .workspace-writing .field-help { display: block; }
+}
+@media (max-width: 999px) {
+  .workspace-design--focused { grid-template-columns: minmax(0, 1fr); }
+  .workspace-page { min-height: 420px; }
+  .workspace-live { min-height: 330px; }
+  .assignment-paper { max-height: 440px; }
+  .workspace-writing #revision { min-height: 240px !important; }
+}
+@media (max-width: 420px) {
+  .workspace-live > header { align-items: flex-start; flex-direction: column; }
+  .assignment-paper { padding: 20px; }
+}
+
+.workspace-page fieldset { padding: 4px 10px 6px; }
+.workspace-page fieldset legend { font-size: 14px; line-height: 1.4; }
+.workspace-page fieldset label { font-size: 14px; line-height: 1.4; padding: 2px 0; margin-right: 12px; }

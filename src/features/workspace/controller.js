@@ -1,4 +1,4 @@
-import { renderWorkspace } from './screen.js';
+import { renderWorkspace, renderDraftPreview } from './screen.js';
 import { readWorkspace, freshWorkspace, saveWorkspace, resetWorkspace } from './storage.js';
 import { findIdea } from '../idea-lab/ideas.js';
 import { createDesignController } from '../design/controller.js';
@@ -15,6 +15,7 @@ import { openReferences } from '../../shared/reference-dialog.js';
 export function mountWorkspace(app, params) {
   const restored = readWorkspace();
   let state = restored.state, readError = restored.error;
+  let designPage = 'start';
   const ai = { pending: false, configured: null, suggestion: null, error: '', context: '' };
   if (params.get('mockBabbage') === '1') state.babbage.mode = 'dev';
   const idea = findIdea(params.get('adapt'));
@@ -44,7 +45,7 @@ export function mountWorkspace(app, params) {
     if (state.finalCheck.context !== context) state.finalCheck = { ...finalCheckDefaults(), context };
   };
   const render = ({ focus = false } = {}) => {
-    app.innerHTML = renderWorkspace(state, ai, readError);
+    app.innerHTML = renderWorkspace(state, ai, readError, designPage);
     if (focus) document.getElementById('setup-title')?.focus({ preventScroll: true });
   };
   const controller = createDesignController({ app, getState: () => state, ai, render, saveSafely, syncFinalCheck });
@@ -74,6 +75,7 @@ export function mountWorkspace(app, params) {
     else if (control.closest('[data-design-form]') && Object.hasOwn(state.design, control.name)) state.design[control.name] = control.value;
     else if (control.closest('[data-setup-form]') && Object.hasOwn(state.teacher, control.name)) {
       state.teacher[control.name] = control.type === 'checkbox' ? control.checked : control.value;
+      if (control.value.trim() && Object.hasOwn(state.teacher, control.name + 'Unsure')) state.teacher[control.name + 'Unsure'] = false;
       movedDraft = state.design.revision.trim() && state.design.sourceDirections !== state.teacher.directions;
       syncDraftAssignment(state.teacher, state.design);
     } else return;
@@ -87,6 +89,8 @@ export function mountWorkspace(app, params) {
       target?.focus({ preventScroll: true });
       if (typeof start === 'number') target?.setSelectionRange(start, end);
     }
+    const preview = app.querySelector('[data-live-preview]');
+    if (preview) preview.innerHTML = renderDraftPreview(state.design.revision);
     updateApproval();
   }
   app.addEventListener('submit', event => event.preventDefault());
@@ -123,6 +127,7 @@ export function mountWorkspace(app, params) {
     const mode = state.babbage.mode;
     if (!resetWorkspace()) { state.saveNotice = 'This browser could not reset the workspace.'; updateApproval(); return; }
     state = freshWorkspace();
+    designPage = 'start';
     state.babbage.mode = mode;
     readError = '';
     Object.assign(ai, { pending: false, suggestion: null, error: '', context: '' });
@@ -130,6 +135,8 @@ export function mountWorkspace(app, params) {
     render({ focus: true });
   }
   app.addEventListener('click', async event => {
+    const page = event.target.closest('[data-design-page]');
+    if (page) { designPage = page.dataset.designPage; render(); document.getElementById('design-page-title')?.focus({ preventScroll: true }); return; }
     const tab = event.target.closest('[data-workspace-panel]');
     if (tab) return setPanel(tab.dataset.workspacePanel);
     const format = event.target.closest('[data-editor-command]');
@@ -155,6 +162,7 @@ export function mountWorkspace(app, params) {
       state.design.reason = ai.suggestion.reason;
       ai.suggestion = null;
       syncFinalCheck(); controller.syncBabbage();
+      designPage = 'draft';
       setPanel('revision');
       document.getElementById('revision')?.focus();
     } else if (action === 'dismiss-ai') { ai.suggestion = null; ai.error = 'Your draft is unchanged.'; render(); app.querySelector('[data-action="generate-ai"]')?.focus(); }
