@@ -12,7 +12,7 @@ Browser persistence retains the original assignment, current and previous drafts
 
 The guide includes original/revised directions and rationale but omits an explicit challenge and learning-goal summary. The rationale prompt can ask how the educator would recognize learning, within the existing response rather than a new required form. Babbage's rationale can currently read like the educator's own judgment after applying a suggestion; ask the educator to evaluate it explicitly. Response length is not a measure of reasoning quality, and the existing nonempty-answer check should stay that way.
 
-Maya's authored dialogue responds to the lemonade example only. There is no course-specific student simulation or detailed Maya profile in this checkout. Do not invent a replacement identity or present keyword-generated judgments as authentic student feedback. A later increment should add an optional, grounded student reading of the actual revised instructions, using the original character profile when available and clearly distinguishing simulation from observed student outcomes.
+Maya's authored dialogue responds to the lemonade example only. At the initial audit, there was no course-specific student simulation or detailed Maya profile in this checkout. The project owner has since supplied her approved identity and personality, now preserved in [Maya's character profile](characters/maya.md); proposed dialogue examples remain pending review. Existing opening dialogue and artwork are compatible and retained. Do not invent a replacement identity or present keyword-generated judgments as authentic student feedback. A later increment should add an optional, grounded student reading of the actual revised instructions using this profile, clearly distinguishing simulation from observed student outcomes.
 
 ## Reuse and simplification
 
@@ -32,7 +32,7 @@ The first increment changes guide presentation and instructional wording only. I
 
 1. Commit this audit after running the existing unit checks as a baseline.
 2. Add the decision summary to the existing guide, using existing fields; refine the existing reason prompt to include expected evidence and evaluation of AI help. Test escaping, old saves, draft/approved labels, and the complete mocked browser flow.
-3. In a separate increment, implement grounded Maya feedback after recovering or confirming her full profile and the intended service contract. Verify feedback against contrasting drafts, edits, and resume behavior.
+3. In a separate increment, implement grounded Maya feedback using the supplied approved profile after confirming the intended service contract. Verify feedback against contrasting drafts, edits, and resume behavior. New proposed dialogue examples remain subject to review.
 4. Recover and audit the research logger and consent contract before integrating any incremental event collection. Validate meaningful decision records without treating word count as reasoning quality.
 
 Use recoverable Git checkpoints. Do not deploy without approval.

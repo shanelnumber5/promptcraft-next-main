@@ -46,6 +46,7 @@ The guide embeds its own styles because downloads must work offline.
 
 ## Assets and supporting files
 
+- `docs/characters/maya.md`: approved Maya identity and dialogue rules; consult before changing her portrayal or implementing conversational feedback.
 - `assets/backgrounds/classroom.png`: active wide classroom background.
 - `assets/characters/maya/`, `assets/characters/pixel/`: used character expressions.
 - `assets/brand/babbage-mark.svg`: PromptCraft emblem, including the offline guide.
