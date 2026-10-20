@@ -26,8 +26,8 @@ body[data-app-view]:not([data-app-view='play']) .app-header {
   padding: 18px max(32px, calc((100vw - 1320px) / 2));
   background: white; color: var(--navy); border-bottom: 1px solid #dce5ef;
 }
-body[data-app-view]:not([data-app-view='play']) .brand { color: var(--navy); gap: 0; }
-body[data-app-view]:not([data-app-view='play']) .brand > img { display: none; }
+body[data-app-view]:not([data-app-view='play']) .brand { color: var(--navy); gap: 12px; }
+body[data-app-view]:not([data-app-view='play']) .brand > img { display: block; width: 56px; height: 56px; object-fit: contain; }
 body[data-app-view]:not([data-app-view='play']) .brand strong { font-size: 30px; font-weight: 700; letter-spacing: -1.3px; }
 body[data-app-view]:not([data-app-view='play']) .brand strong span { color: var(--blue); }
 body[data-app-view]:not([data-app-view='play']) .brand small { color: #405674; font-size: 14px; margin-top: 2px; }
@@ -286,4 +286,36 @@ body[data-app-view]:not([data-app-view='play']) select { font-family: var(--font
   .workspace-shell .ai-panel-heading h2 { font-size: 22px; }
   .babbage-machine-mark { width: 52px; height: 52px; }
   .babbage-machine-mark svg { width: 40px; height: 40px; }
+}
+
+/* One clear gallery heading, a visible way back, and open workspace sections. */
+.gallery-heading { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 4px 0 22px; }
+.gallery-heading h1 { font-size: clamp(32px, 3.5vw, 44px); margin: 0 0 8px; }
+.gallery-heading p { margin: 0; font-size: 17px; color: #405674; }
+.gallery-return { background: var(--navy); color: white; border-color: var(--navy); border-radius: 12px; padding: 12px 18px; flex-shrink: 0; }
+.gallery-provenance { font-size: 14px; color: #405674; margin: 0 0 14px; }
+.gallery-controls { padding: 18px 0; margin: 0 0 12px; border: 0; border-top: 1px solid #c8d6e5; border-bottom: 1px solid #c8d6e5; border-radius: 0; background: transparent; }
+.workspace-settings { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; margin-top: 32px; padding-top: 28px; border-top: 1px solid #b7c9de; }
+.workspace-section { min-width: 0; }
+.workspace-section h2 { font-size: 22px; margin: 0 0 20px; }
+.workspace-section .setup-field { margin: 0 0 20px; }
+.workspace-section .setup-field > label { font-size: 16px; font-weight: 700; }
+.workspace-section .field-help { font-size: 14px; line-height: 1.5; }
+.workspace-section textarea, .workspace-section input[type='text'] { width: 100%; padding: 10px; border: 1px solid #9eb5d0; border-radius: 10px; background: white; color: var(--ink); }
+.workspace-earlier { margin-top: 24px; padding-top: 20px; border-top: 1px solid #c8d6e5; }
+.workspace-earlier h3 { font-size: 18px; }
+.workspace-shell .babbage-history { margin-top: 24px; }
+.workspace-inspiration { padding-top: 12px; border-top: 1px solid #dce5ef; }
+.workspace-inspiration h3 { font-size: 16px; margin: 0 0 6px; }
+.workspace-inspiration p { margin: 0; }
+@media (max-width: 900px) {
+  .gallery-heading { align-items: flex-start; flex-direction: column; gap: 18px; }
+  .workspace-settings { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .workspace-section + .workspace-section { padding-top: 24px; border-top: 1px solid #c8d6e5; }
+}
+@media (max-width: 700px) {
+  body[data-app-view]:not([data-app-view='play']) .brand { gap: 8px; }
+  body[data-app-view]:not([data-app-view='play']) .brand > img { width: 40px; height: 40px; }
+  body[data-app-view]:not([data-app-view='play']) .brand strong { font-size: 23px; letter-spacing: -.8px; }
+  .gallery-return { width: 100%; flex-shrink: 1; font-size: 16px; }
 }

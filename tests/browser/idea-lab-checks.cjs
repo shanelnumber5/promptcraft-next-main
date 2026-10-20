@@ -73,7 +73,7 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await panel('revision');
     await fill('subject', 'Office Management & Supervision');
     await fill('learningGoal', 'Explain a fair staffing decision with evidence.');
-    await evaluate('document.querySelector(".workspace-context details summary").click()');
+    assert.equal(await evaluate('document.querySelectorAll(".workspace-shell details").length'), 0, 'Workspace fields are visible sections');
     await fill('aiUse', 'Students may ask AI for feedback, but must explain and verify their own decisions.');
     await fill('workTime', '60 minutes');
     await fill('mustStay', 'Use a fictional staffing case and preserve the existing rubric.');
@@ -81,6 +81,9 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await accessibleScreen(device + ' workspace design');
     await contrast();
     await shot('lab-' + device + '-design');
+    await evaluate('document.querySelector(".workspace-settings").scrollIntoView()');
+    await shot('lab-' + device + '-context-sections');
+    await evaluate('scrollTo(0, 0)');
     await keyboardReach('[data-workspace-panel="revision"]');
     await key('ArrowRight', 'ArrowRight', 39);
     assert.equal(await evaluate('document.activeElement.dataset.workspacePanel'), 'babbage');
@@ -100,6 +103,7 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await click('dismiss-ai');
     await click('generate-ai');
     await waitFor('!!document.querySelector("[data-action=apply-ai]")');
+    assert.equal(await evaluate('document.querySelectorAll(".workspace-shell details").length'), 0);
     await accessibleScreen(device + ' workspace Babbage');
     await contrast();
     await shot('lab-' + device + '-suggestion');
@@ -178,7 +182,7 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await fill('directions', 'Existing assignment updated: compare three recommendations.');
     assert.equal(await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.design.revision'), '', 'A changed baseline archives the previous draft');
     assert.equal(await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.design.previousRevision'), 'My independent recommendation report.');
-    await evaluate('document.querySelector(".workspace-draft details summary").click()');
+    assert.equal(await evaluate('document.querySelectorAll(".workspace-shell details").length'), 0);
     await click('restore-earlier');
     assert.equal(await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.design.revision'), 'My independent recommendation report.');
     await evaluate('localStorage.setItem("promptcraft_assignment_workspace_v1","{broken");location.reload()');
