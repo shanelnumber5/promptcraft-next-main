@@ -9,7 +9,7 @@ export function freshWorkspace() {
   const state = initialState(discussionOpening);
   state.phase = 'design';
   state.designStep = 2;
-  state.designPanel = 'babbage';
+  state.designPanel = 'revision';
   state.workspace = workspaceDefaults();
   return state;
 }
@@ -29,7 +29,7 @@ export function readWorkspace(storage = window.localStorage) {
     state.workspace = metadata;
     state.phase = 'design';
     state.designStep = 2;
-    state.designPanel = 'babbage';
+    state.designPanel = ['revision', 'babbage', 'reason'].includes(state.designPanel) ? state.designPanel : 'revision';
     return { state, exists: true, error: '' };
   } catch {
     return { state: freshWorkspace(), exists: false, error: 'Your saved workspace could not be read. It has not been overwritten. Reset this workspace to start again.' };
@@ -57,9 +57,9 @@ export function resumePath(storage = window.localStorage) {
   try {
     const raw = JSON.parse(storage.getItem(STORAGE_KEY) || 'null');
     guided = raw?.version === 1 && raw.scenarioId === discussionOpening.id && raw.contentVersion === discussionOpening.contentVersion && discussionOpening.scenes.some(scene => scene.id === raw.sceneId);
-    workspace = readWorkspace(storage).exists;
-    last = JSON.parse(storage.getItem(ENTRY_KEY) || 'null')?.lastPath;
   } catch { /* Invalid preferences must not erase either save. */ }
+  workspace = readWorkspace(storage).exists;
+  try { last = JSON.parse(storage.getItem(ENTRY_KEY) || 'null')?.lastPath; } catch { /* Resume a valid path without this preference. */ }
   if (last === 'workspace' && workspace) return 'workspace';
   if (last === 'play' && guided) return 'play';
   return guided ? 'play' : workspace ? 'workspace' : '';

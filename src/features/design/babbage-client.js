@@ -1,4 +1,6 @@
 import { instructions } from './babbage-prompt.js';
+import { workspaceInstructions } from '../workspace/prompt.js';
+import { findIdea } from '../idea-lab/ideas.js';
 export const BABBAGE_ENDPOINT = 'https://promptcraft-test.netlify.app/.netlify/functions/babbage';
 export const conversationDefaults = () => ({
   context: '',
@@ -10,7 +12,7 @@ export const conversationDefaults = () => ({
   mode: 'live',
 });
 export const assignmentContext = (state) =>
-  JSON.stringify({ teacher: state.teacher, design: state.design });
+  JSON.stringify({ teacher: state.teacher, design: state.design, ...(state.workspace ? { workspace: state.workspace } : {}) });
 
 export function buildBabbageRequest(state, intent) {
   const conversation = state.babbage ?? conversationDefaults();
@@ -18,13 +20,14 @@ export function buildBabbageRequest(state, intent) {
   return {
     analysis_type: 'scenario1',
     max_output_tokens: intent === 'revise' ? 5000 : 2500,
-    system: instructions,
+    system: state.workspace ? workspaceInstructions : instructions,
     messages: [
       {
         role: 'user',
         content: JSON.stringify({
           teacher: state.teacher,
           design: { concern, exchange, notes, revision, reason },
+          ...(state.workspace ? { workspace: { ...state.workspace, idea: findIdea(state.workspace.ideaId) || null } } : {}),
         }),
       },
       ...conversation.history.map(({ role, content }) => ({ role, content })),
@@ -95,14 +98,14 @@ export function devBabbageTurn(state, intent) {
   if (intent === 'clarify' && !conversation.history.some((turn) => turn.role === 'user'))
     return {
       message:
-        'This simulated check asks about the reply and follow-up. It does not analyze your assignment with AI.',
+        state.workspace ? 'This simulated check asks about the activity and constraints. It does not analyze your assignment with AI.' : 'This simulated check asks about the reply and follow-up. It does not analyze your assignment with AI.',
       questions: [
         {
           id: 'dev-reply',
-          text: 'What should a classmate’s reply help the student reconsider?',
+          text: state.workspace ? 'What should students produce or decide in this activity?' : 'What should a classmate’s reply help the student reconsider?',
           field: '',
         },
-        { id: 'dev-followup', text: 'What should students do after receiving a reply?', field: '' },
+        { id: 'dev-followup', text: state.workspace ? 'Which practical constraint should the activity preserve?' : 'What should students do after receiving a reply?', field: '' },
       ],
       ready: false,
       suggestion: null,
@@ -123,7 +126,7 @@ export function devBabbageTurn(state, intent) {
       revision: state.design.revision || state.teacher.directions,
       reason:
         state.design.reason ||
-        'Dev testing example: use peer feedback to reconsider a choice, then revise or defend it with reasons.',
+        (state.workspace ? 'Dev testing example: explain a design decision and look for evidence in student work.' : 'Dev testing example: use peer feedback to reconsider a choice, then revise or defend it with reasons.'),
       questions: '',
     },
   };

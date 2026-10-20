@@ -1,0 +1,59 @@
+/* Entry and workspace additions use the existing PromptCraft palette. */
+.action-link {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 44px; padding: 8px 14px; border: 1px solid var(--border);
+  border-radius: 10px; background: #e8f1f7; color: var(--navy);
+  font-size: 16px; font-weight: 650; text-align: center; text-decoration: none;
+}
+.action-link.primary { background: var(--blue); color: white; border-color: var(--blue); }
+.action-link:hover { text-decoration: underline; }
+.entry-shell, .workspace-shell {
+  max-width: 1200px; margin: 0 auto; padding: clamp(16px, 3vw, 32px);
+  border: 1px solid var(--border); border-top: 5px solid var(--gold);
+  border-radius: 16px; background: var(--paper); overflow-wrap: anywhere;
+}
+.entry-shell h1, .workspace-shell h1 { color: var(--navy); line-height: 1.2; margin: 12px 0; font-size: clamp(28px, 4vw, 38px); }
+.entry-shell h2, .workspace-shell h2 { color: var(--navy); font-size: 23px; line-height: 1.3; }
+.entry-grid, .idea-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.entry-grid article, .idea-card { padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: #f4f8fb; min-width: 0; }
+.idea-card { display: flex; flex-direction: column; gap: 10px; font-size: 16px; }
+.idea-card h2, .idea-card p { margin: 0; }
+.idea-card .action-link { align-self: flex-start; margin-top: auto; }
+.idea-label { display: block; color: #795009; font-size: 16px; font-weight: 650; }
+.idea-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.idea-tags span { background: var(--gold-pale); color: var(--navy); padding: 4px 8px; border-radius: 8px; font-size: 16px; }
+.resume-card, .sharing-note { margin: 24px 0; padding: 20px; border-left: 4px solid var(--gold); background: #fff9ec; border-radius: 8px; }
+.gallery-controls { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin: 24px 0 12px; }
+.gallery-controls label { display: block; font-weight: 650; color: var(--navy); }
+.gallery-controls input, .gallery-controls select { width: 100%; min-width: 0; min-height: 48px; font: inherit; font-size: 16px; padding: 10px; border: 2px solid #6b8197; border-radius: 8px; color: var(--ink); background: white; }
+.idea-detail { max-width: 860px; }
+.idea-detail .idea-label { margin-top: 20px; }
+.idea-detail li { margin-bottom: 12px; }
+.workspace-heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+.workspace-tabs { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 0 16px; border-bottom: 2px solid var(--gold); margin-bottom: 20px; }
+.workspace-tabs [aria-selected='true'] { color: white; background: var(--navy); }
+.workspace-shell [role='tabpanel'] { min-width: 0; }
+.workspace-design { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 24px; }
+.workspace-context { display: grid; gap: 16px; align-content: start; }
+.workspace-context fieldset { border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin: 0; }
+.workspace-context fieldset label { display: block; padding: 6px 0; font-size: 16px; }
+.workspace-context [data-setup-form] > .setup-field { margin-bottom: 16px; }
+.workspace-context textarea { height: auto; min-height: 100px; resize: vertical; }
+.workspace-shell details { padding: 12px; margin: 12px 0; border: 1px solid var(--border); border-radius: 8px; }
+.workspace-shell summary { cursor: pointer; color: var(--navy); font-weight: 650; min-height: 44px; }
+.workspace-shell details .setup-field { margin: 12px 0; }
+.workspace-draft .directions-editor { min-height: 360px; max-height: 70dvh; overflow: auto; }
+.workspace-draft, .workspace-original { min-width: 0; }
+.workspace-original { max-height: 240px; overflow: auto; padding: 12px; border: 1px solid var(--border); border-radius: 8px; }
+.workspace-shell .final-check-layout { margin-top: 20px; }
+.workspace-shell .guide-access { padding: 18px; gap: 16px; margin-bottom: 20px; }
+@media (max-width: 1000px) { .idea-grid, .entry-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) {
+  .workspace-design, .gallery-controls, .entry-grid, .idea-grid { grid-template-columns: minmax(0, 1fr); }
+  .workspace-tabs { display: grid; grid-template-columns: 1fr; }
+  .workspace-tabs button { font-size: 16px; }
+  .workspace-shell .final-check-layout { display: block; }
+  .workspace-shell .directions-toolbar { flex-wrap: wrap; }
+  .entry-shell, .workspace-shell { border-radius: 10px; }
+  .header-actions { flex-wrap: wrap; }
+}

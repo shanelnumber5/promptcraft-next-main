@@ -9,13 +9,13 @@ Give a brief first reading of the CURRENT revised assignment, about 80–130 wor
 Use the existing scenario1 response schema. Put only Maya's student response in feedback_summary. Set input_quality.usable true and input_quality.concerns to an empty array. Leave revised_discussion_prompt and revision_review.why_these_changes empty. Do not generate assignment directions or approve anything.`;
 
 const normalized = (text) => text.replace(/[*_`#]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
-export const mayaContext = (state) => JSON.stringify([state.teacher, state.design, state.babbage.mode]);
+export const mayaContext = (state) => JSON.stringify([state.teacher, state.design, state.babbage.mode, ...(state.workspace ? [state.workspace] : [])]);
 
 export function buildMayaRequest(state, previous = []) {
   const request = buildBabbageRequest(state, 'clarify');
   return {
     ...request,
-    system: mayaInstructions,
+    system: mayaInstructions + (state.workspace ? '\nThis is the private assignment workspace. If workspace.sourceKind is idea, teacher.directions is a starting idea, not an earlier assignment students completed. Describe how the current draft develops that idea rather than inventing a before-and-after experience. A gallery idea is optional inspiration. You may read any type of assignment; do not expect a forum or peer replies unless the directions call for them.' : ''),
     max_output_tokens: 1800,
     messages: [
       ...previous.slice(-2).flatMap((reading) => [
@@ -59,5 +59,5 @@ export function mayaExcerptPreview(state) {
   // Deliberately an excerpt preview, not pretend AI analysis or student evaluation.
   const excerpt = (text) => text.trim().replace(/\s+/g, ' ').slice(0, 240);
   const same = normalized(state.teacher.directions) === normalized(state.design.revision);
-  return `Original directions: “${excerpt(state.teacher.directions)}”\n\nCurrent revised directions: “${excerpt(state.design.revision)}”\n\n${same ? 'These directions have not changed.' : 'These are excerpts of the two versions for comparison.'} This preview does not interpret the assignment or simulate Maya’s judgment.`;
+  return `${state.workspace?.sourceKind === 'idea' ? 'Starting idea' : 'Original directions'}: “${excerpt(state.teacher.directions)}”\n\nCurrent revised directions: “${excerpt(state.design.revision)}”\n\n${same ? 'These directions have not changed.' : 'These are excerpts of the two versions for comparison.'} This preview does not interpret the assignment or simulate Maya’s judgment.`;
 }

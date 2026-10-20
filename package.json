@@ -9,7 +9,8 @@
   },
   "scripts": {
     "start": "node server/index.js",
-    "test": "node tests/unit/design.test.cjs && node tests/unit/babbage.test.cjs && node tests/unit/maya.test.cjs && node tests/unit/server.test.cjs && node tests/unit/repository.test.cjs",
+    "test": "node tests/unit/design.test.cjs && node tests/unit/babbage.test.cjs && node tests/unit/maya.test.cjs && node tests/unit/idea-lab.test.cjs && node tests/unit/server.test.cjs && node tests/unit/repository.test.cjs",
+    "test:lab": "node tests/browser/idea-lab.test.cjs",
     "test:design": "node tests/unit/design.test.cjs",
     "test:babbage": "node tests/unit/babbage.test.cjs",
     "test:maya": "node tests/unit/maya.test.cjs",

@@ -92,6 +92,7 @@ restartButton?.addEventListener('click', async () => {
 });
 const index = () => scenario.scenes.findIndex((s) => s.id === state.sceneId);
 function render({ focus = false, choiceFocus = null } = {}) {
+  document.querySelector('.skip-link')?.setAttribute('href', state.phase === 'opening' ? '#scene-title' : '#setup-title');
   app.innerHTML =
     state.phase === 'closing'
       ? renderClosing(state)
@@ -520,5 +521,6 @@ app.addEventListener('click', async (event) => {
   }
 });
 render();
+window.addEventListener?.('pagehide', () => ai.requestController?.abort());
 
 if (state.babbage.mode !== 'dev') refreshBabbageConnection();

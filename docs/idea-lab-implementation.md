@@ -10,6 +10,18 @@ Existing prompts, checks, and guide headings assume a discussion activity. A sep
 
 Foundation checkpoint: 12 original illustrative activities, local search/filtering, entry renderer, isolated save/restore/reset, and legacy-compatible restoration. The gallery is not a collection of real faculty submissions. Foundation unit checks and all five existing unit suites passed before wiring the new views into the application.
 
+## Integrated prototype
+
+The same `index.html` now loads a small entry module. `?view=home`, `?view=play`, `?view=workspace`, and `?view=lab` select views. Root visits resume valid saved progress automatically; explicit Home offers Continue and the entry choices. Existing guided phase IDs and the guided key are unchanged. The original app controller is imported only for the guided path.
+
+The gallery has 12 AI-assisted illustrative starters, keyword search, category filtering, and activity details. Adapt with Babbage records inspiration and opens the workspace; it does not send an AI request automatically. For a new workspace, it seeds a starting idea. For an existing workspace, it keeps the starting text, draft, and rationale while resetting outdated conversation and approval, as described beside the action. One current workspace is supported in this prototype.
+
+The workspace presents Design, Babbage, and Review & Course Guide as keyboard-accessible tabs. It reuses the formatted editor, AI panel and asynchronous controller, Maya dialog, final checks, preview, and HTML download. Starting material can be existing directions or an idea. General learner-needs text is optional. A final workspace guide requires a starting point, learning goal, rationale, draft, and reviewed checks; it omits the scenario example and identifies any illustrative inspiration. Nothing is published.
+
+Workspace prompt version: `idea-lab-workspace-2026-10-19`. It is selected only for workspace requests; guided instructions retain their current version. Both retain the existing API envelope. Workspace metadata appears inside ordinary request content, not a research event. Maya's workspace instruction distinguishes an idea from an existing assignment. Session-only Maya readings and transient unapplied AI suggestions retain their existing refresh limitations.
+
+The first integrated desktop Chrome check passed gallery search/details, adaptation, shared Babbage accept/edit/reject, Maya, approved guide preview/download, path switching, approval restoration, reset isolation, malformed workspace protection, and quota-failure recovery. All six unit suites pass. Browser AI calls are mocked; no live-service quality result is claimed. Broader responsive and guided regression checks follow this checkpoint.
+
 ## Research, privacy, and version effects
 
 No event schema or participant enrollment is introduced. Workspace metadata describes a private design, not research participation. Any optional learner-needs description must concern general access or learning needs, without names or identifying details. Babbage and Maya continue using the same external endpoint and API envelope. A workspace prompt variant changes the educational task and outputs, so it must be documented separately from the guided prompt.

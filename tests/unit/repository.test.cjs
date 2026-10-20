@@ -41,8 +41,9 @@ for (const asset of filesIn(path.join(root, 'assets')))
   assert.ok(usedAssets.has(asset), `Unreferenced asset: ${path.relative(root, asset)}`);
 const entry = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 for (const match of entry.matchAll(/(?:src|href)="([^"#]+)"/g)) {
-  if (match[1] !== './')
-    assert.ok(fs.existsSync(path.join(root, match[1])), `Missing entry reference: ${match[1]}`);
+  const pathname = match[1].split(/[?#]/)[0];
+  if (pathname && pathname !== './')
+    assert.ok(fs.existsSync(path.join(root, pathname)), `Missing entry reference: ${match[1]}`);
 }
 assert.ok(!fs.existsSync(path.join(root, 'server/ai.js')), 'Retired provider should not return');
 const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));

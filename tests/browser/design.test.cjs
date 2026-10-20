@@ -18,6 +18,7 @@ const auditRecords = [];
 let failNextAi = false;
 let babbageCalls = 0;
 const mayaRequests = [];
+const apiRequests = [];
 const aiFixture = {
   revision:
     '### Peer exchange\n\n1. **First post:** Explain a recommendation.\n2. **Reply:** Compare a classmate’s evidence.\n   - Explain what it reveals.\n3. **Follow-up:** Revise or defend your recommendation.',
@@ -36,10 +37,14 @@ const server = http.createServer((req, res) => {
     req.on('data', (chunk) => chunks.push(chunk));
     req.on('end', () => {
       const body = JSON.parse(Buffer.concat(chunks).toString());
+      apiRequests.push(body);
+      const isWorkspace = body.system.includes("PromptCraft's Idea Lab");
       const isMaya = body.system.startsWith('You are Maya,');
       if (isMaya) mayaRequests.push(body);
       const current = isMaya ? JSON.parse(body.messages.at(-2).content) : {};
-      const mayaResponse = current.design?.revision.includes('Follow-up due Sunday.')
+      const mayaResponse = current.design?.revision.includes('Compare two staffing schedules.')
+        ? '“Compare two staffing schedules.” gives me a specific decision to work through. I can explain which plan seems fair and why. The starting idea was broad; now I know what I would produce. I would want to know which staffing details I should use.'
+        : current.design?.revision.includes('Follow-up due Sunday.')
         ? 'The new directions say “Follow-up due Sunday.” That answers my earlier timing question. I still need to compare a classmate’s evidence and explain what I learned from it, but now I can plan when to return to the discussion.'
         : current.design?.revision.includes('Choose a metaphor')
         ? '“Choose a metaphor in the poem” gives me somewhere to start. Before, I could just agree with two people. Now I need two lines to explain my reading, so I have something specific to discuss. Which poem are we using?'
@@ -57,12 +62,12 @@ const server = http.createServer((req, res) => {
         analysis: {
           feedback_summary: isMaya ? mayaResponse : answered
             ? 'You can generate a revision.'
-            : 'Please clarify the follow-up.',
+            : isWorkspace ? 'Which time or resource constraint should this activity preserve?' : 'Please clarify the follow-up.',
           input_quality: {
             usable: isMaya || answered,
-            concerns: isMaya || answered ? [] : ['What should students do after receiving a reply?'],
+            concerns: isMaya || answered ? [] : [isWorkspace ? 'Which time or resource constraint should this activity preserve?' : 'What should students do after receiving a reply?'],
           },
-          revised_discussion_prompt: intent === 'revise' ? aiFixture.revision : '',
+          revised_discussion_prompt: intent === 'revise' ? (isWorkspace ? '### Staffing decision\n\n1. Compare two staffing schedules.\n2. Recommend a fair plan using the supplied workplace case.\n3. Explain a tradeoff and how you would check the plan.' : aiFixture.revision) : '',
           revision_review: { why_these_changes: intent === 'revise' ? aiFixture.reason : '' },
         },
       };
@@ -265,6 +270,8 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     });
     const { initialState } = await import('../../src/app/storage.js'),
       { discussionOpening: scenario } = await import('../../src/features/opening/content.js');
+    if (process.env.PC_BROWSER_FEATURE === 'lab')
+      await require('./idea-lab-checks.cjs')({ send, evaluate, waitFor, click, fill, shot, key, keyboardReach, keyboardActivate, accessibleScreen, root, apiRequests, initialState, scenario });
     for (const [device, width, height] of [
       ['desktop', 1440, 1000],
       ['wide-review', 1892, 907],
@@ -288,7 +295,7 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       ['desktop-breakpoint', 1181, 821],
     ].filter(
       ([device]) =>
-        !process.env.PC_BROWSER_DEVICE || process.env.PC_BROWSER_DEVICE.split(',').includes(device),
+        process.env.PC_BROWSER_FEATURE !== 'lab' && (!process.env.PC_BROWSER_DEVICE || process.env.PC_BROWSER_DEVICE.split(',').includes(device)),
     )) {
       const storyFullscreen = width >= 1100 && height >= 700 || width >= 1000 && height >= 850;
       await send('Emulation.setDeviceMetricsOverride', {
@@ -297,7 +304,7 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
         deviceScaleFactor: 1,
         mobile: device === 'phone',
       });
-      await send('Page.navigate', { url: 'http://127.0.0.1:8783' });
+      await send('Page.navigate', { url: 'http://127.0.0.1:8783/?view=play' });
       await waitFor(
         '!!document.querySelector("#scene-title") || !!document.querySelector("#setup-title")',
       );

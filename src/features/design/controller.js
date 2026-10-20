@@ -209,7 +209,7 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
     } catch {
       ai.configured = false;
     }
-    if (state.phase === 'design' && !ai.pending) render();
+    if (state === getState() && state.phase === 'design' && !ai.pending && (!state.workspace || state.designPanel === 'babbage')) render();
   }
   return { updateClarificationAnswer, moveQuestion, syncBabbage, askBabbage, refreshBabbageConnection };
 }

@@ -143,6 +143,7 @@ export const finalCheckContext = (teacher, design) =>
 export const finalCheckReady = (state) =>
   Boolean(
     state.design.revision.trim() &&
+      (!state.workspace || (state.design.reason.trim() && state.teacher.directions.trim() && !state.teacher.learningGoalUnsure)) &&
       state.teacher.learningGoal.trim() &&
       finalCheckItems.every((item) => state.finalCheck[item.id] === true) &&
       state.finalCheck.context === finalCheckContext(state.teacher, state.design),

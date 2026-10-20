@@ -107,7 +107,7 @@ export function loadState(scenario, storage = window.localStorage, workspace = n
       for (const key of ['instructions', 'learning', 'requirements'])
         finalCheck[key] = saved.finalCheck[key] === true;
       finalCheck.completed =
-        saved.finalCheck.completed === true && finalCheckReady({ teacher, design, finalCheck });
+        saved.finalCheck.completed === true && finalCheckReady({ teacher, design, finalCheck, ...(workspace ? { workspace } : {}) });
       finalCheck.approved = saved.finalCheck.approved === true && finalCheck.completed;
     }
     const designStep = Math.max(
