@@ -47,7 +47,7 @@ export function renderScene(scenario, scene, state, index, options = {}) {
   }));
   const navigation =
     options.navigation ??
-    `<nav class="scene-actions" aria-label="Story navigation"><button type="button" class="nav-button nav-button--back" data-action="back"${index === 0 && !showingBoard ? ' disabled' : ''}><span aria-hidden="true">←</span><span>Back</span></button><span class="navigation-hint">${!showingBoard ? 'Read the dialogue, then continue to the board.' : !ready ? 'Choose a response, then use the feedback to reconsider.' : 'Continue when you are ready.'}</span><button type="button" class="primary nav-button nav-button--next" data-action="${nextAction}"${!ready ? ' disabled' : ''}><span>${nextLabel}</span><span aria-hidden="true">→</span></button></nav>`;
+    `<nav class="scene-actions" aria-label="Story navigation"><button type="button" class="nav-button nav-button--back" data-action="back"${index === 0 && !showingBoard ? ' disabled' : ''}><span>Back</span></button><span class="navigation-hint">${!showingBoard ? 'Read the dialogue, then continue to the board.' : !ready ? 'Choose a response, then use the feedback to reconsider.' : 'Continue when you are ready.'}</span><button type="button" class="primary nav-button nav-button--next" data-action="${nextAction}"${!ready ? ' disabled' : ''}><span>${nextLabel}</span></button></nav>`;
   const progressLabel =
     options.progressLabel ?? scene.part + ' · ' + (index + 1) + ' of ' + scenario.scenes.length;
   const speaker = cast.find((c) => c.id === scene.speaker);

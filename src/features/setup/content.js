@@ -57,7 +57,7 @@ const setupSections = {
         {
           id: 'directions',
           label: 'Paste the larger assignment directions',
-          help: 'These directions provide context. We’ll create a bounded discussion-board component that supports the assignment, not an all-in-one replacement.',
+          help: 'These directions provide context for the discussion-board component.',
           type: 'textarea',
           rows: 9,
           placeholder: 'Paste the current assignment directions for context.',

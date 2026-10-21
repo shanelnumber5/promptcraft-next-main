@@ -82,8 +82,8 @@ export async function requestBabbageTurn(state, intent, { fetchImpl = fetch, sig
   if (!response.ok)
     throw Error(
       response.status === 429
-        ? 'Babbage has reached a usage limit. Try again later or use the labeled Dev fallback.'
-        : 'Babbage could not respond. Your draft is unchanged. Retry or use the labeled Dev fallback.',
+        ? 'Babbage has reached a usage limit. Try again later or continue editing your draft.'
+        : 'Babbage could not respond. Your draft is unchanged. Retry or continue editing your draft.',
     );
   let data;
   try {

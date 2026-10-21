@@ -1,3 +1,4 @@
+import { isTestLessonKeyword, fillTestLesson } from '../shared/test-lesson.js';
 import { createDesignController } from '../features/design/controller.js';
 import { openGuidePreview } from '../features/design/guide-preview.js';
 import { renderClosing } from '../features/design/closing.js';
@@ -198,6 +199,12 @@ app.addEventListener('change', (event) => {
   highlightNextAction(app, state, ai);
 });
 app.addEventListener('input', (event) => {
+  if (event.target.closest('[data-setup-form]') && isTestLessonKeyword(event.target)) {
+    ai.requestController?.abort();
+    fillTestLesson(state, event.target.value);
+    Object.assign(ai, {configured:null,pending:false,suggestion:null,error:'',context:''});
+    saveSafely(); render({focus:true}); refreshBabbageConnection(); return;
+  }
   const editor = event.target.closest('[data-assignment-editor]');
   if (editor) {
     updateDesignField({ name: 'revision', value: serializeDirectionsEditor(editor) });

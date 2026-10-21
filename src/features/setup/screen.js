@@ -9,7 +9,7 @@ function renderTeacherField(field, values) {
 }
 
 function navigation(step, total, summary = false) {
-  return `<nav class="setup-actions" aria-label="Teacher setup navigation"><button type="button" class="nav-button nav-button--back" data-action="setup-back"><span aria-hidden="true">←</span><span>Back</span></button><span>${summary ? 'Review and edit your information' : `Step ${step + 1} of ${total}`}</span><button type="button" class="primary nav-button nav-button--next" data-action="${summary ? 'start-design' : 'setup-next'}"><span>${summary ? 'Design with Babbage' : step === total - 1 ? 'Review summary' : 'Continue'}</span><span aria-hidden="true">→</span></button></nav>`;
+  return `<nav class="setup-actions" aria-label="Teacher setup navigation"><button type="button" class="nav-button nav-button--back" data-action="setup-back"><span>Back</span></button><span>${summary ? 'Review and edit your information' : `Step ${step + 1} of ${total}`}</span><button type="button" class="primary nav-button nav-button--next" data-action="${summary ? 'start-design' : 'setup-next'}"><span>${summary ? 'Design with Babbage' : step === total - 1 ? 'Review summary' : 'Continue'}</span></button></nav>`;
 }
 
 function livePreview(directions) {

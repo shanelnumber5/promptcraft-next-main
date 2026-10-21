@@ -1,3 +1,4 @@
+import { characterArt } from '../../shared/character-art.js';
 // Content owns the scenario; the shared engine owns interaction and navigation.
 const firstPlan = {
   label: 'The first plan',
@@ -35,20 +36,21 @@ export const discussionOpening = {
       id: 'maya',
       name: 'Maya',
       side: 'left',
-      src: 'assets/characters/maya/neutral.png',
+      src: characterArt.maya.neutral,
       alt: 'Maya, the student in this fictional story.',
     },
     pixel: {
       id: 'pixel',
       name: 'Professor Pixel',
       side: 'right',
-      src: 'assets/characters/pixel/listening.png',
+      src: characterArt.pixel.neutral,
       alt: 'Professor Pixel, facing the student.',
     },
   },
   scenes: [
     {
       id: 'student-before',
+      portraits: { maya: characterArt.maya.skeptical },
       part: 'The experience',
       title: 'Maya describes the old discussion',
       speaker: 'maya',
@@ -63,6 +65,7 @@ export const discussionOpening = {
     },
     {
       id: 'meet-plan',
+      portraits: { pixel: characterArt.pixel.confident },
       part: 'The example',
       title: 'Pixel introduces the shared plan',
       speaker: 'pixel',
@@ -85,7 +88,7 @@ export const discussionOpening = {
       part: 'The example',
       title: 'Find a useful concern in the first plan',
       speaker: 'pixel',
-      portraits: { pixel: 'assets/characters/pixel/thinking.png' },
+      portraits: { pixel: characterArt.pixel.skeptical },
       dialogue:
         'Their first plan assigns Alex to payments and drinks, and Sam to supplies. Where might it get stuck?',
       board: firstPlan,
@@ -116,6 +119,7 @@ export const discussionOpening = {
     },
     {
       id: 'peer-question',
+      portraits: { pixel: characterArt.pixel.thoughtful },
       part: 'The exchange',
       title: 'Give a peer question a useful job',
       speaker: 'pixel',
@@ -157,7 +161,7 @@ export const discussionOpening = {
       part: 'The response',
       title: 'See how the group responds',
       speaker: 'pixel',
-      portraits: { pixel: 'assets/characters/pixel/encouraging.png' },
+      portraits: { pixel: characterArt.pixel.confident },
       dialogue:
         'They propose different roles and explain why. This is a plan to test, not proof that service will be faster. A group could also defend its original choice if it addresses the concern.',
       board: revisedPlan,
@@ -192,8 +196,8 @@ export const discussionOpening = {
       title: 'Maya explains what changed',
       speaker: 'maya',
       portraits: {
-        maya: 'assets/characters/maya/confident.png',
-        pixel: 'assets/characters/pixel/listening.png',
+        maya: characterArt.maya.friendly,
+        pixel: characterArt.pixel.neutral,
       },
       dialogue:
         "Another group asked what our second helper would do when a line formed. We hadn't thought about that. We changed the jobs and explained why.",
@@ -204,7 +208,7 @@ export const discussionOpening = {
       part: 'Your course',
       title: 'Connect the example to your assignment',
       speaker: 'pixel',
-      portraits: { pixel: 'assets/characters/pixel/encouraging.png' },
+      portraits: { pixel: characterArt.pixel.pleasant },
       dialogue:
         "Their question gave the group a reason to reconsider a decision. Where could a classmate's contribution help students think something through in your course?",
       board: {
