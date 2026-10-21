@@ -18,7 +18,7 @@ export function renderBoard(board, { afterContent = '' } = {}) {
   }
   if (board.note) content += `<p class="board-note">${e(board.note)}</p>`;
   const reading = (board.text || board.quote) && !board.visual && !board.nodes?.length && !board.facts?.length && !afterContent;
-  return `<section class="smartboard${reading ? ' smartboard--reading' : ''}" aria-labelledby="board-title"><div class="board-screen"><div class="board-heading"><div><span class="eyebrow">${e(board.label || 'On the smartboard')}</span><h2 id="board-title">${e(board.title)}</h2></div><span class="lemonade-icon">${lemonadeIcon}</span></div>${content}${afterContent}</div><div class="board-frame" aria-hidden="true"><span class="board-light"></span> PROMPTCRAFT</div></section>`;
+  return `<section class="smartboard${reading ? ' smartboard--reading' : ''}" aria-labelledby="board-title"><div class="board-camera" aria-hidden="true"><span></span></div><div class="board-screen"><div class="board-heading"><div><span class="eyebrow">${e(board.label || 'On the smartboard')}</span><h2 id="board-title">${e(board.title)}</h2></div><span class="lemonade-icon">${lemonadeIcon}</span></div>${content}${afterContent}</div><div class="board-frame" aria-hidden="true"><span class="board-status"><span class="board-light"></span><span class="board-speaker"></span></span><span class="board-brand">PROMPTCRAFT</span><span class="board-power"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2v7m-4-5a7 7 0 1 0 8 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span></div><div class="board-pen-tray" aria-hidden="true"><span class="board-stylus"></span><span class="board-stylus board-stylus--gold"></span></div></section>`;
 }
 
 export function renderCharacter(character, active) {

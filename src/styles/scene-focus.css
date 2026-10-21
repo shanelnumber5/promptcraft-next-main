@@ -427,3 +427,42 @@ body:has(.focused-scene) #app {
   .focused-scene .smartboard--reading .board-text { font-size: 20px; }
   .focused-scene .smartboard--reading .board-note { margin-top: 24px; padding-top: 16px; font-size: 16px; }
 }
+
+/* Physical interactive-display hardware; decorative, with no extra controls. */
+.focused-scene .smartboard {
+  padding: 17px 10px 0;
+  border: 1px solid #09111e;
+  border-radius: 10px;
+  background: linear-gradient(105deg, #28384b, #152439 8%, #18283d 92%, #344255);
+  box-shadow: 0 0 0 1px #6e7b8966, 0 2px 0 #07101c, 0 14px 28px #08132655;
+}
+.focused-scene .board-screen {
+  border-radius: 3px;
+  border: 1px solid #0a1422;
+  box-shadow: 0 0 0 1px #54617455, inset 0 1px 3px #1126500d;
+}
+.board-camera {
+  position: absolute; top: 4px; left: 50%; transform: translateX(-50%);
+  width: 58px; height: 9px; border-radius: 5px; background: #0a121e;
+  display: grid; place-items: center; box-shadow: inset 0 1px 2px #0008;
+  pointer-events: none;
+}
+.board-camera > span { width: 6px; height: 6px; border-radius: 50%; border: 1px solid #526174; background: radial-gradient(circle at 35% 30%, #768ca6 0 13%, #192c45 22% 48%, #070d18 60%); }
+.focused-scene .board-frame { display: flex; align-items: center; justify-content: space-between; height: 28px; min-height: 28px; padding: 0 12px; color: #9fabb9; font-size: 8px; letter-spacing: .18em; pointer-events: none; }
+.board-status { display: flex; align-items: center; gap: 12px; width: 74px; }
+.focused-scene .board-light { width: 4px; height: 4px; margin: 0; background: #a4b9b4; box-shadow: 0 0 2px #a4b9b444; }
+.board-speaker { width: 48px; height: 4px; border-radius: 2px; background: repeating-linear-gradient(90deg, #080f19 0 2px, #344255 2px 4px); }
+.board-power { display: flex; justify-content: flex-end; width: 74px; }
+.board-power svg { width: 13px; height: 13px; color: #a0adbd; }
+.board-pen-tray { position: absolute; z-index: 2; left: 29%; right: 29%; bottom: -10px; height: 14px; border: 1px solid #344153; border-radius: 2px 2px 5px 5px; background: linear-gradient(#75818e 0 12%, #3e4c5e 18% 45%, #263345 55% 80%, #536173 90%); box-shadow: 0 4px 5px #07101c44; pointer-events: none; }
+.board-stylus { position: absolute; top: -3px; left: 12%; width: 30%; height: 5px; border-radius: 4px; background: linear-gradient(#6f7b89, #172333 65%); box-shadow: 0 1px 1px #0005; }
+.board-stylus::after { content: ''; position: absolute; right: 7px; top: 0; width: 3px; height: 5px; background: #9cabb8; }
+.board-stylus--gold { left: 53%; background: linear-gradient(#b6a172, #695a39 65%); }
+.board-stylus--gold::after { background: #c8b687; }
+@media (max-width: 700px) {
+  .focused-scene .smartboard { padding: 15px 7px 0; }
+  .focused-scene .board-frame { height: 25px; min-height: 25px; padding: 0 7px; }
+  .board-speaker { width: 28px; }
+  .board-status, .board-power { width: 46px; }
+  .board-pen-tray { left: 23%; right: 23%; bottom: -9px; height: 12px; }
+}
