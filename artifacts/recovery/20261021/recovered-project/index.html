@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>PromptCraft | Give the discussion a job</title>
+    <link rel="icon" href="favicon.ico" />
+    <link rel="stylesheet" href="src/styles/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#scene-title">Skip to the activity</a>
+    <header class="app-header">
+      <a class="brand" href="?view=home" aria-label="PromptCraft home"
+        ><img src="assets/brand/babbage-mark.svg" alt="" /><span
+          ><strong>Prompt<span>Craft</span></strong
+          ><small>The Prompt Lab · Great Falls College MSU</small></span
+        ></a
+      >
+      <div class="header-actions">
+      <a class="action-link" href="?view=home">Home</a>
+      <button type="button" class="restart-module" data-action="open-references" aria-label="Sources and samples">
+        <span class="reference-label-wide">Sources &amp; samples</span><span class="reference-label-small">Resources</span>
+      </button>
+      <button type="button" class="restart-module" data-action="restart-module">
+        Restart module
+      </button>
+      </div>
+    </header>
+    <main id="app"></main>
+    <footer class="app-footer">
+      <span class="app-footer-brand">PromptCraft</span>
+      <a href="?view=privacy">Privacy &amp; Progress</a>
+      <span class="app-footer-disclosure">Asking Babbage sends assignment details to OpenAI</span>
+    </footer>
+    <noscript
+      >This prototype needs JavaScript. Your existing PromptCraft project is unchanged.</noscript
+    >
+    <script type="module" src="src/app/entry.js"></script>
+  </body>
+</html>

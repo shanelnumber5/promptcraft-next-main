@@ -1,0 +1,468 @@
+/* One camera subject at a time: the speaker, then the learning activity. */
+body:has(.focused-scene) {
+  height: auto;
+  min-height: 100dvh;
+  overflow: auto;
+  padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px));
+}
+body:has(.focused-scene) #app {
+  flex: 1 0 auto;
+}
+.focused-scene {
+  height: auto;
+  min-height: calc(100dvh - 250px);
+}
+.focused-scene .classroom {
+  flex: 1 0 auto;
+  display: grid;
+  place-items: center;
+  padding: 32px 24px;
+  min-height: 440px;
+  overflow: hidden;
+  background: #c6b9a2;
+}
+.focused-scene .classroom::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: linear-gradient(#10264755, #10264799), url('../../assets/backgrounds/classroom.png');
+  background-size: cover;
+  background-position: center;
+  transform: scale(1.5);
+  pointer-events: none;
+}
+.focused-scene.camera--left .classroom::before { transform-origin: left center; }
+.focused-scene.camera--right .classroom::before { transform-origin: right center; }
+.focused-scene.focus--board .classroom::before,
+.focused-scene.focus--question .classroom::before { transform: none; }
+.focused-scene .speaker-panel {
+  display: grid;
+  grid-template-columns: minmax(180px, 300px) minmax(0, 580px);
+  align-items: center;
+  gap: 32px;
+  width: 100%;
+  max-width: 1120px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+  animation: camera-arrive 420ms ease-out both;
+}
+.focused-scene.camera--left { --camera-entry: -28px; }
+.focused-scene.camera--right { --camera-entry: 28px; }
+.focused-scene .speaker-panel .cast {
+  position: relative;
+  inset: auto;
+  grid-column: 1;
+  grid-row: 1;
+  align-self: end;
+  width: 100%;
+  height: 360px;
+  overflow: visible;
+  border-bottom: 0;
+}
+.focused-scene .speaker-panel .character {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: visible;
+}
+.focused-scene .speaker-panel .character img {
+  top: auto;
+  bottom: 0;
+  left: 50%;
+  height: 100%;
+  width: auto;
+  transform: translateX(-50%);
+}
+.focused-scene .speaker-panel .character--left img {
+  width: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  left: 43%;
+  bottom: -15%;
+  transform: translateX(-50%) scale(1.25);
+  transform-origin: center bottom;
+}
+.focused-scene .speaker-panel .character--right img {
+  left: 40%;
+  height: 125%;
+  bottom: -30%;
+}
+.focused-scene.camera--right .speaker-panel {
+  grid-template-columns: minmax(0, 580px) minmax(180px, 300px);
+  justify-content: center;
+}
+.focused-scene.camera--right .speaker-panel .cast { grid-column: 2; }
+.focused-scene.camera--right .speaker-panel .speech-bubble { grid-column: 1; }
+.focused-scene .character figcaption { display: none; }
+.focused-scene .speaker-panel .speech-bubble {
+  grid-column: 2;
+  grid-row: 1;
+  position: relative;
+  inset: auto;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  max-height: none;
+  overflow: visible;
+  align-self: center;
+  margin: 0;
+  padding: 28px 32px;
+  border: 1px solid #d9ad51;
+  border-radius: 18px;
+  background: #fff8e8;
+  box-shadow: 0 8px 28px #081a3633;
+}
+.focused-scene .speech-bubble h2 {
+  font-size: 26px;
+  margin: 8px 0 16px;
+}
+.focused-scene .speech-bubble p {
+  font-size: clamp(20px, 2vw, 26px);
+  line-height: 1.6;
+}
+.focused-scene .smartboard {
+  position: relative;
+  inset: auto;
+  flex: none;
+  width: 100%;
+  max-width: 1050px;
+  min-height: 420px;
+  height: auto;
+  max-height: none;
+  margin: 0;
+  padding: 8px 8px 0;
+  animation: board-arrive 320ms ease-out both;
+}
+.focused-scene .board-screen {
+  flex: none;
+  padding: 24px 28px;
+  overflow: visible;
+}
+.focused-scene .board-heading h2 { font-size: clamp(24px, 3vw, 34px); }
+.focused-scene .board-text,
+.focused-scene .board-quote { font-size: 20px; line-height: 1.5; }
+.focused-scene .choices {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #829db2;
+}
+.focused-scene .choices legend {
+  float: left;
+  width: 100%;
+  font-size: 22px;
+  line-height: 1.4;
+  margin-bottom: 16px;
+}
+.focused-scene .choice-list {
+  clear: both;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+.focused-scene .choice { font-size: 18px; padding: 16px; line-height: 1.5; }
+.focused-scene .feedback { line-height: 1.5; padding-top: 16px; }
+.focused-scene .dialogue {
+  flex: 0 0 auto;
+  height: auto;
+  padding: 0 24px;
+}
+.focused-scene .scene-actions {
+  position: fixed;
+  z-index: 10;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 16px 24px calc(24px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -4px 18px #081a3614;
+}
+.focused-scene .save-notice:empty { display: none; }
+@keyframes camera-arrive {
+  from { opacity: 0; transform: translateX(var(--camera-entry, 0)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes board-arrive {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 700px) {
+  .focused-scene .scene-actions { padding-left: 12px; padding-right: 12px; }
+  .focused-scene .classroom { padding: 20px 12px 0; min-height: 0; place-items: end center; }
+  .focused-scene .speaker-panel {
+    grid-template-columns: 1fr;
+    gap: 0;
+    max-width: 580px;
+  }
+  .focused-scene.camera--right .speaker-panel {
+    grid-template-columns: minmax(0, 1fr) 110px;
+    align-items: end;
+    gap: 8px;
+  }
+  .focused-scene.camera--right .speaker-panel .cast {
+    grid-row: 1;
+    grid-column: 2;
+    width: 110px;
+    height: 220px;
+  }
+  .focused-scene.camera--right .speaker-panel .character img {
+    height: 110%;
+    bottom: -18%;
+    left: 35%;
+  }
+  .focused-scene.camera--right .speaker-panel .speech-bubble {
+    grid-row: 1;
+    grid-column: 1;
+    padding: 16px;
+  }
+  .focused-scene.camera--right .speech-bubble p { font-size: 18px; }
+  .focused-scene .smartboard { min-height: 360px; }
+  .focused-scene .speaker-panel .cast {
+    grid-column: 1;
+    grid-row: 1;
+    width: 200px;
+    height: 200px;
+    justify-self: center;
+    border: 0;
+  }
+  .focused-scene .speaker-panel .character img { height: 100%; }
+  .focused-scene .speaker-panel .speech-bubble {
+    grid-column: 1;
+    grid-row: 2;
+    padding: 20px;
+  }
+  .focused-scene .speech-bubble h2 { font-size: 22px; margin-bottom: 12px; }
+  .focused-scene .speech-bubble p { font-size: 20px; line-height: 1.5; }
+  .focused-scene .board-screen { padding: 18px 14px; }
+  .focused-scene .choices legend { font-size: 20px; }
+  .focused-scene .choice { font-size: 17px; padding: 12px; }
+}
+
+/* A full-size classroom uses a fixed camera frame and a 16:9 display. */
+@media (min-width: 1100px) and (min-height: 700px), (min-width: 1000px) and (min-height: 850px) {
+  body:has(.focused-scene) {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    overflow: hidden;
+    padding-bottom: 0;
+  }
+  body:has(.focused-scene) #app { flex: 1; min-height: 0; }
+  .focused-scene { height: 100%; min-height: 0; }
+  .focused-scene .classroom {
+    flex: 1;
+    min-height: 0;
+    padding: 16px 24px 0;
+    overflow: hidden;
+    container-type: size;
+  }
+  .focused-scene .speaker-panel {
+    height: 100%;
+    grid-template-columns: minmax(240px, 36%) minmax(0, 64%);
+    align-items: center;
+    gap: 24px;
+  }
+  .focused-scene.camera--right .speaker-panel { grid-template-columns: minmax(0, 64%) minmax(240px, 36%); }
+  .focused-scene .speaker-panel .cast { height: min(94%, 560px); }
+  .focused-scene .speech-bubble p { font-size: clamp(20px, 2vw, 26px); }
+  .focused-scene .smartboard {
+    width: min(100%, calc((100cqh - 24px) * 16 / 9));
+    max-width: 1400px;
+    min-height: 0;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    border-width: 5px;
+    box-shadow: 0 12px 30px #081a3666;
+  }
+  .focused-scene .board-screen {
+    flex: 1;
+    min-height: 0;
+    padding: 14px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .focused-scene .smartboard:has(.choices) .board-screen { justify-content: center; }
+  .focused-scene .board-heading h2 { font-size: 26px; margin: 4px 0 8px; }
+  .focused-scene .board-frame { padding: 6px 10px; font-size: 12px; }
+  .focused-scene .service-flow { margin: 4px 0; }
+  .focused-scene .service-flow li { padding: 8px; gap: 3px; }
+  .focused-scene .service-flow .lemonade-visual { height: 42px; width: auto; align-self: center; }
+  .focused-scene .service-flow strong { font-size: 16px; }
+  .focused-scene .service-flow li > span:last-child { font-size: 16px; }
+  .focused-scene .board-note { margin-top: 6px; padding-top: 6px; }
+  .focused-scene .choices { margin-top: 12px; padding-top: 12px; }
+  .focused-scene .choices legend { font-size: 20px; margin-bottom: 10px; }
+  .focused-scene .choice-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .focused-scene .choice { font-size: 16px; padding: 10px; line-height: 1.4; }
+  .focused-scene .feedback { font-size: 16px; padding: 10px 0 0; }
+  .focused-scene .dialogue { padding: 0 24px; }
+  .focused-scene .scene-actions { position: relative; padding: 12px 0 24px; }
+  .focused-scene .closing-board-recap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 20px; }
+  .focused-scene .closing-board-recap h3 { font-size: 17px; margin: 12px 0 0; grid-row: 1; }
+  .focused-scene .closing-board-recap p { font-size: 16px; margin: 0; grid-row: 2; }
+  .focused-scene .closing-board-recap .closing-goal { grid-row: 3; grid-column: 1 / -1; }
+  .focused-scene .closing-board-recap { margin-top: 10px; }
+  .focused-scene .closing-board-recap p { line-height: 1.4; }
+  .focused-scene.closing-experience .flow-number { display: none; }
+  .focused-scene .design-evidence { padding: 8px 0; margin-top: 8px; }
+  .focused-scene .design-evidence[open] {
+    position: absolute;
+    inset: 14px;
+    z-index: 5;
+    padding: 20px;
+    border: 2px solid #829db2;
+    border-radius: 8px;
+    background: #e9f5fb;
+    overflow: auto;
+  }
+}
+@media (min-width: 1000px) and (min-height: 650px) and (max-height: 820px) {
+  .focused-scene .scene-actions { padding-top: 8px; }
+  .focused-scene .scene-actions .nav-button { height: 56px; min-height: 56px; font-size: 16px; }
+  .focused-scene .board-screen { padding: 10px 16px; }
+  .focused-scene .board-heading h2 { font-size: 22px; margin-bottom: 6px; }
+  .focused-scene .choices { margin-top: 8px; padding-top: 8px; }
+  .focused-scene .choices legend { font-size: 18px; line-height: 1.35; margin-bottom: 8px; }
+  .focused-scene .choice { padding: 8px; line-height: 1.35; }
+  .focused-scene .feedback { padding-top: 8px; line-height: 1.4; }
+  .focused-scene .handoff p { font-size: 16px; line-height: 1.4; }
+  .focused-scene .board-stand-visual { width: 100px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .focused-scene .speaker-panel,
+  .focused-scene .smartboard { animation: none; }
+}
+
+/* A quiet display: the heading leads, the task follows, the note supports it. */
+.focused-scene .smartboard {
+  padding: 7px 7px 0;
+  border: 1px solid #112650;
+  border-radius: 16px;
+  background: #112650;
+  box-shadow: 0 10px 28px #081a3633;
+}
+.focused-scene .board-screen {
+  border: 0;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: none;
+}
+.focused-scene .board-heading > div { padding: 0; border: 0; }
+.focused-scene .board-heading .eyebrow {
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #526477;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.focused-scene .board-heading h2 { margin: 8px 0 12px; }
+.focused-scene .lemonade-icon { display: none; }
+.focused-scene .board-text,
+.focused-scene .board-quote {
+  padding: 0;
+  margin: 8px 0 16px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #223650;
+  font-weight: 400;
+}
+.focused-scene .board-note {
+  margin: 18px 0 0;
+  padding: 14px 0 0;
+  border: 0;
+  border-top: 1px solid #e0e6ed;
+  border-radius: 0;
+  background: transparent;
+  color: #455970;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+.focused-scene .service-flow li { border-color: #dce4eb; box-shadow: none; }
+.focused-scene .handoff {
+  margin-top: 16px;
+  padding: 14px 0 0;
+  border: 0;
+  border-top: 1px solid #dce4eb;
+  border-radius: 0;
+  background: transparent;
+  color: var(--navy);
+}
+.focused-scene .handoff strong { font-size: 18px; }
+.focused-scene .handoff p { margin: 6px 0 0; color: #455970; }
+.focused-scene .board-frame { padding: 6px 10px; color: #aebdd0; font-size: 9px; letter-spacing: .12em; }
+.focused-scene .board-light { background: #aebdd0; width: 4px; height: 4px; }
+.focused-scene.focus--board .classroom::before,
+.focused-scene.focus--question .classroom::before {
+  background-image: linear-gradient(#10264788, #102647bb), url('../../assets/backgrounds/classroom.png');
+  filter: blur(2px);
+  transform: scale(1.02);
+}
+.focused-scene .smartboard--reading .board-screen { padding: clamp(24px, 4.5vw, 64px); }
+.focused-scene .smartboard--reading .board-screen > * { width: 100%; max-width: 740px; margin-left: auto; margin-right: auto; }
+.focused-scene .smartboard--reading .board-heading h2 { font-size: clamp(28px, 3vw, 40px); line-height: 1.2; letter-spacing: -.8px; margin: 10px 0 16px; }
+.focused-scene .smartboard--reading .board-text,
+.focused-scene .smartboard--reading .board-quote { font-size: clamp(20px, 2vw, 25px); line-height: 1.55; margin-top: 0; margin-bottom: 0; }
+.focused-scene .smartboard--reading .board-note { margin-top: 30px; padding-top: 18px; font-size: 17px; }
+@media (max-width: 700px) {
+  .focused-scene .smartboard--reading .board-screen { padding: 24px 20px; }
+  .focused-scene .smartboard--reading .board-heading h2 { font-size: 28px; }
+  .focused-scene .smartboard--reading .board-text { font-size: 20px; }
+  .focused-scene .smartboard--reading .board-note { margin-top: 24px; padding-top: 16px; font-size: 16px; }
+}
+
+/* Physical interactive-display hardware; decorative, with no extra controls. */
+.focused-scene .smartboard {
+  padding: 17px 10px 0;
+  border: 1px solid #09111e;
+  border-radius: 10px;
+  background: linear-gradient(105deg, #28384b, #152439 8%, #18283d 92%, #344255);
+  box-shadow: 0 0 0 1px #6e7b8966, 0 2px 0 #07101c, 0 14px 28px #08132655;
+}
+.focused-scene .board-screen {
+  border-radius: 3px;
+  border: 1px solid #0a1422;
+  box-shadow: 0 0 0 1px #54617455, inset 0 1px 3px #1126500d;
+}
+.board-camera {
+  position: absolute; top: 4px; left: 50%; transform: translateX(-50%);
+  width: 58px; height: 9px; border-radius: 5px; background: #0a121e;
+  display: grid; place-items: center; box-shadow: inset 0 1px 2px #0008;
+  pointer-events: none;
+}
+.board-camera > span { width: 6px; height: 6px; border-radius: 50%; border: 1px solid #526174; background: radial-gradient(circle at 35% 30%, #768ca6 0 13%, #192c45 22% 48%, #070d18 60%); }
+.focused-scene .board-frame { display: flex; align-items: center; justify-content: space-between; height: 28px; min-height: 28px; padding: 0 12px; color: #9fabb9; font-size: 8px; letter-spacing: .18em; pointer-events: none; }
+.board-status { display: flex; align-items: center; gap: 12px; width: 74px; }
+.focused-scene .board-light { width: 4px; height: 4px; margin: 0; background: #a4b9b4; box-shadow: 0 0 2px #a4b9b444; }
+.board-speaker { width: 48px; height: 4px; border-radius: 2px; background: repeating-linear-gradient(90deg, #080f19 0 2px, #344255 2px 4px); }
+.board-power { display: flex; justify-content: flex-end; width: 74px; }
+.board-power svg { width: 13px; height: 13px; color: #a0adbd; }
+.board-pen-tray { position: absolute; z-index: 2; left: 29%; right: 29%; bottom: -10px; height: 14px; border: 1px solid #344153; border-radius: 2px 2px 5px 5px; background: linear-gradient(#75818e 0 12%, #3e4c5e 18% 45%, #263345 55% 80%, #536173 90%); box-shadow: 0 4px 5px #07101c44; pointer-events: none; }
+.board-stylus { position: absolute; top: -3px; left: 12%; width: 30%; height: 5px; border-radius: 4px; background: linear-gradient(#6f7b89, #172333 65%); box-shadow: 0 1px 1px #0005; }
+.board-stylus::after { content: ''; position: absolute; right: 7px; top: 0; width: 3px; height: 5px; background: #9cabb8; }
+.board-stylus--gold { left: 53%; background: linear-gradient(#b6a172, #695a39 65%); }
+.board-stylus--gold::after { background: #c8b687; }
+@media (max-width: 700px) {
+  .focused-scene .smartboard { padding: 15px 7px 0; }
+  .focused-scene .board-frame { height: 25px; min-height: 25px; padding: 0 7px; }
+  .board-speaker { width: 28px; }
+  .board-status, .board-power { width: 46px; }
+  .board-pen-tray { left: 23%; right: 23%; bottom: -9px; height: 12px; }
+}

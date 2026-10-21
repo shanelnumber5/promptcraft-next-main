@@ -1,0 +1,167 @@
+{
+  "browser": "Chrome",
+  "viewports": [
+    "1280×720"
+  ],
+  "screenshots": 25,
+  "checks": [
+    "Horizontal overflow",
+    "Button text clipping",
+    "Dialog overflow",
+    "Workflow navigation and persistence",
+    "Story content bounds",
+    "Summary and guided card width"
+  ],
+  "screens": [
+    {
+      "screen": "lab-short-desktop-home",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "info-short-desktop-how-to-play",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "info-short-desktop-about",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "info-short-desktop-babbage",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "info-short-desktop-privacy",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-short-desktop-gallery",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-short-desktop-cards",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-short-desktop-filtered",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-short-desktop-detail",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-short-desktop-starting-point",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-short-desktop-learners",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-short-desktop-design",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-short-desktop-live-preview",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-short-desktop-babbage-question",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-short-desktop-suggestion",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-short-desktop-reasoning-box",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-short-desktop-maya-unavailable",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-short-desktop-maya",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-short-desktop-pixel-response",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-short-desktop-review-checks",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-short-desktop-guide",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-short-desktop-pixel-wrap-up",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-short-desktop-recovered",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-short-desktop-field-focus",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-short-desktop-sample-lesson",
+      "width": 1280,
+      "height": 720,
+      "result": "pass"
+    }
+  ]
+}

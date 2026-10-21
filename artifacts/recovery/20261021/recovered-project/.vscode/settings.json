@@ -1,0 +1,8 @@
+{
+  "files.exclude": {
+    "**/artifacts/browser-profiles": true,
+    "**/qa-design": true,
+    "**/debug.log": true
+  },
+  "liveServer.settings.port": 5501
+}

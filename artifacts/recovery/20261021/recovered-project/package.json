@@ -1,0 +1,25 @@
+{
+  "name": "promptcraft-next",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PromptCraft discussion design module with teacher setup, Babbage clarification, and an assignment guide",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "node tests/unit/design.test.cjs && node tests/unit/babbage.test.cjs && node tests/unit/maya.test.cjs && node tests/unit/characters.test.cjs && node tests/unit/idea-lab.test.cjs && node tests/unit/server.test.cjs && node tests/unit/repository.test.cjs",
+    "test:lab": "node tests/browser/idea-lab.test.cjs",
+    "test:design": "node tests/unit/design.test.cjs",
+    "test:babbage": "node tests/unit/babbage.test.cjs",
+    "test:maya": "node tests/unit/maya.test.cjs",
+    "test:server": "node tests/unit/server.test.cjs",
+    "test:browser": "node tests/browser/design.test.cjs",
+    "format": "prettier --write index.html package.json README.md docs src server tests",
+    "format:check": "prettier --check index.html package.json README.md docs src server tests"
+  },
+  "devDependencies": {
+    "prettier": "3.6.2"
+  }
+}

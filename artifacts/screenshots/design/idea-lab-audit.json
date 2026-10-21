@@ -1,0 +1,212 @@
+{
+  "browser": "Chrome",
+  "viewports": [
+    "1440×1000",
+    "768×1024",
+    "390×844",
+    "320×568"
+  ],
+  "screenshots": 32,
+  "checks": [
+    "Horizontal overflow",
+    "Button text clipping",
+    "Dialog overflow",
+    "Workflow navigation and persistence",
+    "Story content bounds",
+    "Summary and guided card width"
+  ],
+  "screens": [
+    {
+      "screen": "lab-desktop-home",
+      "width": 1440,
+      "height": 1000,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-desktop-filtered",
+      "width": 1440,
+      "height": 1000,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-desktop-detail",
+      "width": 1440,
+      "height": 1000,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-desktop-design",
+      "width": 1440,
+      "height": 1000,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-desktop-suggestion",
+      "width": 1440,
+      "height": 1000,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-desktop-maya",
+      "width": 1440,
+      "height": 1000,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-desktop-guide",
+      "width": 1440,
+      "height": 1000,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-desktop-recovered",
+      "width": 1440,
+      "height": 1000,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-tablet-home",
+      "width": 768,
+      "height": 1024,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-tablet-filtered",
+      "width": 768,
+      "height": 1024,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-tablet-detail",
+      "width": 768,
+      "height": 1024,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-tablet-design",
+      "width": 768,
+      "height": 1024,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-tablet-suggestion",
+      "width": 768,
+      "height": 1024,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-tablet-maya",
+      "width": 768,
+      "height": 1024,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-tablet-guide",
+      "width": 768,
+      "height": 1024,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-tablet-recovered",
+      "width": 768,
+      "height": 1024,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-home",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-filtered",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-detail",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-design",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-suggestion",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-maya",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-guide",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-recovered",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-small-phone-home",
+      "width": 320,
+      "height": 568,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-small-phone-filtered",
+      "width": 320,
+      "height": 568,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-small-phone-detail",
+      "width": 320,
+      "height": 568,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-small-phone-design",
+      "width": 320,
+      "height": 568,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-small-phone-suggestion",
+      "width": 320,
+      "height": 568,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-small-phone-maya",
+      "width": 320,
+      "height": 568,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-small-phone-guide",
+      "width": 320,
+      "height": 568,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-small-phone-recovered",
+      "width": 320,
+      "height": 568,
+      "result": "pass"
+    }
+  ]
+}

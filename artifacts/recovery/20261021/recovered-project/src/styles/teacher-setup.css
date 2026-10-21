@@ -1,0 +1,134 @@
+/* Shared geometry for the five guided setup/summary sections only.
+   These rules replace the old two-field assignment/subgrid assumptions. */
+body:has(.setup-shell--teacher) { padding-bottom: 0; }
+body:has(.setup-shell--teacher) #app { width: 100%; max-width: 1440px; padding: 12px 20px; }
+.setup-shell.setup-shell--teacher { width: 100%; margin: 0; border-radius: 18px; }
+.setup-shell--teacher .setup-header { padding: 10px 20px; font-size: 15px; }
+.setup-shell--teacher .setup-form { display: flex; flex: 1; min-height: 0; padding: 20px; gap: 0; }
+.setup-shell--teacher .setup-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); grid-template-rows: minmax(0, 1fr) auto; flex: 1; min-height: 0; gap: 16px 24px; }
+.setup-shell--teacher .setup-columns .setup-main { display: flex; flex-direction: column; grid-column: 1; grid-row: 1; min-width: 0; min-height: 0; overflow: visible; }
+.setup-shell--teacher .setup-main .setup-intro { flex: 0 0 auto; margin: 0 0 12px; padding: 0; }
+.setup-shell--teacher .setup-intro h1 { font-size: clamp(24px, 2.2vw, 30px); line-height: 1.2; margin: 0 0 6px; }
+.setup-shell--teacher .setup-intro p { font-size: 15px; line-height: 1.4; margin: 0; }
+.setup-shell--teacher .summary-tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; padding: 4px; margin: 0 0 12px; flex: 0 0 auto; }
+.setup-shell--teacher .summary-tabs button { min-width: 0; min-height: 44px; padding: 6px; font-size: 14px; line-height: 1.2; }
+.setup-shell--teacher .summary-sections { flex: 1; min-height: 0; overflow: auto; border: 1px solid #c3ced9; border-radius: 10px; background: #f7fafc; }
+.setup-shell--teacher.summary-shell .summary-sections > section { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-auto-rows: min-content; gap: 14px; padding: 16px; border: 0; min-width: 0; overflow: visible; }
+.setup-shell--teacher .summary-sections h2 { grid-column: 1 / -1; font-size: 20px; line-height: 1.25; margin: 0; }
+.setup-shell--teacher.summary-shell .summary-sections .setup-field,
+.setup-shell--teacher .setup-fields .setup-field { display: block; grid-row: auto; grid-template-rows: none; min-width: 0; margin: 0; }
+.setup-shell--teacher .summary-sections .setup-field + .setup-field { margin: 0; }
+.setup-shell--teacher .setup-fields { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: none; gap: 14px; min-width: 0; }
+.setup-shell--teacher .setup-fields > .setup-field { grid-column: auto; }
+.setup-shell--teacher .setup-field > label,
+.setup-shell--teacher .setup-field > legend { font-size: 16px; line-height: 1.35; }
+.setup-shell--teacher .setup-field .field-help { display: block; font-size: 14px; line-height: 1.4; margin: 4px 0 8px; }
+.setup-shell--teacher .setup-field input[type='text'] { width: 100%; height: 44px; min-height: 44px; font-size: 16px; padding: 8px 10px; }
+.setup-shell--teacher .setup-field textarea { width: 100%; height: clamp(110px, 17dvh, 190px); min-height: 100px; font-size: 16px; line-height: 1.5; padding: 10px 12px; resize: vertical; }
+.setup-shell--teacher .setup-field .unsure { font-size: 14px !important; line-height: 1.4; margin-top: 6px; }
+.setup-shell--teacher .unsure input, .setup-shell--teacher .radio-cards input { width: 20px; height: 20px; }
+.setup-shell--teacher .radio-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.setup-shell--teacher .radio-cards label { min-width: 0; min-height: 44px; padding: 6px 8px; font-size: 14px; line-height: 1.3; gap: 6px; }
+.setup-shell--teacher .setup-example { flex: 0 0 auto; margin: 0 0 12px; padding: 8px 12px; font-size: 14px; }
+.setup-shell--teacher .setup-example button { min-height: 38px; font-size: 14px; padding: 6px 10px; }
+.setup-shell--teacher .setup-live-preview { grid-column: 2; grid-row: 1 / span 2; min-width: 0; min-height: 0; padding: 16px; border-radius: 10px; }
+.setup-shell--teacher .setup-live-preview h2 { font-size: 20px; line-height: 1.25; }
+.setup-shell--teacher .setup-live-preview > p { font-size: 14px; line-height: 1.4; margin: 6px 0 12px; }
+.setup-shell--teacher .setup-preview-content { min-height: 0; padding: 16px; }
+.setup-shell--teacher .setup-preview-empty { font-style: normal; }
+.setup-shell.setup-shell--teacher .setup-actions { position: static; inset: auto; grid-column: 1; grid-row: 2; display: grid; grid-template-columns: 120px minmax(0, 1fr) 180px; min-height: 64px; gap: 12px; margin: 0; padding: 12px 0 0; border-top: 1px solid var(--border); box-shadow: none; }
+.setup-shell.setup-shell--teacher .setup-actions .nav-button { height: 50px; min-height: 50px; padding: 8px 12px; font-size: 15px; }
+.setup-shell--teacher .setup-actions .nav-button > span { font-size: 15px; }
+.setup-shell--teacher .setup-actions > span { display: block; grid-column: 2; grid-row: 1; width: auto; order: initial; font-size: 13px; line-height: 1.4; }
+.setup-shell--teacher .setup-actions .nav-button--next { grid-column: 3; }
+.setup-shell--teacher .save-notice:empty { display: none; }
+
+@media (min-width: 1100px) and (min-height: 700px) {
+  html:has(.setup-shell--teacher) { height: 100%; overflow: hidden; }
+  body:has(.setup-shell--teacher) { height: 100dvh; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+  body:has(.setup-shell--teacher) #app { display: flex; flex: 1; height: auto; min-height: 0; overflow: hidden; }
+  .setup-shell.setup-shell--teacher { height: 100%; min-height: 0; overflow: hidden; }
+  .setup-shell--teacher .setup-form { overflow: hidden; }
+  .setup-shell--teacher .setup-fields { overflow: auto; }
+  .setup-shell--teacher.summary-section--class .summary-sections > section,
+  .setup-shell--teacher.summary-section--time .summary-sections > section,
+  .setup-shell--teacher.setup-step--class .setup-fields,
+  .setup-shell--teacher.setup-step--time .setup-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .setup-shell--teacher.summary-section--class .summary-sections fieldset,
+  .setup-shell--teacher.setup-step--class .setup-fields fieldset { grid-column: 1 / -1; }
+  .setup-shell--teacher.summary-section--class .setup-field:not(fieldset) > label,
+  .setup-shell--teacher.setup-step--class .setup-field:not(fieldset) > label,
+  .setup-shell--teacher.summary-section--time .setup-field > label,
+  .setup-shell--teacher.setup-step--time .setup-field > label { min-height: 0; }
+  .setup-shell--teacher.summary-section--class .setup-field:not(fieldset) .field-help,
+  .setup-shell--teacher.setup-step--class .setup-field:not(fieldset) .field-help,
+  .setup-shell--teacher.summary-section--time .setup-field .field-help,
+  .setup-shell--teacher.setup-step--time .setup-field .field-help { min-height: 40px; }
+}
+
+@media (max-width: 1099px), (max-height: 699px) {
+  html:has(.setup-shell--teacher) { height: auto; overflow: auto; }
+  body:has(.setup-shell--teacher) { display: block; height: auto; min-height: 100dvh; overflow: auto; padding-bottom: 100px; }
+  body:has(.setup-shell--teacher) #app { flex: none; height: auto; overflow: visible; padding: 12px; }
+  .setup-shell.setup-shell--teacher { height: auto; overflow: visible; }
+  .setup-shell--teacher .setup-form { display: block; padding: 16px; }
+  .setup-shell--teacher .setup-columns { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto; gap: 20px; }
+  .setup-shell--teacher .setup-main { overflow: visible; }
+  .setup-shell--teacher .summary-sections { overflow: visible; }
+  .setup-shell--teacher .setup-live-preview { grid-column: 1; grid-row: 2; min-height: 280px; }
+  .setup-shell--teacher .setup-preview-content { max-height: 440px; min-height: 180px; }
+  .setup-shell.setup-shell--teacher .setup-actions { position: fixed; z-index: 10; bottom: 0; left: 0; right: 0; top: auto; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: 12px 16px calc(16px + env(safe-area-inset-bottom, 0px)); box-shadow: 0 -4px 18px #081a3614; background: white; }
+  .setup-shell--teacher .setup-actions > span { display: none; }
+  .setup-shell--teacher .setup-actions .nav-button--next { grid-column: 2; }
+}
+@media (max-width: 600px) {
+  .setup-shell--teacher .summary-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .setup-shell--teacher .summary-tabs button:last-child { grid-column: 1 / -1; }
+  .setup-shell--teacher .radio-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .setup-shell--teacher .setup-form { padding: 12px; }
+  .setup-shell--teacher.summary-shell .summary-sections > section { padding: 12px; }
+  .setup-shell--teacher .setup-field textarea { height: 160px; }
+}
+
+.setup-shell--teacher #directions, .setup-shell--teacher #learningGoal { height: clamp(120px, 17dvh, 190px); min-height: 100px; }
+
+@media (min-width: 1100px) and (min-height: 700px) {
+  .setup-shell--teacher.summary-section--limits .summary-sections > section,
+  .setup-shell--teacher.setup-step--limits .setup-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .setup-shell--teacher.summary-section--limits .summary-sections .setup-field,
+  .setup-shell--teacher.setup-step--limits .setup-fields .setup-field { grid-column: auto; }
+  .setup-shell--teacher.summary-section--limits .radio-cards,
+  .setup-shell--teacher.setup-step--limits .radio-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .setup-shell--teacher.summary-section--limits .setup-field > label,
+  .setup-shell--teacher.summary-section--limits .setup-field > legend,
+  .setup-shell--teacher.setup-step--limits .setup-field > label,
+  .setup-shell--teacher.setup-step--limits .setup-field > legend { min-height: 44px; }
+  .setup-shell--teacher.summary-section--limits .setup-field .field-help,
+  .setup-shell--teacher.setup-step--limits .setup-field .field-help { min-height: 60px; }
+}
+@media (min-width: 1100px) and (min-height: 700px) and (max-height: 850px) {
+  .setup-shell--teacher .setup-form { padding: 14px 18px; }
+  .setup-shell--teacher .setup-intro h1 { font-size: 26px; }
+  .setup-shell--teacher .setup-intro p { font-size: 14px; }
+  .setup-shell--teacher .setup-columns { gap: 12px 20px; }
+  .setup-shell--teacher.summary-shell .summary-sections > section { padding: 12px; gap: 12px; }
+  .setup-shell--teacher .summary-sections h2 { font-size: 18px; }
+  .setup-shell--teacher .setup-field .field-help { font-size: 13px; min-height: 0; margin: 4px 0 6px; }
+  .setup-shell--teacher.summary-section--class .setup-field:not(fieldset) .field-help,
+  .setup-shell--teacher.setup-step--class .setup-field:not(fieldset) .field-help { min-height: 36px; }
+  .setup-shell--teacher #directions, .setup-shell--teacher #learningGoal { height: 120px; }
+  .setup-shell--teacher.summary-section--limits .setup-field textarea,
+  .setup-shell--teacher.setup-step--limits .setup-field textarea { height: 100px; min-height: 100px; }
+  .setup-shell--teacher.summary-section--limits .setup-field .field-help,
+  .setup-shell--teacher.setup-step--limits .setup-field .field-help { min-height: 54px; }
+  .setup-shell--teacher .summary-tabs { margin-bottom: 8px; }
+  .setup-shell--teacher .summary-tabs button { min-height: 40px; }
+  .setup-shell--teacher .setup-main .setup-intro { margin-bottom: 8px; }
+}
+
+@media (max-width: 1180px) {
+  body:has(.setup-shell--teacher) #app { padding: 12px; }
+}
+
+/* Keep the next guided screen on the same frame as the setup summary. */
+.design-shell--guided { max-width: none; }

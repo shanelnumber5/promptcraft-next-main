@@ -1,0 +1,92 @@
+# Great Falls College visual refresh — October 19, 2026
+
+This local presentation checkpoint refreshes Home, Babbage’s Idea Lab, activity details, and the assignment workspace. It uses bold type, river-line graphics, rounded surfaces, colorful activity illustrations, and the college’s navy, blue, and gold. Existing character artwork is reused. The guided classroom retains its established layout and interactions.
+
+Navigation, saved-state keys and structures, AI prompts and request infrastructure, Maya’s approved profile, Course Guide generation, and research event schema are unchanged by this checkpoint. The only entry-controller change identifies the active view on the body so presentation rules can be scoped. No participant collection, external runtime asset request, or deployment is added.
+
+## Asset provenance
+
+- Official colors: navy `#001F5B`, blue `#0069A6`, gold `#EDAA00`, from the college’s [graphic standards, page 15](https://gfcmsu.edu/wp-content/uploads/2024/12/GFCMSU_GRAPHIC_STANDARDS.pdf).
+- `assets/brand/gfc-river-otters.png`: unchanged official college River Otter logotype, downloaded from the [college website](https://www.gfcmsu.edu/wp-content/uploads/2023/09/RiverOtter_Logotype_L_RGB.png). Its transparent white lettering is displayed on solid navy with surrounding space. College artwork remains college property.
+- `assets/fonts/manrope.ttf`: self-hosted variable Manrope, from [Google Fonts’ source repository](https://github.com/google/fonts/tree/main/ofl/manrope). The SIL Open Font License is preserved in `docs/asset-licenses/manrope-OFL.txt`.
+- Interface icons, river curves, and activity decorations are code-native SVG in `src/shared/lab-visuals.js`; they do not alter official artwork. Decorative SVG and character portraits are hidden from assistive technology. The official college image has descriptive alternative text.
+
+## Verification
+
+- `npm.cmd test`: PASS, all six suites (design, Babbage, Maya, Idea Lab, server, repository).
+- `node tests/browser/idea-lab.test.cjs`: PASS at desktop 1440×1000, tablet 768×1024, phone 390×844, and small phone 320×568. Covers gallery/filter/detail, adaptation, shared Babbage accept/reject, Maya, guide preview/download, separate saves, resume/reset, malformed records, quota recovery, keyboard/accessible names, sampled text contrast, and layout overflow.
+- Desktop, tablet, and phone Home plus desktop workspace screenshots were visually inspected. Screenshots are local ignored artifacts under `artifacts/screenshots/design/`.
+- `$env:PC_BROWSER_DEVICE='desktop,phone'; node tests/browser/design.test.cjs`: PASS for the complete guided opening-to-guide workflow, Babbage accept/adapt/reject, Maya readings and revisions, keyboard/accessible names, guide download, resume/reset, and layout checks.
+- `git diff --check`: PASS, with line-ending notices only.
+- Browser AI responses are mocked. No live AI-service or output-quality result is claimed; this presentation work respects the existing Netlify service pause. No hands-on screen-reader speech test or comprehensive WCAG audit was performed.
+
+The refreshed appearance and new entry-page wording may affect engagement and path selection in comparisons across versions. Record this presentation checkpoint separately from the previously documented Babbage prompt refinements; neither requires changing the research event schema.
+
+## Follow-up: mechanical graphics and clearer browsing
+
+Replaced generic small interface icons with custom SVG calculating-engine modules: drive wheels, numbered-drum-style linkages, punched tape, and brass-colored housings. The workspace Babbage header uses this machine treatment instead of the raster portrait mark; guided character artwork and official college artwork remain intact. The Home aside now reads “These ideas are otterly worth a look.”
+
+Idea Lab cards now show the activity in plain language, what students make, and when an educator might choose it. Full purposes and steps remain in the detail view. The banner is shorter, tags are limited to two per card, and the decorative card header takes less space. All 12 starters retain their original IDs and underlying assignment content.
+
+The workspace keeps starting material, course, learning goal, and draft visible. Optional improvement/context questions are expandable, repeated editor labels are reduced visually while retaining the accessible name, and helper copy is shorter. Arial with sans-serif fallbacks replaces Manrope on these entry/workspace surfaces; heading weights and sizes are reduced. The original self-hosted Manrope asset/license remains available from the earlier checkpoint.
+
+Fixed the reported Babbage title contrast: `.workspace-shell h2` had overridden the dark panel’s white heading. A more specific white heading rule resolves that conflict. Browser contrast checks now include the Babbage heading and run while its panel is visible.
+
+Verification after the follow-up: `npm.cmd test` passed all six suites; `node tests/browser/idea-lab.test.cjs` passed the complete workflow at 1440×1000, 768×1024, 390×844, and 320×568; `git diff --check` passed. Final desktop gallery/card/workspace and mobile layouts were visually inspected. The browser harness now waits for local gallery images/fonts and a short paint interval before capturing the gallery and adds scrolled card screenshots. AI remains mocked. The complete guided browser suite was not rerun in this follow-up; its shared renderer retains the original non-workspace branch, and the unit suites passed. No AI prompts, save structures, research collection, or deployment changed.
+
+## Follow-up: simpler gallery and open workspace sections
+
+Removed the gallery’s decorative banner, repeated college mark, and second promotional heading. A single page heading and subtitle sit beside a prominent white-on-navy “Return to my assignment workspace” button; search and category controls now share a quieter divider treatment. Restored the original Babbage portrait beside PromptCraft in the application header and in the Babbage collaboration panel. Mechanical activity-card graphics remain.
+
+The Design tab now groups the starting point and draft together, then presents open sections for Learners & timing, Requirements & AI use, and What you want to improve. Optional fields remain optional. No workspace fields, earlier drafts, or conversation history use disclosure menus. All field IDs, input handlers, saved values, and existing workspace tabs remain compatible; no save migration is needed.
+
+Validation: all six unit suites passed; four-layout Idea Lab/workspace browser checks passed (1440×1000, 768×1024, 390×844, 320×568), including explicit assertions that Design, archived drafts, and Babbage have no disclosure menus. The checks exercise the visible context fields, Babbage accept/reject, Maya, guide approval/export, isolated saves, resume/reset, accessibility names, sampled contrast, and overflow. AI remains mocked; no live-service quality check or deployment was performed. The full guided browser suite was not rerun for this presentation change. Gallery and workspace screenshots are under the same ignored local artifacts directory.
+
+## Follow-up: focused design screens and live preview
+
+Replaced the long Design form with five small sections: Starting point, Learning & learners, Time, Requirements, and Write your draft. Back/Next buttons change only the visible section; the existing Design/Babbage/Review tabs remain. Edit directions opens the writing section directly. No disclosure menus were introduced. Section selection is transient; refresh reopens Starting point with the saved draft visible in the preview. Draft and context values retain the existing storage format and keys.
+
+The right pane is now a styled, read-only student assignment preview. The writing section uses a plain textarea with no formatting toolbar. Typing updates the preview in place, without replacing the focused input or changing the saved source text. The existing escaped directions renderer styles supported headings, paragraphs, and lists; no new AI call or inferred assignment content is introduced. Accepted Babbage suggestions open the writing section and appear in the preview. Guided-scenario editing remains unchanged. When an educator supplies a value for a previously uncertain context field, its existing uncertainty flag clears.
+
+At desktop sizes of at least 1000px wide and 680px high, the Design panes use the available viewport height. The checked starting, learning, requirements, and writing forms fit without page or form scrolling at 1440×1000 and 1280×720. Long assignment content can scroll inside the preview or text input. Tablet/phone layouts stack the form and preview and allow normal page scrolling; zoom and smaller windows remain usable rather than clipping content. This is a Design-tab improvement, not a claim that arbitrarily long Babbage conversations or review documents fit one screen.
+
+Verification: `npm.cmd test` passed all six unit suites. The browser workflow passed desktop, short desktop, tablet, phone, and small phone (1440×1000, 1280×720, 768×1024, 390×844, 320×568). Added checks for immediate heading/list preview rendering, absence of formatting buttons, compact form/page height, and navigation through the smaller sections. Existing mocked Babbage accept/reject, Maya, guide download, save/refresh/reset, draft restoration, malformed saves, and storage-failure checks remain. Initial checks exposed desktop overflow and a reset assertion expecting the old editor; these were corrected before the final run. Screenshots of the shorter desktop form and live preview were visually inspected. No live AI or full guided browser run was performed for this change. No deployment, research event changes, or participant collection.
+
+## Follow-up: repair first-field preview and focus the remaining tabs
+
+Reproduced the reported blank preview with Chrome’s real `Input.insertText` input in the first visible starting-material field: the preview only rendered `design.revision`, which is entered later. That regression assertion failed before the fix. The preview now renders the active starting assignment/idea immediately, with an explicit source label, and renders the working draft while editing it and throughout review. Starting material is never silently promoted to an approved draft: “Use starting material in my draft” is an explicit action. Preview updates preserve typing focus; refresh restores the saved working draft and opens its writing section.
+
+Babbage now pairs one focused conversation task with a document pane. Questions reuse the shared question renderer; request lifecycle, endpoint, prompt, answer validation, and accept/reject logic remain shared. Suggestions appear in the document pane marked “Not applied.” Their rationale, earlier conversation, and connection/Dev options have separate visible views, without disclosure menus. The original Babbage portrait remains. Shared controller context invalidation now re-renders the workspace view rather than injecting a guided-only panel into it.
+
+Review & Course Guide has three focused sections: Your design reasoning (including optional Maya), Check your design, and Your Course Guide. It uses the existing check definitions, approval readiness/state, Maya dialog, guide preview, and downloader. The current assignment stays beside each section. Saving an approved design opens Course Guide; approval and downloads survive refresh. Existing storage keys and structures, prompt versions, and research event schema are unchanged.
+
+Verification: `npm.cmd test` passed all six suites. `node tests/browser/idea-lab.test.cjs` passed all five layouts: 1440×1000, 1280×720, 768×1024, 390×844, and 320×568. The suite now checks real text insertion in both starting material and draft, focus retention, preview restoration after refresh, explicit draft adoption, suggestion rationale navigation, the three review sections, and viewport/form fit for normal desktop questions, suggestions, rationale, checks, and guide screens. Existing guide download, isolated saves, approval restoration, malformed records, reset, and quota recovery remain covered. A download-status overflow found during the first desktop run was corrected before final verification. `git diff --check` passed. Short-desktop Babbage/checks and phone checks screenshots were visually inspected. Long assignment documents and conversation history can scroll within their dedicated panes; mobile layouts use normal page scrolling. AI was mocked; live-service quality and the full guided browser suite were not tested in this follow-up. No deployment or formal participant collection.
+
+## October 20: guided setup and summary consistency
+
+The reported screenshots concern the guided scenario’s editable assignment summary. Old layout rules still assumed directions and learning goal shared one screen, leaving a single directions field in half a two-column grid. Overlapping responsive rules also wrapped the five tabs and introduced form scrolling. A dedicated `setup-shell--teacher` hook and scoped `teacher-setup.css` now give all five setup/summary sections one consistent frame, spacing, field sizing, preview column, and navigation baseline. Directions and learning goal use the full panel width. Class, time, and requirements use intentional paired fields where desktop space permits. Course/learner labels are shorter; values and help remain available. The original blue/gold styling is retained.
+
+At desktop sizes the five summary tabs share one row and the checked forms fit without internal scrolling, including 1280×720. Below 1100px wide or 700px high, the preview stacks and the page can flow without clipping; the two-button navigation remains available. Preview content is keyboard-focusable for long documents. The next guided card now uses the same frame width as the summary rather than reverting to its old 1120px cap. No assignment values, save structures, instructional prompt versions, research events, or AI infrastructure changed.
+
+Validation completed:
+
+- `npm.cmd test`: PASS, all six unit suites. Two existing assertions in checkpoint `57638dc` expected retired wording; they now check the current equivalent setup/prompt wording. Production prompt text was not changed.
+- `node tests/browser/setup.test.cjs`: PASS, five summary sections and five setup sections at each of seven sizes: 1693×950, 1440×1000, 1280×720, 932×903, 820×790, 390×844, and 320×568. Covers 70 screenshot/layout checks, desktop field fit, full-width single fields, consistent tab/preview/navigation positions, labels and accessibility tree, keyboard tabs, real text input into the live preview, and refresh persistence. No AI requests. Audit: ignored `artifacts/screenshots/design/setup-layout-audit.json`.
+- `$env:PC_BROWSER_DEVICE='desktop,phone'; node tests/browser/design.test.cjs`: PASS, complete keyboard opening-to-guide flow at 1440×1000 and 390×844, including Babbage accept/adapt/reject, Maya, guide download, save/resume/reset, and responsive checks. AI was mocked. Its Maya fixture now matches visible text after Markdown normalization, because current editor serialization can split a follow-up line into a heading and paragraph; the production Maya implementation was not changed.
+- `git diff --check`: PASS. Wide/short-desktop summary screenshots were visually inspected.
+
+No live AI-quality check, deployment, or participant collection was performed.
+
+## October 20: a quieter opening-board hierarchy
+
+The opening board had several equally emphasized treatments: patterned surface, colored label badge, yellow heading rail, decorative lemonade icon, boxed task, boxed reflection, and a prominent frame. Replaced that competing decoration with a plain white display and a clear reading order: assignment heading, task text, then a smaller reflection question separated by one quiet rule. Text-only boards use a constrained reading width and larger heading rather than stretching every line across the display. The classroom background is softened behind board/question views; speaker views and approved character artwork remain intact.
+
+The board keeps its navy frame, classroom setting, display proportions, existing instructional wording, and choice/navigation behavior. Informational boards also use quieter labels and notes, while instructional plan illustrations and interactive answer controls remain. This is a presentation change that may affect attention across versions; no prompt, save, research-event, or participant-collection change was made.
+
+Actual verification: `npm.cmd test` passed all six unit suites. `$env:PC_BROWSER_DEVICE='desktop,short-desktop,phone'; node tests/browser/design.test.cjs` passed the complete guided workflow at 1440×1000, 1280×720, and 390×844, including every opening board/question, keyboard controls, board proportions/content bounds, Babbage accept/adapt/reject, Maya, Course Guide download, and save/resume/reset. AI responses were mocked; no live quality result is claimed. The harness now captures the first revealed board in each opening scene as well as the existing later screenshots. Desktop, shorter desktop, and phone first-board screenshots were visually inspected. `git diff --check` passed. No deployment.
+
+## October 20: physical smartboard treatment
+
+Added interactive-display hardware around the calm white content surface: a matte beveled bezel, inset screen edge, small camera/sensor, speaker strip, status light, engraved power symbol, and projecting pen tray with two styluses. The original navy/gold identity remains in the frame and subdued pen accent. Hardware is decorative (`aria-hidden`, no buttons or tab stops, no pointer interception). Instructional content, camera staging, choices, save state, and navigation remain unchanged.
+
+Verification: all six unit suites passed. The complete guided browser workflow passed again at 1440×1000, 1280×720, and 390×844, including board proportions/content bounds, keyboard navigation, Babbage/Maya, guide download, and save/resume/reset. AI was mocked. Desktop, shorter-desktop, and phone screenshots were visually inspected; the tray clears the navigation area and remains visible. `git diff --check` passed. No deployment or research-data change.
