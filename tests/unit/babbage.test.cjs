@@ -82,7 +82,7 @@ const assert = require('node:assert/strict');
   );
   assert.equal(JSON.parse(body.messages.at(-1).content).request_intent, 'clarify');
   assert.ok(body.system.includes('comfort with student AI use'));
-  assert.ok(body.system.includes("classmates' contributions necessary"));
+  assert.ok(body.system.includes("purposeful way classmates' contributions interact"));
   state.teacher.aiUse =
     'Feedback only; explain how it was used. Students interpret their own SPSS output.';
   state.babbage.context = assignmentContext(state);

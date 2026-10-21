@@ -42,13 +42,15 @@ const server = http.createServer((req, res) => {
       const isMaya = body.system.startsWith('You are Maya,');
       if (isMaya) mayaRequests.push(body);
       const current = isMaya ? JSON.parse(body.messages.at(-2).content) : {};
-      const mayaResponse = current.design?.revision.includes('Compare two staffing schedules.')
+      // Match the visible text even when the editor serializes a line as a heading.
+      const visibleRevision = (current.design?.revision || '').replace(/[*_`#]/g, '').replace(/\s+/g, ' ').trim();
+      const mayaResponse = visibleRevision.includes('Compare two staffing schedules.')
         ? '“Compare two staffing schedules.” gives me a specific decision to work through. I can explain which plan seems fair and why. The starting idea was broad; now I know what I would produce. I would want to know which staffing details I should use.'
-        : current.design?.revision.includes('Follow-up due Sunday.')
+        : visibleRevision.includes('Follow-up due Sunday.')
         ? 'The new directions say “Follow-up due Sunday.” That answers my earlier timing question. I still need to compare a classmate’s evidence and explain what I learned from it, but now I can plan when to return to the discussion.'
-        : current.design?.revision.includes('Choose a metaphor')
+        : visibleRevision.includes('Choose a metaphor')
         ? '“Choose a metaphor in the poem” gives me somewhere to start. Before, I could just agree with two people. Now I need two lines to explain my reading, so I have something specific to discuss. Which poem are we using?'
-        : current.design?.revision.includes('Compare two t-test outputs')
+        : visibleRevision.includes('Compare two t-test outputs')
           ? 'Now I need to “Compare two t-test outputs” and have someone check an assumption instead of just replying twice. I can see what I would work on with a classmate. Where do I get the outputs?'
           : 'The old directions let me finish and reply twice. Now I need to “Compare a classmate’s evidence” and explain what it reveals. That gives me a reason to read carefully. I would want to know when the follow-up is due before I plan my week.';
       const intent = JSON.parse(body.messages.at(-1).content).request_intent;
@@ -271,6 +273,11 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     });
     const { initialState } = await import('../../src/app/storage.js'),
       { discussionOpening: scenario } = await import('../../src/features/opening/content.js');
+    if (process.env.PC_BROWSER_FEATURE === 'setup') {
+      await require('./setup-checks.cjs')({ send, evaluate, waitFor, fill, shot, key, accessibleScreen, initialState, scenario, root });
+      assert.deepEqual(errors, []);
+      return;
+    }
     if (process.env.PC_BROWSER_FEATURE === 'lab')
       await require('./idea-lab-checks.cjs')({ send, evaluate, waitFor, click, fill, shot, key, keyboardReach, keyboardActivate, accessibleScreen, root, apiRequests, initialState, scenario });
     for (const [device, width, height] of [
@@ -364,7 +371,8 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       const summaryWidth = await evaluate('document.querySelector(".summary-shell").getBoundingClientRect().width');
       await click('start-design');
       const assertGuidedFit = async () => {
-        assert(Math.abs(await evaluate('document.querySelector(".design-shell").getBoundingClientRect().width') - summaryWidth) < 2, 'Guided design matches the assignment summary width');
+        const designWidth = await evaluate('document.querySelector(".design-shell").getBoundingClientRect().width');
+        assert(Math.abs(designWidth - summaryWidth) < 2, `Guided design matches the assignment summary width (${designWidth} vs ${summaryWidth})`);
         assert.equal(await evaluate('document.querySelectorAll("#app details:not(.design-evidence)").length'), 0);
         if (width >= 900 && height >= 650) assert(await evaluate('document.documentElement.scrollHeight <= innerHeight + 1'), 'Guided task fits without page scrolling');
       };
@@ -625,7 +633,8 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       assert.equal(await evaluate('document.querySelector("[data-maya-response]").textContent'), '', 'An edited draft does not reuse the earlier response');
       await evaluate('document.querySelector("[data-maya-ask]").click()');
       await waitFor('document.querySelector("[data-maya-status]").textContent.includes("ready below")');
-      assert(await evaluate('document.querySelector("[data-maya-response]").textContent.includes("answers my earlier timing question")'));
+      const revisedMayaResponse = await evaluate('document.querySelector("[data-maya-response]").textContent');
+      assert(revisedMayaResponse.includes('answers my earlier timing question'), 'Revised Maya fixture: ' + revisedMayaResponse);
       assert(mayaRequests.at(-1).messages.some(turn => turn.role === 'assistant' && turn.content.includes('when the follow-up is due')), 'The next reading includes relevant earlier student feedback');
       await evaluate('document.querySelector("[data-maya-close]").click()');
       await waitFor('!document.querySelector(".maya-dialog")');

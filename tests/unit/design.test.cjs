@@ -29,7 +29,8 @@ const assert = require('node:assert/strict');
     assert.match(screen, /data-setup-live-preview/);
     assert.match(screen, /<h4>First post<\/h4>/);
   }
-  assert.match(teacherSetup.steps[1].intro, /discussion board belongs/);
+  assert.match(teacherSetup.steps[1].intro, /one focused forum component/);
+  assert.match(teacherSetup.steps[1].intro, /not replace it/);
   assert.match(instructions, /one bounded discussion-board component within the larger assignment/);
   assert.match(instructions, /distinctive, feasible forum mechanism that fits this course/);
   assert.match(instructions, /not an all-in-one replacement/);
