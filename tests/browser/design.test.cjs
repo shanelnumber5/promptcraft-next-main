@@ -12,6 +12,7 @@ const mime = {
   '.css': 'text/css',
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
+  '.webp': 'image/webp',
   '.ico': 'image/x-icon',
 };
 const auditRecords = [];
@@ -38,7 +39,7 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
       const body = JSON.parse(Buffer.concat(chunks).toString());
       apiRequests.push(body);
-      const isWorkspace = body.system.includes("PromptCraft's Idea Lab");
+      const isWorkspace = Boolean(JSON.parse(body.messages[0].content).workspace);
       const isMaya = body.system.startsWith('You are Maya,');
       if (isMaya) mayaRequests.push(body);
       const current = isMaya ? JSON.parse(body.messages.at(-2).content) : {};
@@ -62,7 +63,12 @@ const server = http.createServer((req, res) => {
       const data = {
         status: 'ok',
         analysis: {
-          feedback_summary: isMaya ? mayaResponse : answered
+          feedback_summary: isMaya ? JSON.stringify({version:1,
+            maya:{emotion: visibleRevision.includes('staffing') || visibleRevision.includes('Sunday') ? 'pleased' : 'thoughtful', text:mayaResponse},
+            pixel:{emotion:'thoughtful', text: visibleRevision.includes('staffing')
+              ? '“Compare two staffing schedules.” asks students to weigh options and explain a decision. Maya can see a practical purpose. Check whether the supplied case gives students enough information to justify the tradeoff.'
+              : `The requirement “${[...mayaResponse.matchAll(/[“]([^”]+)[”]/g)][0][1]}” gives students a concrete task. Maya’s reaction can help you examine clarity and purpose, but it does not establish learning. Consider whether the directions explain what students should do with the comparison.`}
+          }) : answered
             ? 'You can generate a revision.'
             : isWorkspace ? 'Which time or resource constraint should this activity preserve?' : 'Please clarify the follow-up.',
           input_quality: {
@@ -604,7 +610,7 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       await key('Tab', 'Tab', 9);
       assert.equal(await evaluate('document.activeElement.hasAttribute("data-maya-ask")'), true, 'Maya has a logical keyboard order');
       await key('Enter', 'Enter', 13);
-      await waitFor('document.querySelector("[data-maya-status]").textContent.includes("ready below")');
+      await waitFor('document.querySelector("[data-maya-status]").textContent.includes("dialogue is ready")');
       assert(await evaluate('document.querySelector("[data-maya-response]").textContent.includes("Compare a classmate’s evidence")'));
       assert(await evaluate('document.querySelector("[data-maya-status]").getAttribute("aria-live") === "polite"'));
       await accessibleScreen(device + ' Maya response');
@@ -633,7 +639,7 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       await click('hear-maya');
       assert.equal(await evaluate('document.querySelector("[data-maya-response]").textContent'), '', 'An edited draft does not reuse the earlier response');
       await evaluate('document.querySelector("[data-maya-ask]").click()');
-      await waitFor('document.querySelector("[data-maya-status]").textContent.includes("ready below")');
+      await waitFor('document.querySelector("[data-maya-status]").textContent.includes("dialogue is ready")');
       const revisedMayaResponse = await evaluate('document.querySelector("[data-maya-response]").textContent');
       assert(revisedMayaResponse.includes('answers my earlier timing question'), 'Revised Maya fixture: ' + revisedMayaResponse);
       assert(mayaRequests.at(-1).messages.some(turn => turn.role === 'assistant' && turn.content.includes('when the follow-up is due')), 'The next reading includes relevant earlier student feedback');
@@ -823,7 +829,8 @@ Check that your post, peer reply, and follow-up meet the original topic, word-co
         'Students use a reply to reconsider their reasons.',
       );
       await goBabbage();
-      await click('toggle-dev');
+      // Exercise the retained offline controller through a test-only event; no product Dev switch.
+      await evaluate('(() => { const b=document.createElement("button"); b.dataset.action="toggle-dev"; document.getElementById("app").append(b); b.click(); b.remove(); })()');
       assert(
         await evaluate(
           'document.querySelector(".babbage-mode").textContent.includes("no API call")',
@@ -888,7 +895,7 @@ Check that your post, peer reply, and follow-up meet the original topic, word-co
         const savedMayaAssignment = await evaluate('localStorage.getItem("promptcraft_next_opening_v1")');
         await click('hear-maya');
         await evaluate('document.querySelector("[data-maya-ask]").click()');
-        await waitFor('document.querySelector("[data-maya-status]").textContent.includes("ready below")');
+        await waitFor('document.querySelector("[data-maya-status]").textContent.includes("dialogue is ready")');
         assert(await evaluate('document.querySelector("[data-maya-response]").textContent.includes(' + JSON.stringify(phrase) + ')'));
         await shot(device + '-maya-' + name);
         await evaluate('document.querySelector("[data-maya-close]").click()');

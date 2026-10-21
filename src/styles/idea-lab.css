@@ -1,4 +1,5 @@
-/* Great Falls College application surfaces. Guided classroom geometry stays intact. */
+/* Application surfaces exclude focused scenes so wrap-ups use opening geometry.
+   :where keeps these exclusions from increasing menu selector specificity. */
 @font-face {
   font-family: 'Manrope';
   src: url('../../assets/fonts/manrope.ttf') format('truetype');
@@ -14,39 +15,39 @@
 }
 .action-link.primary { background: var(--blue); color: white; border-color: var(--blue); }
 .action-link:hover { text-decoration: underline; }
-body[data-app-view]:not([data-app-view='play']) {
+body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) {
   --navy: #001f5b; --navy-deep: #00163f; --blue: #0069a6; --blue-dark: #005587;
   --gold: #edaa00; --gold-pale: #fff2c9; --ink: #152a47; --muted: #405674;
   --border: #b7c9de; --font: Arial, Helvetica, sans-serif;
   font-family: var(--font); font-size: 17px; line-height: 1.65;
   background: #f3f6fa;
 }
-body[data-app-view]:not([data-app-view='play']) #app { max-width: 1400px; margin: 0 auto; padding: 36px 40px 48px; }
-body[data-app-view]:not([data-app-view='play']) .app-header {
+body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) #app { max-width: 1400px; margin: 0 auto; padding: 36px 40px 48px; }
+body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) .app-header {
   padding: 18px max(32px, calc((100vw - 1320px) / 2));
   background: white; color: var(--navy); border-bottom: 1px solid #dce5ef;
 }
-body[data-app-view]:not([data-app-view='play']) .brand { color: var(--navy); gap: 12px; }
-body[data-app-view]:not([data-app-view='play']) .brand > img { display: block; width: 56px; height: 56px; object-fit: contain; }
-body[data-app-view]:not([data-app-view='play']) .brand strong { font-size: 30px; font-weight: 700; letter-spacing: -1.3px; }
-body[data-app-view]:not([data-app-view='play']) .brand strong span { color: var(--blue); }
-body[data-app-view]:not([data-app-view='play']) .brand small { color: #405674; font-size: 14px; margin-top: 2px; }
-body[data-app-view]:not([data-app-view='play']) .header-actions .action-link {
+body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) .brand { color: var(--navy); gap: 12px; }
+body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) .brand > img { display: block; width: 56px; height: 56px; object-fit: contain; }
+body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) .brand strong { font-size: 30px; font-weight: 700; letter-spacing: -1.3px; }
+body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) .brand strong span { color: var(--blue); }
+body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) .brand small { color: #405674; font-size: 14px; margin-top: 2px; }
+body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) .header-actions .action-link {
   min-height: 44px; padding: 8px 20px; border: 1px solid var(--navy);
   border-radius: 999px; background: var(--navy); color: white;
   font-weight: 700; box-shadow: 0 2px 6px #001f5b26;
 }
-body[data-app-view]:not([data-app-view='play']) .header-actions .action-link:hover {
+body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) .header-actions .action-link:hover {
   background: var(--blue-dark); border-color: var(--blue-dark); text-decoration: none;
 }
-body[data-app-view]:not([data-app-view='play']) .restart-module { background: transparent; border-color: #d2deeb; color: var(--navy); border-radius: 999px; font-weight: 700; }
-body[data-app-view]:not([data-app-view='play']) .app-footer {
+body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) .restart-module { background: transparent; border-color: #d2deeb; color: var(--navy); border-radius: 999px; font-weight: 700; }
+body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) .app-footer {
   display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px 18px;
   padding: 14px 24px; border-top: 1px solid #dce5ef; background: white;
   font-family: var(--font); font-size: 13px; color: #405674;
 }
-body[data-app-view]:not([data-app-view='play']) .app-footer-brand { color: var(--navy); font-weight: 700; }
-body[data-app-view]:not([data-app-view='play']) .app-footer-disclosure {
+body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) .app-footer-brand { color: var(--navy); font-weight: 700; }
+body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) .app-footer-disclosure {
   padding: 5px 10px; border-radius: 7px; background: #fff2c9; color: #392800; font-weight: 650;
 }
 .entry-shell, .workspace-shell { max-width: 1320px; margin: 0 auto; padding: 0; border: 0; background: transparent; overflow-wrap: anywhere; }
@@ -207,11 +208,11 @@ body[data-app-view]:not([data-app-view='play']) .app-footer-disclosure {
   .workspace-design { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 700px) {
-  body[data-app-view]:not([data-app-view='play']) #app { padding: 20px 16px 32px; }
-  body[data-app-view]:not([data-app-view='play']) .app-header { padding: 14px 18px; gap: 12px; }
-  body[data-app-view]:not([data-app-view='play']) .brand strong { font-size: 26px; }
-  body[data-app-view]:not([data-app-view='play']) .brand small { display: none; }
-  body[data-app-view]:not([data-app-view='play']) .header-actions .action-link { padding: 6px 12px; min-height: 36px; }
+  body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) #app { padding: 20px 16px 32px; }
+  body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) .app-header { padding: 14px 18px; gap: 12px; }
+  body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) .brand strong { font-size: 26px; }
+  body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) .brand small { display: none; }
+  body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) .header-actions .action-link { padding: 6px 12px; min-height: 36px; }
   .home-hero, .gallery-hero { grid-template-columns: minmax(0, 1fr); border-radius: 22px; gap: 0; }
   .hero-copy { padding: 28px; }
   .home-hero h1 { font-size: clamp(40px, 8.8vw, 58px); letter-spacing: -2px; margin: 20px 0; }
@@ -254,10 +255,10 @@ body[data-app-view]:not([data-app-view='play']) .app-footer-disclosure {
 @media (prefers-reduced-motion: reduce) { .idea-card, .action-link { transition: none; } }
 
 /* Second visual pass: quieter type, calculating-engine details, less competing copy. */
-body[data-app-view]:not([data-app-view='play']) button,
-body[data-app-view]:not([data-app-view='play']) input,
-body[data-app-view]:not([data-app-view='play']) textarea,
-body[data-app-view]:not([data-app-view='play']) select { font-family: var(--font); }
+body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) button,
+body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) input,
+body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) textarea,
+body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) select { font-family: var(--font); }
 .entry-shell h1, .workspace-shell h1 { letter-spacing: -1.5px; }
 .entry-shell h2, .workspace-shell h2 { letter-spacing: -.4px; }
 .path-icon { background: #f7edd6; color: #694815; border: 1px solid #b9934b; border-radius: 12px; }
@@ -350,9 +351,9 @@ body[data-app-view]:not([data-app-view='play']) select { font-family: var(--font
   .workspace-section + .workspace-section { padding-top: 24px; border-top: 1px solid #c8d6e5; }
 }
 @media (max-width: 700px) {
-  body[data-app-view]:not([data-app-view='play']) .brand { gap: 8px; }
-  body[data-app-view]:not([data-app-view='play']) .brand > img { width: 40px; height: 40px; }
-  body[data-app-view]:not([data-app-view='play']) .brand strong { font-size: 23px; letter-spacing: -.8px; }
+  body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) .brand { gap: 8px; }
+  body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) .brand > img { width: 40px; height: 40px; }
+  body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))) .brand strong { font-size: 23px; letter-spacing: -.8px; }
   .gallery-intro-row { align-items: stretch; flex-direction: column; }
   .gallery-return { width: 100%; flex-shrink: 1; font-size: 16px; }
 }
@@ -449,6 +450,9 @@ body[data-app-view]:not([data-app-view='play']) select { font-family: var(--font
 .partner-turn p { white-space: pre-line; }
 .preview-source { font-size: 13px; color: #405674; }
 .workspace-reason { display: flex; flex-direction: column; }
+.review-content:has(.workspace-reason) { display:flex; flex-direction:column; }
+.review-content .workspace-reason { flex:1; min-height:0; }
+.review-card .workspace-reason textarea { flex:1; height:auto; min-height:180px; }
 .workspace-reason > label { font-size: 16px; font-weight: 700; }
 .workspace-reason .field-help { font-size: 14px; line-height: 1.4; margin: 6px 0 12px; }
 .workspace-reason textarea { width: 100%; min-height: 120px; padding: 12px; border: 1px solid #9eb5d0; border-radius: 10px; font: inherit; resize: vertical; }
@@ -467,7 +471,7 @@ body[data-app-view]:not([data-app-view='play']) select { font-family: var(--font
 .course-guide-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 24px 0; }
 .course-guide-actions button { font-size: 16px; min-height: 44px; padding: 8px 14px; }
 @media (min-width: 1000px) and (min-height: 680px) {
-  .review-card .workspace-reason textarea { height: 110px; min-height: 90px; }
+  .review-card .workspace-reason textarea { height:auto; min-height:180px; }
   .review-layout .workspace-checks { gap: 10px; }
   .review-layout .workspace-check span > span { font-size: 14px; }
   .review-layout .workspace-check small { max-height: 36px; overflow: auto; }

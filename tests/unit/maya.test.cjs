@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict');
 
 (async () => {
-  const { buildMayaRequest, normalizeMayaResponse, requestMayaResponse, mayaExcerptPreview, mayaContext } =
+  const { buildMayaRequest, normalizeMayaResponse, requestMayaResponse, mayaExcerptPreview, mayaContext, normalizeMayaScene, mayaSceneBeats } =
     await import('../../src/features/design/maya-client.js');
   const { buildBabbageRequest, conversationDefaults } = await import('../../src/features/design/babbage-client.js');
   const { initialState, saveState, loadState } = await import('../../src/app/storage.js');
@@ -29,6 +29,30 @@ const assert = require('node:assert/strict');
     state.babbage.history = [{ role: 'assistant', content: 'Babbage is not Maya', display: '' }];
     return state;
   };
+  const revision = assignments[0].revision;
+  for (const emotion of ['pleased', 'frustrated', 'thoughtful', 'skeptical', 'surprised', 'amused', 'confident', 'neutral']) {
+    const raw = JSON.stringify({version:1, maya:{emotion, text:assignments[0].response},
+      pixel:{emotion:'thoughtful', text:'“Compare two t-test outputs” invites comparison. Check whether students have enough context to interpret the examples.'}});
+    const scene = normalizeMayaScene(raw, revision);
+    assert.equal(scene.maya.emotion, emotion, 'The explicit scene emotion drives the portrait');
+    const beats = mayaSceneBeats(scene);
+    assert(beats.every(beat => beat.text.length <= 180));
+    assert.equal(beats.filter(beat => beat.speaker === 'maya').map(beat => beat.text).join(' '), assignments[0].response);
+    assert(beats.findIndex(beat => beat.speaker === 'pixel') > 0, 'Pixel follows the student reaction');
+    assert.throws(() => normalizeMayaScene(raw.replace('"emotion":"'+emotion+'"', '"emotion":"evil"'), revision), /unreadable/);
+    assert.throws(() => normalizeMayaScene(raw.replace('invites comparison', 'invites comparison').replace('“Compare two t-test outputs” invites', '“Invented homework task” invites'), revision), /current directions/);
+  }
+  assert.equal(normalizeMayaScene(assignments[0].response, revision).maya.emotion, 'neutral', 'Legacy prose does not guess sentiment');
+  assert.equal(normalizeMayaScene(assignments[0].response, revision).pixel, null, 'Legacy prose does not invent a pedagogy response');
+  assert.throws(() => normalizeMayaScene('{bad json}', revision), /unreadable/);
+  const longDialogue = {maya:{emotion:'thoughtful', text:'I see a reason to compare the schedules. The case gives me evidence to use. I still have a question about fairness. I would like to hear how a classmate would handle that tradeoff. That could change my recommendation.'}, pixel:{emotion:'explaining',text:'The comparison gives the reply a purpose. The follow-up asks students to use it. Look for specific evidence in their explanations.'}};
+  const divided = mayaSceneBeats(longDialogue);
+  assert(divided.filter(beat => beat.speaker === 'maya').length >= 3, 'Long dialogue uses several bubbles');
+  assert(divided.every(beat => beat.text.length <= 180));
+  for (const speaker of ['maya','pixel']) {
+    assert.equal(divided.filter(beat => beat.speaker === speaker).map(beat => beat.text).join(' '),longDialogue[speaker].text,'Pagination preserves the complete dialogue');
+    assert(divided.filter(beat => beat.speaker === speaker).every(beat => beat.emotion === longDialogue[speaker].emotion));
+  }
   const responses = [];
   for (const assignment of assignments) {
     const state = stateFor(assignment);

@@ -30,15 +30,26 @@ for (const file of sources) {
     assert.ok(fs.existsSync(target), `Missing stylesheet reference in ${file}: ${match[1]}`);
     if (target.startsWith(path.join(root, 'assets') + path.sep)) usedAssets.add(target);
   }
-  for (const match of text.matchAll(/(?:\.\.\/)*assets\/[A-Za-z0-9_./-]+\.(?:png|svg|ico)/g)) {
+  for (const match of text.matchAll(/(?:\.\.\/)*assets\/[A-Za-z0-9_./-]+\.(?:png|webp|svg|ico)/g)) {
     const relative = match[0].slice(match[0].indexOf('assets/'));
     const target = path.join(root, relative);
     assert.ok(fs.existsSync(target), `Missing asset in ${file}: ${relative}`);
     usedAssets.add(target);
   }
 }
+// Retain the original images without rendering identities superseded by the supplied guide.
+const referenceAssets = new Set([
+  'assets/people/babbage-engine.png',
+  'assets/characters/maya/neutral.png', 'assets/characters/maya/confident.png',
+  'assets/characters/pixel/listening.png', 'assets/characters/pixel/thinking.png',
+  'assets/characters/pixel/encouraging.png', 'assets/people/charles-babbage.png',
+].map(relative => path.join(root, relative)));
+for (const asset of referenceAssets) {
+  // Reference files may be archived or removed separately; none may become active again.
+  assert.ok(!usedAssets.has(asset), `Retired character artwork is still active: ${asset}`);
+}
 for (const asset of filesIn(path.join(root, 'assets')))
-  assert.ok(usedAssets.has(asset), `Unreferenced asset: ${path.relative(root, asset)}`);
+  assert.ok(usedAssets.has(asset) || referenceAssets.has(asset), `Unreferenced asset: ${path.relative(root, asset)}`);
 const entry = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 for (const match of entry.matchAll(/(?:src|href)="([^"#]+)"/g)) {
   const pathname = match[1].split(/[?#]/)[0];

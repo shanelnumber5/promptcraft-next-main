@@ -10,6 +10,10 @@ Guided progress saves under `promptcraft_next_opening_v1`; existing saves remain
 
 Fresh visits show Home. Saved progress can be continued there; direct links use `?view=play`, `?view=workspace`, and `?view=lab`. The Idea Lab contains 12 AI-assisted illustrative forum starters with search, category filtering, and details. Each is structured around an initial post, a purposeful peer reply, and a follow-up. **Adapt with Babbage** opens the private workspace without changing Scenario 1 progress or making an AI call automatically.
 
+Home also opens **Course Guide** (`?view=guide`) to preview the current saved design from either path, including clearly labeled drafts. This view never changes progress or the resume preference. **Create an Assignment** opens the existing discussion forum workspace directly. See [menu refinement and staged rollout](docs/menu-refinement.md).
+
+Secondary navigation on Home offers **How to Play**, **About PromptCraft**, **Meet the Characters**, and **Privacy & Progress** (`?view=how-to-play`, `?view=about`, `?view=babbage`, and `?view=privacy`). The footer also links to Privacy & Progress from every path. These information pages make no AI calls and do not change browser progress or research participation.
+
 In the workspace, use **Design**, **Babbage**, and **Review & Course Guide** to move freely. Bring existing directions or an idea as starting material for a forum, edit the draft, consider Maya, and review the design. Selecting different gallery inspiration keeps your starting material and draft while resetting outdated conversation and approval. Reopening the same idea preserves approval. **Reset workspace** clears only that workspace. It currently holds one design; export a guide before deliberately replacing it. Unapplied AI suggestions and Maya readings remain session-only.
 
 Use **Restart module** in the header to begin again. A confirmation lets you keep your work or clear the module's saved answers, discussion setup, draft, and conversation. Download your guide first if you want to keep it. Restart preserves your selected live or Dev testing mode.
@@ -42,6 +46,8 @@ Desktop and tablet introductions fit the viewport, including their answer choice
 
 Use [the project map](docs/project-map.md) to find the file for a specific change. Source is organized by feature under `src/features`, reusable renderers under `src/shared`, and app navigation and persistence under `src/app`. Styles are grouped under `src/styles`.
 
+Maya and Professor Pixel use the visually inspected realistic portraits in the shared `src/shared/character-art.js` catalog. Keep their identities and clothing distinct. The [character guide](docs/characters/guide.md) and [artwork inventory](docs/characters/artwork-integration.md) document available poses, missing expression states, and preserved reference images. No missing poses are synthesized or silently relabeled.
+
 ## Checks and formatting
 
 ```sh
@@ -61,3 +67,15 @@ Optional live check: set `RUN_LIVE_BABBAGE=1` and run `node tests/manual/babbage
 For consistent formatting, install development dependencies with `npm install`, then use `npm run format` or `npm run format:check`. Prettier is the only development dependency. Editor indentation is defined in `.editorconfig`.
 
 Generated screenshots and browser profiles belong in the ignored `artifacts/` directory. They are not app source and can be cleared after closing the test browser. API keys must never be added to browser code or committed files.
+
+
+## Sample lessons for testing
+
+Type one of these exact words in the **subject** or **original assignment directions** field in either path. The shortcut fills a complete sample and opens the review screen. These shortcuts are documented here only.
+
+- `good`: a purposeful staffing discussion with evidence, peer questions, and follow-up.
+- `bad`: excessive posting, forced agreement, and weak connection to the learning goal.
+- `joke`: an office printer applying for a management promotion, with an evidence-based decision underneath the humor.
+- `test`: an alias for `good`.
+
+Filling a sample makes no AI request and does not approve the design. In the workspace, **Check your design** starts the required Maya and Pixel dialogue before the final checks. They use the normal AI connection; their emotion and feedback are not preset. The current path is replaced with the sample, and the previous draft and rationale are retained as the earlier version.

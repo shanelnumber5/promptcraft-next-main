@@ -426,6 +426,33 @@ const assert = require('node:assert/strict');
   assert.ok(loadState(scenario, blocked).saveNotice);
   saveState(state, blocked);
   assert.ok(state.saveNotice);
+  const { fillTestLesson, isTestLessonKeyword } = await import('../../src/shared/test-lesson.js');
+  assert(isTestLessonKeyword({name:'subject',value:' TEST '}));
+  assert(isTestLessonKeyword({name:'directions',value:'test'}));
+  assert(!isTestLessonKeyword({name:'directions',value:'A test of evidence'}));
+  assert(!isTestLessonKeyword({name:'reason',value:'test'}));
+  const sample = initialState(scenario);
+  sample.design.revision='Earlier draft'; sample.design.reason='Earlier reason';
+  sample.finalCheck.approved=true; sample.babbage.mode='dev';
+  fillTestLesson(sample);
+  assert.equal(sample.phase,'design'); assert.equal(sample.designPanel,'reason');
+  assert.equal(sample.babbage.mode,'live'); assert.equal(sample.finalCheck.approved,false);
+  assert.equal(sample.design.previousRevision,'Earlier draft');
+  assert.equal(sample.design.sourceDirections,sample.teacher.directions);
+  assert(sample.design.revision.includes('staffing schedules'));
+  assert(sample.teacher.learningGoal && sample.teacher.mustStay && sample.design.reason);
+  const variants = ['good', 'bad', 'joke'].map(keyword => {
+    assert(isTestLessonKeyword({name:'subject',value:keyword.toUpperCase()}));
+    const variant = initialState(scenario); fillTestLesson(variant, keyword);
+    assert.equal(variant.babbage.mode,'live'); assert(!variant.finalCheck.approved);
+    assert.equal(variant.design.sourceDirections, variant.teacher.directions);
+    return variant;
+  });
+  assert.equal(new Set(variants.map(variant => variant.design.revision)).size, 3);
+  assert(variants[1].design.revision.includes('Do not ask questions'));
+  assert(variants[2].design.revision.includes('Paper Jams'));
+  assert(!isTestLessonKeyword({name:'subject',value:'good management'}));
+  assert.throws(() => fillTestLesson(sample,'unknown'), /Unknown sample/);
   console.log(
     'PASS: design navigation, original preservation, starter append, edits, restore, legacy saves, validation, escaping, storage failures.',
   );

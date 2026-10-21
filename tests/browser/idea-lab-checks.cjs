@@ -41,13 +41,100 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await evaluate('localStorage.clear();location.reload()');
     await waitFor('!!document.querySelector("#entry-title")');
     assert(!await evaluate('document.body.textContent.includes("Continue Where You Left Off")'));
+    assert(!await evaluate('document.querySelector(".home-private")'), 'The requested Home disclaimer is removed');
+    if (width >= 700) assert(await evaluate('document.querySelector(".home-qr img").getBoundingClientRect().width >= 110'), 'Published-site QR is visible on desktop and tablet');
     await accessibleScreen(device + ' entry');
     await contrast();
+    assert.equal(await evaluate('document.querySelectorAll(".home-path svg, .home-private svg").length'), 0, 'Home choices have no decorative icons');
+    assert(await evaluate('document.querySelector(".header-actions .campus-signature img").getBoundingClientRect().width >= 100'), 'Existing GFC logo is visible');
+    assert(await evaluate('document.querySelector(".header-actions > a").hidden'), 'Duplicate header Home button is hidden');
     await shot('lab-' + device + '-home');
+    const menuFrame = await evaluate('(() => { const rect = document.querySelector(".menu-board").getBoundingClientRect(); return { top:rect.top, height:rect.height, footer:document.querySelector(".app-footer").getBoundingClientRect().top }; })()');
+    assert(await evaluate('document.querySelector(".home-choices").scrollHeight <= document.querySelector(".home-choices").clientHeight + 1'), 'All Home choices and privacy text fit inside the frame');
+    assert(await evaluate('document.querySelector(".home-choices").getBoundingClientRect().bottom <= document.querySelector(".menu-board").getBoundingClientRect().bottom + 1'), 'Home choices do not extend past the panel');
+    assert(await evaluate('[...document.querySelectorAll(".home-character-crop")].every(el => el.getBoundingClientRect().height >= 80)'), 'Home characters have a visible portrait area');
+    if (width >= 700 || height >= 800) assert(await evaluate('document.documentElement.scrollHeight <= innerHeight + 1'), `${device} Home fits without scrolling`);
     const guided = initialState(scenario);
     guided.sceneId = 'meet-plan'; guided.storyStage = 'board';
     const guidedRaw = JSON.stringify(guided);
     await evaluate('localStorage.setItem("promptcraft_next_opening_v1",' + JSON.stringify(guidedRaw) + ')');
+    const savedBeforeGuide = await evaluate('JSON.stringify({...localStorage})');
+    const requestsBeforeInfo = apiRequests.length;
+    for (const view of ['how-to-play', 'about', 'babbage', 'privacy']) {
+      if (width <= 700) {
+        await keyboardReach('.info-nav-select');
+        await evaluate(`(() => { const select = document.querySelector('.info-nav-select'); select.value = '${view}'; select.dispatchEvent(new Event('change', { bubbles: true })); })()`);
+      } else await follow(`.info-nav a[href="?view=${view}"]`);
+      await waitFor('!!document.querySelector(".info-shell")');
+      assert.equal(await evaluate('document.querySelector(".info-nav [aria-current=page]").getAttribute("href")'), `?view=${view}`);
+      await accessibleScreen(device + ' ' + view);
+      await contrast();
+      assert(await evaluate('document.documentElement.scrollWidth <= innerWidth'), 'Information page fits viewport');
+      assert.equal(await evaluate('document.querySelectorAll(".info-shell select").length'), 0, 'Topics use side buttons without a dropdown');
+      assert(!await evaluate('document.querySelector(".info-topic-groups")'), 'Redundant More/Earlier controls are removed');
+      if (view === 'babbage') {
+        assert.equal(await evaluate('document.querySelector("#entry-title").textContent'), 'Meet the Characters');
+      }
+      if (view === 'babbage') assert(await evaluate('document.querySelector(".info-portrait").src.endsWith("/assets/people/babbage-engine-repaired.png")'), 'Babbage is represented by the computer');
+      await shot('info-' + device + '-' + view);
+      await keyboardReach('.info-sidebar [data-info-section="1"]');
+      await key('Enter', 'Enter', 13);
+      assert.equal(await evaluate('document.querySelector("[data-current-topic]").dataset.currentTopic'), '1', 'Side topic buttons support keyboard selection');
+      await keyboardReach('.info-sidebar [data-info-section="0"]');
+      await key('Enter', 'Enter', 13);
+      const count = await evaluate('Number(document.querySelector("[data-topic-count]").dataset.topicCount)');
+      for (let topic = 0; topic < count; topic++) {
+        const frame = await evaluate('(() => { const rect = document.querySelector(".menu-board").getBoundingClientRect(); return { top:rect.top, height:rect.height, footer:document.querySelector(".app-footer").getBoundingClientRect().top }; })()');
+        assert.deepEqual(frame, menuFrame, 'Home and every information topic keep the same frame and footer positions');
+        assert(await evaluate('document.querySelector(".info-page").scrollHeight <= document.querySelector(".info-page").clientHeight + 1'), `${device} ${view} topic ${topic + 1} content fits its panel`);
+        assert.equal(await evaluate('document.querySelectorAll(".info-page").length'), 1, 'Only one information topic is displayed');
+        const topicTitle = await evaluate('document.querySelector("#info-topic-title").textContent');
+        const expectedPortraits = {
+          'Babbage': '/assets/people/babbage-engine-repaired.png',
+          'Why Babbage?': '/assets/people/babbage-engine-repaired.png',
+          'When you ask for AI help': '/assets/people/babbage-engine-repaired.png',
+          'External service privacy': '/assets/people/babbage-engine-repaired.png',
+          'Evaluate': '/assets/people/babbage-engine-repaired.png',
+          'Revise': '/assets/people/babbage-engine-repaired.png',
+          'Professor Pixel': '/assets/characters/pixel/pixel_pleasant.png',
+          'Maya': '/assets/characters/maya/maya_neutral.png',
+          'A student’s first read': '/assets/characters/maya/maya_explaining.png',
+          'Meet the developer': '/assets/people/shanel-profile.png',
+          'Institutional context': '/assets/brand/gfc-river-otters.png',
+        };
+        if (expectedPortraits[topicTitle]) assert(await evaluate(`document.querySelector('.info-portrait').src.endsWith(${JSON.stringify(expectedPortraits[topicTitle])})`), `${topicTitle} shows the relevant person or institution`);
+        assert(await evaluate('(() => { const edge = document.querySelector(".info-sidebar").getBoundingClientRect().bottom; return [...document.querySelectorAll(".info-sidebar button")].every(button => button.getBoundingClientRect().bottom <= edge + 1); })()'), `${device} ${view} topic ${topic + 1} side controls fit: ` + JSON.stringify(await evaluate('[...document.querySelectorAll(".info-sidebar, .info-sidebar button")].map(el => ({text:el.textContent,top:el.getBoundingClientRect().top,bottom:el.getBoundingClientRect().bottom}))')));
+        if (width >= 700 || height >= 800) assert(await evaluate('document.documentElement.scrollHeight <= innerHeight + 1'), `${device} ${view} topic ${topic + 1} fits without scrolling: ` + JSON.stringify(await evaluate('({height:innerHeight, document:document.documentElement.scrollHeight, parts:[...document.querySelectorAll(".app-header,.info-nav,#app,.app-footer,.info-page,.info-index")].map(el=>[el.className,el.getBoundingClientRect().height])})')));
+        if (topic < count - 1) {
+          await keyboardReach('.info-pager button:last-child');
+          await key('Enter', 'Enter', 13);
+          assert(await evaluate('document.activeElement.id === "info-topic-title"'), 'Topic changes focus its heading');
+        }
+      }
+      await keyboardReach('.info-pager button:first-child');
+      await key('Enter', 'Enter', 13);
+      assert.equal(await evaluate('document.querySelector("[data-current-topic]").dataset.currentTopic'), String(count - 2), 'Previous opens the preceding topic');
+    }
+    assert.equal(apiRequests.length, requestsBeforeInfo, 'Information pages make no AI calls');
+    assert.equal(await evaluate('JSON.stringify({...localStorage})'), savedBeforeGuide, 'Information pages preserve progress and resume preference');
+    if (width <= 700) {
+      await keyboardReach('.info-nav-select');
+      await evaluate(`(() => { const select = document.querySelector('.info-nav-select'); select.value = 'home'; select.dispatchEvent(new Event('change', { bubbles:true })); })()`);
+    } else await follow('.info-nav a[href="?view=home"]');
+    await waitFor('!!document.querySelector(".home-shell")');
+    assert.equal(await evaluate('document.querySelector(".menu-board").getBoundingClientRect().height'), menuFrame.height, 'Resume option does not resize Home');
+    await follow('a[href="?view=guide"]');
+    await waitFor('!!document.querySelector("[data-guide-index]")');
+    const guideFrame = await evaluate('(() => { const rect = document.querySelector(".menu-board").getBoundingClientRect(); return { top:rect.top, height:rect.height, footer:document.querySelector(".app-footer").getBoundingClientRect().top }; })()');
+    assert.deepEqual(guideFrame, menuFrame, 'Course Guide keeps the same menu frame');
+    await accessibleScreen(device + ' course guide');
+    await keyboardReach('[data-guide-index="0"]');
+    await key('Enter', 'Enter', 13);
+    await waitFor('!!document.querySelector(".guide-preview iframe[data-ready=true]")');
+    await key('Escape', 'Escape', 27);
+    await waitFor('!document.querySelector(".guide-preview")');
+    assert(await evaluate('document.activeElement.matches("[data-guide-index]")'), 'Closing guide restores keyboard focus');
+    assert.equal(await evaluate('JSON.stringify({...localStorage})'), savedBeforeGuide, 'Guide browsing preserves every saved value');
     const requestsBeforeBrowse = apiRequests.length;
     await goto('?view=lab');
     assert.equal(await evaluate('document.querySelectorAll(".idea-card").length'), 12);
@@ -154,15 +241,62 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await panel('reason');
     await designFits(width);
     await fill('reason', 'I kept the comparison and added a clear deadline. I will look for supported decisions that address fairness and a realistic tradeoff.');
-    await keyboardActivate('hear-maya');
-    await key('Tab', 'Tab', 9);
-    await key('Enter', 'Enter', 13);
-    await waitFor('document.querySelector("[data-maya-status]").textContent.includes("ready below")');
-    assert(await evaluate('document.querySelector("[data-maya-response]").textContent.includes("Compare two staffing schedules.")'));
-    await shot('lab-' + device + '-maya');
+    assert(!await evaluate('document.querySelector("[data-action=hear-maya]")'), 'No separate optional Maya button');
+    if (width >= 1000) assert(await evaluate('document.querySelector("#reason").getBoundingClientRect().height >= 200'), 'Reasoning box uses the available panel height');
+    await shot('lab-' + device + '-reasoning-box');
+    await evaluate('window.mayaSavedFetch=window.fetch;window.fetch=(url,options)=>options?.method === "POST" ? Promise.resolve(new Response("{}",{status:503})) : window.mayaSavedFetch(url,options)');
+    await keyboardReach('[data-review-page=checks]'); await key('Enter','Enter',13);
+    await waitFor('document.querySelector("[data-maya-status]")?.textContent.includes("unavailable")');
+    assert(await evaluate('document.querySelector(".maya-dialogue").hidden && document.querySelector(".maya-actor").hidden'), 'Connection errors are not presented as Maya dialogue');
+    assert(await evaluate('!document.querySelector(".maya-state").hidden'), 'Error has its own status card');
+    assert(!await evaluate('document.querySelector("[data-maya-preview]")'), 'Required reading has no misleading excerpt-preview option');
+    assert.equal(await evaluate('document.querySelector("[data-maya-ask]").textContent'),'Retry reading');
+    await shot('lab-' + device + '-maya-unavailable');
+
     await closeMaya();
-    await evaluate('document.querySelector("[data-review-page=checks]").click()');
+    assert(await evaluate('!!document.querySelector("#reason") && !document.querySelector("[data-final-check]")'), 'Unavailable Maya does not bypass the reading');
+    await evaluate('window.fetch=window.mayaSavedFetch');
+    await keyboardReach('[data-review-page=checks]'); await key('Enter','Enter',13);
+    assert(await evaluate('document.querySelector("[data-maya-portrait]").src.endsWith("/maya_neutral.png")'), 'Maya listens neutrally before a reading');
+    await waitFor('document.querySelector("[data-maya-status]").textContent.includes("dialogue is ready")');
+    assert(await evaluate('document.querySelector("[data-maya-portrait]").src.endsWith("/maya_pleased.png")'), 'Maya uses the emotion supplied with her grounded response');
+    assert(await evaluate('document.querySelector("[data-maya-response]").textContent.includes("Compare two staffing schedules.")'));
+    assert.equal(await evaluate('document.querySelector(".maya-dialog").dataset.emotion'), 'pleased');
+    assert(await evaluate('document.querySelector(".maya-state").hidden && !document.querySelector(".maya-dialogue").hidden'), 'Only returned character dialogue uses the speech bubble');
+    assert(await evaluate('document.querySelector("[data-maya-ask]").hidden'), 'No second Ask button after automatic reading');
+
+    await shot('lab-' + device + '-maya');
+    for (let turn = 0; turn < 20 && await evaluate('document.querySelector(".maya-dialog").dataset.speaker !== "pixel"'); turn++)
+      await evaluate('document.querySelector("[data-maya-next]").click()');
+    assert.equal(await evaluate('document.querySelector("[data-maya-speaker]").textContent'), 'Professor Pixel');
+    assert(await evaluate('document.querySelector("[data-maya-portrait]").src.endsWith("/pixel_thoughtful.png")'));
+    assert(await evaluate('document.querySelector("[data-dialogue-beat]:not([hidden])").textContent.includes("staffing")'));
+    await accessibleScreen(device + ' Pixel pedagogy dialogue');
+    await shot('lab-' + device + '-pixel-response');
+    await evaluate('document.querySelector("[data-maya-back]").click()');
+    assert.equal(await evaluate('document.querySelector(".maya-dialog").dataset.speaker'), 'maya', 'Back replays Maya without another request');
+    const requestsBeforeReplay = apiRequests.length;
+    for (let turn = 0; turn < 20 && await evaluate('document.querySelector("[data-maya-next]").textContent !== "Continue to design checks"'); turn++)
+      await evaluate('document.querySelector("[data-maya-next]").click()');
+    assert.equal(await evaluate('document.querySelector("[data-maya-next]").textContent'), 'Continue to design checks');
+    await evaluate('document.querySelector("[data-maya-next]").click()');
+    await waitFor('!document.querySelector(".maya-dialog")');
+    assert.equal(await evaluate('document.activeElement.id'), 'review-title', 'Finishing the dialogue focuses the design checks');
+    assert.equal(apiRequests.length, requestsBeforeReplay, 'Replaying dialogue makes no AI requests');
+    assert(await evaluate('!!document.querySelector("[data-final-check]")'), 'Completing the dialogue opens design checks');
     await shot('lab-' + device + '-review-checks');
+    const reviewedDraft = await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.design.revision');
+    await panel('revision');
+    await evaluate('document.querySelector("[data-action=edit-draft]").click()');
+    await fill('revision', reviewedDraft+' Use only fictional case details.');
+    await panel('reason');
+    assert(await evaluate('!!document.querySelector("#reason") && !document.querySelector("[data-final-check]")'), 'Editing the lesson invalidates review access even through the workspace tab');
+    await panel('revision');
+    await fill('revision', reviewedDraft);
+    await panel('reason');
+    await evaluate('document.querySelector("[data-review-page=checks]").click()');
+    assert(await evaluate('!!document.querySelector("[data-final-check]")'), 'Restoring the already-read draft can reuse its completed reading');
+
     await designFits(width);
     assert(await evaluate('document.querySelector("[data-final-check=instructions]").parentElement.textContent.includes("what to produce")'));
     await evaluate('document.querySelectorAll("[data-final-check]").forEach(el=>{el.checked=true;el.dispatchEvent(new Event("change",{bubbles:true}));})');
@@ -186,6 +320,27 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await accessibleScreen(device + ' workspace approval');
     await shot('lab-' + device + '-guide');
     await designFits(width);
+    const beforeWrapSave = await evaluate('localStorage.getItem("promptcraft_assignment_workspace_v1")');
+    const beforeWrapRequests = apiRequests.length;
+    await keyboardActivate('finish-workspace');
+    await waitFor('!!document.querySelector(".closing-experience")');
+    assert(await evaluate('document.querySelector(".speech-bubble").textContent.includes("Your design and reasoning are saved")'));
+    assert(await evaluate('(() => { const rect=document.getElementById("app").getBoundingClientRect(); return rect.left === 0 && Math.abs(rect.width-document.documentElement.clientWidth) <= 1; })()'), 'Wrap-up uses the opening full-width scene frame');
+    assert(await evaluate('getComputedStyle(document.querySelector(".app-footer")).display === "none"'), 'Scene hides the workspace footer like the opening');
+    await accessibleScreen(device + ' Pixel wrap-up');
+    await shot('lab-' + device + '-pixel-wrap-up');
+    assert.equal(apiRequests.length,beforeWrapRequests,'Pixel wrap-up works without AI');
+    assert.equal(await evaluate('localStorage.getItem("promptcraft_assignment_workspace_v1")'),beforeWrapSave,'Finishing preserves the saved guide');
+    await click('return-assignment');
+    await waitFor('!!document.querySelector("[data-action=finish-workspace]")');
+    assert.equal(await evaluate('document.activeElement.id'),'review-title');
+    await click('finish-workspace');
+    await click('workspace-home');
+    await waitFor('!!document.querySelector(".home-shell")');
+    assert.equal(await evaluate('localStorage.getItem("promptcraft_assignment_workspace_v1")'),beforeWrapSave);
+    await goto('?view=workspace');
+    await waitFor('!!document.querySelector("[data-action=download-guide]")');
+
     await evaluate('location.reload()');
     await waitFor('!!document.querySelector("[data-action=download-guide]")');
     assert(await evaluate('!document.querySelector("[data-action=download-guide]").disabled'), 'Approval survives refresh');
@@ -193,8 +348,8 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await waitFor('!!document.querySelector(".workspace-shell")');
     assert(await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.finalCheck.approved'), 'Reopening the same inspiration does not discard approval');
     await goto('?view=home');
-    assert(await evaluate('document.querySelector(".resume-card a").href.includes("view=workspace")'));
-    await follow('.resume-card a');
+    assert(await evaluate('document.querySelector(".home-resume a").href.includes("view=workspace")'));
+    await follow('.home-resume a');
     await waitFor('!!document.querySelector(".workspace-shell")');
     await goto('?view=play');
     await waitFor('!!document.querySelector("#scene-title")');
@@ -211,8 +366,8 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await goto('?view=workspace');
     await waitFor('!!document.querySelector("[data-partner-page=options]")');
     await evaluate('document.querySelector("[data-partner-page=options]").click()');
-    await waitFor('!!document.querySelector("[data-action=toggle-dev]")');
-    await click('toggle-dev');
+    // Exercise the retained offline controller through a test-only event; no product Dev switch.
+      await evaluate('(() => { const b=document.createElement("button"); b.dataset.action="toggle-dev"; document.getElementById("app").append(b); b.click(); b.remove(); })()');
     const beforeDev = apiRequests.length;
     await click('ask-ai');
     await waitFor('!!document.querySelector("[data-clarification-answer]")');
@@ -251,6 +406,37 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await evaluate('Storage.prototype.setItem=window.restoreSetItem');
     await fill('directions', 'Storage works again.');
     await shot('lab-' + device + '-recovered');
+    await keyboardReach('#directions');
+    assert.deepEqual(await evaluate('(() => { const s=getComputedStyle(document.querySelector("#directions")); return [s.outlineWidth,s.outlineOffset]; })()'), ['2px','-2px'], 'Field focus is compact and inside the border');
+    assert(!await evaluate('document.querySelector("#directions").placeholder.includes("joke")'), 'Testing shortcuts stay out of field instructions');
+    await shot('lab-' + device + '-field-focus');
+    const beforeSample = apiRequests.length;
+    await fill('directions', 'test');
+    await waitFor('!!document.querySelector("#reason")');
+    assert.equal(await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.babbage.mode'), 'live');
+    assert(await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.design.revision.includes("staffing schedules")'));
+    assert(!await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.finalCheck.approved'));
+    assert.equal(apiRequests.length, beforeSample, 'Sample fill is local and does not ask AI');
+    assert.equal(await evaluate('document.querySelectorAll("[data-action=toggle-dev]").length'), 0, 'No manual Dev switches');
+    await shot('lab-' + device + '-sample-lesson');
+    const shortcut = initialState(scenario); shortcut.phase='setup';
+    await evaluate('localStorage.setItem("promptcraft_next_opening_v1",'+JSON.stringify(JSON.stringify(shortcut))+')');
+    await goto('?view=play');
+    await waitFor('!!document.querySelector("#subject")');
+    await fill('subject', 'test');
+    await waitFor('!!document.querySelector("[data-action=hear-maya]")');
+    assert.equal(await evaluate('JSON.parse(localStorage.getItem("promptcraft_next_opening_v1")).babbage.mode'), 'live');
+    assert(await evaluate('JSON.parse(localStorage.getItem("promptcraft_next_opening_v1")).teacher.subject.includes("Office Management")'));
+    for (const [word, phrase] of [['good','By Thursday'],['bad','Do not ask questions'],['joke','Paper Jams']]) {
+      await evaluate('localStorage.setItem("promptcraft_next_opening_v1",'+JSON.stringify(JSON.stringify(shortcut))+')');
+      await goto('?view=play');
+      await waitFor('!!document.querySelector("#subject")');
+      const callsBeforeVariant = apiRequests.length;
+      await fill('subject', word);
+      await waitFor('!!document.querySelector("[data-action=hear-maya]")');
+      assert(await evaluate('JSON.parse(localStorage.getItem("promptcraft_next_opening_v1")).design.revision.includes('+JSON.stringify(phrase)+')'), word+' loads a distinct draft');
+      assert.equal(apiRequests.length,callsBeforeVariant, 'Sample selection does not ask AI or predetermine a reaction');
+    }
     console.log(device + ' PASS: Idea Lab gallery/filter/details, adaptation, shared Babbage and Maya, approval/export, keyboard/AX labels, separate saves, resume/reset, corrupt records and quota recovery. Mocked AI only.');
   }
 };

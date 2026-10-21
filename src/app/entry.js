@@ -1,12 +1,25 @@
+import { campusSignature } from '../shared/lab-visuals.js';
 import { renderHome } from '../features/entry/screen.js';
 import { renderGallery, renderIdeaCards, renderIdeaDetail } from '../features/idea-lab/screen.js';
 import { readWorkspace, rememberPath, resumePath } from '../features/workspace/storage.js';
+import { infoPages, renderInfoNavigation, mountInfoPage } from '../features/entry/info-screen.js';
 const params = new URLSearchParams(window.location.search);
 const requested = params.get('view');
 const resume = resumePath();
-const view = ['home', 'play', 'lab', 'workspace'].includes(requested) ? requested : 'home';
+const view = ['home', 'play', 'lab', 'workspace', 'guide', ...infoPages.map(([id]) => id)].includes(requested) ? requested : 'home';
 document.body.dataset.appView = view;
 const app = document.getElementById('app');
+if (['home', 'guide', ...infoPages.map(([id]) => id)].includes(view)) document.body.dataset.infoReader = '';
+if (['home', 'guide'].includes(view) || infoPages.some(([id]) => id === view)) {
+  document.querySelector('.header-actions a[href="?view=home"]').hidden = true;
+  document.querySelector('.header-actions').insertAdjacentHTML('beforeend', campusSignature());
+  app.insertAdjacentHTML('beforebegin', renderInfoNavigation(view));
+  document.querySelector('.info-nav-select')?.addEventListener('change', event => {
+    const destination = new URL(window.location.href);
+    destination.searchParams.set('view', event.target.value);
+    window.location.href = destination.href;
+  });
+}
 const restart = document.querySelector('[data-action="restart-module"]');
 if (params.get('mockBabbage') === '1') document.addEventListener('click', event => {
   const link = event.target.closest('a[href^="?"]');
@@ -27,7 +40,11 @@ if (view === 'play') {
 } else {
   const references = document.querySelector('[data-action="open-references"]');
   if (references) references.hidden = true;
-  if (view === 'home') app.innerHTML = renderHome(resume);
+  if (view === 'guide') {
+    const { mountCourseGuide } = await import('../features/entry/guide-screen.js');
+    mountCourseGuide(app);
+  } else if (infoPages.some(([id]) => id === view)) mountInfoPage(app, view);
+  else if (view === 'home') app.innerHTML = renderHome(resume);
   else if (params.has('idea')) app.innerHTML = renderIdeaDetail(params.get('idea'), readWorkspace().exists);
   else {
     app.innerHTML = renderGallery();

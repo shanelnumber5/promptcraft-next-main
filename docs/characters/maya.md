@@ -2,6 +2,8 @@
 
 Status: Approved biographical and personality decisions, supplied by the project owner. Proposed dialogue examples remain pending review. This profile does not approve new dialogue.
 
+The supplied [character guide](guide.md) also establishes Maya's realistic visual identity: high brown ponytail, multicolored striped turtleneck, denim shirt tied at the waist, beige pants, and natural makeup. Keep her face, clothes, proportions, and hair consistent. She is distinct from Professor Pixel. See [the inspected artwork inventory](artwork-integration.md) for available expressions and absent states.
+
 ## Identity
 
 Maya is a millennial returning adult student studying Office Management & Supervision at Great Falls College.
@@ -62,6 +64,6 @@ Use a consistent character identity across scenarios while allowing her conversa
 
 ## Current implementation review
 
-The existing `student-before` and `student-after` scenes in `src/features/opening/content.js` are compatible: Maya describes completing a repetitive discussion without needing peers' ideas, then explains how a specific question helped her group reconsider its plan. Both lines speak from a student experience rather than grading the educator. Retain these lines and the existing neutral/confident artwork.
+The existing `student-before` and `student-after` scenes in `src/features/opening/content.js` are compatible: Maya describes completing a repetitive discussion without needing peers' ideas, then explains how a specific question helped her group reconsider its plan. Both lines speak from a student experience rather than grading the educator. Retain these lines; the opening now uses the inspected realistic explaining/friendly artwork instead of the retired illustrations.
 
 Scenario 1 now offers an optional first reading of the educator's original and revised assignment through the existing AI service, using this profile and relevant readings from the current session. See [the stabilization report](../scenario1-stabilization.md) for validation and live-service limits. Dev mode offers excerpts only. Preserve the distinction between this approved identity and proposed dialogue examples awaiting review; a generated response is not evidence that a real student experienced an activity.

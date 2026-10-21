@@ -1,3 +1,5 @@
+import { renderClosing } from '../design/closing.js';
+import { isTestLessonKeyword, fillTestLesson } from '../../shared/test-lesson.js';
 import { renderWorkspace, renderDraftPreview, workspacePreview } from './screen.js';
 import { readWorkspace, freshWorkspace, saveWorkspace, resetWorkspace } from './storage.js';
 import { findIdea } from '../idea-lab/ideas.js';
@@ -6,7 +8,7 @@ import { conversationDefaults, assignmentContext } from '../design/babbage-clien
 import { finalCheckDefaults, finalCheckContext, finalCheckReady, syncDraftAssignment } from '../design/content.js';
 import { renderAssignmentDirections } from '../../shared/directions.js';
 import { serializeDirectionsEditor, formatDirectionsEditor } from '../../shared/directions-editor.js';
-import { openMayaDialog } from '../design/maya-dialog.js';
+import { openMayaDialog, requireMayaReview, hasMayaReview } from '../design/maya-dialog.js';
 import { openGuidePreview } from '../design/guide-preview.js';
 import { downloadGuide, loadGuideLogo } from '../design/guide.js';
 import { confirmRestart } from '../../shared/restart-dialog.js';
@@ -16,6 +18,7 @@ export function mountWorkspace(app, params) {
   const restored = readWorkspace();
   let state = restored.state, readError = restored.error;
   let designPage = state.design.revision.trim() ? 'draft' : 'start', partnerPage = 'work', reviewPage = state.finalCheck.approved ? 'guide' : 'rationale';
+  let showingWrapUp = false;
   const ai = { pending: false, configured: null, suggestion: null, error: '', context: '' };
   if (params.get('mockBabbage') === '1') state.babbage.mode = 'dev';
   const idea = findIdea(params.get('adapt'));
@@ -45,7 +48,8 @@ export function mountWorkspace(app, params) {
     if (state.finalCheck.context !== context) state.finalCheck = { ...finalCheckDefaults(), context };
   };
   const render = ({ focus = false } = {}) => {
-    app.innerHTML = renderWorkspace(state, ai, readError, designPage, partnerPage, reviewPage);
+    if (reviewPage === 'checks' && !state.finalCheck.approved && !hasMayaReview(state)) reviewPage='rationale';
+    app.innerHTML = showingWrapUp ? renderClosing(state) : renderWorkspace(state, ai, readError, designPage, partnerPage, reviewPage);
     if (focus) document.getElementById('setup-title')?.focus({ preventScroll: true });
   };
   const controller = createDesignController({ app, getState: () => state, ai, render, saveSafely, syncFinalCheck });
@@ -66,6 +70,12 @@ export function mountWorkspace(app, params) {
   }
   function input(control) {
     if (readError) return;
+    if (control.closest('[data-setup-form]') && isTestLessonKeyword(control)) {
+      ai.requestController?.abort(); fillTestLesson(state, control.value);
+      Object.assign(ai, {configured:null,pending:false,suggestion:null,error:'',context:''});
+      designPage='start'; partnerPage='work'; reviewPage='rationale';
+      saveSafely(); render({focus:true}); controller.refreshBabbageConnection(); return;
+    }
     if (control.dataset?.clarificationAnswer) return controller.updateClarificationAnswer(control);
     let movedDraft = false;
     if (control.dataset?.workspaceMeta) {
@@ -132,6 +142,7 @@ export function mountWorkspace(app, params) {
     ai.requestController?.abort();
     const mode = state.babbage.mode;
     if (!resetWorkspace()) { state.saveNotice = 'This browser could not reset the workspace.'; updateApproval(); return; }
+    showingWrapUp = false;
     state = freshWorkspace();
     designPage = 'start'; partnerPage = 'work'; reviewPage = 'rationale';
     state.babbage.mode = mode;
@@ -144,7 +155,17 @@ export function mountWorkspace(app, params) {
     const partner = event.target.closest('[data-partner-page]');
     if (partner) { partnerPage = partner.dataset.partnerPage; render(); document.getElementById('ai-title')?.focus({ preventScroll: true }); return; }
     const review = event.target.closest('[data-review-page]');
-    if (review) { reviewPage = review.dataset.reviewPage; render(); document.getElementById('review-title')?.focus({ preventScroll: true }); return; }
+    if (review) {
+      const destination = review.dataset.reviewPage;
+      const show = () => { reviewPage=destination; render(); document.getElementById('review-title')?.focus({preventScroll:true}); };
+      if (destination === 'checks' && !state.finalCheck.approved) {
+        if (!state.design.revision.trim() || !state.design.reason.trim()) {
+          app.querySelector('.design-notice').textContent='Add your draft and design reasoning before checking the design.'; return;
+        }
+        requireMayaReview(state,review,show);
+      } else show();
+      return;
+    }
     const page = event.target.closest('[data-design-page]');
     if (page) { designPage = page.dataset.designPage; render(); document.getElementById('design-page-title')?.focus({ preventScroll: true }); return; }
     const tab = event.target.closest('[data-workspace-panel]');
@@ -154,6 +175,14 @@ export function mountWorkspace(app, params) {
     const action = event.target.closest('[data-action]')?.dataset.action;
     if (action === 'reset-workspace') return reset();
     if (readError) return;
+    if (action === 'finish-workspace' && state.finalCheck.approved && finalCheckReady(state)) {
+      showingWrapUp = true; render({focus:true}); return;
+    }
+    if (action === 'workspace-home' && showingWrapUp) { window.location.href='?view=home'; return; }
+    if (action === 'return-assignment' && showingWrapUp) {
+      showingWrapUp = false; reviewPage='guide'; render();
+      document.getElementById('review-title')?.focus({preventScroll:true}); return;
+    }
     if (action === 'edit-draft') { designPage = 'draft'; setPanel('revision'); document.getElementById('revision')?.focus(); }
     else if (action === 'use-starting') {
       if (state.design.revision.trim() || !state.teacher.directions.trim()) return;
@@ -188,7 +217,7 @@ export function mountWorkspace(app, params) {
       syncFinalCheck(); controller.syncBabbage(); saveSafely(); render();
     } else if (action === 'edit-context') { designPage = 'start'; setPanel('revision'); }
     else if (action === 'preview-guide') openGuidePreview(state, app);
-    else if (action === 'approve-version' && finalCheckReady(state)) {
+    else if (action === 'approve-version' && finalCheckReady(state) && hasMayaReview(state)) {
       state.finalCheck.approved = state.finalCheck.completed = true;
       reviewPage = 'guide'; saveSafely(); render(); document.getElementById('review-title')?.focus({ preventScroll: true });
     } else if (action === 'download-guide' && finalCheckReady(state) && state.finalCheck.approved) {
