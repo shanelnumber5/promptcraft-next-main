@@ -323,6 +323,7 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       for (const scene of scenario.scenes) {
         assert.equal(await evaluate('document.querySelector("#scene-title").textContent'), scene.title);
         await keyboardActivate('reveal-board');
+        await shot(device + '-opening-' + scene.id);
         if (scene.choice) {
           await keyboardActivate('reveal-question');
           await keyboardReach('input[name="scene-choice"]');

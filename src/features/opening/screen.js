@@ -17,7 +17,8 @@ export function renderBoard(board, { afterContent = '' } = {}) {
     content += `<${tag} class="service-flow${board.numbered === false ? ' service-flow--roles' : ''}" aria-label="${e(board.flowLabel || 'Plan in order')}">${board.nodes.map((n, i) => `<li>${board.visual === 'plan' ? planVisuals(board)[i] : ''}${board.numbered === false ? '' : `<span class="flow-number" aria-hidden="true">${i + 1}</span>`}<strong>${e(n.title)}</strong><span>${e(n.detail)}</span></li>`).join('')}</${tag}>`;
   }
   if (board.note) content += `<p class="board-note">${e(board.note)}</p>`;
-  return `<section class="smartboard" aria-labelledby="board-title"><div class="board-screen"><div class="board-heading"><div><span class="eyebrow">${e(board.label || 'On the smartboard')}</span><h2 id="board-title">${e(board.title)}</h2></div><span class="lemonade-icon">${lemonadeIcon}</span></div>${content}${afterContent}</div><div class="board-frame" aria-hidden="true"><span class="board-light"></span> PROMPTCRAFT</div></section>`;
+  const reading = (board.text || board.quote) && !board.visual && !board.nodes?.length && !board.facts?.length && !afterContent;
+  return `<section class="smartboard${reading ? ' smartboard--reading' : ''}" aria-labelledby="board-title"><div class="board-screen"><div class="board-heading"><div><span class="eyebrow">${e(board.label || 'On the smartboard')}</span><h2 id="board-title">${e(board.title)}</h2></div><span class="lemonade-icon">${lemonadeIcon}</span></div>${content}${afterContent}</div><div class="board-frame" aria-hidden="true"><span class="board-light"></span> PROMPTCRAFT</div></section>`;
 }
 
 export function renderCharacter(character, active) {

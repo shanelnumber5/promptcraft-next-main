@@ -76,3 +76,11 @@ Validation completed:
 - `git diff --check`: PASS. Wide/short-desktop summary screenshots were visually inspected.
 
 No live AI-quality check, deployment, or participant collection was performed.
+
+## October 20: a quieter opening-board hierarchy
+
+The opening board had several equally emphasized treatments: patterned surface, colored label badge, yellow heading rail, decorative lemonade icon, boxed task, boxed reflection, and a prominent frame. Replaced that competing decoration with a plain white display and a clear reading order: assignment heading, task text, then a smaller reflection question separated by one quiet rule. Text-only boards use a constrained reading width and larger heading rather than stretching every line across the display. The classroom background is softened behind board/question views; speaker views and approved character artwork remain intact.
+
+The board keeps its navy frame, classroom setting, display proportions, existing instructional wording, and choice/navigation behavior. Informational boards also use quieter labels and notes, while instructional plan illustrations and interactive answer controls remain. This is a presentation change that may affect attention across versions; no prompt, save, research-event, or participant-collection change was made.
+
+Actual verification: `npm.cmd test` passed all six unit suites. `$env:PC_BROWSER_DEVICE='desktop,short-desktop,phone'; node tests/browser/design.test.cjs` passed the complete guided workflow at 1440×1000, 1280×720, and 390×844, including every opening board/question, keyboard controls, board proportions/content bounds, Babbage accept/adapt/reject, Maya, Course Guide download, and save/resume/reset. AI responses were mocked; no live quality result is claimed. The harness now captures the first revealed board in each opening scene as well as the existing later screenshots. Desktop, shorter desktop, and phone first-board screenshots were visually inspected. `git diff --check` passed. No deployment.
