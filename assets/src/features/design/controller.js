@@ -9,6 +9,11 @@ import {
 } from './babbage-client.js';
 import { syncDraftAssignment } from './content.js';
 import { answerIssue } from './input-quality.js';
+import {
+  applyBabbageTurn,
+  hasCompleteClarificationAnswers,
+  prepareClarificationAnswers,
+} from './turn-state.js';
 import { highlightNextAction } from '../../shared/next-action.js';
 
 // Keeps asynchronous conversation work separate from app navigation.
@@ -23,7 +28,7 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
     if (send)
       send.disabled =
         ai.pending || (state.babbage.mode !== 'dev' && ai.configured !== true) ||
-        state.babbage.questions.some((q) => answerIssue(state.babbage.answers[q.id] || ''));
+        !hasCompleteClarificationAnswers(state.babbage);
     const next = app.querySelector('[data-action="next-question"]');
     const issue = answerIssue(control.value);
     if (next) next.disabled = ai.pending || Boolean(issue);
@@ -71,27 +76,11 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
     if (intent === 'revise' && !state.babbage.ready) return;
     const history = [...state.babbage.history];
     if (sendAnswers) {
-      if (
-        !state.babbage.questions.length ||
-        state.babbage.questions.some((q) => answerIssue(state.babbage.answers[q.id] || ''))
-      )
-        return;
-      const answers = state.babbage.questions.map((q) => ({
-        question: q.text,
-        answer: state.babbage.answers[q.id].trim(),
-      }));
-      for (const q of state.babbage.questions)
-        if (['learningGoal', 'aiUse'].includes(q.field)) {
-          state.teacher[q.field] = state.babbage.answers[q.id].trim();
-          if (q.field === 'learningGoal') state.teacher.learningGoalUnsure = false;
-          syncFinalCheck();
-        }
+      const clarification = prepareClarificationAnswers(state.babbage, state.teacher);
+      if (!clarification) return;
+      if (clarification.hasTeacherFieldAnswers) syncFinalCheck();
       state.babbage.context = assignmentContext(state);
-      history.push({
-        role: 'user',
-        content: JSON.stringify({ clarification_answers: answers }),
-        display: answers.map((a) => a.question + '\n' + a.answer).join('\n\n'),
-      });
+      history.push(clarification.historyEntry);
     }
     ai.pending = true;
     ai.requestController = new AbortController();
@@ -127,44 +116,7 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
           'Your assignment changed while Babbage was working. Ask again to use the latest details.';
         return;
       }
-      if (!state.teacher.learningGoal.trim() || state.teacher.learningGoalUnsure) {
-        turn.questions.unshift({
-          id: 'learning-goal',
-          text: 'What should students learn or practice in this assignment?',
-          field: 'learningGoal',
-        });
-        turn.ready = false;
-        turn.suggestion = null;
-      }
-      if (!state.teacher.aiUse?.trim()) {
-        turn.questions = turn.questions
-          .filter((q) => !/(artificial intelligence|\bAI\b)/i.test(q.text))
-          .slice(0, 2);
-        turn.questions.unshift({
-          id: 'ai-use',
-          text: 'What student AI use should this assignment allow? You can say none, ideas or feedback only, drafting with limits, or describe what you are unsure about.',
-          field: 'aiUse',
-        });
-        turn.ready = false;
-        turn.suggestion = null;
-      }
-      state.babbage.history = [
-        ...history,
-        {
-          role: 'assistant',
-          content: JSON.stringify({
-            message: turn.message,
-            questions: turn.questions,
-            ready: turn.ready,
-          }),
-          display: turn.message,
-        },
-      ].slice(-20);
-      state.babbage.questions = turn.questions;
-      state.babbage.questionIndex = 0;
-      state.babbage.answers = {};
-      state.babbage.ready = turn.ready;
-      ai.suggestion = turn.suggestion;
+      ai.suggestion = applyBabbageTurn(state.babbage, history, turn, state.teacher);
       state.designReadPage = 0;
       if (intent === 'revise') ai.error = turn.message;
       ai.stage = 'complete';

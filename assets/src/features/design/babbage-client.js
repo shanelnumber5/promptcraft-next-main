@@ -19,7 +19,7 @@ export function buildBabbageRequest(state, intent) {
   const { concern, exchange, notes, revision, reason } = state.design;
   return {
     analysis_type: 'scenario1',
-    max_output_tokens: intent === 'revise' ? 5000 : 2500,
+    max_output_tokens: intent === 'revise' ? 3500 : 1600,
     system: state.workspace ? workspaceInstructions : instructions,
     messages: [
       {
