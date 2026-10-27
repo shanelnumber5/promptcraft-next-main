@@ -1,3 +1,4 @@
+import { postJSON } from '../../shared/json-request.js';
 import { BABBAGE_ENDPOINT, buildBabbageRequest, assignmentContext } from '../design/babbage-client.js';
 
 const fields = ['title', 'description', 'experience', 'learning', 'online', 'core'];
@@ -37,10 +38,13 @@ export function buildCreativeRequest(state) {
   };
 }
 export async function requestCreativeDirections(state, { fetchImpl = fetch, signal } = {}) {
-  const response = await fetchImpl(BABBAGE_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(buildCreativeRequest(state)), signal });
-  if (!response.ok) throw Error('Babbage could not explore new directions. Your work is unchanged. Retry or keep designing.');
-  let data;
-  try { data = await response.json(); } catch { throw Error('Babbage returned an unreadable response. Your work is unchanged.'); }
+  const data = await postJSON(BABBAGE_ENDPOINT, buildCreativeRequest(state), {
+    fetchImpl,
+    signal,
+    httpError: () =>
+      Error('Babbage could not explore new directions. Your work is unchanged. Retry or keep designing.'),
+    unreadableMessage: 'Babbage returned an unreadable response. Your work is unchanged.',
+  });
   return normalizeCreativeResponse(data);
 }
 export const creativeBasis = state => JSON.stringify([assignmentContext(state), state.creative.feedback]);

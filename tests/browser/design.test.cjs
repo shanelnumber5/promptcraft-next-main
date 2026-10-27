@@ -1,11 +1,14 @@
 // Optional browser check using installed Chrome and Node's built-in WebSocket.
 const fs = require('node:fs'),
   path = require('node:path'),
+  os = require('node:os'),
   http = require('node:http'),
   assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
-const root = path.resolve(__dirname, '../..'),
-  output = process.env.PC_BROWSER_OUTPUT || path.join(root, 'artifacts/screenshots/design');
+const root = path.resolve(__dirname, '../..');
+const runDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'promptcraft-browser-'));
+const output = process.env.PC_BROWSER_OUTPUT || path.join(runDirectory, 'screenshots');
+const profile = process.env.PC_BROWSER_PROFILE || path.join(runDirectory, 'profile');
 const mime = {
   '.html': 'text/html',
   '.js': 'application/javascript',
@@ -113,6 +116,7 @@ const server = http.createServer((req, res) => {
 const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 (async () => {
   fs.mkdirSync(output, { recursive: true });
+  console.log('Browser test output: ' + output);
   await new Promise((resolve) => server.listen(8783, '127.0.0.1', resolve));
   const chrome = spawn(
     process.env.PC_CHROME_EXECUTABLE || 'C:/Program Files/Google/Chrome/Application/chrome.exe',
@@ -124,7 +128,7 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       '--no-first-run',
       '--disable-background-networking',
       '--remote-debugging-port=9223',
-      '--user-data-dir=' + (process.env.PC_BROWSER_PROFILE || path.join(root, 'artifacts/browser-profiles/design')),
+      '--user-data-dir=' + profile,
       'about:blank',
     ],
     { windowsHide: true, stdio: ['ignore', 'ignore', 'pipe'] },

@@ -1,3 +1,4 @@
+import { postJSON } from '../../shared/json-request.js';
 import { instructions } from './babbage-prompt.js';
 import { workspaceInstructions } from '../workspace/prompt.js';
 import { findIdea } from '../idea-lab/ideas.js';
@@ -73,24 +74,17 @@ export async function checkBabbage({ fetchImpl = fetch, signal } = {}) {
   return data.configured === true;
 }
 export async function requestBabbageTurn(state, intent, { fetchImpl = fetch, signal } = {}) {
-  const response = await fetchImpl(BABBAGE_ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(buildBabbageRequest(state, intent)),
+  const data = await postJSON(BABBAGE_ENDPOINT, buildBabbageRequest(state, intent), {
+    fetchImpl,
     signal,
+    httpError: (status) =>
+      Error(
+        status === 429
+          ? 'Babbage has reached a usage limit. Try again later or continue editing your draft.'
+          : 'Babbage could not respond. Your draft is unchanged. Retry or continue editing your draft.',
+      ),
+    unreadableMessage: 'Babbage returned an unreadable response. Your draft is unchanged.',
   });
-  if (!response.ok)
-    throw Error(
-      response.status === 429
-        ? 'Babbage has reached a usage limit. Try again later or continue editing your draft.'
-        : 'Babbage could not respond. Your draft is unchanged. Retry or continue editing your draft.',
-    );
-  let data;
-  try {
-    data = await response.json();
-  } catch {
-    throw Error('Babbage returned an unreadable response. Your draft is unchanged.');
-  }
   return normalizeBabbageResponse(data, intent);
 }
 export function devBabbageTurn(state, intent) {

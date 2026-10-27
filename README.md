@@ -56,7 +56,7 @@ npm run test:browser
 npm run test:lab
 ```
 
-Unit checks cover persistence, draft ownership, navigation, guide formatting, the active Babbage adapter, static server protection, and repository references. Browser checks cover the complete flow on desktop, short desktop, and phone. They mock Babbage and make no live AI calls. Browser tests use an installed Chrome; set `PC_CHROME_EXECUTABLE` to use another Chromium browser.
+Unit checks cover persistence, draft ownership, navigation, guide formatting, the active Babbage adapter, static server protection, and repository references. Browser checks cover the complete flow on desktop, short desktop, and phone. They mock Babbage and make no live AI calls. Browser tests use an installed Chrome; set `PC_CHROME_EXECUTABLE` to use another Chromium browser. Each run uses a new temporary folder for screenshots and the Chrome profile, and prints the screenshot location. Set `PC_BROWSER_OUTPUT` or `PC_BROWSER_PROFILE` to override those locations. Temporary output stays available for inspection without changing tracked repository artifacts.
 
 Set `PC_BROWSER_DEVICE` to a comma-separated list such as `desktop,short-desktop,tablet,phone,small-phone` for targeted browser validation. Checks include keyboard navigation, accessibility-tree names, Maya's mocked readings, approved guide downloads, and resume/reset. Live Maya checks are opt-in: set `RUN_LIVE_MAYA=1` and run `node tests/manual/maya-smoke.cjs`. Review its fictional outputs for student voice and substantive differences; automated grounding alone does not establish response quality. See the [Scenario 1 stabilization report](docs/scenario1-stabilization.md) for actual results and service limits.
 

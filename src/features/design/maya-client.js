@@ -1,3 +1,4 @@
+import { postJSON } from '../../shared/json-request.js';
 import { BABBAGE_ENDPOINT, buildBabbageRequest } from './babbage-client.js';
 
 // Identity source: docs/characters/maya.md. Keep biography out of assignment inventions.
@@ -107,22 +108,37 @@ export function mayaSceneBeats(scene) {
 }
 
 export async function requestMayaResponse(state, previous = [], { fetchImpl = fetch, signal } = {}) {
-  const request=buildMayaRequest(state,previous), draft=state.design.revision;
-  for(let attempt=0;attempt<2;attempt++) {
+  const request = buildMayaRequest(state, previous);
+  const draft = state.design.revision;
+  for (let attempt = 0; attempt < 2; attempt++) {
     signal?.throwIfAborted();
-    const response=await fetchImpl(BABBAGE_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(request),signal});
-    if(!response.ok) {
-      const error=Error(response.status===429 ? 'Maya’s AI service has reached a usage limit (HTTP 429). Your draft is unchanged. Try later or use the excerpt preview.' : 'Maya’s AI service is unavailable for this reading (HTTP '+response.status+'). Your draft is unchanged. Try again later.');
-      error.status=response.status; throw error;
-    }
-    let data;
-    try { data=await response.json(); } catch { throw Error('Maya returned an unreadable response. Your draft is unchanged. Try again.'); }
-    try { return normalizeMayaResponse(data,draft); }
-    catch(error) {
-      if(attempt || error.code!=='MAYA_DRAFT_QUOTE_MISMATCH') throw error;
+    const data = await postJSON(BABBAGE_ENDPOINT, request, {
+      fetchImpl,
+      signal,
+      httpError: (status) => {
+        const error = Error(
+          status === 429
+            ? 'Maya’s AI service has reached a usage limit (HTTP 429). Your draft is unchanged. Try later or use the excerpt preview.'
+            : 'Maya’s AI service is unavailable for this reading (HTTP ' + status + '). Your draft is unchanged. Try again later.',
+        );
+        error.status = status;
+        return error;
+      },
+      unreadableMessage: 'Maya returned an unreadable response. Your draft is unchanged. Try again.',
+    });
+    try {
+      return normalizeMayaResponse(data, draft);
+    } catch (error) {
+      if (attempt || error.code !== 'MAYA_DRAFT_QUOTE_MISMATCH') throw error;
       signal?.throwIfAborted();
-      const last=request.messages.at(-1);
-      request.messages[request.messages.length-1]={...last,content:JSON.stringify({...JSON.parse(last.content),maya_quote_repair:'The previous scene did not include verifiable draft quotations in both character turns. Generate the full version-1 scene again. In EACH turn, copy one current_draft_quote_options entry exactly inside double quotation marks. Base the reaction on the complete current draft. Do not invent improvements or change the assignment.'})};
+      const last = request.messages.at(-1);
+      request.messages[request.messages.length - 1] = {
+        ...last,
+        content: JSON.stringify({
+          ...JSON.parse(last.content),
+          maya_quote_repair: 'The previous scene did not include verifiable draft quotations in both character turns. Generate the full version-1 scene again. In EACH turn, copy one current_draft_quote_options entry exactly inside double quotation marks. Base the reaction on the complete current draft. Do not invent improvements or change the assignment.',
+        }),
+      };
     }
   }
 }
