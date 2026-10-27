@@ -8,6 +8,8 @@ export function renderField(field, values) {
     helpId = `${field.id}-help`;
   if (field.type === 'radio')
     return `<fieldset class="setup-field"><legend>${e(field.label)}</legend><p id="${helpId}" class="field-help">${e(field.help)}</p><div class="radio-cards" aria-describedby="${helpId}">${field.options.map(([id, label]) => `<label><input type="radio" name="${e(field.id)}" value="${e(id)}"${value === id ? ' checked' : ''}><span>${e(label)}</span></label>`).join('')}</div></fieldset>`;
+  if (field.type === 'select')
+    return `<div class="setup-field"><label for="${e(field.id)}">${e(field.label)}</label><p id="${helpId}" class="field-help">${e(field.help)}</p><select id="${e(field.id)}" name="${e(field.id)}" aria-describedby="${helpId}">${field.options.map(([id, label]) => `<option value="${e(id)}"${value === id ? ' selected' : ''}>${e(label)}</option>`).join('')}</select></div>`;
   const unsure = field.unsure
     ? `<label class="unsure"><input type="checkbox" name="${e(unsureId(field.id))}"${values[unsureId(field.id)] ? ' checked' : ''}> <span>Not sure yet</span></label>`
     : '';

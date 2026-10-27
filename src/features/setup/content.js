@@ -135,7 +135,29 @@ export const teacherSetup = {
       title: 'Your learning goal',
       intro:
         'Choose one skill or understanding a focused discussion-board exchange can advance within the larger assignment.',
-      fields: assignmentSection.fields.slice(1),
+      fields: [
+        ...assignmentSection.fields.slice(1),
+        {
+          id: 'alignmentGuide',
+          label: 'Optional: Which guide should inform this assignment?',
+          help: 'Choose one lens, or leave this set to none. Babbage uses only the relevant guidance you provide; it does not verify official alignment.',
+          type: 'select',
+          options: [
+            ['none', 'No additional guide'],
+            ['montana-k12', 'Montana K–12 Content Standards'],
+            ['msu-outcomes', 'MSU course description or learning outcomes'],
+            ['oscqr', 'OSCQR online course quality rubric'],
+          ],
+        },
+        {
+          id: 'alignmentReference',
+          label: 'Relevant standard, outcome, or rubric item (optional)',
+          help: 'Paste the exact text, standard number, or rubric item you want Babbage to consider. For Montana K–12 standards, include the grade and subject; for MSU, include the course outcome. Leave blank if you do not have it handy.',
+          type: 'textarea',
+          rows: 4,
+          placeholder: 'Paste a relevant excerpt or identifier here.',
+        },
+      ],
     },
     {
       id: 'time',
@@ -168,6 +190,8 @@ export const teacherSetupDefaults = () => ({
   directions: '',
   learningGoal: '',
   learningGoalUnsure: false,
+  alignmentGuide: 'none',
+  alignmentReference: '',
   workTime: '',
   workTimeUnsure: false,
   daysAvailable: '',

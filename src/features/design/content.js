@@ -135,6 +135,8 @@ export const finalCheckContext = (teacher, design) =>
     teacher.directions,
     teacher.learningGoal,
     teacher.learningGoalUnsure,
+    teacher.alignmentGuide,
+    teacher.alignmentReference,
     teacher.mustStay,
     teacher.mustStayUnsure,
     teacher.workTime,

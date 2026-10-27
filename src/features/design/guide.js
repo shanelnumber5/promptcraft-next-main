@@ -21,6 +21,17 @@ function lemonadeExample() {
     )}</ul></div></div><div class="plans"><article><h3>First plan</h3>${flow(scene('spot-hole').board)}</article><article><h3>A revision to test</h3>${flow(scene('revised-plan').board)}</article></div><h3>The useful peer question</h3><blockquote>${e(scene('peer-question').board.quote)}</blockquote><p>The question points to a specific concern: Alex handles both payments and drinks while Sam may have no supplies to restock. It helps the group reconsider how the helpers share service work.</p><h3 class="practice-title">What students practice</h3><ol class="flow practice-steps"><li><strong>Propose</strong><p>Choose a plan and explain the helper roles.</p></li><li><strong>Question</strong><p>Name a choice, explain a concern, and ask a question about it.</p></li><li><strong>Respond</strong><p>Revise or defend the plan with reasons that address the question.</p></li></ol><p class="practice-note">The revised plan is a possibility to test, not proof of faster service. Defending the original plan can also be a useful response if the group addresses the concern.</p><h3>Use the same approach in your course</h3><p>Choose a decision students need to explain. Ask classmates to test one part of that decision. Then ask students to show how the reply informed their revision or defense.</p></section>`;
 }
 
+function alignmentGuidance(teacher) {
+  const labels = {
+    'montana-k12': 'Montana K–12 Content Standards',
+    'msu-outcomes': 'MSU course description or learning outcomes',
+    oscqr: 'OSCQR online course quality rubric',
+  };
+  const guide = labels[teacher?.alignmentGuide];
+  if (!guide) return null;
+  return `<section><h2>Optional assignment guidance</h2><p><strong>Selected guide:</strong> ${e(guide)}</p>${teacher.alignmentReference?.trim() ? `<h3>Reference supplied by the instructor</h3><p>${e(teacher.alignmentReference)}</p>` : '<p>No standard, outcome, or rubric item was supplied.</p>'}<p>This guide was used as an optional design reference, not as verification of official alignment or compliance.</p></section>`;
+}
+
 let logoPromise;
 export function loadGuideLogo() {
   return (logoPromise ??= fetch(new URL('../../../assets/brand/babbage-mark.svg', import.meta.url), { signal: AbortSignal.timeout(5000) })
@@ -53,6 +64,8 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
   if (workspace && (workspace.selectedDirection || workspace.creativeCore || workspace.instructorPlan || workspace.openQuestions)) {
     sections.push({ id: 'creative-intentions', title: 'Creative core and design intentions', body: `<section><h2>Creative core and design intentions</h2>${workspace.selectedDirection ? `<h3>Chosen possibility</h3><p>${e(workspace.selectedDirection.title)}</p><p>${e(workspace.selectedDirection.description)}</p>` : ''}<h3>The creative core I want to protect</h3><p>${e(workspace.creativeCore || 'Not recorded yet.')}</p><h3>My instructor interaction plan</h3><p>${e(workspace.instructorPlan || 'Not recorded yet.')}</p><h3>Questions to revisit</h3><p>${e(workspace.openQuestions || 'No questions recorded. This does not establish that every issue is resolved.')}</p><p>These are the educator’s design intentions. Peer interaction and simulated AI responses are distinct from instructor interaction. Approval does not certify compliance or establish learning outcomes.</p></section>` });
   }
+  const alignmentSection = teacher && alignmentGuidance(teacher);
+  if (alignmentSection) sections.push({ id: 'assignment-guidance', title: 'Optional assignment guidance', body: alignmentSection });
   if (inspiration) sections.push({ id: 'idea-inspiration', title: 'Idea Lab inspiration', body: `<section><h2>Idea Lab inspiration: ${e(inspiration.title)}</h2><p>Illustrative AI-assisted starter idea · not a faculty submission or tested intervention.</p><p>${e(inspiration.summary)}</p><p>The educator adapted this starting point; the final choices are their own.</p></section>` });
   if (workspace && teacher && design.revision.trim())
     sections.push({
@@ -80,7 +93,7 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
     body: '<section class="guide-sources"><h2>Sources</h2><p>References behind the teaching moves. The lemonade example is a fictional illustration.</p><ul>'+designEvidence.map(source=>'<li><a href="'+e(source.url)+'" target="_blank" rel="noopener noreferrer">'+e(source.short)+'</a><span>'+e(source.citation)+'</span></li>').join('')+'</ul></section>',
   });
   sections.push({ id:'using-guide',title:'Using your downloaded guide',body:'<section class="guide-help-section">'+renderGuideHelp({standalone:true})+'</section>' });
-  const order = ['lemonade-example','your-assignment','assignment-pending','decision-milestone','creative-intentions','idea-inspiration','design-sources','using-guide'];
+  const order = ['lemonade-example','your-assignment','assignment-pending','decision-milestone','assignment-guidance','creative-intentions','idea-inspiration','design-sources','using-guide'];
   sections.sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id));
   const contents = sections.map(section => '<li><a href="#'+section.id+'">'+e(section.title)+'</a></li>').join('');
   return `<!doctype html>

@@ -89,7 +89,12 @@ export function mountWorkspace(app, params) {
     document.getElementById('creative-core')?.focus();
   }
   async function exploreDirections() {
-    if (ai.pending || state.babbage.mode === 'dev' || ai.configured !== true || !state.teacher.directions.trim() || !state.teacher.learningGoal.trim()) return;
+    if (ai.pending || state.babbage.mode === 'dev' || ai.configured !== true || !state.teacher.directions.trim()) return;
+    const initialExploration = !state.creative.directions.length && !state.creative.alternatives.length &&
+      !state.workspace.selectedDirection && !state.design.revision.trim();
+    if (initialExploration && state.babbage.questions.length) {
+      state.babbage = { ...conversationDefaults(), mode: state.babbage.mode };
+    }
     const source = state;
     const basis = creativeBasis(state);
     const snapshot = structuredClone(state);
@@ -362,4 +367,3 @@ export function mountWorkspace(app, params) {
   render();
   if (!readError && state.babbage.mode !== 'dev') controller.refreshBabbageConnection();
 }
-

@@ -68,10 +68,7 @@ module.exports = async ({send,evaluate,waitFor,fill,shot,key,click,keyboardReach
 
     await fill('learningGoal','Defend management decisions using evidence.');
     await section('ai-use');await fill('aiUse','Feedback only; students verify their own decisions.');
-    await choose('[data-workspace-panel=babbage]');await waitFor('!document.querySelector("[data-action=ask-ai]")?.disabled');
-    await click('ask-ai');await waitFor('!!document.querySelector("[data-clarification-answer]")');
-    await evaluate('(()=>{const el=document.querySelector("[data-clarification-answer]");el.value="Asynchronous in the existing LMS.";el.dispatchEvent(new Event("input",{bubbles:true}));})()');
-    await click('send-clarification');await waitFor('!!document.querySelector("[data-action=explore-directions]")');
+    await choose('[data-workspace-panel=babbage]');await waitFor('!document.querySelector("[data-action=explore-directions]")?.disabled');
     const conversation=await evaluate('JSON.stringify(JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.babbage.history)');
     await keyboardReach('[data-action=explore-directions]');await key('Enter','Enter',13);
     await waitFor('document.querySelectorAll("[data-view-direction]").length===3');
@@ -134,4 +131,3 @@ module.exports = async ({send,evaluate,waitFor,fill,shot,key,click,keyboardReach
     console.log(device+' PASS: no accordions, short task layouts, direct section navigation, separate idea views, combinations, preview/back focus, saved work, approval without Maya, guide, and failed-save recovery. Mocked AI only.');
   }
 };
-

@@ -31,9 +31,17 @@ const assert = require('node:assert/strict');
   }
   assert.match(teacherSetup.steps[1].intro, /one focused forum component/);
   assert.match(teacherSetup.steps[1].intro, /not replace it/);
+  assert.equal(teacherSetup.steps[2].fields.find((field) => field.id === 'alignmentGuide').type, 'select');
+  assert.deepEqual(
+    teacherSetup.steps[2].fields.find((field) => field.id === 'alignmentGuide').options.map(([id]) => id),
+    ['none', 'montana-k12', 'msu-outcomes', 'oscqr'],
+  );
+  assert.match(setupPreviews[2], /OSCQR online course quality rubric/);
+  assert.match(setupPreviews[2], /Relevant standard, outcome, or rubric item/);
   assert.match(instructions, /one bounded discussion-board component within the larger assignment/);
   assert.match(instructions, /distinctive, feasible forum mechanism that fits this course/);
   assert.match(instructions, /not an all-in-one replacement/);
+  assert.match(instructions, /Never claim official alignment, endorsement, accreditation, or compliance/);
   const legacySetupRecords = new Map();
   const legacySetupStorage = {
     getItem: (key) => legacySetupRecords.get(key),
@@ -64,6 +72,17 @@ const assert = require('node:assert/strict');
   assert(milestone.includes('Evaluate claims &amp; evidence'));
   assert(milestone.includes(milestoneDesign.reason));
   assert(milestone.includes('href="#your-assignment"'));
+  const guidedMilestone = createGuide(milestoneDesign, {
+    teacher: {
+      ...milestoneTeacher,
+      alignmentGuide: 'oscqr',
+      alignmentReference: 'OSCQR item <interaction>',
+    },
+  });
+  assert(guidedMilestone.includes('Optional assignment guidance'));
+  assert(guidedMilestone.includes('OSCQR online course quality rubric'));
+  assert(guidedMilestone.includes('OSCQR item &lt;interaction&gt;'));
+  assert(guidedMilestone.includes('not as verification of official alignment or compliance'));
   assert(createGuide(milestoneDesign, { teacher: milestoneTeacher, approved: false }).includes('Draft preview · Not yet approved'));
   assert(createGuide({ revision: 'Legacy revision', reason: '' }, { teacher: milestoneTeacher }).includes('Legacy revision'));
   const unrelated = {

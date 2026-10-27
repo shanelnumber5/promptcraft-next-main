@@ -3,6 +3,8 @@ const assert = require('node:assert/strict');
   const { freshWorkspace, saveWorkspace, readWorkspace, WORKSPACE_KEY } = await import('../../src/features/workspace/storage.js');
   const { buildCreativeRequest, requestCreativeDirections, normalizeCreativeResponse, combineDirections, creativeBasis } = await import('../../src/features/workspace/creative.js');
   const { renderPossibilities, renderCreativeCore } = await import('../../src/features/workspace/creative-view.js');
+  const { renderPartner } = await import('../../src/features/workspace/partner-view.js');
+  const { finalCheckReady, finalCheckContext } = await import('../../src/features/design/content.js');
   const { buildBabbageRequest } = await import('../../src/features/design/babbage-client.js');
   const { createGuide } = await import('../../src/features/design/guide.js');
   const { initialState, STORAGE_KEY, saveState } = await import('../../src/app/storage.js');
@@ -11,15 +13,25 @@ const assert = require('node:assert/strict');
   const response = { analysis: { feedback_summary: JSON.stringify({ version: 1, directions: fixtures }) } };
   const state = freshWorkspace();
   state.teacher.directions = 'Replace an agreement-only discussion.';
-  state.teacher.learningGoal = 'Defend decisions using evidence.';
   state.design.revision = 'My current draft';
   state.creative.feedback = 'Use our existing LMS.';
+  const explorationCard = renderPossibilities(state, { configured: true, pending: false });
+  assert(!explorationCard.includes('disabled'), 'A starting activity can be explored without a learning goal');
+  state.babbage.questions = [{ id: 'ai-use', text: 'What student AI use should this assignment allow?' }];
+  const initialPartner = renderPartner(state, { configured: true, pending: false }, 'work');
+  assert(initialPartner.includes('data-action="explore-directions"'), 'Initial exploration uses the creative workflow');
+  assert(!initialPartner.includes('data-action="ask-ai"'), 'Initial exploration does not use general clarification');
+  state.teacher.learningGoal = 'Defend decisions using evidence.';
   const before = JSON.stringify(state);
   let sent;
   const directions = await requestCreativeDirections(state, { fetchImpl: async (url, options) => { sent = JSON.parse(options.body); return { ok: true, json: async () => response }; } });
   assert.equal(JSON.stringify(state), before, 'Receiving possibilities cannot change the active design');
   assert.equal(sent.analysis_type, 'scenario1', 'Keep the existing service envelope');
+  assert.equal(JSON.parse(sent.messages.at(-1).content).explore_three_directions, true, 'Mark the request as exploratory sketch generation');
   assert(sent.system.includes('genuinely different student actions'));
+  assert(sent.system.includes('do not ask clarification questions'));
+  assert(sent.system.includes('Do not require student AI-use policy'));
+  assert(sent.system.includes('do not invent, imply, or silently finalize a learning objective'));
   assert.equal(JSON.parse(sent.messages.at(-1).content).educator_feedback, state.creative.feedback);
   assert.deepEqual(directions, fixtures);
   assert.throws(() => normalizeCreativeResponse({ analysis: { feedback_summary: 'a prose response' } }), /three readable/);
@@ -84,5 +96,21 @@ const assert = require('node:assert/strict');
   const guidedRequest = buildBabbageRequest(initialState(discussionOpening), 'clarify');
   assert(!guidedRequest.system.includes('workspace.selectedDirection'));
   assert(buildCreativeRequest(state).system.includes('ONLY JSON'));
+  const approvalState = freshWorkspace();
+  approvalState.teacher.directions = 'Use a discussion.';
+  approvalState.design.revision = 'Students explain and revise a decision.';
+  approvalState.design.reason = 'The exchange makes reasoning visible.';
+  approvalState.teacher.learningGoal = 'Evaluate evidence.';
+  approvalState.finalCheck = {
+    ...approvalState.finalCheck,
+    instructions: true,
+    learning: true,
+    requirements: true,
+  };
+  approvalState.finalCheck.context = finalCheckContext(approvalState.teacher, approvalState.design);
+  assert(finalCheckReady(approvalState), 'Final approval remains available with a meaningful learning goal');
+  approvalState.teacher.learningGoal = '';
+  approvalState.finalCheck.context = finalCheckContext(approvalState.teacher, approvalState.design);
+  assert(!finalCheckReady(approvalState), 'Final approval remains blocked without a learning goal');
   console.log('PASS: creative service contract, malformed and duplicate responses, cancellation, stale context, combinations, independent persistence, legacy and corrupt saves, escaping, optional Maya, guide intentions, guided prompt isolation. Mocked service only.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

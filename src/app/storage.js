@@ -58,6 +58,7 @@ export function loadState(scenario, storage = window.localStorage, workspace = n
       'learnerLevel',
       'directions',
       'learningGoal',
+      'alignmentReference',
       'workTime',
       'daysAvailable',
       'mustStay',
@@ -76,6 +77,8 @@ export function loadState(scenario, storage = window.localStorage, workspace = n
     for (const key of allowedBooleans) teacher[key] = saved.teacher?.[key] === true;
     if (['online', 'in-person', 'both', 'not-sure'].includes(saved.teacher?.participation))
       teacher.participation = saved.teacher.participation;
+    if (['none', 'montana-k12', 'msu-outcomes', 'oscqr'].includes(saved.teacher?.alignmentGuide))
+      teacher.alignmentGuide = saved.teacher.alignmentGuide;
     if (['individual', 'group', 'both', 'not-sure'].includes(saved.teacher?.workMode))
       teacher.workMode = saved.teacher.workMode;
     const design = designDefaults();

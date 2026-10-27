@@ -57,6 +57,8 @@ const assert = require('node:assert/strict');
   const state = initialState(scenario);
   state.teacher.directions = 'Choose a recommendation; keep the rubric.';
   state.teacher.learningGoal = 'Compare evidence.';
+  state.teacher.alignmentGuide = 'oscqr';
+  state.teacher.alignmentReference = 'OSCQR item on student interaction.';
   state.teacher.workTimeUnsure = true;
   state.design.sourceDirections = state.teacher.directions;
   state.babbage.context = assignmentContext(state);
@@ -193,6 +195,15 @@ const assert = require('node:assert/strict');
     true,
     'Uncertainty flags reach backend',
   );
+  assert.equal(
+    JSON.parse(body.messages[0].content).teacher.alignmentGuide,
+    'oscqr',
+    'Selected assignment guidance reaches Babbage',
+  );
+  assert.equal(
+    JSON.parse(body.messages[0].content).teacher.alignmentReference,
+    'OSCQR item on student interaction.',
+  );
   assert.equal(JSON.parse(body.messages.at(-1).content).request_intent, 'clarify');
   assert.ok(body.system.includes('comfort with student AI use'));
   assert.ok(body.system.includes("purposeful way classmates' contributions interact"));
@@ -255,6 +266,11 @@ const assert = require('node:assert/strict');
     loadState(scenario, storage).teacher.aiUse,
     state.teacher.aiUse,
     'AI policy survives reload',
+  );
+  assert.equal(loadState(scenario, storage).teacher.alignmentGuide, 'oscqr');
+  assert.equal(
+    loadState(scenario, storage).teacher.alignmentReference,
+    'OSCQR item on student interaction.',
   );
   assert.equal(loadState(scenario, storage).babbage.answers['question-1'], 'Compare evidence.');
   assert.equal(loadState(scenario, storage).babbage.history.length, 2);
