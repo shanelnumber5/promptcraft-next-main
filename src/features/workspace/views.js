@@ -22,7 +22,77 @@ export function renderUtility(state, ai, ui) {
   let title, body;
   if (ui.screen === 'options') {
     title = 'Workspace options';
-    body = `<nav class="workspace-utility-list" aria-label="Workspace tools"><button type="button" data-workspace-view="sections">Choose a Build section</button><button type="button" data-partner-page="history">Earlier conversation</button><button type="button" data-partner-page="options">AI connection</button><a href="?view=lab">Browse Idea Lab</a>${state.babbage.ready ? `<button type="button" data-action="generate-ai"${ai.pending?' disabled':''}>Draft directly with Babbage</button>` : ''}${state.creative.alternatives.length?'<button type="button" data-workspace-view="saved">Saved ideas</button>':''}</nav>`;
+    const connectionDescription = ai.configured === true
+      ? 'Babbage is connected. View details or retry the connection.'
+      : ai.configured === false
+        ? 'Babbage is unavailable. View details and retry the connection.'
+        : 'Check the connection status or retry Babbage.';
+    body = `
+      <div class="workspace-options-menu">
+        <p class="workspace-options-intro">
+          Shortcuts for your workspace, saved work, and creative tools.
+        </p>
+        <section class="workspace-option-group" aria-labelledby="workspace-tools-title">
+          <h3 id="workspace-tools-title">Your workspace</h3>
+          <div class="workspace-option-list">
+            <button type="button" class="workspace-option" data-workspace-view="sections">
+              <span>
+                <strong>Choose a Build section</strong>
+                <small>Jump to a specific part of your activity.</small>
+              </span>
+              <span class="workspace-option-action" aria-hidden="true">Open</span>
+            </button>
+            <button type="button" class="workspace-option" data-partner-page="history">
+              <span>
+                <strong>Earlier conversation</strong>
+                <small>Review your previous messages with Babbage.</small>
+              </span>
+              <span class="workspace-option-action" aria-hidden="true">Open</span>
+            </button>
+            ${
+              state.creative.alternatives.length
+                ? `<button type="button" class="workspace-option" data-workspace-view="saved">
+                    <span>
+                      <strong>Saved ideas</strong>
+                      <small>Return to directions you saved for later.</small>
+                    </span>
+                    <span class="workspace-option-action" aria-hidden="true">Open</span>
+                  </button>`
+                : ''
+            }
+          </div>
+        </section>
+        <section class="workspace-option-group" aria-labelledby="workspace-explore-title">
+          <h3 id="workspace-explore-title">Explore and create</h3>
+          <div class="workspace-option-list">
+            <button type="button" class="workspace-option" data-partner-page="options">
+              <span>
+                <strong>AI connection</strong>
+                <small>${connectionDescription}</small>
+              </span>
+              <span class="workspace-option-action" aria-hidden="true">View</span>
+            </button>
+            <a class="workspace-option" href="?view=lab">
+              <span>
+                <strong>Browse Idea Lab</strong>
+                <small>Find a discussion starter to adapt for your course.</small>
+              </span>
+              <span class="workspace-option-action" aria-hidden="true">Browse</span>
+            </a>
+            ${
+              state.babbage.ready
+                ? `<button type="button" class="workspace-option" data-action="generate-ai"${ai.pending ? ' disabled' : ''}>
+                    <span>
+                      <strong>Draft directly with Babbage</strong>
+                      <small>Ask Babbage to develop your current activity.</small>
+                    </span>
+                    <span class="workspace-option-action" aria-hidden="true">Draft</span>
+                  </button>`
+                : ''
+            }
+          </div>
+        </section>
+      </div>`;
   } else if (ui.screen === 'sections') {
     title = 'What would you like to work on?';
     body = `<nav class="workspace-build-menu" aria-label="Build sections">${buildPages.map(([id,label])=>`<button type="button" data-design-page="${id}">${label}</button>`).join('')}</nav>`;
