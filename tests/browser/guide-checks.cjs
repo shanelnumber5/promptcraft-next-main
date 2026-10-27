@@ -1,0 +1,47 @@
+const assert = require('node:assert/strict');
+module.exports = async ({ send, evaluate, waitFor, shot, key, keyboardReach, accessibleScreen, initialState, scenario }) => {
+  const { freshWorkspace, saveWorkspace, WORKSPACE_KEY } = await import('../../src/features/workspace/storage.js');
+  const { STORAGE_KEY } = await import('../../src/app/storage.js');
+  const { finalCheckContext } = await import('../../src/features/design/content.js');
+  const workspace = freshWorkspace();
+  workspace.teacher.directions = 'Compare possible management decisions.';
+  workspace.teacher.learningGoal = 'Use evidence to defend a management decision.';
+  workspace.teacher.learningGoalUnsure = false;
+  workspace.design.sourceDirections = workspace.teacher.directions;
+  workspace.design.revision = 'Make a provisional choice, consider new evidence, then revise or defend it.';
+  workspace.design.reason = 'New evidence gives students a reason to reconsider.';
+  workspace.workspace.selectedDirection = {title:'A decision worth revisiting',description:'A changing workplace case.',experience:'Reconsider a choice.',learning:workspace.teacher.learningGoal,online:'Asynchronous LMS.',core:'Defend a decision when evidence changes.'};
+  workspace.finalCheck = {instructions:true,learning:true,requirements:true,approved:true,completed:true,context:finalCheckContext(workspace.teacher,workspace.design)};
+  let workspaceRaw;
+  saveWorkspace(workspace,{setItem:(key,value)=>{workspaceRaw=value;}});
+  const guided = initialState(scenario);
+  guided.teacher.subject = 'Start With the Learning';
+  for (const [device,width,height] of [['desktop',1280,720],['phone',390,844],['narrow-phone',320,568]]) {
+    await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<600});
+    await send('Page.navigate',{url:'http://127.0.0.1:8783/?view=guide'});
+    await waitFor('!!document.querySelector(".guide-library")');
+    await evaluate('localStorage.clear();location.reload()');
+    await waitFor('!!document.querySelector(".guide-empty")');
+    await accessibleScreen(device+' empty Course Guide');
+    await shot('guide-'+device+'-empty');
+    await evaluate(`localStorage.setItem(${JSON.stringify(WORKSPACE_KEY)},${JSON.stringify(workspaceRaw)});localStorage.setItem(${JSON.stringify(STORAGE_KEY)},${JSON.stringify(JSON.stringify(guided))});location.reload()`);
+    await waitFor('document.querySelectorAll(".guide-entry").length === 2');
+    assert(await evaluate('document.querySelector(".guide-library").textContent.includes("A decision worth revisiting")'));
+    assert.equal(await evaluate('document.querySelectorAll(".guide-entry-status.is-approved").length'),1);
+    const raw = await evaluate('JSON.stringify({...localStorage})');
+    await accessibleScreen(device+' saved Course Guides');
+    assert(await evaluate('document.querySelector(".guide-library").scrollHeight <= document.querySelector(".guide-library").clientHeight + 1'), 'Saved designs are not clipped inside a scrolling panel');
+    await shot('guide-'+device+'-saved');
+    await keyboardReach('[data-guide-index="1"]');
+    await key('Enter','Enter',13);
+    await waitFor('document.querySelector(".guide-preview iframe")?.dataset.ready === "true"');
+    await key('Escape','Escape',27);
+    await waitFor('!document.querySelector(".guide-preview")');
+    assert(await evaluate('document.activeElement.matches("[data-guide-index=\\"1\\"]")'));
+    assert.equal(await evaluate('JSON.stringify({...localStorage})'),raw,'Guide browsing leaves all saved work unchanged');
+    await evaluate('localStorage.setItem("promptcraft_assignment_workspace_v1","{broken");location.reload()');
+    await waitFor('document.querySelector("[data-guide-notice]")?.textContent.includes("could not be read")');
+    assert.equal(await evaluate('localStorage.getItem("promptcraft_assignment_workspace_v1")'),'{broken');
+    console.log(device+' PASS: empty and saved-guide layouts, approved/draft status, keyboard preview, focus restoration, read-only saves, and visible recovery notice.');
+  }
+};

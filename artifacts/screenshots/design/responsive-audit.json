@@ -1,9 +1,10 @@
 {
   "browser": "Chrome",
   "viewports": [
-    "1280×720"
+    "1280×720",
+    "390×844"
   ],
-  "screenshots": 25,
+  "screenshots": 48,
   "checks": [
     "Horizontal overflow",
     "Button text clipping",
@@ -122,12 +123,6 @@
       "result": "pass"
     },
     {
-      "screen": "lab-short-desktop-pixel-response",
-      "width": 1280,
-      "height": 720,
-      "result": "pass"
-    },
-    {
       "screen": "lab-short-desktop-review-checks",
       "width": 1280,
       "height": 720,
@@ -161,6 +156,150 @@
       "screen": "lab-short-desktop-sample-lesson",
       "width": 1280,
       "height": 720,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-home",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "info-phone-how-to-play",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "info-phone-about",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "info-phone-babbage",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "info-phone-privacy",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-gallery",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-cards",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-filtered",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-detail",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-starting-point",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-learners",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-design",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-live-preview",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-babbage-question",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-suggestion",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-reasoning-box",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-maya-unavailable",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-maya",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-review-checks",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-guide",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-pixel-wrap-up",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-recovered",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-field-focus",
+      "width": 390,
+      "height": 844,
+      "result": "pass"
+    },
+    {
+      "screen": "lab-phone-sample-lesson",
+      "width": 390,
+      "height": 844,
       "result": "pass"
     }
   ]

@@ -10,14 +10,6 @@
       "result": "pass"
     },
     {
-      "device": "desktop",
-      "width": 1440,
-      "height": 1000,
-      "summarySections": 5,
-      "setupSections": 5,
-      "result": "pass"
-    },
-    {
       "device": "short",
       "width": 1280,
       "height": 720,
@@ -26,33 +18,9 @@
       "result": "pass"
     },
     {
-      "device": "tablet",
-      "width": 932,
-      "height": 903,
-      "summarySections": 5,
-      "setupSections": 5,
-      "result": "pass"
-    },
-    {
-      "device": "compact-tablet",
-      "width": 820,
-      "height": 790,
-      "summarySections": 5,
-      "setupSections": 5,
-      "result": "pass"
-    },
-    {
       "device": "phone",
       "width": 390,
       "height": 844,
-      "summarySections": 5,
-      "setupSections": 5,
-      "result": "pass"
-    },
-    {
-      "device": "small-phone",
-      "width": 320,
-      "height": 568,
       "summarySections": 5,
       "setupSections": 5,
       "result": "pass"
