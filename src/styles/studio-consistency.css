@@ -936,9 +936,11 @@ body[data-app-view='workspace'] .workspace-section-main .workspace-writing #revi
 
 body[data-app-view='workspace'] #workspace-panel { height:calc(100dvh - 258px); }
 body[data-app-view='workspace'] .workspace-section-main :is(.workspace-view-actions,.review-actions),
-body[data-app-view='workspace'] .partner-card .partner-actions { height:76px; min-height:76px; box-sizing:border-box; }
+body[data-app-view='workspace'] .partner-card .partner-actions { height:auto; min-height:76px; box-sizing:border-box; }
 @media(max-width:700px) {
- body[data-app-view='workspace'] #workspace-panel { height:calc(100dvh - 300px); min-height:400px; }
+ body[data-app-view='workspace'] #workspace-panel { height:calc(100dvh - 300px); min-height:400px;   body[data-app-view='workspace'] .workspace-section-main :is(.workspace-view-actions,.review-actions),
+  body[data-app-view='workspace'] .partner-card .partner-actions { height:auto; min-height:120px; }
+ }
  body[data-app-view='workspace'] .workspace-section-main :is(.workspace-view-actions,.review-actions),
  body[data-app-view='workspace'] .partner-card .partner-actions { height:120px; min-height:120px; }
 }

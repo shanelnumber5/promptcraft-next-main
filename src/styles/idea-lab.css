@@ -474,7 +474,7 @@ body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))
   .review-card .workspace-reason textarea { height:auto; min-height:180px; }
   .review-layout .workspace-checks { gap: 10px; }
   .review-layout .workspace-check span > span { font-size: 14px; }
-  .review-layout .workspace-check small { max-height: 36px; overflow: auto; }
+  .review-layout .workspace-check small { max-height: none; overflow: visible; }
 }
 @media (max-width: 700px) {
   .partner-nav { padding-left: 14px; padding-right: 14px; }
