@@ -8,6 +8,8 @@ const { spawn } = require('node:child_process');
 const root = path.resolve(__dirname, '../..');
 const runDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'promptcraft-browser-'));
 const output = process.env.PC_BROWSER_OUTPUT || path.join(runDirectory, 'screenshots');
+// Feature harnesses share the same isolated output directory for their JSON audits.
+process.env.PC_BROWSER_OUTPUT = output;
 const profile = process.env.PC_BROWSER_PROFILE || path.join(runDirectory, 'profile');
 const mime = {
   '.html': 'text/html',
@@ -310,6 +312,11 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
         return issues;
       })()`);
       assert.deepEqual(layoutIssues, [], label + ' formatting audit');
+      if (process.env.PC_CONTRAST_AUDIT === '1') {
+        const contrast = await require('./contrast-checks.cjs')(evaluate);
+        fs.writeFileSync(path.join(output, label + '-contrast.json'), JSON.stringify(contrast, null, 2));
+        if (process.env.PC_CONTRAST_STRICT === '1') assert.deepEqual(contrast.failures, [], label + ' contrast audit');
+      }
       auditRecords.push({screen: label, ...await evaluate('({width: innerWidth, height: innerHeight})'), result: 'pass'});
     };
     await send('Runtime.enable');
@@ -321,6 +328,16 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       { discussionOpening: scenario } = await import('../../src/features/opening/content.js');
     if (process.env.PC_BROWSER_FEATURE === 'guide') {
       await require('./guide-checks.cjs')({ send, evaluate, waitFor, shot, key, keyboardReach, accessibleScreen, initialState, scenario });
+      assert.deepEqual(errors, []);
+      return;
+    }
+    if (process.env.PC_BROWSER_FEATURE === 'type-menu') {
+      await require('./type-menu-checks.cjs')({send,evaluate,waitFor,shot});
+      assert.deepEqual(errors, []);
+      return;
+    }
+    if (process.env.PC_BROWSER_FEATURE === 'stabilization') {
+      await require('./stabilization-checks.cjs')({send,evaluate,waitFor,shot,initialState,scenario});
       assert.deepEqual(errors, []);
       return;
     }
@@ -500,7 +517,7 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
         current.forEach((position, index) => {
           assert(Math.abs(position.left - navigationPosition[index].left) <= 1 &&
             Math.abs(position.top - navigationPosition[index].top) <= 1,
-          device + ' keeps Back and Continue in place between steps');
+          device + ' keeps Back and Continue in place between steps: ' + JSON.stringify({current, expected:navigationPosition}));
         });
         assert(await evaluate('parseFloat(getComputedStyle(document.querySelector(".setup-actions")).paddingBottom) >= 24'),
           device + ' leaves padding below the navigation buttons');

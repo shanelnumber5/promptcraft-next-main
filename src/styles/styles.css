@@ -1,4 +1,5 @@
-/* Entry stylesheet. Order preserves shared, feature, and final layout rules. */
+/* Tokens and foundations, feature layouts, responsive framing, then shared type/navigation.
+   No theme or consistency override layers. Each file owns its component states. */
 @import url('./base.css');
 @import url('./classroom.css');
 @import url('./setup.css');
@@ -7,18 +8,14 @@
 @import url('./responsive.css');
 @import url('./navigation.css');
 @import url('./scene-focus.css');
-@import url('./references.css?v=20261026-dev-explore-1');
+@import url('./references.css');
 @import url('./review.css');
 @import url('./guided-design.css');
 @import url('./maya.css');
 @import url('./idea-lab.css');
-
+@import url('./workspace.css');
 @import url('./teacher-setup.css');
 @import url('./info.css');
 @import url('./portrait-framing.css');
-@import url('./interface-consistency.css');
-
-@import url('./visual-hierarchy.css?v=20261026-dev-explore-1');
-@import url('./studio-consistency.css?v=20261027-workspace-action-banners-8');
-
-@import url('./typography.css?v=20261027-workspace-menu-polish-3');
+@import url('./typography.css');
+@import url('./workflow-nav.css');

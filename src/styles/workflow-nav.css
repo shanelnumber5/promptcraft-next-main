@@ -1,0 +1,117 @@
+/* Shared workflow shortcuts and their compact phone layout. */
+.workflow-nav {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .65rem;
+  padding: .5rem .75rem;
+  margin: .5rem 0 1rem;
+  border: 1px solid var(--border);
+  border-radius: .75rem;
+  background: #f1f7fb;
+  color: var(--ink);
+}
+.workflow-nav a,
+.workflow-nav button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border: 2px solid var(--navy);
+  border-radius: var(--button-radius);
+  padding: .55rem .85rem;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.workflow-nav a:hover,
+.workflow-nav button:hover {
+  background: #e2f0f9;
+}
+.workflow-nav a:focus-visible,
+.workflow-nav button:focus-visible {
+  outline: 3px solid var(--navy);
+  outline-offset: 3px;
+}
+.workflow-nav .workflow-nav-leave {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+}
+.workflow-nav .workflow-nav-leave:hover {
+  background: var(--navy-deep);
+  color: #fff;
+}
+.workflow-nav-note {
+  flex: 1 1 20rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+@media (max-width:550px) {
+  .workflow-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: 68px auto;
+    padding: .6rem;
+  }
+  .workflow-nav-note {
+    grid-column: 1 / -1;
+  }
+  body[data-app-view='workspace'] .workflow-nav-note {
+    display: none;
+  }
+  body[data-app-view='workspace'] .workflow-nav {
+    grid-template-rows: 68px;
+  }
+  .workflow-nav:has(button) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .workflow-nav a,
+.workflow-nav button {
+    flex: 1 1 auto;
+    padding: .5rem .3rem;
+    font-size: 16px;
+  }
+}
+
+body[data-app-view] :is(.app-header, .page-banner, button.primary, a.action-link.primary, .workflow-nav-leave) {
+  background-color: var(--pc-brand-navy);
+  color: #fff;
+}
+body[data-app-view] :is(button.primary, a.action-link.primary, .workflow-nav-leave) {
+  border-color: var(--pc-brand-navy);
+}
+body[data-app-view] :is(button.primary:hover:enabled, a.action-link.primary:hover, .workflow-nav-leave:hover) {
+  background-color: #152142;
+  color: #fff;
+}
+
+
+
+
+body[data-app-view] :is(.workflow-nav a, .workflow-nav button) {
+  color: var(--pc-brand-navy);
+}
+body[data-app-view] .workflow-nav .workflow-nav-leave,
+body[data-app-view] .workflow-nav .workflow-nav-leave:hover {
+  background: var(--pc-brand-navy);
+  border-color: var(--pc-brand-navy);
+  color: #fff;
+}
+body[data-app-view='workspace'] .workspace-shell .workflow-nav a.workflow-nav-leave,
+body[data-app-view='workspace'] .workspace-shell .workflow-nav a.workflow-nav-leave:hover,
+body[data-app-view='play'] .workflow-nav a.workflow-nav-leave {
+  background: var(--pc-brand-navy);
+  color: #fff;
+  border-color: var(--pc-brand-navy);
+}
+
+@media (max-width:350px) {
+  .workflow-nav, body[data-app-view='workspace'] .workflow-nav { grid-template-rows: 80px; }
+}

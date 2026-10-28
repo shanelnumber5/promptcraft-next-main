@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict');
 (async () => {
   const { freshWorkspace, saveWorkspace, readWorkspace, WORKSPACE_KEY } = await import('../../src/features/workspace/storage.js');
-  const { buildCreativeRequest, requestCreativeDirections, normalizeCreativeResponse, combineDirections, creativeBasis } = await import('../../src/features/workspace/creative.js');
+  const { buildCreativeRequest, requestCreativeDirections, normalizeCreativeResponse, combineDirections, creativeBasis, needsInitialExploration } = await import('../../src/features/workspace/creative.js');
   const { renderPossibilities, renderCreativeCore } = await import('../../src/features/workspace/creative-view.js');
   const { renderPartner } = await import('../../src/features/workspace/partner-view.js');
   const { finalCheckReady, finalCheckContext } = await import('../../src/features/design/content.js');
@@ -21,6 +21,13 @@ const assert = require('node:assert/strict');
   const initialPartner = renderPartner(state, { configured: true, pending: false }, 'work');
   assert(initialPartner.includes('data-action="explore-directions"'), 'Initial exploration uses the creative workflow');
   assert(!initialPartner.includes('data-action="ask-ai"'), 'Initial exploration does not use general clarification');
+  assert(needsInitialExploration(state), 'A saved draft and stale clarification do not skip Phase 1');
+  const chosen = structuredClone(state);
+  chosen.workspace.selectedDirection = fixtures[0];
+  assert(!needsInitialExploration(chosen), 'A chosen creative direction retains its development workflow');
+  const explored = structuredClone(state);
+  explored.creative.directions = fixtures;
+  assert(!needsInitialExploration(explored), 'Existing possibilities remain available rather than restarting exploration');
   state.teacher.learningGoal = 'Defend decisions using evidence.';
   const before = JSON.stringify(state);
   let sent;

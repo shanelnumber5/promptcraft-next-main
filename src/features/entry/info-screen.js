@@ -31,41 +31,16 @@ export function renderInfoPage(view, index = 0) {
 
 export function mountInfoPage(app, view) {
   app.innerHTML = renderInfoPage(view);
-  let measurement = 0;
-  let lastWidth = 0;
-  const sizePanel = async () => {
-    const width = app.querySelector('.info-shell')?.getBoundingClientRect().width;
-    if (!width) return;
-    lastWidth = width;
-    const token = ++measurement;
-    const probe = document.createElement('div');
-    probe.dataset.infoMeasurement = '';
-    probe.inert = true;
-    probe.setAttribute('aria-hidden', 'true');
-    probe.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;width:${width}px;height:0;overflow:hidden;left:0;top:0;--info-panel-height:0px;`;
-    probe.innerHTML = pages[view].sections.map((section, index) => renderInfoPage(view, index)).join('');
-    app.append(probe);
-    try {
-      await Promise.all([
-        document.fonts.ready,
-        ...[...probe.querySelectorAll('img')].map(img => img.decode().catch(() => {})),
-      ]);
-      if (token !== measurement) return;
-      const height = Math.ceil(Math.max(...[...probe.querySelectorAll('.info-book')].map(panel => panel.getBoundingClientRect().height)));
-      app.style.setProperty('--info-panel-height', `${height}px`);
-    } finally {
-      probe.remove();
-    }
+  // The shared menu frame is viewport-sized in info.css, so changing pages or
+  // topics cannot move the footer. Keep content scrollable inside that frame.
+  const sizePanel = () => {
+    const panel = app.querySelector('.menu-board');
+    if (panel) app.style.setProperty('--info-panel-height', `${panel.getBoundingClientRect().height}px`);
   };
-  // Measure the tallest topic at the actual available width, rather than choosing
-  // an oversized fixed height or letting each click move the footer.
-  const observer = new ResizeObserver(() => {
-    const width = app.querySelector('.info-shell')?.getBoundingClientRect().width;
-    if (width && Math.abs(width - lastWidth) > 1) void sizePanel();
-  });
+  const observer = new ResizeObserver(sizePanel);
   observer.observe(app);
-  window.addEventListener('resize', () => { void sizePanel(); });
-  void sizePanel();
+  window.addEventListener('resize', sizePanel);
+  sizePanel();
   const show = index => {
     app.querySelector('.info-shell').outerHTML = renderInfoPage(view, index);
     app.querySelector('#info-topic-title').focus({ preventScroll: true });

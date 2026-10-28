@@ -1,4 +1,4 @@
-/* Setup uses the same screen-sized shell, with visible actions and no accordions. */
+/* Component styles and responsive states; no late consistency override layers. */
 body:has(.setup-shell) {
   height: 100dvh;
   overflow: hidden;
@@ -69,7 +69,7 @@ body:has(.setup-shell) #app {
   display: flex;
   flex-direction: column;
   padding: 18px;
-  border: 1px solid #c3ced9;
+  border: 1px solid var(--border);
   border-radius: 12px;
   background: #f8fbfd;
 }
@@ -79,19 +79,19 @@ body:has(.setup-shell) #app {
 .setup-live-preview h2 {
   margin: 0;
   color: var(--navy);
-  font-size: 20px;
+  font-size: 28px;
 }
 .setup-live-preview > p {
   margin: 4px 0 12px;
-  color: #52677b;
-  font-size: 15px;
+  color: var(--ink);
+  font-size: 16px;
 }
 .setup-preview-content {
   flex: 1;
   min-height: 0;
   overflow: auto;
   padding: 16px;
-  border: 1px solid #c3ced9;
+  border: 1px solid var(--border);
   border-radius: 8px;
   background: #fff;
   font-size: 16px;
@@ -104,11 +104,11 @@ body:has(.setup-shell) #app {
 .setup-preview-content h4 {
   margin: 22px 0 10px;
   padding: 8px 12px;
-  border-left: 4px solid #a96700;
+  border-left: 4px solid var(--navy);
   border-radius: 0 6px 6px 0;
   background: #fff5df;
   color: var(--navy);
-  font-size: 18px;
+  font-size: 22px;
   line-height: 1.35;
 }
 .setup-preview-content h4:first-child {
@@ -125,7 +125,7 @@ body:has(.setup-shell) #app {
   margin-top: 8px;
 }
 .setup-preview-empty {
-  color: #60758a;
+  color: var(--ink);
   font-style: italic;
 }
 .setup-main .setup-intro {
@@ -138,7 +138,7 @@ body:has(.setup-shell) #app {
   margin-bottom: 14px;
 }
 .setup-intro h1 {
-  font-size: clamp(24px, 3vw, 34px);
+  font-size: max(32px, clamp(24px, 3vw, 34px));
   margin-bottom: 6px;
 }
 .setup-intro p {
@@ -211,6 +211,7 @@ body:has(.setup-shell) #app {
   order: initial;
   width: auto;
   font-size: 16px;
+  color: var(--pc-on-accent);
 }
 .setup-actions .nav-button span {
   font-size: 16px;
@@ -227,7 +228,7 @@ body:has(.setup-shell) #app {
   padding: 14px 16px;
 }
 .summary-sections h2 {
-  font-size: 20px;
+  font-size: 28px;
   margin-bottom: 12px;
 }
 .summary-sections .setup-field + .setup-field {
@@ -314,19 +315,18 @@ body:has(.setup-shell) #app {
   .setup-intro {
     margin-bottom: 10px;
   }
-
   .setup-intro p {
     font-size: 16px;
   }
   .setup-step--class .setup-fields,
-  .setup-step--limits .setup-fields {
+.setup-step--limits .setup-fields {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .setup-fields {
     gap: 10px;
   }
   .setup-field > label,
-  .setup-field > legend {
+.setup-field > legend {
     font-size: 16px;
   }
   .field-help {
@@ -334,7 +334,7 @@ body:has(.setup-shell) #app {
     margin: 3px 0 5px;
   }
   .setup-field input[type='text'],
-  .setup-field textarea {
+.setup-field textarea {
     font-size: 16px;
     padding: 7px;
   }
@@ -363,6 +363,7 @@ body:has(.setup-shell) #app {
   }
   .setup-actions > span {
     font-size: 16px;
+    color: var(--pc-on-accent);
   }
   .summary-tabs button {
     font-size: 16px;
@@ -372,8 +373,6 @@ body:has(.setup-shell) #app {
     padding: 10px;
   }
 }
-
-/* Summary fields share label and help rows, even when their text wraps. */
 .summary-section--class .summary-sections > section > .setup-field:not(fieldset),
 .summary-section--limits .summary-sections > section > .setup-field:nth-child(2),
 .summary-section--limits .summary-sections > section > .setup-field:nth-child(3) {
@@ -386,9 +385,7 @@ body:has(.setup-shell) #app {
 .summary-sections .setup-field input[type='text'] {
   height: 44px;
 }
-.summary-sections .setup-field .field-help {
-  align-self: start;
-}
+.summary-sections .setup-field .field-help,
 .summary-sections .setup-field .unsure {
   align-self: start;
 }
@@ -396,28 +393,26 @@ body:has(.setup-shell) #app {
 .setup-step--limits .setup-actions {
   padding-bottom: 16px;
 }
-
-/* Small screens use a flowing page instead of the fixed desktop stage. */
 @media (max-width: 1180px), (max-height: 820px) {
   html {
     height: auto;
     overflow-y: auto;
   }
   body:has(.experience),
-  body:has(.setup-shell) {
+body:has(.setup-shell) {
     height: auto;
     min-height: 100dvh;
     overflow: auto;
     display: block;
   }
   body:has(.experience) #app,
-  body:has(.setup-shell) #app {
+body:has(.setup-shell) #app {
     height: auto;
     min-height: 0;
     flex: none;
   }
   .experience,
-  .setup-shell {
+.setup-shell {
     height: auto;
     min-height: 0;
     overflow: visible;
@@ -435,7 +430,6 @@ body:has(.setup-shell) #app {
     min-height: 0;
     flex: none;
   }
-
   .smartboard {
     position: relative;
     inset: auto;
@@ -452,13 +446,13 @@ body:has(.setup-shell) #app {
     padding: 18px 16px;
   }
   .board-heading h2 {
-    font-size: 24px;
+    font-size: 28px;
     line-height: 1.25;
     margin: 8px 0 14px;
   }
   .board-text,
-  .board-quote,
-  .facts {
+.board-quote,
+.facts {
     font-size: 17px;
     line-height: 1.5;
   }
@@ -504,7 +498,7 @@ body:has(.setup-shell) #app {
     margin: 0;
   }
   .speech-bubble h2 {
-    font-size: 17px;
+    font-size: 28px;
     margin-bottom: 8px;
   }
   .speech-bubble p {
@@ -523,7 +517,7 @@ body:has(.setup-shell) #app {
     overflow: hidden;
   }
   .character,
-  .character--right {
+.character--right {
     position: relative;
     inset: auto;
     flex: 0 0 48%;
@@ -612,24 +606,24 @@ body:has(.setup-shell) #app {
     line-height: 1.5;
   }
   .setup-step--class .setup-fields,
-  .setup-step--limits .setup-fields,
-  .setup-step--assignment .setup-fields {
+.setup-step--limits .setup-fields,
+.setup-step--assignment .setup-fields {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: none;
     gap: 24px;
   }
   .setup-step--assignment .setup-field,
-  .summary-section--assignment .setup-field,
-  .summary-section--class .summary-sections > section > .setup-field:not(fieldset),
-  .summary-section--limits .summary-sections > section > .setup-field:nth-child(2),
-  .summary-section--limits .summary-sections > section > .setup-field:nth-child(3) {
+.summary-section--assignment .setup-field,
+.summary-section--class .summary-sections > section > .setup-field:not(fieldset),
+.summary-section--limits .summary-sections > section > .setup-field:nth-child(2),
+.summary-section--limits .summary-sections > section > .setup-field:nth-child(3) {
     display: block;
     grid-row: auto;
     grid-template-rows: none;
   }
   .setup-field > label,
-  .setup-field > legend {
+.setup-field > legend {
     font-size: 18px;
     line-height: 1.4;
   }
@@ -638,15 +632,18 @@ body:has(.setup-shell) #app {
     line-height: 1.5;
     margin: 6px 0 10px;
   }
-  .setup-field input[type='text'],
-  .setup-field textarea {
+  .setup-field input[type='text'] {
     font-size: 16px;
     padding: 12px;
     min-height: 48px;
   }
+  .setup-field textarea {
+    font-size: 16px;
+    padding: 12px;
+  }
   .setup-field textarea,
-  .setup-step--assignment .setup-field textarea,
-  .summary-section--assignment .setup-field textarea {
+.setup-step--assignment .setup-field textarea,
+.summary-section--assignment .setup-field textarea {
     height: 180px;
     min-height: 180px;
     resize: vertical;
@@ -685,6 +682,7 @@ body:has(.setup-shell) #app {
   .setup-actions > span {
     order: 3;
     width: 100%;
+    color: var(--pc-on-accent);
   }
   .setup-actions .primary {
     margin-left: auto;
@@ -700,8 +698,8 @@ body:has(.setup-shell) #app {
     padding: 10px;
   }
   .summary-section--class .summary-sections > section,
-  .summary-section--limits .summary-sections > section,
-  .summary-section--assignment .summary-sections > section {
+.summary-section--limits .summary-sections > section,
+.summary-section--assignment .summary-sections > section {
     display: block;
     grid-template-columns: none;
     grid-template-rows: none;
@@ -711,22 +709,20 @@ body:has(.setup-shell) #app {
     margin-bottom: 20px;
   }
   .summary-section--class .summary-sections .setup-field + .setup-field,
-  .summary-section--limits .summary-sections .setup-field + .setup-field,
-  .summary-section--assignment .summary-sections .setup-field + .setup-field {
+.summary-section--limits .summary-sections .setup-field + .setup-field,
+.summary-section--assignment .summary-sections .setup-field + .setup-field {
     margin-top: 24px;
   }
 }
 @media (min-width: 601px) and (max-width: 1180px) {
   .board-text,
-  .board-quote,
-  .facts,
-  .speech-bubble p,
-  .choice {
-    font-size: 18px;
-  }
-  .setup-field input[type='text'],
-  .setup-field textarea,
-  .setup-intro p {
+.board-quote,
+.facts,
+.speech-bubble p,
+.choice,
+.setup-field input[type='text'],
+.setup-field textarea,
+.setup-intro p {
     font-size: 18px;
   }
   .classroom {
@@ -742,16 +738,16 @@ body:has(.setup-shell) #app {
 }
 @media (max-width: 360px) {
   .cast,
-  .character,
-  .character--right {
+.character,
+.character--right {
     height: 200px;
   }
   .scene-actions .primary,
-  .setup-actions .primary {
+.setup-actions .primary {
     margin-left: 0;
   }
   .scene-actions,
-  .setup-actions {
+.setup-actions {
     justify-content: space-between;
   }
   .setup-actions .nav-button {
@@ -759,8 +755,6 @@ body:has(.setup-shell) #app {
     gap: 8px;
   }
 }
-
-/* Keep the summary navigation inside the card, with its own reserved row. */
 @media (min-width: 1181px) and (min-height: 821px) {
   .summary-shell .setup-form {
     display: flex;
@@ -776,7 +770,7 @@ body:has(.setup-shell) #app {
     flex-direction: column;
   }
   .summary-shell .setup-intro,
-  .summary-shell .summary-tabs {
+.summary-shell .summary-tabs {
     margin-bottom: 0;
   }
   .summary-shell .summary-sections {
@@ -796,8 +790,6 @@ body:has(.setup-shell) #app {
     min-height: 0;
   }
 }
-
-/* Use one navigation baseline throughout setup and every summary category. */
 .setup-shell .setup-form {
   padding-bottom: 24px;
 }
@@ -811,7 +803,6 @@ body:has(.setup-shell) #app {
   height: 50px;
   min-height: 50px;
 }
-
 @media (min-width: 780px) and (max-width: 899px) and (min-height: 750px) and (max-height: 820px) {
   html:has(.setup-shell) {
     height: 100%;
@@ -871,43 +862,43 @@ body:has(.setup-shell) #app {
   }
   .setup-main .setup-intro h1 {
     margin-bottom: 4px;
-    font-size: 25px;
+    font-size: 32px;
   }
   .setup-main .setup-intro p {
-    font-size: 15px;
+    font-size: 16px;
     line-height: 1.2;
   }
   .summary-shell .setup-intro {
     margin-bottom: 6px;
   }
   .summary-shell .setup-intro h1 {
-    font-size: 22px;
+    font-size: 32px;
     line-height: 1.15;
   }
   .summary-shell .setup-intro p {
-    font-size: 15px;
+    font-size: 16px;
     line-height: 1.2;
   }
   .setup-main .setup-fields {
     gap: 8px;
   }
   .setup-main .setup-field > label,
-  .setup-main .setup-field > legend {
+.setup-main .setup-field > legend {
     font-size: 16px;
     line-height: 1.2;
   }
   .setup-main .setup-field .field-help {
-    font-size: 15px;
+    font-size: 16px;
     line-height: 1.2;
     margin: 3px 0 5px;
   }
   .setup-main .setup-field input[type='text'],
-  .setup-main .setup-field textarea {
+.setup-main .setup-field textarea {
     padding: 6px 8px;
   }
   .setup-step--class .setup-fields,
-  .setup-step--time .setup-fields,
-  .setup-step--limits .setup-fields {
+.setup-step--time .setup-fields,
+.setup-step--limits .setup-fields {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-rows: auto;
@@ -916,12 +907,12 @@ body:has(.setup-shell) #app {
     grid-column: 1 / -1;
   }
   .setup-step--class .radio-cards,
-  .setup-step--limits .radio-cards {
+.setup-step--limits .radio-cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 5px;
   }
   .setup-step--class .radio-cards label,
-  .setup-step--limits .radio-cards label {
+.setup-step--limits .radio-cards label {
     min-height: 34px;
     padding: 5px;
   }
@@ -934,7 +925,6 @@ body:has(.setup-shell) #app {
     grid-row: auto;
     grid-template-rows: none;
   }
-  .setup-step--assignment .setup-field textarea,
   .setup-step--limits .setup-field textarea {
     height: 10dvh;
     min-height: 64px;
@@ -981,41 +971,41 @@ body:has(.setup-shell) #app {
   }
   .summary-sections h2 {
     margin-bottom: 8px;
-    font-size: 18px;
+    font-size: 28px;
   }
   .summary-sections .setup-field + .setup-field {
     margin-top: 8px;
   }
   .summary-section--class .summary-sections > section,
-  .summary-section--limits .summary-sections > section {
+.summary-section--limits .summary-sections > section {
     gap: 8px;
   }
   .summary-shell.summary-section--class .summary-sections > section,
-  .summary-shell.summary-section--limits .summary-sections > section {
+.summary-shell.summary-section--limits .summary-sections > section {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-auto-rows: min-content;
     gap: 8px;
   }
   .summary-section--class .summary-sections > section > .setup-field,
-  .summary-section--limits .summary-sections > section > .setup-field {
+.summary-section--limits .summary-sections > section > .setup-field {
     display: block;
     grid-row: auto;
     grid-template-rows: none;
     min-width: 0;
   }
   .summary-section--class .summary-sections .radio-cards,
-  .summary-section--limits .summary-sections .radio-cards {
+.summary-section--limits .summary-sections .radio-cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 5px;
   }
   .summary-section--class .summary-sections .radio-cards label,
-  .summary-section--limits .summary-sections .radio-cards label {
+.summary-section--limits .summary-sections .radio-cards label {
     min-height: 34px;
     padding: 5px;
   }
   .summary-sections .setup-field > label,
-  .summary-sections .setup-field > legend {
+.summary-sections .setup-field > legend {
     font-size: 16px;
     line-height: 1.2;
   }
@@ -1037,12 +1027,9 @@ body:has(.setup-shell) #app {
     gap: 6px;
   }
   .summary-section--assignment .setup-field textarea,
-  .setup-step--assignment .setup-field textarea {
-    height: 10dvh;
-    min-height: 64px;
-  }
-  .summary-section--time .setup-field textarea,
-  .summary-section--requirements .setup-field textarea {
+.setup-step--assignment .setup-field textarea,
+.summary-section--time .setup-field textarea,
+.summary-section--requirements .setup-field textarea {
     height: 10dvh;
     min-height: 64px;
   }
@@ -1060,6 +1047,7 @@ body:has(.setup-shell) #app {
   }
   .setup-shell .setup-actions > span {
     display: block;
+    color: var(--pc-on-accent);
   }
   .setup-shell .setup-actions .nav-button {
     height: 44px;
@@ -1073,5 +1061,293 @@ body:has(.setup-shell) #app {
   .summary-shell .setup-form {
     gap: 0;
     padding-bottom: 10px;
+  }
+}
+body[data-app-view] .setup-shell .setup-header {
+  background: transparent;
+  border: 0;
+  color: var(--ink);
+  box-shadow: none;
+}
+body[data-app-view] .setup-shell .setup-header strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+body[data-app-view] .setup-shell .setup-intro h1 {
+  font-family: Georgia,'Times New Roman',serif;
+  font-weight: 400;
+  letter-spacing: -.7px;
+}
+body[data-app-view='play'] .setup-shell .summary-sections > section {
+  background: transparent;
+}
+body[data-app-view='play'] .setup-shell .setup-field :is(input[type='text'],textarea,select) {
+  border-radius: 3px;
+}
+body[data-app-view='play'] .setup-shell .summary-tabs {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+body[data-app-view='play'] .setup-shell .summary-tabs button {
+  background: transparent;
+  border: 0;
+  color: var(--ink);
+  border-radius: var(--button-radius);
+}
+body[data-app-view='play'] .setup-shell .summary-tabs button[aria-selected='true'] {
+  background: transparent;
+  color: var(--navy);
+  border-bottom: 2px solid var(--navy);
+}
+body[data-app-view='play'] .setup-shell .comparison-card {
+  border-radius: 3px;
+  box-shadow: none;
+}
+body[data-app-view='play'] .setup-shell .comparison-card > header {
+  background: transparent;
+  color: var(--navy);
+  border: 0;
+}
+body[data-app-view='play'] .setup-shell .comparison-card > header h2 {
+  color: var(--navy);
+}
+body:has(.setup-shell--teacher) #app {
+  max-width: 1240px;
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-header {
+  background: var(--navy);
+  color: #fff;
+  border-radius: 4px 4px 0 0;
+  padding: 14px 20px;
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-header strong {
+  color: #fff;
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-columns {
+  grid-template-columns: minmax(0,1.65fr) minmax(0,.65fr);
+  gap: 20px 28px;
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-main .setup-intro {
+  margin-bottom: 20px;
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-intro p {
+  max-width: 65ch;
+  line-height: 1.5;
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-live-preview {
+  align-self: start;
+  height: auto;
+  max-height: min(430px,58dvh);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  border: 0;
+  border-radius: 4px;
+  background: var(--navy);
+  overflow: hidden;
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-live-preview h2 {
+  margin: 0;
+  padding: 20px 20px 0;
+  font-family: Georgia,'Times New Roman',serif;
+  font-size: 28px;
+  font-weight: 400;
+  color: #fff;
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-live-preview > p {
+  color: #e3ebf5;
+  margin: 8px 0 0;
+  padding: 0 20px 20px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-preview-content {
+  flex: 0 1 auto;
+  height: auto;
+  min-height: 0;
+  max-height: 300px;
+  margin: 0;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--gold);
+  border-radius: 0 0 4px 4px;
+  background: #fff;
+  overflow: auto;
+  font-size: 16px;
+  line-height: 1.5;
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-preview-empty {
+  margin: 0;
+  font-size: 16px;
+  color: var(--ink);
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-actions {
+  grid-column: 1 / -1;
+  background: var(--gold);
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 4px;
+  color: var(--pc-on-accent);
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-actions button.nav-button--back {
+  background: #fff;
+  color: var(--navy);
+  border: 2px solid var(--navy);
+  border-radius: var(--button-radius);
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-actions button.primary.nav-button--next {
+  background: var(--navy);
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: var(--button-radius);
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-actions > span {
+  color: var(--pc-on-accent);
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher .summary-tabs {
+  padding: 4px;
+  border-radius: 3px;
+  background: var(--navy);
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher .summary-tabs button {
+  color: #fff;
+  border: 0;
+  border-radius: var(--button-radius);
+  background: var(--navy);
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher .summary-tabs button[aria-selected='true'] {
+  color: var(--pc-on-accent);
+  background: var(--gold);
+  border: 0;
+}
+@media (max-width: 1099px), (max-height: 699px) {
+  body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-columns {
+    grid-template-columns: minmax(0,1fr);
+  }
+  body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-live-preview {
+    min-height: 0;
+    max-height: 400px;
+  }
+  body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-actions {
+    border-radius: 0;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom,0px));
+  }
+}
+@media (min-width: 1100px) and (min-height: 700px) and (max-height: 850px) {
+  body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-columns {
+    gap: 12px 20px;
+  }
+  body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-main .setup-intro {
+    margin-bottom: 8px;
+  }
+  body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-header {
+    padding: 10px 18px;
+  }
+  body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-actions {
+    padding: 8px 12px;
+  }
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher.setup-step--class .setup-fields,
+body[data-app-view='play'] .setup-shell.setup-shell--teacher.summary-section--class .summary-sections > section {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px;
+  gap: 20px 16px;
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .setup-field .field-help {
+  min-height: 0;
+  font-size: 16px;
+  line-height: 1.4;
+  margin: 5px 0 10px;
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .setup-field input[type='text'] {
+  height: 48px;
+  background: #f7f9fc;
+  border: 1px solid var(--border);
+  border-bottom: 2px solid var(--navy);
+  padding: 10px 12px;
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .unsure {
+  color: var(--ink);
+  gap: 8px;
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .unsure input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--navy);
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .radio-cards {
+  gap: 8px;
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .radio-cards label {
+  position: relative;
+  justify-content: center;
+  min-height: 48px;
+  padding: 10px 8px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--navy);
+  text-align: center;
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .radio-cards input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .radio-cards label:has(input:checked) {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+  box-shadow: inset 0 -3px var(--gold);
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .radio-cards label:focus-within {
+  outline: 2px solid #b47900;
+  outline-offset: 3px;
+}
+@media (min-width: 1100px) and (min-height: 700px) and (max-height: 850px) {
+  body[data-app-view='play'] .setup-shell.setup-shell--teacher.setup-step--class .setup-fields,
+body[data-app-view='play'] .setup-shell.setup-shell--teacher.summary-section--class .summary-sections > section {
+    padding: 12px;
+    gap: 10px 14px;
+  }
+  body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .setup-field .field-help {
+    margin: 4px 0 6px;
+  }
+  body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .radio-cards label {
+    min-height: 44px;
+    padding: 8px;
+  }
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher.setup-step--class .setup-fields {
+  row-gap: 28px;
+}
+@media (min-width: 1100px) and (min-height: 700px) and (max-height: 850px) {
+  body[data-app-view='play'] .setup-shell.setup-shell--teacher.setup-step--class .setup-fields {
+    row-gap: 20px;
+  }
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher.setup-step .setup-fields,
+body[data-app-view='play'] .setup-shell.setup-shell--teacher.summary-shell .summary-sections > section {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px;
+}
+body[data-app-view='play'] .setup-shell.setup-shell--teacher.setup-step--class .setup-fields {
+  padding-top: 24px;
+  padding-bottom: 28px;
+}
+@media (min-width: 1100px) and (min-height: 700px) and (max-height: 850px) {
+  body[data-app-view='play'] .setup-shell.setup-shell--teacher.setup-step .setup-fields,
+body[data-app-view='play'] .setup-shell.setup-shell--teacher.summary-shell .summary-sections > section {
+    padding: 12px;
+  }
+  body[data-app-view='play'] .setup-shell.setup-shell--teacher.setup-step--class .setup-fields {
+    padding-top: 20px;
+    padding-bottom: 24px;
   }
 }

@@ -1,11 +1,16 @@
+/* Component styles and responsive states; no late consistency override layers. */
 .header-actions {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 html:has(dialog[open]),
-body:has(dialog[open]) { overflow: hidden; }
-.reference-label-small { display: none; }
+body:has(dialog[open]) {
+  overflow: hidden;
+}
+.reference-label-small {
+  display: none;
+}
 .reference-dialog {
   width: min(720px, calc(100vw - 32px));
   max-width: calc(100vw - 32px);
@@ -19,87 +24,355 @@ body:has(dialog[open]) { overflow: hidden; }
   overflow: auto;
   overflow-wrap: anywhere;
 }
-.reference-dialog::backdrop { background: #081a36aa; }
+.reference-dialog::backdrop {
+  background: #081a36aa;
+}
 .reference-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
-.reference-header h2 { margin: 0; font-size: 26px; }
-.reference-header form { margin: 0; }
-.reference-tabs { display: flex; gap: 12px; margin: 20px 0; }
-.reference-tabs button { flex: 1; min-width: 0; padding: 10px 12px; }
-.reference-tabs [aria-pressed='true'] { background: var(--navy); color: #fff; }
-.reference-content label { display: block; font-weight: 700; margin-bottom: 8px; }
-.reference-content select { width: 100%; padding: 10px; font-size: 16px; }
-.reference-entry { line-height: 1.5; }
-.reference-entry h3 { margin: 20px 0 12px; font-size: 21px; }
-.reference-entry p { margin: 12px 0; }
+.reference-header h2 {
+  margin: 0;
+  font-size: 28px;
+}
+.reference-header form {
+  margin: 0;
+}
+.reference-tabs {
+  display: flex;
+  gap: 12px;
+  margin: 20px 0;
+}
+.reference-tabs button {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+}
+.reference-tabs [aria-pressed='true'] {
+  background: var(--navy);
+  color: #fff;
+}
+.reference-content label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.reference-content select {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+}
+.reference-entry {
+  line-height: 1.5;
+}
+.reference-entry h3 {
+  margin: 20px 0 12px;
+  font-size: 24px;
+}
+.reference-entry p {
+  margin: 12px 0;
+}
 .reference-entry blockquote {
   margin: 12px 0;
   padding: 16px;
   border-left: 3px solid var(--gold);
   background: #fff8e8;
 }
-.reference-entry a { color: var(--blue-dark); text-decoration: underline; }
-.reference-note { border-top: 1px solid var(--border); padding-top: 12px; font-size: 15px; line-height: 1.5; }
+.reference-entry a {
+  color: var(--blue-dark);
+  text-decoration: underline;
+}
+.reference-note {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  font-size: 16px;
+  line-height: 1.5;
+}
 @media (min-width: 601px) and (max-width: 900px) {
-  .app-header { gap: 12px; }
-  .brand { min-width: 0; }
-  .brand > span { min-width: 0; }
-  .brand strong { font-size: 24px; }
-  .brand small { font-size: 14px; }
-  .header-actions { gap: 8px; flex-shrink: 0; }
-  .app-header .restart-module { font-size: 14px; padding: 8px 10px; }
+  .app-header {
+    gap: 12px;
+  }
+  .brand,
+.brand > span {
+    min-width: 0;
+  }
+  .brand strong {
+    font-size: 24px;
+  }
+  .brand small {
+    font-size: 16px;
+  }
+  .header-actions {
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .app-header .restart-module {
+    font-size: 16px;
+    padding: 8px 10px;
+  }
 }
 @media (max-width: 600px) {
-  .app-header { gap: 8px; }
-  .header-actions { flex-direction: column; gap: 4px; }
-  .header-actions .restart-module { padding: 6px 8px; min-height: 30px; font-size: 12px; }
-  .reference-label-wide { display: none; }
-  .reference-label-small { display: inline; }
-  .reference-dialog { padding: 16px; }
-  .reference-header h2 { font-size: 21px; }
-  .reference-header button { padding: 8px 12px; }
+  .app-header {
+    gap: 8px;
+  }
+  .header-actions {
+    flex-direction: column;
+    gap: 4px;
+  }
+  .header-actions .restart-module {
+    padding: 6px 8px;
+    min-height: 30px;
+    font-size: 16px;
+  }
+  .reference-label-wide {
+    display: none;
+  }
+  .reference-label-small {
+    display: inline;
+  }
+  .reference-dialog {
+    padding: 16px;
+  }
+  .reference-header h2 {
+    font-size: 28px;
+  }
+  .reference-header button {
+    padding: 8px 12px;
+  }
 }
-
-/* A compact reference reader with direct topic navigation. */
-body[data-app-view] .reference-dialog { width: min(900px,calc(100vw - 32px)); height: min(560px,calc(100dvh - 32px)); max-height: calc(100dvh - 32px); padding: 0; border: 0; border-radius: 4px; background: #faf9f5; }
-body[data-app-view] .reference-dialog[open] { display: flex; flex-direction: column; }
-body[data-app-view] .reference-header { padding: 20px 24px 12px; background: #001f5b; color: #fff; flex-shrink: 0; }
-body[data-app-view] .reference-header h2 { font-family: Georgia,'Times New Roman',serif; font-size: 28px; font-weight: 400; color: #fff; }
-body[data-app-view] .reference-header button { min-height: 44px; padding: 8px 16px; border: 1px solid #fff; border-radius: 3px; background: transparent; color: #fff; font-size: 15px; }
-body[data-app-view] .reference-header button:hover { background: #17396f; }
-body[data-app-view] .reference-tabs { gap: 8px; margin: 0; padding: 0 24px 16px; background: #001f5b; flex-shrink: 0; }
-body[data-app-view] .reference-tabs button { flex: 0 1 150px; min-height: 44px; padding: 8px 16px; background: transparent; color: #fff; border: 0; border-radius: 3px; font-size: 16px; }
-body[data-app-view] .reference-tabs button[aria-pressed='true'] { background: #edaa00; color: #001f5b; }
-body[data-app-view] .reference-content { display: grid; grid-template-columns: 190px minmax(0,1fr); flex: 1; min-height: 0; overflow: auto; }
-body[data-app-view] .reference-topics { padding: 20px 12px; background: #eeeef0; }
-body[data-app-view] .reference-topics nav { display: grid; gap: 6px; }
-body[data-app-view] .reference-topics button { min-height: 44px; padding: 10px 12px; font-size: 15px; line-height: 1.4; font-weight: 400; text-align: left; background: transparent; color: #001f5b; border: 0; border-radius: 3px; }
-body[data-app-view] .reference-topics button:hover { background: #e0e5eb; }
-body[data-app-view] .reference-topics button[aria-current] { background: #001f5b; color: #fff; font-weight: 600; }
-body[data-app-view] .reference-content :is(.reference-picker-label,#reference-picker) { display: none; }
-body[data-app-view] .reference-entry { padding: 24px 28px; min-width: 0; }
-body[data-app-view] .reference-entry h3 { font-family: Georgia,'Times New Roman',serif; font-size: 25px; font-weight: 400; line-height: 1.25; margin: 0 0 16px; }
-body[data-app-view] .reference-entry p { font-size: 16px; line-height: 1.55; margin: 0 0 18px; }
-body[data-app-view] .reference-entry blockquote { font-size: 17px; line-height: 1.55; background: #fff; border: 0; border-left: 3px solid #edaa00; margin: 0 0 18px; padding: 14px 18px; white-space: pre-line; }
-body[data-app-view] .reference-entry .reference-citation { color: #405674; font-size: 14px; }
-body[data-app-view] .reference-entry a { display: inline-flex; align-items: center; min-height: 44px; font-size: 15px; font-weight: 600; color: #001f5b; text-underline-offset: 4px; }
-body[data-app-view] .reference-note { flex-shrink: 0; margin: 0; border: 0; background: #edaa00; color: #001f5b; padding: 12px 24px; font-size: 13px; line-height: 1.45; }
+body[data-app-view] .reference-dialog {
+  width: min(900px,calc(100vw - 32px));
+  height: min(560px,calc(100dvh - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: #faf9f5;
+}
+body[data-app-view] .reference-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+body[data-app-view] .reference-header {
+  padding: 20px 24px 12px;
+  background: var(--navy);
+  color: #fff;
+  flex-shrink: 0;
+}
+body[data-app-view] .reference-header h2 {
+  font-family: Georgia,'Times New Roman',serif;
+  font-size: 28px;
+  font-weight: 400;
+  color: #fff;
+}
+body[data-app-view] .reference-header button {
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 1px solid #fff;
+  border-radius: var(--button-radius);
+  background: transparent;
+  color: #fff;
+  font-size: 16px;
+}
+body[data-app-view] .reference-header button:hover {
+  background: #17396f;
+}
+body[data-app-view] .reference-tabs {
+  gap: 8px;
+  margin: 0;
+  padding: 0 24px 16px;
+  background: var(--navy);
+  flex-shrink: 0;
+}
+body[data-app-view] .reference-tabs button {
+  flex: 0 1 150px;
+  min-height: 44px;
+  padding: 8px 16px;
+  background: transparent;
+  color: #fff;
+  border: 0;
+  border-radius: var(--button-radius);
+  font-size: 16px;
+}
+body[data-app-view] .reference-tabs button[aria-pressed='true'] {
+  background: var(--gold);
+  color: var(--pc-on-accent);
+}
+body[data-app-view] .reference-content {
+  display: grid;
+  grid-template-columns: 190px minmax(0,1fr);
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+body[data-app-view] .reference-topics {
+  padding: 20px 12px;
+  background: #eeeef0;
+}
+body[data-app-view] .reference-topics nav {
+  display: grid;
+  gap: 6px;
+}
+body[data-app-view] .reference-topics button {
+  min-height: 44px;
+  padding: 10px 12px;
+  font-size: 16px;
+  line-height: 1.4;
+  font-weight: 400;
+  text-align: left;
+  background: transparent;
+  color: var(--navy);
+  border: 0;
+  border-radius: var(--button-radius);
+}
+body[data-app-view] .reference-topics button:hover {
+  background: #e0e5eb;
+}
+body[data-app-view] .reference-topics button[aria-current] {
+  background: var(--navy);
+  color: #fff;
+  font-weight: 600;
+}
+body[data-app-view] .reference-content :is(.reference-picker-label,#reference-picker) {
+  display: none;
+}
+body[data-app-view] .reference-entry {
+  padding: 24px 28px;
+  min-width: 0;
+}
+body[data-app-view] .reference-entry h3 {
+  font-family: Georgia,'Times New Roman',serif;
+  font-size: 25px;
+  font-weight: 400;
+  line-height: 1.25;
+  margin: 0 0 16px;
+}
+body[data-app-view] .reference-entry p {
+  font-size: 16px;
+  line-height: 1.55;
+  margin: 0 0 18px;
+}
+body[data-app-view] .reference-entry blockquote {
+  font-size: 17px;
+  line-height: 1.55;
+  background: #fff;
+  border: 0;
+  border-left: 3px solid var(--gold);
+  margin: 0 0 18px;
+  padding: 14px 18px;
+  white-space: pre-line;
+}
+body[data-app-view] .reference-entry .reference-citation {
+  color: var(--ink);
+  font-size: 16px;
+}
+body[data-app-view] .reference-entry a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--navy);
+  text-underline-offset: 4px;
+}
+body[data-app-view] .reference-note {
+  flex-shrink: 0;
+  margin: 0;
+  border: 0;
+  background: var(--gold);
+  color: var(--pc-on-accent);
+  padding: 12px 24px;
+  font-size: 16px;
+  line-height: 1.45;
+}
 @media (max-width: 700px) {
- body[data-app-view] .reference-dialog { height: min(620px,calc(100dvh - 24px)); width: calc(100vw - 24px); max-width: calc(100vw - 24px); max-height: calc(100dvh - 24px); }
- body[data-app-view] .reference-header { padding: 12px 16px 8px; gap: 8px; }
- body[data-app-view] .reference-header h2 { font-size: 24px; }
- body[data-app-view] .reference-tabs { padding: 0 16px 12px; }
- body[data-app-view] .reference-content { display: block; }
- body[data-app-view] .reference-topics { padding: 12px 16px; }
- body[data-app-view] .reference-topics nav { display: none; }
- body[data-app-view] .reference-content #reference-picker { display: block; min-height: 44px; width: 100%; padding: 8px; background: #fff; color: #001f5b; border: 1px solid #aeb9c2; border-radius: 3px; }
- body[data-app-view] .reference-content .reference-picker-label { display: block; font-size: 14px; font-weight: 400; margin-bottom: 6px; }
- body[data-app-view] .reference-entry { padding: 20px 16px; }
- body[data-app-view] .reference-entry h3 { font-size: 23px; }
- body[data-app-view] .reference-entry blockquote { font-size: 16px; padding: 12px; }
- body[data-app-view] .reference-note { padding: 10px 16px; font-size: 12px; }
+  body[data-app-view] .reference-dialog {
+    height: min(620px,calc(100dvh - 24px));
+    width: calc(100vw - 24px);
+    max-width: calc(100vw - 24px);
+    max-height: calc(100dvh - 24px);
+  }
+  body[data-app-view] .reference-header {
+    padding: 12px 16px 8px;
+    gap: 8px;
+  }
+  body[data-app-view] .reference-header h2 {
+    font-size: 28px;
+  }
+  body[data-app-view] .reference-tabs {
+    padding: 0 16px 12px;
+  }
+  body[data-app-view] .reference-content {
+    display: block;
+  }
+  body[data-app-view] .reference-topics {
+    padding: 12px 16px;
+  }
+  body[data-app-view] .reference-topics nav {
+    display: none;
+  }
+  body[data-app-view] .reference-content #reference-picker {
+    display: block;
+    min-height: 44px;
+    width: 100%;
+    padding: 8px;
+    background: #fff;
+    color: var(--navy);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+  }
+  body[data-app-view] .reference-content .reference-picker-label {
+    display: block;
+    font-size: 16px;
+    font-weight: 400;
+    margin-bottom: 6px;
+  }
+  body[data-app-view] .reference-entry {
+    padding: 20px 16px;
+  }
+  body[data-app-view] .reference-entry h3 {
+    font-size: 24px;
+  }
+  body[data-app-view] .reference-entry blockquote {
+    font-size: 16px;
+    padding: 12px;
+  }
+  body[data-app-view] .reference-note {
+    padding: 10px 16px;
+    font-size: 16px;
+  }
+}
+body[data-app-view='play'] .design-shell--review .review-tabs.reference-tabs {
+  padding: 12px 18px;
+  gap: 8px;
+  margin: 0;
+  background: var(--navy);
+}
+body[data-app-view='play'] .design-shell--review .review-tabs.reference-tabs button {
+  color: #fff;
+  border: 0;
+  border-radius: var(--button-radius);
+  padding: 10px 14px;
+  flex: 0 1 auto;
+  font-weight: 400;
+}
+body[data-app-view='play'] .design-shell--review .review-tabs.reference-tabs button[aria-pressed='true'] {
+  background: var(--gold);
+  color: var(--pc-on-accent);
+}
+body[data-app-view='play'] .design-shell--review .review-reference-content .reference-topics {
+  overflow: auto;
+}
+@media (max-width:700px) {
+  body[data-app-view='play'] .design-shell--review .review-tabs.reference-tabs {
+    padding: 10px;
+    gap: 4px;
+  }
+  body[data-app-view='play'] .design-shell--review .review-tabs.reference-tabs button {
+    flex: 1;
+    padding: 8px 6px;
+    font-size: 16px;
+  }
 }

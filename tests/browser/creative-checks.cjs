@@ -1,6 +1,16 @@
 const assert = require('node:assert/strict');
-module.exports = async ({send,evaluate,waitFor,fill,shot,key,click,keyboardReach,accessibleScreen,apiRequests,initialState,scenario}) => {
+module.exports = async ({send,evaluate,waitFor,fill,shot:capture,key,click,keyboardReach,accessibleScreen,apiRequests,initialState,scenario}) => {
   await send('Page.addScriptToEvaluateOnNewDocument',{source:`if(location.search.includes('offlineUi=1')){const normal=window.fetch.bind(window);window.fetch=(url,options)=>String(url).includes('babbage')&&(!options||!options.method||options.method==='GET')?Promise.resolve(new Response('{"configured":false}',{headers:{'Content-Type':'application/json'}})):normal(url,options);}`});
+  const shot=async label=>{
+    const bars=await evaluate(`(() => {
+      const panel=document.getElementById('workspace-panel'); if(!panel)return [];
+      return [...panel.querySelectorAll('.workspace-view-actions,.review-actions,.partner-actions,.question-actions,.workspace-view-back')]
+        .filter(e=>e.getBoundingClientRect().height&&getComputedStyle(e).backgroundColor==='rgb(217, 143, 6)')
+        .map(e=>({class:e.className,bottom:e.getBoundingClientRect().bottom,panel:panel.getBoundingClientRect().bottom}));
+    })()`);
+    for(const bar of bars)assert(Math.abs(bar.bottom-bar.panel)<2,label+' gold bar stays at frame bottom: '+JSON.stringify(bar));
+    await capture(label);
+  };
   const goto=async query=>{await send('Page.navigate',{url:'http://127.0.0.1:8783/'+query});await waitFor('!!document.querySelector("#setup-title,#entry-title")');};
   const choose=async selector=>evaluate(`document.querySelector(${JSON.stringify(selector)}).click()`);
   const view=async name=>choose(`[data-workspace-view="${name}"]`);
@@ -11,7 +21,7 @@ module.exports = async ({send,evaluate,waitFor,fill,shot,key,click,keyboardReach
   };
   const meta=async(id,value)=>evaluate(`(()=>{const el=document.getElementById(${JSON.stringify(id)});el.value=${JSON.stringify(value)};el.dispatchEvent(new Event('input',{bubbles:true}));})()`);
   const noAccordions=async()=>assert.equal(await evaluate('document.querySelectorAll(".workspace-shell details").length'),0,'Workspace uses direct views instead of accordions');
-  const fits=async()=>{assert(await evaluate('document.documentElement.scrollWidth<=innerWidth'),'No horizontal clipping');if(await evaluate('innerHeight>=720'))assert(await evaluate('document.documentElement.scrollHeight<=innerHeight+1'),'The short task fits the screen: '+JSON.stringify(await evaluate('({height:innerHeight,scroll:document.documentElement.scrollHeight,panel:document.getElementById("workspace-panel")?.getBoundingClientRect().toJSON(),shell:document.querySelector(".workspace-shell")?.getBoundingClientRect().toJSON()})')));};
+  const fits=async()=>{assert(await evaluate('document.documentElement.scrollWidth<=innerWidth'),'No horizontal clipping');if(await evaluate('innerHeight>=720'))assert(await evaluate('document.documentElement.scrollHeight<=innerHeight+1'),'The short task fits the screen: '+JSON.stringify(await evaluate('({height:innerHeight,scroll:document.documentElement.scrollHeight,panel:document.getElementById("workspace-panel")?.getBoundingClientRect().toJSON(),shell:document.querySelector(".workspace-shell")?.getBoundingClientRect().toJSON(),overflow:Array.from(document.querySelectorAll("#workspace-panel,#workspace-panel *")).filter(e=>e.getBoundingClientRect().bottom>innerHeight).slice(0,12).map(e=>({tag:e.className,rect:e.getBoundingClientRect().toJSON(),display:getComputedStyle(e).display,overflow:getComputedStyle(e).overflow,flex:getComputedStyle(e).flex,minHeight:getComputedStyle(e).minHeight}))})')));};
   for(const [device,width,height] of [['desktop',1280,720],['phone',390,844],['small-phone',320,568]]) {
     await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<600});
     await goto('?view=home');await evaluate('localStorage.clear()');
@@ -21,7 +31,7 @@ module.exports = async ({send,evaluate,waitFor,fill,shot,key,click,keyboardReach
     assert(await evaluate('document.body.textContent.includes("What could your discussion become?")'));
     await shot('workspace-'+device+'-start');
     await click('edit-context');await fill('directions','Replace an agreement-only management discussion.');
-    await evaluate('(()=>{const picker=document.querySelector("#workspace-build-group");picker.value="time";picker.dispatchEvent(new Event("change",{bubbles:true}));})()');
+    await section('time');
     await shot('workspace-'+device+'-time');
     assert(await evaluate('(()=>{const work=document.getElementById("workTime").getBoundingClientRect(),days=document.getElementById("daysAvailable").getBoundingClientRect();return work.height>=40 && days.top>work.bottom+10;})()'),'Time inputs are separate, full-height, and do not overlap');
     await fill('workTime','60–90 minutes');
@@ -39,7 +49,7 @@ module.exports = async ({send,evaluate,waitFor,fill,shot,key,click,keyboardReach
       const frame=await evaluate('document.getElementById("workspace-panel").getBoundingClientRect().toJSON()');
       const bar=await evaluate('document.querySelector(".workspace-section-main .workspace-view-actions").getBoundingClientRect().toJSON()');
       for(const property of ['x','y','width','height']) assert(Math.abs(frame[property]-stableRect[property])<2,'Stable panel '+property+' for '+destination);
-      for(const property of ['y','height']) assert(Math.abs(bar[property]-stableBar[property])<2,'Stable actions '+property+' for '+destination);
+      for(const property of ['y','height']) assert(Math.abs(bar[property]-stableBar[property])<2,'Stable actions '+property+' for '+destination+JSON.stringify({bar,stableBar}));
     }
     const expectedTitle=buildTypes[0].heading;
     assert(expectedTitle.family.startsWith('Arial'),'Build titles use the same font family as the fields');
@@ -55,20 +65,23 @@ module.exports = async ({send,evaluate,waitFor,fill,shot,key,click,keyboardReach
       const frame=await evaluate('document.getElementById("workspace-panel").getBoundingClientRect().toJSON()');
       for(const property of ['x','y','width','height']) assert(Math.abs(frame[property]-stableRect[property])<2,'Stable review '+property+' for '+destination);
       const bar=await evaluate('document.querySelector(".review-actions").getBoundingClientRect().toJSON()');
-      for(const property of ['y','height']) assert(Math.abs(bar[property]-stableBar[property])<2,'Stable review actions '+property+' for '+destination);
+      for(const property of ['y','height']) assert(Math.abs(bar[property]-stableBar[property])<2,'Stable review actions '+property+' for '+destination+JSON.stringify({bar,stableBar,chain:await evaluate('Array.from(document.querySelectorAll("#workspace-panel, .workspace-section-frame, .workspace-section-rail, .workspace-section-main, .workspace-design, .review-card, .review-card > *, #review-title")).map(e=>({c:e.className,r:e.getBoundingClientRect().toJSON(),flex:getComputedStyle(e).flex,gap:getComputedStyle(e).gap,margin:getComputedStyle(e).margin,padding:getComputedStyle(e).padding}))')}));
     }
     await choose('[data-workspace-panel=babbage]');
     const exploreRect=await evaluate('document.getElementById("workspace-panel").getBoundingClientRect().toJSON()');
-    for(const property of ['x','y','width','height']) assert(Math.abs(exploreRect[property]-stableRect[property])<2,'Stable Explore '+property);
+    for(const property of ['x','y','width','height']) assert(Math.abs(exploreRect[property]-stableRect[property])<2,'Stable Explore '+property+JSON.stringify({exploreRect,stableRect}));
+    await choose('#workspace-options');await shot('workspace-'+device+'-options');
+    await choose('[data-partner-page=options]');await shot('workspace-'+device+'-connection');
+    await choose('[data-partner-page=work]');
     await choose('[data-workspace-panel=revision]');
     await section('start');
     await shot('workspace-'+device+'-build-start');await fits();
-    if(width>=700) { await keyboardReach('[data-workspace-section-group]');await section('learners'); }
+    if(width>=700) { await keyboardReach('[data-workspace-section-picker]');await section('learners'); }
     else { await keyboardReach('[data-workspace-section-picker]');await section('learners'); }
 
     await fill('learningGoal','Defend management decisions using evidence.');
     await section('ai-use');await fill('aiUse','Feedback only; students verify their own decisions.');
-    await choose('[data-workspace-panel=babbage]');await waitFor('!document.querySelector("[data-action=explore-directions]")?.disabled');
+    await choose('[data-workspace-panel=babbage]');await shot('workspace-'+device+'-explore-ready');await waitFor('!document.querySelector("[data-action=explore-directions]")?.disabled');
     const conversation=await evaluate('JSON.stringify(JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.babbage.history)');
     await keyboardReach('[data-action=explore-directions]');await key('Enter','Enter',13);
     await waitFor('document.querySelectorAll("[data-view-direction]").length===3');
@@ -79,7 +92,7 @@ module.exports = async ({send,evaluate,waitFor,fill,shot,key,click,keyboardReach
     assert(await evaluate('document.body.textContent.includes("Saved possibilities (1)")'));
     await view('combine');await choose('[data-combine-direction="0"]');await choose('[data-combine-direction="1"]');await click('combine-directions');
     await meta('creative-core','Students defend a choice after encountering competing evidence.');await shot('workspace-'+device+'-core');await fits();
-    if(width>=390) assert(await evaluate('(()=>{const fields=document.querySelector(".build-page-fields");return fields.scrollHeight<=fields.clientHeight+2;})()'),'The creative-core form fits without an outer scrollbar');
+    if(width>=390) assert(await evaluate('(()=>{const fields=document.querySelector(".build-page-fields");return fields.scrollHeight<=fields.clientHeight+2;})()'),'The creative-core form fits without an outer scrollbar: '+JSON.stringify(await evaluate('Array.from(document.querySelectorAll(".build-page-fields,.creative-core,.creative-core > *")).map(e=>({c:e.className,tag:e.tagName,scroll:e.scrollHeight,client:e.clientHeight,rect:e.getBoundingClientRect().toJSON(),min:getComputedStyle(e).minHeight,margin:getComputedStyle(e).margin,padding:getComputedStyle(e).padding}))')));
     await section('presence');await meta('instructor-plan','Question initial reasoning and provide final feedback.');await section('questions');await meta('open-questions','Can this fit one hour?');
     assert.equal(await evaluate('JSON.stringify(JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.babbage.history)'),conversation);
     await section('draft');await fill('revision','Read the case, defend a choice, then reconsider after new evidence.');
@@ -120,12 +133,14 @@ module.exports = async ({send,evaluate,waitFor,fill,shot,key,click,keyboardReach
     assert.equal(apiRequests.length,requestCount,'Autofill does not generate an AI response');
     assert.equal(await evaluate('localStorage.getItem("promptcraft_next_opening_v1")'),guidedRaw,'Workspace autofill preserves the guided save');
     await goto('?view=workspace');
-    await waitFor('!!document.querySelector("[data-action=ask-ai]") && !document.querySelector("[data-action=ask-ai]").disabled');
-    await click('ask-ai');await waitFor('!!document.querySelector("[data-clarification-answer]")');
+    await waitFor('!!document.querySelector("[data-action=explore-directions]") && !document.querySelector("[data-action=explore-directions]").disabled');
+    await click('explore-directions');await waitFor('document.querySelectorAll("[data-view-direction]").length===3');
     assert(apiRequests.length>requestCount,'Start exploring sends the filled context through Babbage');
     const afterDev=await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1"))');
-    assert(afterDev.state.babbage.history.some(turn=>turn.role==='assistant'),'Babbage response is recorded');
-    assert.equal(afterDev.state.design.revision,'','Clarification never silently applies a draft');
+    assert.equal(afterDev.creative.directions.length,3,'Initial exploration records all three creative possibilities');
+    assert.equal(JSON.parse(apiRequests.at(-1).messages.at(-1).content).explore_three_directions,true,'Initial exploration sends the creative request, not general clarification');
+    assert.equal(afterDev.state.teacher.directions,devSample.state.teacher.directions,'Exploration preserves the starting material');
+    assert.equal(afterDev.state.design.revision,'','Exploration never silently applies a draft');
     await choose('[data-workspace-panel=revision]');await section('presence');
     assert(await evaluate('document.getElementById("instructor-plan").value.includes("focused question")'),'Sample values remain available after changing sections');
     console.log(device+' PASS: no accordions, short task layouts, direct section navigation, separate idea views, combinations, preview/back focus, saved work, approval without Maya, guide, and failed-save recovery. Mocked AI only.');

@@ -10,8 +10,19 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await waitFor(`document.querySelector('[data-workspace-panel="${name}"]').getAttribute('aria-selected') === 'true'`);
   };
   const view = async name => evaluate(`document.querySelector('[data-workspace-view="${name}"]').click()`);
-  const section = async name => { await view('sections'); await evaluate(`document.querySelector('[data-design-page="${name}"]').click()`); };
-  const preview = async expression => { await view('preview'); const result=await evaluate(expression); await view('work'); return result; };
+  const section = async name => { if(await evaluate('!!document.querySelector("[data-workspace-section-picker]")')) await evaluate(`(()=>{const picker=document.querySelector('[data-workspace-section-picker]');picker.value='${name}';picker.dispatchEvent(new Event('change',{bubbles:true}));})()`);else {await view('sections');await evaluate(`document.querySelector('[data-design-page="${name}"]').click()`);} };
+  const preview = async expression => {
+    await view('preview');
+    let result = await evaluate(expression);
+    // A short phone reader paginates the same text; verify every rendered section.
+    for (let page=0; !result && page<100; page++) {
+      if (!await evaluate('!!document.querySelector(".workspace-reading-nav button:last-child:not(:disabled)")')) break;
+      await evaluate('document.querySelector(".workspace-reading-nav button:last-child").click()');
+      result = await evaluate(expression);
+    }
+    await view('work');
+    return result;
+  };
   const draftAI = async () => { await view('options'); await click('generate-ai'); };
   const fillId = async (id, value, type = 'input') => evaluate(`(() => {const el=document.getElementById(${JSON.stringify(id)}); el.value=${JSON.stringify(value)};el.dispatchEvent(new Event(${JSON.stringify(type)},{bubbles:true}));})()`);
   const selectTopic = async index => {
@@ -170,7 +181,7 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     assert.equal(apiRequests.length, requestsBeforeBrowse, 'Browsing never sends assignment content to AI');
     await shot('lab-' + device + '-detail');
     await follow('a[href*="adapt=shift-change"]');
-    await waitFor('!!document.querySelector(".workspace-shell") && !!document.querySelector("[data-action=ask-ai]")');
+    await waitFor('!!document.querySelector(".workspace-shell") && !!document.querySelector("[data-action=explore-directions]")');
     assert.equal(await evaluate('localStorage.getItem("promptcraft_next_opening_v1")'), guidedRaw);
     assert(await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).workspace.sourceKind === "idea"'));
     await panel('revision');
@@ -179,7 +190,7 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await send('Input.insertText', { text: '\nPreview typing check.' });
     assert(await preview('document.querySelector("[data-live-preview]").textContent.includes("Preview typing check.")'), 'Starting material previews real typing immediately');
     await fill('directions', startingText);
-    await fill('subject', 'Office Management & Supervision');
+    await section('subject');await fill('subject', 'Office Management & Supervision');await section('start');
     await shot('lab-' + device + '-starting-point');
     await designFits(width);
     await section('learners');
@@ -190,8 +201,9 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await designFits(width);
     await section('time');
     await fill('workTime', '60 minutes');
-    await section('requirements');
+    await section('ai-use');
     await fill('aiUse', 'Students may ask AI for feedback, but must explain and verify their own decisions.');
+    await section('requirements');
     await fill('mustStay', 'Use a fictional staffing case and preserve the existing rubric.');
     await accessibleScreen(device + ' workspace design');
     await contrast();
@@ -218,8 +230,15 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await keyboardReach('[data-workspace-panel="revision"]');
     await key('ArrowLeft', 'ArrowLeft', 37);
     assert.equal(await evaluate('document.activeElement.dataset.workspacePanel'), 'babbage');
+    await waitFor('!!document.querySelector("[data-action=explore-directions]") && !document.querySelector("[data-action=explore-directions]").disabled');
+    await keyboardActivate('explore-directions');
+    await waitFor('document.querySelectorAll("[data-view-direction]").length===3');
+    assert.equal(JSON.parse(apiRequests.at(-1).messages.at(-1).content).explore_three_directions,true,'Adapted ideas enter Phase 1 exploration');
+    await evaluate('document.querySelector("[data-view-direction]").click();document.querySelector("[data-develop-direction]").click()');
+    await section('draft');
     await waitFor('!document.querySelector("[data-action=ask-ai]").disabled');
     await keyboardActivate('ask-ai');
+    await panel('babbage');
     await waitFor('!!document.querySelector("[data-clarification-answer]")');
     await shot('lab-' + device + '-babbage-question');
     await designFits(width);
@@ -229,7 +248,7 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     assert(request.system.includes('This prototype supports discussion forum activities only'));
     await evaluate('(() => {const el=document.querySelector("[data-clarification-answer]");el.value="Keep the case, existing rubric, and 60 minute workload.";el.dispatchEvent(new Event("input",{bubbles:true}));})()');
     await click('send-clarification');
-    await waitFor('!!document.querySelector("[data-action=explore-directions]")');
+    await waitFor('!!document.querySelector("[data-action=generate-ai]")');
     await draftAI();
     await waitFor('!!document.querySelector("[data-action=apply-ai]")');
     assert.equal(await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.design.revision'), '');
@@ -280,7 +299,9 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await click('preview-guide');
     await waitFor('document.querySelector(".guide-preview iframe")?.dataset.ready === "true"');
     const html = await evaluate('document.querySelector(".guide-preview iframe").srcdoc');
-    assert(html.includes('Your starting idea') && html.includes('Your chosen assignment design'));
+    assert(html.includes('Idea Lab inspiration:') && html.includes('Your chosen assignment design'), 'The current guide includes its starting inspiration and chosen design');
+    assert(html.includes('Submit your recommendation by Sunday.'), 'The guide retains the educator’s actual final edit');
+    assert(html.includes('Chosen possibility'), 'The guide retains the Phase 1 design choice');
     assert(!html.includes('id="lemonade-example"'));
     await evaluate('document.querySelector(".guide-preview button").click()');
     await waitFor('!document.querySelector(".guide-preview")');
@@ -297,8 +318,6 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await designFits(width);
     const beforeWrapSave = await evaluate('localStorage.getItem("promptcraft_assignment_workspace_v1")');
     const beforeWrapRequests = apiRequests.length;
-    await keyboardReach('[data-workspace-view=review-options]');
-    await key('Enter','Enter',13);
     await keyboardActivate('finish-workspace');
     await waitFor('!!document.querySelector(".closing-experience")');
     assert(await evaluate('document.querySelector(".speech-bubble").textContent.includes("Your design and reasoning are saved")'));
@@ -309,9 +328,8 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     assert.equal(apiRequests.length,beforeWrapRequests,'Pixel wrap-up works without AI');
     assert.equal(await evaluate('localStorage.getItem("promptcraft_assignment_workspace_v1")'),beforeWrapSave,'Finishing preserves the saved guide');
     await click('return-assignment');
-    await waitFor('!!document.querySelector("[data-workspace-view=review-options]")');
+    await waitFor('!!document.querySelector("[data-action=finish-workspace]")');
     assert.equal(await evaluate('document.activeElement.id'),'review-title');
-    await view('review-options');
     await click('finish-workspace');
     await click('workspace-home');
     await waitFor('!!document.querySelector(".home-shell")');
@@ -338,6 +356,7 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     assert((await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.design.revision')).includes('Submit your recommendation by Sunday.'));
     assert(!await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.finalCheck.approved'));
     assert.equal(await evaluate('JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).workspace.ideaId'), 'two-audiences');
+    await panel('revision');await section('draft');
     await waitFor('!document.querySelector("[data-action=ask-ai]").disabled');
     await click('ask-ai');
     await goto('?view=home');
@@ -348,7 +367,8 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     // Exercise the retained offline controller through a test-only event; no product Dev switch.
       await evaluate('(() => { const b=document.createElement("button"); b.dataset.action="toggle-dev"; document.getElementById("app").append(b); b.click(); b.remove(); })()');
     const beforeDev = apiRequests.length;
-    await click('ask-ai');
+    await panel('revision');await section('draft');
+    await click('ask-ai');await panel('babbage');
     await waitFor('!!document.querySelector("[data-clarification-answer]")');
     assert.equal(apiRequests.length, beforeDev, 'Dev assistance makes no AI requests');
     await click('restart-module');
@@ -407,7 +427,7 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
     await goto('?view=play');
     await waitFor('!!document.querySelector("#subject")');
     await fill('subject', 'test');
-    await waitFor('!!document.querySelector("[data-action=hear-maya]")');
+    await waitFor('!!document.querySelector(".guided-panel--reason #reason")');
     assert.equal(await evaluate('JSON.parse(localStorage.getItem("promptcraft_next_opening_v1")).babbage.mode'), 'live');
     assert(await evaluate('JSON.parse(localStorage.getItem("promptcraft_next_opening_v1")).teacher.subject.includes("Office Management")'));
     for (const [word, phrase] of [['good','By Thursday'],['bad','Do not ask questions'],['joke','Paper Jams']]) {
@@ -416,7 +436,7 @@ module.exports = async ({ send, evaluate, waitFor, click, fill, shot, key, keybo
       await waitFor('!!document.querySelector("#subject")');
       const callsBeforeVariant = apiRequests.length;
       await fill('subject', word);
-      await waitFor('!!document.querySelector("[data-action=hear-maya]")');
+      await waitFor('!!document.querySelector(".guided-panel--reason #reason")');
       assert(await evaluate('JSON.parse(localStorage.getItem("promptcraft_next_opening_v1")).design.revision.includes('+JSON.stringify(phrase)+')'), word+' loads a distinct draft');
       assert.equal(apiRequests.length,callsBeforeVariant, 'Sample selection does not ask AI or predetermine a reaction');
     }

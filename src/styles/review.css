@@ -1,8 +1,5 @@
-/* Use the screen width throughout the Design with Babbage workspace. */
-body:has(.design-shell) #app {
-  max-width: none;
-  width: 100%;
-}
+/* Component styles and responsive states; no late consistency override layers. */
+body:has(.design-shell) #app,
 .design-shell {
   max-width: none;
   width: 100%;
@@ -11,30 +8,79 @@ body:has(.design-shell--review) #app {
   max-width: none;
   padding: 8px 12px;
 }
-
 .design-shell--review {
   max-width: none;
   width: 100%;
 }
-.design-shell--review .setup-form { padding: 10px 16px 8px; gap: 8px; }
-.design-shell--review .setup-intro { padding-bottom: 4px; }
-.design-shell--review .setup-intro h1 { margin: 0 0 4px; }
-.design-shell--review .setup-intro p { margin: 0; }
-.design-shell--review .design-body { padding: 0 2px 4px; }
-.design-shell--review .comparison-card > header { padding: 10px 16px; }
-.design-shell--review .comparison-content { padding: 14px 18px; font-size: 16px; line-height: 1.45; }
-.design-shell--review .comparison-content p { margin-bottom: 10px; line-height: 1.45; }
-.design-shell--review .comparison-content h4 { font-size: 19px; margin: 14px 0 8px; line-height: 1.3; }
-.design-shell--review .comparison-content h4:first-child { margin-top: 0; }
-.design-shell--review .assignment-steps { margin: 8px 0 12px; padding-left: 24px; }
-.design-shell--review .assignment-steps li { line-height: 1.45; margin: 0 0 6px; }
-.design-shell--review .assignment-steps ul { margin: 6px 0; }
-.design-shell--review .assignment-steps ul li { margin-bottom: 4px; }
-.design-shell--review .design-review { margin: 10px 0; }
-.design-shell--review .design-review h2 { font-size: 17px; margin: 0 0 8px; }
-.comparison-original-pane { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-.comparison-original-pane .comparison-card { flex: 1; }
-.comparison-original-pane .design-review { margin: 0; }
+.design-shell--review .setup-form {
+  padding: 10px 16px 8px;
+  gap: 8px;
+}
+.design-shell--review .setup-intro {
+  padding-bottom: 4px;
+}
+.design-shell--review .setup-intro h1 {
+  margin: 0 0 4px;
+}
+.design-shell--review .setup-intro p {
+  margin: 0;
+}
+.design-shell--review .design-body {
+  padding: 0 2px 4px;
+}
+.design-shell--review .comparison-card > header {
+  padding: 10px 16px;
+}
+.design-shell--review .comparison-content {
+  padding: 14px 18px;
+  font-size: 16px;
+  line-height: 1.45;
+}
+.design-shell--review .comparison-content p {
+  margin-bottom: 10px;
+  line-height: 1.45;
+}
+.design-shell--review .comparison-content h4 {
+  font-size: 22px;
+  margin: 14px 0 8px;
+  line-height: 1.3;
+}
+.design-shell--review .comparison-content h4:first-child {
+  margin-top: 0;
+}
+.design-shell--review .assignment-steps {
+  margin: 8px 0 12px;
+  padding-left: 24px;
+}
+.design-shell--review .assignment-steps li {
+  line-height: 1.45;
+  margin: 0 0 6px;
+}
+.design-shell--review .assignment-steps ul {
+  margin: 6px 0;
+}
+.design-shell--review .assignment-steps ul li {
+  margin-bottom: 4px;
+}
+.design-shell--review .design-review {
+  margin: 10px 0;
+}
+.design-shell--review .design-review h2 {
+  font-size: 28px;
+  margin: 0 0 8px;
+}
+.comparison-original-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.comparison-original-pane .comparison-card {
+  flex: 1;
+}
+.comparison-original-pane .design-review {
+  margin: 0;
+}
 .design-shell--review .design-review {
   padding: 12px;
   border: 1px solid var(--border);
@@ -42,49 +88,147 @@ body:has(.design-shell--review) #app {
   background: #f4f8fb;
   font-size: 16px;
 }
-.design-shell--review .design-review p { margin: 8px 0; line-height: 1.4; }
+.design-shell--review .design-review p {
+  margin: 8px 0;
+  line-height: 1.4;
+}
 .design-shell--review .design-review p > strong,
-.design-shell--review .design-review .design-rationale > strong { display: block; font-size: 16px; margin-bottom: 3px; }
-.review-document { display: grid; gap: 12px; min-width: 0; }
-.review-document-block { min-width: 0; padding: 10px 12px; border: 1px solid #d8c795; border-radius: 8px; background: #fff; }
-.review-document-block--intro { border: 0; padding: 0; background: transparent; }
-.design-shell--review .review-document-block h4 { margin: 0 0 8px; }
-.design-shell--review .review-document-block > :last-child { margin-bottom: 0; }
-.comparison-original-pane [data-action='copy-draft'] { align-self: flex-start; }
-.design-shell--review [data-action='copy-draft'] { font-size: 16px; min-height: 38px; padding: 6px 12px; }
+.design-shell--review .design-review .design-rationale > strong {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 3px;
+}
+.review-document {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.review-document-block {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+}
+.review-document-block--intro {
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+.design-shell--review .review-document-block h4 {
+  margin: 0 0 8px;
+}
+.design-shell--review .review-document-block > :last-child {
+  margin-bottom: 0;
+}
+.comparison-original-pane [data-action='copy-draft'] {
+  align-self: flex-start;
+}
+.design-shell--review [data-action='copy-draft'] {
+  font-size: 16px;
+  min-height: 38px;
+  padding: 6px 12px;
+}
 @media (max-width: 1180px), (max-height: 820px) {
-  .comparison-original-pane { display: contents; }
-  .design-shell--review .comparison-card--original { order: 0; }
-  .design-shell--review .comparison-card--revised { order: 1; }
-  .design-shell--review .design-review { order: 2; }
-  .design-shell--review [data-action='copy-draft'] { order: 3; justify-self: start; }
+  .comparison-original-pane {
+    display: contents;
+  }
+  .design-shell--review .comparison-card--original {
+    order: 0;
+  }
+  .design-shell--review .comparison-card--revised {
+    order: 1;
+  }
+  .design-shell--review .design-review {
+    order: 2;
+  }
+  .design-shell--review [data-action='copy-draft'] {
+    order: 3;
+    justify-self: start;
+  }
 }
 @media (min-width: 1181px) and (min-height: 821px) {
-  body:has(.design-shell) #app { padding: 8px 0; }
-  .design-shell { border-radius: 0; }
-  body:has(.design-shell--review) #app { padding: 8px 0; }
-  .design-shell--review { border-radius: 0; }
-  .design-shell--review .setup-form { padding-left: 12px; padding-right: 12px; }
-  .design-shell--review .design-body { scrollbar-gutter: auto; }
-  .design-shell--review .design-comparison { grid-template-columns: minmax(0, 25fr) minmax(0, 75fr); }
-  .design-shell--review .setup-actions { padding-top: 8px; }
+  body:has(.design-shell) #app {
+    padding: 8px 0;
+  }
+  .design-shell {
+    border-radius: 0;
+  }
+  body:has(.design-shell--review) #app {
+    padding: 8px 0;
+  }
+  .design-shell--review {
+    border-radius: 0;
+  }
+  .design-shell--review .setup-form {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .design-shell--review .design-body {
+    scrollbar-gutter: auto;
+  }
+  .design-shell--review .design-comparison {
+    grid-template-columns: minmax(0, 25fr) minmax(0, 75fr);
+  }
+  .design-shell--review .setup-actions {
+    padding-top: 8px;
+  }
 }
 @media (min-width: 1600px) and (min-height: 821px) {
-  .design-shell--review .setup-form { gap: 6px; }
-  .review-document { grid-template-columns: repeat(var(--review-columns), minmax(0, 1fr)); gap: 10px; align-items: start; }
+  .design-shell--review .setup-form {
+    gap: 6px;
+  }
+  .review-document {
+    grid-template-columns: repeat(var(--review-columns), minmax(0, 1fr));
+    gap: 10px;
+    align-items: start;
+  }
   .review-document-block--intro,
-  .review-document-block--wide { grid-column: 1 / -1; }
-  .design-shell--review .review-document-block h4 { margin: 0 0 6px; }
-  .design-shell--review .review-document-block--wide { padding: 8px 12px; }
-  .design-shell--review .design-comparison { grid-template-columns: minmax(340px, 22fr) minmax(0, 78fr); }
-  .design-shell--review .setup-intro h1 { font-size: 30px; }
-  .design-shell--review .setup-actions { padding-top: 0; }
-  .design-shell--review .comparison-card > header { display: flex; align-items: baseline; gap: 12px; }
-  .design-shell--review .comparison-card h2 { margin: 0; font-size: 21px; }
-  .design-shell--review .comparison-content h4 { margin: 10px 0 6px; }
-  .design-shell--review .comparison-content h4:first-child { margin-top: 0; }
-  .design-shell--review .assignment-steps { margin: 6px 0 8px; }
-  .design-shell--review .assignment-steps li { margin-bottom: 3px; line-height: 1.35; }
-  .design-shell--review .assignment-steps ul { margin: 3px 0; }
-  .design-shell--review .comparison-content p { line-height: 1.35; margin-bottom: 8px; }
+.review-document-block--wide {
+    grid-column: 1 / -1;
+  }
+  .design-shell--review .review-document-block h4 {
+    margin: 0 0 6px;
+  }
+  .design-shell--review .review-document-block--wide {
+    padding: 8px 12px;
+  }
+  .design-shell--review .design-comparison {
+    grid-template-columns: minmax(340px, 22fr) minmax(0, 78fr);
+  }
+  .design-shell--review .setup-intro h1 {
+    font-size: 32px;
+  }
+  .design-shell--review .setup-actions {
+    padding-top: 0;
+  }
+  .design-shell--review .comparison-card > header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .design-shell--review .comparison-card h2 {
+    margin: 0;
+    font-size: 28px;
+  }
+  .design-shell--review .comparison-content h4 {
+    margin: 10px 0 6px;
+  }
+  .design-shell--review .comparison-content h4:first-child {
+    margin-top: 0;
+  }
+  .design-shell--review .assignment-steps {
+    margin: 6px 0 8px;
+  }
+  .design-shell--review .assignment-steps li {
+    margin-bottom: 3px;
+    line-height: 1.35;
+  }
+  .design-shell--review .assignment-steps ul {
+    margin: 3px 0;
+  }
+  .design-shell--review .comparison-content p {
+    line-height: 1.35;
+    margin-bottom: 8px;
+  }
 }

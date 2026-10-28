@@ -9,7 +9,14 @@ import { renderDesignRationale } from '../../shared/design-evidence.js';
 import { renderPagedDirections } from '../../shared/paged-directions.js';
 export const aiContext = assignmentContext;
 
-export function renderQuestion(conversation, available, pending, compact = false, extraAction = '') {
+export function renderQuestion(conversation, available, pending, compact = false, extraAction = '', separateActions = false) {
+  const index = Math.max(0, Math.min(conversation.questionIndex || 0, conversation.questions.length - 1));
+  const question = conversation.questions[index];
+  const answer = conversation.answers[question.id] || '';
+  return `<div class="babbage-questions"><h3>Question ${index + 1} of ${conversation.questions.length}</h3>${compact ? '' : '<p>Answer this question, then continue. Your earlier answers stay saved.</p>'}<label for="${e(question.id)}">${e(question.text)}</label><textarea id="${e(question.id)}" data-clarification-answer="${e(question.id)}" rows="3" aria-describedby="answer-guidance"${pending ? ' disabled' : ''}>${e(answer)}</textarea><p id="answer-guidance" class="answer-guidance" role="status">${e(answer.trim() ? answerIssue(answer) : 'Unsure? Describe what you need help deciding.')}</p>${separateActions?'':`<div class="question-actions">${renderQuestionActions(conversation,available,pending,extraAction)}</div>`}</div>`;
+}
+
+export function renderQuestionActions(conversation,available,pending,extraAction='') {
   const index = Math.max(0, Math.min(conversation.questionIndex || 0, conversation.questions.length - 1));
   const question = conversation.questions[index];
   const answer = conversation.answers[question.id] || '';
@@ -17,7 +24,7 @@ export function renderQuestion(conversation, available, pending, compact = false
   const ready = last
     ? hasCompleteClarificationAnswers(conversation)
     : !answerIssue(answer);
-  return `<div class="babbage-questions"><h3>Question ${index + 1} of ${conversation.questions.length}</h3>${compact ? '' : '<p>Answer this question, then continue. Your earlier answers stay saved.</p>'}<label for="${e(question.id)}">${e(question.text)}</label><textarea id="${e(question.id)}" data-clarification-answer="${e(question.id)}" rows="3" aria-describedby="answer-guidance"${pending ? ' disabled' : ''}>${e(answer)}</textarea><p id="answer-guidance" class="answer-guidance" role="status">${e(answer.trim() ? answerIssue(answer) : 'Unsure? Describe what you need help deciding.')}</p><div class="question-actions">${index ? `<button type="button" data-action="previous-question"${pending ? ' disabled' : ''}>Previous question</button>` : ''}${extraAction}<button type="button" class="primary" data-action="${last ? 'send-clarification' : 'next-question'}"${available && ready && !pending ? '' : ' disabled'}>${last ? 'Send answers to Babbage' : 'Save answer and continue'}</button></div></div>`;
+  return `${index ? `<button type="button" data-action="previous-question"${pending ? ' disabled' : ''}>Previous question</button>` : ''}${extraAction}<button type="button" class="primary" data-action="${last ? 'send-clarification' : 'next-question'}"${available && ready && !pending ? '' : ' disabled'}>${last ? 'Send answers to Babbage' : 'Save answer and continue'}</button>`;
 }
 
 export function renderAiPanel(state, ai, { compact = false } = {}) {

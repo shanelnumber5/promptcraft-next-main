@@ -19,7 +19,9 @@ export function renderReview(state, ai, page, preview) {
   } else if (page === 'guide') {
     title = 'Your Course Guide';
     content = `<p class="final-check-status" role="status" aria-live="polite">${state.finalCheck.approved ? 'This version is saved to your Course Guide.' : 'Review and save your design before downloading.'}</p><div class="course-guide-actions"><button type="button" data-action="preview-guide">Preview guide</button><button type="button" class="primary" data-action="download-guide"${state.finalCheck.approved && ready ? '' : ' disabled'}>Download guide</button></div>`;
-    actions = '<button type="button" data-workspace-view="review-options">Keep working or finish</button>';
+    actions = state.finalCheck.approved && ready
+      ? '<button type="button" class="primary" data-action="finish-workspace">Finish with Pixel</button><button type="button" data-workspace-panel="revision">Keep editing</button>'
+      : '<button type="button" data-review-page="checks">Complete final checks</button><button type="button" data-workspace-panel="revision">Keep editing</button>';
   } else {
     title = 'Your design reasoning';
     content = `<div class="workspace-reason" data-design-form><label for="reason">Why did you choose this design?</label><p id="reason-help" class="field-help">Explain what you changed, why it helps, and what student work would show you it worked.</p><textarea id="reason" name="reason" aria-describedby="reason-help" rows="4">${e(separateRationaleReferences(state.design.reason).prose)}</textarea></div>${state.design.revision.trim() ? '<button type="button" data-workspace-view="maya">Student perspective (optional)</button>' : ''}`;

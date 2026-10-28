@@ -206,7 +206,7 @@
   .chapter-line,
   .speech-bubble h2,
   .eyebrow {
-    font-size: 18px;
+    font-size: 28px;
   }
   .speech-bubble h2 {
     color: #593b06;
@@ -265,7 +265,7 @@
     padding: 10px 14px;
   }
   .board-heading h2 {
-    font-size: 26px;
+    font-size: 28px;
     margin: 2px 0 6px;
   }
   .board-text,
@@ -326,7 +326,7 @@
     padding: 10px 12px;
   }
   .board-heading h2 {
-    font-size: 26px;
+    font-size: 28px;
     margin-bottom: 6px;
   }
   .speaker-panel .character,
@@ -399,7 +399,7 @@
   .chapter-line,
   .eyebrow,
   .speech-bubble h2 {
-    font-size: 16px;
+    font-size: 28px;
   }
   .choices legend {
     font-size: 17px;
@@ -414,7 +414,7 @@
     font-size: 16px;
   }
   .board-heading h2 {
-    font-size: 22px;
+    font-size: 28px;
   }
   .speaker-panel .speech-bubble,
   .speaker-panel:has(.speech-bubble--right) .speech-bubble {

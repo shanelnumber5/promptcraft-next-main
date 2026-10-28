@@ -139,7 +139,7 @@ export const teacherSetup = {
         ...assignmentSection.fields.slice(1),
         {
           id: 'alignmentGuide',
-          label: 'Optional: Which guide should inform this assignment?',
+          label: 'Optional assignment guide',
           help: 'Choose one lens, or leave this set to none. Babbage uses only the relevant guidance you provide; it does not verify official alignment.',
           type: 'select',
           options: [
@@ -151,8 +151,8 @@ export const teacherSetup = {
         },
         {
           id: 'alignmentReference',
-          label: 'Relevant standard, outcome, or rubric item (optional)',
-          help: 'Paste the exact text, standard number, or rubric item you want Babbage to consider. For Montana K–12 standards, include the grade and subject; for MSU, include the course outcome. Leave blank if you do not have it handy.',
+          label: 'Relevant standard, outcome, or rubric item',
+          help: 'Optional: paste source text, a standard number, or a rubric item, or leave blank. Montana K-12: include grade and subject. MSU: include course outcome.',
           type: 'textarea',
           rows: 4,
           placeholder: 'Paste a relevant excerpt or identifier here.',

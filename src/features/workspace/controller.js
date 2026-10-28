@@ -1,5 +1,5 @@
 import { workspaceViews } from './views.js';
-import { requestCreativeDirections, creativeBasis, combineDirections } from './creative.js';
+import { requestCreativeDirections, creativeBasis, combineDirections, needsInitialExploration } from './creative.js';
 import { renderClosing } from '../design/closing.js';
 import { isTestLessonKeyword, fillTestLesson } from '../../shared/test-lesson.js';
 import { renderWorkspace } from './screen.js';
@@ -90,8 +90,7 @@ export function mountWorkspace(app, params) {
   }
   async function exploreDirections() {
     if (ai.pending || state.babbage.mode === 'dev' || ai.configured !== true || !state.teacher.directions.trim()) return;
-    const initialExploration = !state.creative.directions.length && !state.creative.alternatives.length &&
-      !state.workspace.selectedDirection && !state.design.revision.trim();
+    const initialExploration = needsInitialExploration(state);
     if (initialExploration && state.babbage.questions.length) {
       state.babbage = { ...conversationDefaults(), mode: state.babbage.mode };
     }

@@ -1,257 +1,229 @@
-/* Shared type scale. Layouts own spacing; these rules own typography. */
-:root {
- --font-body:Arial,Helvetica,sans-serif;
- --font-heading:Georgia,'Times New Roman',serif;
- --type-title:32px;
- --type-section:26px;
- --type-subheading:18px;
- --type-body:16px;
- --type-small:14px;
+/* Shared type roles. Layout and colors are defined at each component source. */
+body[data-app-view] {
+  font-family: var(--font-body);
+  font-size: max(16px, var(--type-body));
+  line-height: 1.55;
 }
-body[data-app-view] { --font:var(--font-body); font-family:var(--font-body); font-size:var(--type-body); line-height:1.55; }
-body[data-app-view] :is(button,input,textarea,select,summary) { font-family:var(--font-body) !important; letter-spacing:normal; }
-body[data-app-view] :is(input,textarea,select,.directions-editor) { font-size:var(--type-body); font-weight:400; line-height:1.5; }
-body[data-app-view] :is(button,.action-link) { font-size:var(--type-body); line-height:1.35; }
+body[data-app-view] :is(button,input,textarea,select,summary) {
+  font-family: var(--font-body) !important;
+  letter-spacing: normal;
+}
+body[data-app-view] :is(input,textarea,select,.directions-editor) {
+  font-size: max(16px, var(--type-body));
+  font-weight: 400;
+  line-height: 1.5;
+}
+body[data-app-view] :is(button,.action-link) {
+  font-size: max(16px, var(--type-body));
+  line-height: 1.35;
+}
 body[data-app-view] :is(.setup-field,.workspace-reason,.creative-core,.workspace-writing) > :is(label,legend),
 body[data-app-view] .workspace-section-main fieldset legend,
-body[data-app-view] .partner-layout--focused .babbage-questions label { font:700 var(--type-body)/1.4 var(--font-body); letter-spacing:normal; }
-body[data-app-view] .workspace-section-main .creative-core > label { font:700 var(--type-body)/1.4 var(--font-body); }
-body[data-app-view] :is(.field-help,.save-notice,.workspace-privacy,.design-notice,.reference-note) { font-family:var(--font-body); font-size:var(--type-small); line-height:1.45; letter-spacing:normal; }
+body[data-app-view] .partner-layout--focused .babbage-questions label {
+  font: 700 var(--type-body)/1.4 var(--font-body);
+  letter-spacing: normal;
+}
+body[data-app-view] .workspace-section-main .creative-core > label {
+  font: 700 var(--type-body)/1.4 var(--font-body);
+}
+body[data-app-view] :is(.field-help,.save-notice,.workspace-privacy,.design-notice,.reference-note) {
+  font-family: var(--font-body);
+  font-size: max(16px, var(--type-small));
+  line-height: 1.45;
+  letter-spacing: normal;
+}
 body[data-app-view] :is(.info-heading,.setup-intro,.library-heading) h1,
-body[data-app-view] .workspace-shell.workspace-shell--focused .workspace-heading h1 { font:400 var(--type-title)/1.2 var(--font-heading); letter-spacing:-.4px; }
+body[data-app-view] .workspace-shell.workspace-shell--focused .workspace-heading h1 {
+  font: 400 var(--type-title)/1.2 var(--font-heading);
+  letter-spacing: -.4px;
+}
 body[data-app-view] :is(.info-page,.reference-entry,.review-reading) > :is(h2,h3,h4),
-body[data-app-view] .workspace-shell.workspace-shell--focused :is(.workspace-view,.workspace-section-main) .design-page-heading h2 { font:400 var(--type-section)/1.25 var(--font-heading); letter-spacing:-.3px; }
-body[data-app-view] :is(.guided-document,.assignment-directions,.workspace-reading) h4 { font-family:var(--font-heading); font-weight:400; }
+body[data-app-view] .workspace-shell.workspace-shell--focused :is(.workspace-view,.workspace-section-main) .design-page-heading h2 {
+  font: 400 var(--type-section)/1.25 var(--font-heading);
+  letter-spacing: -.3px;
+}
+body[data-app-view] :is(.guided-document,.assignment-directions,.workspace-reading) h4 {
+  font-family: var(--font-heading);
+  font-weight: 400;
+}
 body[data-app-view] :is(.guided-feedback,.review-notes,.closing-board-recap) h3,
-body[data-app-view] .focused-scene.closing-experience .service-flow li strong { font-family:var(--font-body); font-size:var(--type-subheading); font-weight:700; letter-spacing:normal; }
+body[data-app-view] .focused-scene.closing-experience .service-flow li strong {
+  font-family: var(--font-body);
+  font-size: max(24px, var(--type-subheading));
+  font-weight: 700;
+  letter-spacing: normal;
+}
 body[data-app-view] :is(.reference-topics,.workspace-section-rail) button,
 body[data-app-view] .header-actions :is(button,.action-link),
-body[data-app-view] :is(.main-nav,.menu-nav) a { font-family:var(--font-body); font-size:var(--type-small); line-height:1.4; }
-body[data-app-view] :is(.workspace-tabs,.reference-tabs,.review-tabs) button { font-family:var(--font-body); font-size:var(--type-body); line-height:1.35; }
-body[data-app-view] .brand strong { font-family:var(--font-body); font-weight:700; letter-spacing:-.4px; }
-@media(max-width:700px) {
- body[data-app-view] :is(.info-heading,.setup-intro,.library-heading) h1,
- body[data-app-view] .workspace-shell.workspace-shell--focused .workspace-heading h1 { font-size:26px; }
- body[data-app-view] .workspace-shell.workspace-shell--focused :is(.workspace-view,.workspace-section-main) .design-page-heading h2 { font-size:24px; }
- body[data-app-view] :is(.reference-tabs,.review-tabs) button { font-size:var(--type-small); }
+body[data-app-view] :is(.main-nav,.menu-nav) a {
+  font-family: var(--font-body);
+  font-size: max(16px, var(--type-small));
+  line-height: 1.4;
 }
-
-body[data-app-view] :is(input,textarea,select) { font-size:var(--type-body) !important; }
-
-/* Explicit Build roles prevent legacy feature rules from changing individual screens. */
-body[data-app-view='workspace'] #workspace-panel .workspace-build-title { font:400 26px/1.25 var(--font-heading); font-style:normal; letter-spacing:-.3px; }
-body[data-app-view='workspace'] #workspace-panel .workspace-build-label { font:700 16px/1.4 var(--font-body); font-style:normal; letter-spacing:normal; }
-@media(max-width:700px) {
- body[data-app-view='workspace'] #workspace-panel .workspace-build-title { font-size:24px; }
+body[data-app-view] :is(.workspace-tabs,.reference-tabs,.review-tabs) button {
+  font-family: var(--font-body);
+  font-size: max(16px, var(--type-body));
+  line-height: 1.35;
 }
-
-/* Creative Workspace uses one font family throughout, including section titles. */
-body[data-app-view='workspace'] .workspace-shell :is(h1,h2,h3,h4,h5,label,legend,button,input,textarea,select,p,span) { font-family:var(--font-body) !important; }
-body[data-app-view='workspace'] .workspace-shell.workspace-shell--focused .workspace-heading h1 { font-weight:700; letter-spacing:normal; }
+body[data-app-view] .brand strong {
+  font-family: var(--font-body);
+  font-weight: 700;
+  letter-spacing: -.4px;
+}
+@media(max-width:700px) {
+  body[data-app-view] :is(.info-heading,.setup-intro,.library-heading) h1,
+body[data-app-view] .workspace-shell.workspace-shell--focused .workspace-heading h1 {
+    font-size: 24px;
+  }
+  body[data-app-view] .workspace-shell.workspace-shell--focused :is(.workspace-view,.workspace-section-main) .design-page-heading h2 {
+    font-size: 24px;
+  }
+  body[data-app-view] :is(.reference-tabs,.review-tabs) button {
+    font-size: max(16px, var(--type-small));
+  }
+}
+body[data-app-view] :is(input,textarea,select) {
+  font-size: max(16px, var(--type-body)) !important;
+}
+body[data-app-view='workspace'] #workspace-panel .workspace-build-title {
+  font: 400 26px/1.25 var(--font-heading);
+  font-style: normal;
+}
+body[data-app-view='workspace'] #workspace-panel .workspace-build-label {
+  font: 700 16px/1.4 var(--font-body);
+  font-style: normal;
+  letter-spacing: normal;
+}
+@media(max-width:700px) {
+  body[data-app-view='workspace'] #workspace-panel .workspace-build-title {
+    font-size: 24px;
+  }
+}
+body[data-app-view='workspace'] .workspace-shell :is(h1,h2,h3,h4,h5,label,legend,button,input,textarea,select,p,span) {
+  font-family: var(--font-body) !important;
+}
+body[data-app-view='workspace'] .workspace-shell.workspace-shell--focused .workspace-heading h1 {
+  font-weight: 700;
+  letter-spacing: normal;
+}
 body[data-app-view='workspace'] #workspace-panel .workspace-build-title,
-body[data-app-view='workspace'] .workspace-shell.workspace-shell--focused .workspace-section-main .design-page-heading h2 { font-family:var(--font-body); font-weight:700; letter-spacing:normal; }
-body[data-app-view='workspace'] .workspace-shell .partner-content h3 { font-weight:700; letter-spacing:normal; }
-@media(max-width:380px) {
- body[data-app-view='workspace'] .workspace-shell.workspace-shell--focused .workspace-heading h1 { font-size:22px; }
+body[data-app-view='workspace'] .workspace-shell.workspace-shell--focused .workspace-section-main .design-page-heading h2 {
+  font-family: var(--font-body);
+  font-weight: 700;
+  letter-spacing: normal;
 }
-
-/* Keep Workspace utility screens and their destinations on one type scale. */
-body[data-app-view='workspace'] .workspace-shell .workspace-view > h2,
-body[data-app-view='workspace'] .workspace-shell .partner-layout--focused .partner-content > h3 {
- font-size:26px;
- font-weight:700;
- line-height:1.25;
- letter-spacing:normal;
+body[data-app-view='workspace'] .workspace-shell .partner-content h3 {
+  font-weight: 700;
+  letter-spacing: normal;
+}
+@media(max-width:380px) {
+  body[data-app-view='workspace'] .workspace-shell.workspace-shell--focused .workspace-heading h1 {
+    font-size: 24px;
+  }
 }
 body[data-app-view='workspace'] .workspace-shell .workspace-view > h2 {
- width:fit-content;
- max-width:100%;
+  letter-spacing: normal;
 }
-body[data-app-view='workspace'] #workspace-panel .workspace-view > h2:focus-visible {
- outline:2px solid #a96700;
- outline-offset:3px;
- border-radius:2px;
+body[data-app-view='workspace'] .workspace-shell .partner-layout--focused .partner-content > h3 {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: normal;
 }
 body[data-app-view='workspace'] .workspace-shell .workspace-view-body,
 body[data-app-view='workspace'] .workspace-shell .partner-layout--utility .partner-content {
- font-size:16px;
- font-weight:400;
- line-height:1.55;
-}
-body[data-app-view='workspace'] .workspace-shell .workspace-build-menu,
-body[data-app-view='workspace'] .workspace-shell .workspace-utility-list {
- grid-template-columns:repeat(2,minmax(0,1fr));
- gap:10px;
-}
-body[data-app-view='workspace'] .workspace-shell :is(.workspace-build-menu,.workspace-utility-list) :is(button,a) {
- min-height:56px;
- padding:12px 14px;
- color:#001f5b;
- background:#faf9f5;
- border:1px solid #e5e9ec;
- border-radius:4px;
- font-size:15px;
- font-weight:700;
- line-height:1.4;
- text-decoration:none;
-}
-body[data-app-view='workspace'] .workspace-shell :is(.workspace-build-menu,.workspace-utility-list) :is(button,a):hover {
- background:#f3f1e9;
- border-color:#b8c5d2;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.55;
 }
 body[data-app-view='workspace'] .workspace-shell .workspace-option-group h3 {
- font-size:14px;
- font-weight:700;
- letter-spacing:.04em;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: .04em;
 }
 body[data-app-view='workspace'] .workspace-shell .workspace-option-list .workspace-option strong {
- font-weight:700;
-}
-body[data-app-view='workspace'] .workspace-shell .partner-layout--utility > .partner-card {
- background:#fff;
- border:1px solid #dce5ef;
- border-radius:6px;
-}
-body[data-app-view='workspace'] .workspace-shell .partner-layout--utility {
- display:flex;
- flex-direction:column;
- gap:0;
-}
-body[data-app-view='workspace'] .workspace-shell .partner-layout--utility > .partner-card {
- flex:1;
- min-height:0;
-}
-body[data-app-view='workspace'] .workspace-shell .partner-layout--utility .partner-content {
- padding:20px 24px;
-}
-body[data-app-view='workspace'] .workspace-shell .partner-layout--utility .partner-actions {
- height:auto;
- min-height:0;
- align-items:flex-start;
- gap:8px;
- padding:16px 24px 20px;
-}
-body[data-app-view='workspace'] .workspace-shell .partner-layout--utility .partner-actions button.primary {
- min-height:44px;
- padding:10px 18px;
- color:#fff;
- background:#001f5b;
- border:2px solid #001f5b;
- border-radius:3px;
- font-weight:700;
-}
-body[data-app-view='workspace'] .workspace-shell .partner-layout--utility .partner-actions button.primary:hover {
- background:#00163f;
- border-color:#00163f;
-}
-body[data-app-view='workspace'] .workspace-shell .workspace-view-back {
- box-sizing:border-box;
- width:100%;
- min-height:76px;
- margin-top:0;
- padding:14px 24px;
- background:#edaa00;
-}
-body[data-app-view='workspace'] .workspace-shell .workspace-view-back button {
- min-height:44px;
- padding:10px 18px;
- color:#fff;
- background:#0069a6;
- border:2px solid #fff;
- border-radius:3px;
- font-weight:700;
+  font-weight: 700;
 }
 @media(max-width:700px) {
- body[data-app-view='workspace'] .workspace-shell .workspace-view > h2,
- body[data-app-view='workspace'] .workspace-shell .partner-layout--focused .partner-content > h3 {
-  font-size:24px;
- }
- body[data-app-view='workspace'] .workspace-shell .workspace-build-menu,
- body[data-app-view='workspace'] .workspace-shell .workspace-utility-list {
-  grid-template-columns:minmax(0,1fr);
- }
- body[data-app-view='workspace'] .workspace-shell .partner-layout--utility .partner-content {
-  padding:18px;
- }
- body[data-app-view='workspace'] .workspace-shell .partner-layout--utility .partner-actions {
-  height:auto;
-  min-height:0;
-  padding:14px 18px 18px;
- }
- body[data-app-view='workspace'] .workspace-shell .workspace-view-back {
-  padding:14px 16px;
- }
+  body[data-app-view='workspace'] .workspace-shell .workspace-view > h2,
+body[data-app-view='workspace'] .workspace-shell .partner-layout--focused .partner-content > h3 {
+    font-size: 28px;
+  }
 }
-
-/* Keep every Workspace screen on the same type system after feature styles load. */
 body[data-app-view='workspace'] .workspace-shell :is(h1,h2,h3,h4,h5,h6,p,label,legend,small,strong,button,a,input,textarea,select,span,li) {
- font-family:var(--font-body) !important;
+  font-family: var(--font-body) !important;
 }
 body[data-app-view='workspace'] .workspace-shell :is(h1,h2,h3,h4,h5,h6) {
- font-size:18px;
- font-weight:700;
- line-height:1.35;
- font-style:normal;
- letter-spacing:normal;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.35;
+  font-style: normal;
+  letter-spacing: normal;
 }
 body[data-app-view='workspace'] .workspace-shell > .workspace-heading h1 {
- font-size:32px;
- font-weight:700;
- line-height:1.2;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
 }
 body[data-app-view='workspace'] .workspace-shell .workspace-view > h2,
 body[data-app-view='workspace'] .workspace-shell .design-page-heading h2,
 body[data-app-view='workspace'] .workspace-shell .partner-content > h3 {
- font-size:26px;
- font-weight:700;
- line-height:1.25;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.25;
 }
 body[data-app-view='workspace'] .workspace-shell :is(.workspace-reading h4,.workspace-short-list :is(h3,h4),.workspace-shell .workspace-option-group h3) {
- font-size:18px;
- font-weight:700;
- line-height:1.35;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.35;
 }
 body[data-app-view='workspace'] .workspace-shell :is(p,li,label,legend,small,button,a,input,textarea,select) {
- font-size:16px;
- font-weight:400;
- line-height:1.5;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
 }
 body[data-app-view='workspace'] .workspace-shell :is(button,a) {
- line-height:1.35;
+  line-height: 1.35;
 }
 body[data-app-view='workspace'] .workspace-shell :is(.workspace-build-label,.workspace-reason > label,.creative-core > label,.babbage-questions label,.workspace-check strong,.workspace-combine-list label strong,.workspace-option strong) {
- font-size:16px;
- font-weight:700;
- line-height:1.4;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
 }
 body[data-app-view='workspace'] .workspace-shell :is(.workspace-welcome-label,.partner-mode,.workspace-option-group h3,.workspace-option-action,.field-help,.ai-status,.final-check-status,.workspace-privacy,.save-notice,.design-notice,.app-footer-disclosure) {
- font-size:14px;
- font-weight:400;
- line-height:1.45;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.45;
 }
 body[data-app-view='workspace'] .workspace-shell :is(.workspace-welcome-label,.workspace-option-group h3,.workspace-option-action) {
- font-weight:700;
+  font-weight: 700;
 }
 body[data-app-view='workspace'] .workspace-shell:has(.partner-card--welcome) .partner-card--welcome .partner-content > h3 {
- font-size:26px !important;
- font-weight:700 !important;
- line-height:1.25 !important;
+  font-size: 26px !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
 }
 body[data-app-view='workspace'] .workspace-shell :is(.workspace-tabs button,.workspace-part-nav button,.workspace-reading-nav button) {
- font-size:14px;
- font-weight:700;
- line-height:1.4;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
 }
 body[data-app-view='workspace'] .workspace-shell :is(.workspace-option-list button,.workspace-option-list a,.workspace-build-menu button,.workspace-utility-list a,.workspace-utility-list button) {
- font-size:15px;
- font-weight:700;
- line-height:1.4;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
 }
 body[data-app-view='workspace'] .workspace-shell button.primary {
- font-weight:700;
+  font-weight: 700;
 }
 @media(max-width:700px) {
- body[data-app-view='workspace'] .workspace-shell > .workspace-heading h1 { font-size:26px; }
- body[data-app-view='workspace'] .workspace-shell :is(.workspace-view > h2,.design-page-heading h2,.partner-content > h3) { font-size:24px; }
- body[data-app-view='workspace'] .workspace-shell:has(.partner-card--welcome) .partner-card--welcome .partner-content > h3 { font-size:24px !important; }
+  body[data-app-view='workspace'] .workspace-shell > .workspace-heading h1 {
+    font-size: 24px;
+  }
+  body[data-app-view='workspace'] .workspace-shell :is(.workspace-view > h2,.design-page-heading h2,.partner-content > h3) {
+    font-size: 24px;
+  }
+  body[data-app-view='workspace'] .workspace-shell:has(.partner-card--welcome) .partner-card--welcome .partner-content > h3 {
+    font-size: 24px !important;
+  }
 }

@@ -26,7 +26,8 @@ module.exports = async ({ send, evaluate, waitFor, fill, shot, key, accessibleSc
       })()`);
       assert(!metrics.bodyOverflow, 'No horizontal overflow');
       if (width >= 1100 && height >= 700) {
-        assert(!metrics.formOverflow, device + ' summary ' + index + ' fields fit without scrolling');
+        if (metrics.formOverflow) await shot('setup-' + device + '-overflow-' + index);
+        assert(!metrics.formOverflow, device + ' summary ' + index + ' fields fit without scrolling: '+JSON.stringify({...metrics,details:await evaluate('Array.from(document.querySelectorAll(".summary-sections,#summary-panel,#summary-panel .setup-field,#summary-panel textarea,#summary-panel label,#summary-panel .field-help")).map(e=>({c:e.className,id:e.id,client:e.clientHeight,scroll:e.scrollHeight,rect:e.getBoundingClientRect().toJSON(),grid:getComputedStyle(e).gridTemplateColumns,gap:getComputedStyle(e).gap}))')}));
         assert(metrics.nav.bottom <= height + 1 && metrics.preview.right <= width, 'Navigation/preview fit viewport');
         assert(metrics.tabs.every(y => Math.abs(y-metrics.tabs[0])<1), 'Five tabs share one row');
         if (baseline) {

@@ -1,4 +1,4 @@
-/* The opening uses the available screen, with the cast layered into the room. */
+/* Component styles and responsive states; no late consistency override layers. */
 body:has(.experience) {
   height: 100dvh;
   overflow: hidden;
@@ -35,16 +35,13 @@ body:has(.experience) #app {
 .classroom {
   flex: 1;
   min-height: 0;
-
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 .smartboard {
   min-height: 0;
-
   max-width: 850px;
-
   margin: 0 auto;
   padding: 8px 8px 0;
   display: flex;
@@ -56,7 +53,7 @@ body:has(.experience) #app {
   padding: 16px 20px;
 }
 .board-heading h2 {
-  font-size: clamp(22px, 2vw, 30px);
+  font-size: max(28px, clamp(22px, 2vw, 30px));
   margin: 5px 0 12px;
 }
 .board-text,
@@ -98,7 +95,6 @@ body:has(.experience) #app {
 }
 .speech-bubble {
   flex: 0 0 auto;
-
   margin-top: 14px;
   margin-bottom: 20px;
 }
@@ -113,10 +109,9 @@ body:has(.experience) #app {
   margin-right: -8%;
 }
 .speech-bubble h2 {
-  font-size: 17px;
+  font-size: 28px;
   margin-bottom: 4px;
 }
-
 .cast {
   position: absolute;
   inset: 0;
@@ -128,7 +123,6 @@ body:has(.experience) #app {
   left: 0;
   bottom: 0;
   width: 22%;
-  height: min(75%, 450px);
   margin: 0;
 }
 .character--right {
@@ -136,7 +130,6 @@ body:has(.experience) #app {
   right: 0;
   width: 23%;
 }
-
 .character figcaption {
   bottom: 10px;
   font-size: 16px;
@@ -202,7 +195,7 @@ body:has(.experience) #app {
     padding: 10px 16px;
   }
   .board-heading h2 {
-    font-size: 23px;
+    font-size: 28px;
     margin-bottom: 8px;
   }
   .eyebrow {
@@ -214,24 +207,21 @@ body:has(.experience) #app {
     padding-top: 6px;
   }
   .board-text,
-  .board-quote,
-  .facts {
+.board-quote,
+.facts {
     font-size: 16px;
   }
   .service-flow li {
     padding: 7px;
   }
-  .service-flow strong {
-    font-size: 16px;
-  }
-  .service-flow li > span:last-child {
+  .service-flow strong,
+.service-flow li > span:last-child {
     font-size: 16px;
   }
   .speech-bubble {
     margin-top: 10px;
     margin-bottom: 16px;
   }
-
   .dialogue {
     padding: 9px 16px;
   }
@@ -259,15 +249,10 @@ body:has(.experience) #app {
   .speech-bubble--right {
     margin-right: 0;
   }
-
-  .character {
-    width: 30%;
-    height: 125px;
-  }
-  .character--right {
+  .character,
+.character--right {
     width: 30%;
   }
-
   .character figcaption {
     font-size: 16px;
     padding: 3px 6px;
@@ -282,10 +267,8 @@ body:has(.experience) #app {
   .service-flow li {
     padding: 7px;
   }
-  .service-flow strong {
-    font-size: 16px;
-  }
-  .service-flow li > span:last-child {
+  .service-flow strong,
+.service-flow li > span:last-child {
     font-size: 16px;
   }
   .navigation-hint {
@@ -340,7 +323,7 @@ body:has(.experience) #app {
     gap: 8px;
   }
   .board-heading h2 {
-    font-size: 20px;
+    font-size: 28px;
     margin-bottom: 8px;
   }
   .eyebrow {
@@ -350,8 +333,8 @@ body:has(.experience) #app {
     display: none;
   }
   .board-text,
-  .board-quote,
-  .facts {
+.board-quote,
+.facts {
     font-size: 16px;
     line-height: 1.35;
   }
@@ -361,7 +344,7 @@ body:has(.experience) #app {
     padding-top: 6px;
   }
   .speech-bubble h2 {
-    font-size: 16px;
+    font-size: 28px;
   }
   .speech-bubble p {
     font-size: 16px;
@@ -378,11 +361,6 @@ body:has(.experience) #app {
     margin-left: auto;
   }
 }
-
-/* Match portrait framing without speech bubble tails. */
-.character--right {
-  height: min(75%, 450px);
-}
 .character--right {
   overflow: visible;
 }
@@ -390,38 +368,33 @@ body:has(.experience) #app {
   height: 120%;
   bottom: -28%;
 }
-
 @media (max-width: 899px) {
-  .character--right {
-    height: 125px;
-  }
   .character--right img {
     height: 120%;
     bottom: -28%;
   }
 }
-
-/* Carry the brand colors through the board and story controls. */
 .smartboard {
   background: var(--navy);
   border-color: var(--navy-deep);
 }
 .board-screen {
   background: #e9f5fb;
-  border-color: #70c8ef;
+  border-color: var(--border);
 }
 .board-frame {
   color: #fff;
 }
 .board-light {
   background: var(--sky);
+  color: var(--pc-on-accent);
 }
 .board-note {
-  border-color: #829db2;
+  border-color: var(--border);
 }
 .service-flow li {
   background: #fff;
-  border-color: #829db2;
+  border-color: var(--border);
 }
 .chapter-line > span:last-child,
 .navigation-hint {
@@ -435,7 +408,7 @@ body:has(.experience) #app {
 }
 .nav-button--back:hover:enabled {
   background: #1d3c70;
-  border-color: #1d3c70;
+  border-color: var(--border);
 }
 .nav-button--next {
   background: var(--blue);
@@ -458,17 +431,15 @@ body:has(.experience) #app {
 }
 .nav-button--back:disabled {
   background: #263b5a;
-  border-color: #263b5a;
+  border-color: var(--border);
   color: #d0dbea;
 }
 .nav-button--back:disabled > span[aria-hidden='true'] {
   color: #d0dbea;
 }
-
-/* Warm dialogue treatment complements the blue smartboard. */
 .speech-bubble {
   background: #fff4d5;
-  border-color: #93620c;
+  border-color: var(--border);
   box-shadow: 0 4px 14px #081a3633;
 }
 .speech-bubble h2 {
@@ -477,17 +448,12 @@ body:has(.experience) #app {
 .speech-bubble p {
   color: var(--navy-deep);
 }
-
-/* Preserve classroom proportions and foreground character layering. */
 .classroom {
   isolation: isolate;
 }
-
 .cast {
   z-index: 3;
 }
-
-/* Reserve the activity area so questions never resize or reposition the room. */
 .dialogue {
   height: 220px;
   flex: 0 0 220px;
@@ -508,7 +474,6 @@ body:has(.experience) #app {
 }
 .speech-bubble {
   position: absolute;
-
   width: 26%;
   max-width: 480px;
   margin: 0;
@@ -584,12 +549,10 @@ body:has(.experience) #app {
     height: auto;
   }
   .character,
-  .character--right {
+.character--right {
     height: 125px;
   }
 }
-
-/* Anchor dialogue above each portrait; longer lines grow upward. */
 .speech-bubble {
   top: auto;
   bottom: calc(min(75%, 450px) - 8px);

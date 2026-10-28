@@ -18,7 +18,8 @@
     "test:browser": "node tests/browser/design.test.cjs",
     "format": "prettier --write index.html package.json README.md docs src server tests",
     "format:check": "prettier --check index.html package.json README.md docs src server tests",
-    "test:creative": "node tests/browser/creative.test.cjs"
+    "test:creative": "node tests/browser/creative.test.cjs",
+    "test:stabilization": "node tests/browser/stabilization.test.cjs"
   },
   "devDependencies": {
     "prettier": "3.6.2"

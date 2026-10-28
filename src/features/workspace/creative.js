@@ -3,6 +3,11 @@ import { BABBAGE_ENDPOINT, buildBabbageRequest, assignmentContext } from '../des
 
 const fields = ['title', 'description', 'experience', 'learning', 'online', 'core'];
 export const creativeDefaults = () => ({ directions: [], alternatives: [], feedback: '', basis: '', mayaPaused: false });
+// A saved draft or clarification from an older session must not skip Phase 1.
+export function needsInitialExploration(state) {
+  return !state.creative.directions.length && !state.creative.alternatives.length &&
+    !state.workspace.selectedDirection;
+}
 export function normalizeDirection(value) {
   if (!value || fields.some(key => typeof value[key] !== 'string' || !value[key].trim() || value[key].length > 2000))
     throw Error('Babbage returned an incomplete creative sketch. Your work is unchanged. Try again.');

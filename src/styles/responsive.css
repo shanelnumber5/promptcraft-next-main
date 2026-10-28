@@ -1,4 +1,4 @@
-/* Desktop keeps the characters in the room; smaller screens use one speaker panel. */
+/* Component styles and responsive states; no late consistency override layers. */
 .suggested-next {
   outline: 2px solid #a9740d;
   outline-offset: 2px;
@@ -10,7 +10,7 @@
 .draft-section {
   margin: 16px 0;
   padding: 16px;
-  border: 1px solid #8da7ba;
+  border: 1px solid var(--border);
   border-radius: 12px;
   background: #f8fbfd;
 }
@@ -27,7 +27,7 @@
 .directions-editor {
   min-height: 240px;
   padding: 18px;
-  border: 2px solid #8da7ba;
+  border: 2px solid var(--border);
   border-radius: 8px;
   background: #fff;
   overflow-wrap: anywhere;
@@ -43,7 +43,7 @@
 .design-evidence {
   padding: 12px 0;
   margin-top: 12px;
-  border-top: 1px solid #8da7ba;
+  border-top: 1px solid var(--border);
   font-size: 16px;
   line-height: 1.5;
 }
@@ -179,7 +179,7 @@
     max-width: 1000px;
     padding: 12px 20px 0 12px;
     gap: 16px;
-    border: 1px solid #93620c;
+    border: 1px solid var(--border);
     border-radius: 18px;
     background: #fff4d5;
     box-shadow: 0 4px 14px #081a3626;
@@ -261,11 +261,11 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .scene-actions,
-  .setup-actions {
+.setup-actions {
     flex-wrap: wrap;
   }
   .scene-actions .nav-button,
-  .setup-actions .nav-button {
+.setup-actions .nav-button {
     height: auto;
     min-height: 50px;
     max-width: 100%;
@@ -321,7 +321,7 @@
     padding: 10px 0 0 12px;
   }
   .speech-bubble h2 {
-    font-size: 16px;
+    font-size: 28px;
     margin-bottom: 6px;
   }
   .speech-bubble p {
@@ -329,7 +329,7 @@
     line-height: 1.45;
   }
   .service-flow,
-  .summary-tabs {
+.summary-tabs {
     grid-template-columns: 1fr;
   }
   .service-flow--roles li {
