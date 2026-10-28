@@ -25,15 +25,9 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
     state.babbage.answers[id] = control.value.slice(0, 24000);
     saveSafely();
     const send = app.querySelector('[data-action="send-clarification"]');
-    if (send)
-      send.disabled =
-        ai.pending || (state.babbage.mode !== 'dev' && ai.configured !== true) ||
-        !hasCompleteClarificationAnswers(state.babbage);
-    const next = app.querySelector('[data-action="next-question"]');
-    const issue = answerIssue(control.value);
-    if (next) next.disabled = ai.pending || Boolean(issue);
+    if (send) send.disabled = ai.pending || (state.babbage.mode !== 'dev' && ai.configured !== true) || !hasCompleteClarificationAnswers(state.babbage);
     const guidance = app.querySelector('.answer-guidance');
-    if (guidance) guidance.textContent = issue;
+    if (guidance) guidance.textContent = hasCompleteClarificationAnswers(state.babbage) ? 'Ready to send.' : 'Please answer each question before continuing.';
     highlightNextAction(app, state, ai);
   }
 
@@ -75,6 +69,7 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
     syncBabbage();
     if (intent === 'revise' && !state.babbage.ready) return;
     const history = [...state.babbage.history];
+    let autoDraft = false;
     if (sendAnswers) {
       const clarification = prepareClarificationAnswers(state.babbage, state.teacher);
       if (!clarification) return;
@@ -117,6 +112,7 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
         return;
       }
       ai.suggestion = applyBabbageTurn(state.babbage, history, turn, state.teacher);
+      autoDraft = intent === 'clarify' && state.babbage.ready && !state.babbage.questions.length;
       state.designReadPage = 0;
       if (intent === 'revise') ai.error = turn.message;
       ai.stage = 'complete';
@@ -136,6 +132,9 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
         ai.pending = false;
         ai.requestController = null;
         saveSafely();
+        if (autoDraft && state.phase === 'design' && state.designStep === 2 && state.designPanel === 'babbage') {
+          queueMicrotask(() => { if (state === getState() && !ai.pending && state.designPanel === 'babbage') void askBabbage('revise'); });
+        }
         if (state.phase === 'design' && state.designStep === 2) {
           if (state.designPanel === 'revision') {
             // A response must not replace the editor DOM while the educator is typing.

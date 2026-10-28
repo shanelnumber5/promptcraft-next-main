@@ -1,13 +1,9 @@
+import { emptyReview, restoreReview } from './review-ai.js';
 import { postJSON } from '../../shared/json-request.js';
 import { BABBAGE_ENDPOINT, buildBabbageRequest, assignmentContext } from '../design/babbage-client.js';
 
 const fields = ['title', 'description', 'experience', 'learning', 'online', 'core'];
-export const creativeDefaults = () => ({ directions: [], alternatives: [], feedback: '', basis: '', mayaPaused: false });
-// A saved draft or clarification from an older session must not skip Phase 1.
-export function needsInitialExploration(state) {
-  return !state.creative.directions.length && !state.creative.alternatives.length &&
-    !state.workspace.selectedDirection;
-}
+export const creativeDefaults = () => ({ directions: [], alternatives: [], feedback: '', basis: '', mayaPaused: false, review: emptyReview() });
 export function normalizeDirection(value) {
   if (!value || fields.some(key => typeof value[key] !== 'string' || !value[key].trim() || value[key].length > 2000))
     throw Error('Babbage returned an incomplete creative sketch. Your work is unchanged. Try again.');
@@ -23,6 +19,7 @@ export function restoreCreative(value) {
   result.feedback = typeof value.feedback === 'string' ? value.feedback.slice(0, 6000) : '';
   result.basis = typeof value.basis === 'string' ? value.basis : '';
   result.mayaPaused = value.mayaPaused === true;
+  result.review = restoreReview(value.review);
   return result;
 }
 export function normalizeCreativeResponse(data) {
@@ -38,7 +35,7 @@ export function normalizeCreativeResponse(data) {
 export function buildCreativeRequest(state) {
   const request = buildBabbageRequest(state, 'clarify');
   return { ...request, max_output_tokens: 5000,
-    system: request.system + `\nThe latest request has explore_three_directions true. For this turn, explore possibilities rather than draft an assignment and do not ask clarification questions. Return the existing scenario1 response envelope. In feedback_summary return ONLY JSON: {"version":1,"directions":[{"title":"...","description":"...","experience":"...","learning":"...","online":"...","core":"..."}]}. Supply exactly THREE short sketches with genuinely different student actions, decision structures, or interaction mechanisms. A change of title or topic alone is insufficient. Each field is a short plain-text string. core names the distinctive learning mechanism to protect. Use the educator's stated learning purpose when one is supplied, but do not invent, imply, or silently finalize a learning objective when it is absent. If the purpose is incomplete, let it remain open and make the learning field a tentative possibility for educator review rather than a claimed outcome. Do not require student AI-use policy or other optional context for these sketches. Distinguish obligations from preferences and conventions. Preserve bold ideas while explaining a plausible asynchronous approach. Do not repeat fixed mystery/decision/relay templates. Honor the educator's feedback, including rejection or combinations. No official outcomes, policies, compliance claims, or invented disciplinary evidence. These are suggestions for educator review, not applied changes. Set input_quality.usable true, concerns to [], and leave revised_discussion_prompt and revision_review.why_these_changes empty.`,
+    system: request.system + `\nThe latest request has explore_three_directions true. For this turn, explore possibilities rather than draft an assignment and do not ask clarification questions. Return the existing scenario1 response envelope. In feedback_summary return ONLY JSON: {"version":1,"directions":[{"title":"...","description":"...","experience":"...","learning":"...","online":"...","core":"..."}]}. Supply exactly THREE short sketches with genuinely different student actions, decision structures, or interaction mechanisms. A change of title or topic alone is insufficient. Each field is a short plain-text string. core names the distinctive learning mechanism to protect. Use the educator's stated learning purpose when one is supplied, but do not invent, imply, or silently finalize a learning objective when it is absent. If the purpose is incomplete, let it remain open and make the learning field a tentative possibility for educator review rather than a claimed outcome. Do not require student AI-use policy or other optional context for these sketches. Distinguish obligations from preferences and conventions. Preserve bold ideas while explaining a plausible asynchronous approach. Where it naturally suits the idea, sketch a brief opportunity for real instructor questioning, responsive disciplinary feedback, or proactive guidance; do not turn the sketch into an RSI checklist, assume peer-to-peer replies count as instructor interaction, or demand an instructor plan before exploring. Do not repeat fixed mystery/decision/relay templates. Honor the educator's feedback, including rejection or combinations. No official outcomes, policies, compliance claims, or invented disciplinary evidence. These are suggestions for educator review, not applied changes. Set input_quality.usable true, concerns to [], and leave revised_discussion_prompt and revision_review.why_these_changes empty.`,
     messages: [...request.messages.slice(0, -1), { role: 'user', content: JSON.stringify({ request_intent: 'clarify', explore_three_directions: true, educator_feedback: state.creative.feedback, previous_possibilities: state.creative.directions }) }],
   };
 }

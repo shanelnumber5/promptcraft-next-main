@@ -1,7 +1,7 @@
 export const designPanels = [
   ['concern', 'original', 'advice'],
   ['exchange', 'notes', 'advice'],
-  ['route', 'babbage', 'revision', 'reason', 'requirements', 'history', 'rationale', 'earlier', 'advice', 'tools', 'feedback'],
+  ['babbage', 'route', 'revision', 'reason', 'requirements', 'history', 'rationale', 'earlier', 'advice', 'tools', 'feedback'],
 ];
 export function currentDesignPanel(state) {
   const panels = designPanels[state.designStep];
@@ -15,7 +15,8 @@ export function designDestination(state, delta) {
   if (delta < 0) {
     if (panel === 'original') return [0, 'concern'];
     if (panel === 'notes') return [1, 'exchange'];
-    if (['babbage', 'revision', 'requirements', 'earlier'].includes(panel)) return [2, 'route'];
+    if (['babbage', 'route'].includes(panel)) return [1, 'notes'];
+    if (['revision', 'requirements', 'earlier'].includes(panel)) return [2, 'babbage'];
     if (['history', 'rationale'].includes(panel)) return [2, 'babbage'];
     if (panel === 'reason') return [2, 'revision'];
     if (step === 2) return [1, 'notes'];
@@ -23,12 +24,13 @@ export function designDestination(state, delta) {
   } else {
     if (panel === 'original') return [0, 'concern'];
     if (panel === 'exchange') return [1, 'notes'];
-    if (['route', 'babbage', 'requirements', 'earlier'].includes(panel)) return [2, 'revision'];
+    if (['route', 'requirements', 'earlier'].includes(panel)) return [2, 'babbage'];
+    if (panel === 'babbage') return [2, 'revision'];
     if (['history', 'rationale'].includes(panel)) return [2, 'babbage'];
     if (panel === 'revision') return [2, 'reason'];
   }
   const next = Math.max(0, Math.min(4, step + delta));
-  return [next, designPanels[next]?.[0] || ''];
+  return [next, next === 2 ? 'babbage' : designPanels[next]?.[0] || ''];
 }
 
 export function introducePixelAdvice(state) {

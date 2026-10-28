@@ -1,3 +1,4 @@
+import { showBabbageCameo } from '../shared/babbage-cameo.js';
 import { isTestLessonKeyword, fillTestLesson } from '../shared/test-lesson.js';
 import { createDesignController } from '../features/design/controller.js';
 import { openGuidePreview } from '../features/design/guide-preview.js';
@@ -115,6 +116,7 @@ function render({ focus = false, choiceFocus = null } = {}) {
     .forEach((img) => img.addEventListener('load', positionPixelTag, { once: true }));
   requestAnimationFrame(positionPixelTag);
   highlightNextAction(app, state, ai);
+  showBabbageCameo(state, app);
   if (choiceFocus)
     app.querySelector(`input[value="${choiceFocus}"]`)?.focus({ preventScroll: true });
   else if (focus) {
@@ -195,6 +197,7 @@ app.addEventListener('change', (event) => {
       ? 'All three points are checked. Select Assignment guide to save your checks and continue.'
       : 'Check each point after reviewing the directions.';
     highlightNextAction(app, state, ai);
+  showBabbageCameo(state, app);
     return;
   }
   if (event.target.closest('[data-design-form]')) {
@@ -227,13 +230,14 @@ app.addEventListener('change', (event) => {
     : 'Choose a response, then use the feedback to reconsider.';
   app.querySelector('.save-notice').textContent = state.saveNotice;
   highlightNextAction(app, state, ai);
+  showBabbageCameo(state, app);
 });
 app.addEventListener('input', (event) => {
   if (event.target.closest('[data-setup-form]') && isTestLessonKeyword(event.target)) {
     ai.requestController?.abort();
     fillTestLesson(state, event.target.value);
     Object.assign(ai, {configured:null,pending:false,suggestion:null,error:'',context:''});
-    saveSafely(); render({focus:true}); refreshBabbageConnection(); return;
+    saveSafely(); render({focus:true}); void refreshBabbageConnection().then(() => { if (state.phase === 'design' && state.designPanel === 'babbage' && !state.babbage.history.length && ai.configured === true) void askBabbage(); }); return;
   }
   const editor = event.target.closest('[data-assignment-editor]');
   if (editor) {
@@ -295,6 +299,7 @@ function updateDesignField(control) {
     if (status) status.textContent = ai.error;
   }
   highlightNextAction(app, state, ai);
+  showBabbageCameo(state, app);
 }
 
 function moveDesign(delta) {
@@ -324,6 +329,9 @@ function moveDesign(delta) {
   syncBabbage();
   saveSafely();
   render({ focus: true });
+  if (delta > 0 && state.phase === 'design' && state.designStep === 2 && state.designPanel === 'babbage' && !state.babbage.history.length && !ai.pending && (state.babbage.mode === 'dev' || ai.configured === true)) {
+    void askBabbage();
+  }
   if (introduceMaya) openMayaDialog(state, document.getElementById('setup-title'), {autoStart:true,novel:true});
 }
 async function copyDraft() {
@@ -453,7 +461,7 @@ app.addEventListener('click', async (event) => {
     const panel = event.target.closest('[data-design-panel]')?.dataset.designPanel;
     if (!designPanels[state.designStep]?.includes(panel)) return;
     state.designReturnPanel = ['original', 'requirements', 'history', 'rationale', 'earlier', 'advice', 'tools', 'feedback'].includes(panel) ? currentDesignPanel(state) : '';
-    state.designPanel = panel;
+    state.designPanel = panel === 'route' ? 'babbage' : panel;
     if(panel !== 'advice') introducePixelAdvice(state);
     state.designReadPage = 0;
     saveSafely();

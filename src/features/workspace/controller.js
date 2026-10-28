@@ -1,5 +1,7 @@
+import { reviewFingerprint, reviewEligible, requestWorkspaceReview, emptyReview } from './review-ai.js';
 import { workspaceViews } from './views.js';
-import { requestCreativeDirections, creativeBasis, combineDirections, needsInitialExploration } from './creative.js';
+import { downloadProjectFile, parseProjectFile, MAX_PROJECT_BYTES } from './project-file.js';
+import { requestCreativeDirections, creativeBasis, combineDirections } from './creative.js';
 import { renderClosing } from '../design/closing.js';
 import { isTestLessonKeyword, fillTestLesson } from '../../shared/test-lesson.js';
 import { renderWorkspace } from './screen.js';
@@ -10,6 +12,7 @@ import { conversationDefaults, assignmentContext } from '../design/babbage-clien
 import { finalCheckDefaults, finalCheckContext, finalCheckReady, syncDraftAssignment } from '../design/content.js';
 import { renderAssignmentDirections } from '../../shared/directions.js';
 import { serializeDirectionsEditor, formatDirectionsEditor } from '../../shared/directions-editor.js';
+import { showBabbageCameo } from '../../shared/babbage-cameo.js';
 import { openMayaDialog } from '../design/maya-dialog.js';
 import { openGuidePreview } from '../design/guide-preview.js';
 import { downloadGuide, loadGuideLogo } from '../design/guide.js';
@@ -21,6 +24,9 @@ export function mountWorkspace(app, params) {
   let state = restored.state, readError = restored.error;
   let designPage = state.design.revision.trim() ? 'draft' : 'start', partnerPage = 'work', reviewPage = state.finalCheck.approved ? 'guide' : 'rationale';
   let showingWrapUp = false;
+  // Track offers per draft for this open session; do not alter saved or research state.
+  let reviewRequest = null;
+  let reviewSequence = 0;
   let ui = workspaceViews();
   const ai = { pending: false, configured: null, suggestion: null, error: '', context: '' };
   if (params.get('mockBabbage') === '1') state.babbage.mode = 'dev';
@@ -52,6 +58,7 @@ export function mountWorkspace(app, params) {
   };
   const render = ({ focus = false } = {}) => {
     app.innerHTML = showingWrapUp ? renderClosing(state) : renderWorkspace(state, ai, readError, designPage, partnerPage, reviewPage, ui);
+    showBabbageCameo(state, app);
     if (focus) document.getElementById('setup-title')?.focus({ preventScroll: true });
   };
   function focusTask() {
@@ -90,7 +97,8 @@ export function mountWorkspace(app, params) {
   }
   async function exploreDirections() {
     if (ai.pending || state.babbage.mode === 'dev' || ai.configured !== true || !state.teacher.directions.trim()) return;
-    const initialExploration = needsInitialExploration(state);
+    const initialExploration = !state.creative.directions.length && !state.creative.alternatives.length &&
+      !state.workspace.selectedDirection && !state.design.revision.trim();
     if (initialExploration && state.babbage.questions.length) {
       state.babbage = { ...conversationDefaults(), mode: state.babbage.mode };
     }
@@ -203,7 +211,59 @@ export function mountWorkspace(app, params) {
     saveSafely();
     updateApproval();
   });
-  const setPanel = panel => { ui = workspaceViews(); state.designPanel = panel; saveSafely(); render(); document.getElementById('workspace-tab-' + panel)?.focus(); };
+  async function runAutomaticReview() {
+    if (readError || showingWrapUp || state.designPanel !== 'reason' || !reviewEligible(state) || ai.pending || reviewRequest) return;
+    const savedReview = state.creative.review;
+    const fingerprint = reviewFingerprint(state);
+    if (savedReview.fingerprint === fingerprint && savedReview.feedback) return;
+    // A changed draft is checked only at the educator's request, not on tab re-entry.
+    if (savedReview.feedback || savedReview.error || savedReview.status === 'complete') return;
+    await checkReview();
+  }
+  async function checkReview() {
+    if (reviewRequest || !reviewEligible(state)) return;
+    const source = state;
+    const fingerprint = reviewFingerprint(state);
+    const previous = source.creative.review.feedback ? {
+      feedback: source.creative.review.feedback,
+      previous_fingerprint: source.creative.review.fingerprint,
+    } : null;
+    const abort = new AbortController();
+    const sequence = ++reviewSequence;
+    reviewRequest = abort;
+    const review = source.creative.review;
+    review.status = 'pending'; review.error = '';
+    saveSafely(); render();
+    try {
+      const feedback = source.babbage.mode === 'dev'
+        ? 'Sample review only; no AI analysis was performed. Consider what students will produce, how you will respond to their thinking, and what changes would make the learning purpose clearer.'
+        : await requestWorkspaceReview(structuredClone(source), previous, { signal: abort.signal });
+      if (sequence !== reviewSequence || source !== state || abort.signal.aborted) return;
+      review.fingerprint = fingerprint;
+      review.feedback = feedback;
+      review.status = 'complete';
+      review.error = '';
+    } catch (error) {
+      if (sequence !== reviewSequence || source !== state || abort.signal.aborted) return;
+      review.status = 'error';
+      review.error = error.message || 'Review unavailable. Your draft is unchanged.';
+    } finally {
+      if (sequence === reviewSequence) {
+        reviewRequest = null;
+        if (source === state) { saveSafely(); if (state.designPanel === 'reason') render(); }
+      }
+    }
+  }
+  function enterReview() {
+    ui = workspaceViews(); state.designPanel = 'reason'; reviewPage = 'rationale'; saveSafely(); render();
+    document.getElementById('workspace-tab-reason')?.focus();
+    void runAutomaticReview();
+  }
+  const setPanel = panel => {
+    if (panel === 'reason') return enterReview();
+    ui = workspaceViews(); state.designPanel = panel; saveSafely(); render();
+    document.getElementById('workspace-tab-' + panel)?.focus();
+  };
   app.addEventListener('keydown', event => {
     const tab = event.target.closest('[data-workspace-panel]');
     if (!tab || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
@@ -222,6 +282,7 @@ export function mountWorkspace(app, params) {
   async function reset() {
     if (!(await confirmRestart({ title: 'Reset this discussion workspace?', description: 'This clears only the private workspace, including its draft, inspiration, and conversation. Scenario 1 progress stays saved.', confirmLabel: 'Reset workspace' }))) return;
     ai.requestController?.abort();
+    reviewRequest?.abort(); reviewRequest = null; reviewSequence++;
     const mode = state.babbage.mode;
     if (!resetWorkspace()) { state.saveNotice = 'This browser could not reset the workspace.'; updateApproval(); return; }
     showingWrapUp = false;
@@ -234,6 +295,31 @@ export function mountWorkspace(app, params) {
     saveSafely();
     render({ focus: true });
   }
+  app.addEventListener('change', async event => {
+    if (!event.target.matches('[data-project-file-input]')) return;
+    const input = event.target;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file || ai.pending) return;
+    const notice = app.querySelector('.design-notice');
+    if (file.size > MAX_PROJECT_BYTES) { if (notice) notice.textContent = 'Project file is too large.'; return; }
+    let imported;
+    try { imported = parseProjectFile(await file.text()); }
+    catch (error) { if (notice) notice.textContent = error.message; return; }
+    if (!window.confirm('Open this project? It will replace your current browser workspace. Download your current project first if you want to keep it.')) return;
+    if (!saveWorkspace(imported)) { if (notice) notice.textContent = imported.saveNotice; return; }
+    reviewRequest?.abort(); reviewRequest = null; reviewSequence++;
+    state = imported;
+    readError = '';
+    showingWrapUp = false;
+    designPage = state.design.revision.trim() ? 'draft' : 'start';
+    partnerPage = 'work';
+    reviewPage = state.finalCheck.approved ? 'guide' : 'rationale';
+    ui = workspaceViews();
+    Object.assign(ai, { pending: false, suggestion: null, error: '', context: '' });
+    render({ focus: true });
+    app.querySelector('.design-notice').textContent = 'Project opened. Your editable work has been restored.';
+  });
   app.addEventListener('click', async event => {
     const route = event.target.closest('[data-workspace-view]');
     if(route && !readError) {
@@ -289,6 +375,12 @@ export function mountWorkspace(app, params) {
       developDirection(direction); return;
     }
     const action = event.target.closest('[data-action]')?.dataset.action;
+    if (action === 'save-project-file' && !readError) {
+      downloadProjectFile(state);
+      app.querySelector('.design-notice').textContent = 'Project download started. Keep the JSON file to reopen this work later.';
+      return;
+    }
+    if (action === 'open-project-file' && !readError) { app.querySelector('[data-project-file-input]')?.click(); return; }
     if (action === 'reset-workspace') return reset();
     if (readError) return;
     if (action === 'finish-workspace' && state.finalCheck.approved && finalCheckReady(state)) {
@@ -298,6 +390,14 @@ export function mountWorkspace(app, params) {
     if (action === 'return-assignment' && showingWrapUp) {
       showingWrapUp = false; ui=workspaceViews(); reviewPage='guide'; render();
       document.getElementById('review-title')?.focus({preventScroll:true}); return;
+    }
+    if (action === 'check-workspace-revision') { await checkReview(); return; }
+    if (action === 'continue-to-maya') {
+      const fingerprint = reviewFingerprint(state);
+      state.creative.review.offeredMaya = fingerprint; saveSafely();
+      if (!state.creative.mayaPaused) openMayaDialog(state, event.target.closest('[data-action]'));
+      else { app.querySelector('.design-notice').textContent = 'Maya is paused. You can continue to the final checks.'; }
+      return;
     }
     if (action === 'explore-directions') { await exploreDirections(); return; }
     if (action === 'combine-directions' && !ai.pending) {
@@ -362,7 +462,8 @@ export function mountWorkspace(app, params) {
   document.addEventListener('click', event => {
     if (event.target.closest('a[href^="?"]') && !readError && !saveSafely()) { event.preventDefault(); updateApproval(); }
   });
-  window.addEventListener('pagehide', () => ai.requestController?.abort());
+  window.addEventListener('pagehide', () => { ai.requestController?.abort(); reviewRequest?.abort(); });
   render();
+  if (state.designPanel === 'reason') void runAutomaticReview();
   if (!readError && state.babbage.mode !== 'dev') controller.refreshBabbageConnection();
 }

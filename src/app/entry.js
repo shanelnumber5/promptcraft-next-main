@@ -14,10 +14,14 @@ if (['home', 'guide'].includes(view) || infoPages.some(([id]) => id === view)) {
   document.querySelector('.header-actions a[href="?view=home"]').hidden = true;
   document.querySelector('.header-actions').insertAdjacentHTML('beforeend', campusSignature());
   app.insertAdjacentHTML('beforebegin', renderInfoNavigation(view));
+  // Switch information tabs in place instead of loading a second page/menu.
+  // Keep normal navigation for other experiences and modified clicks.
   document.querySelector('.info-nav-select')?.addEventListener('change', event => {
     const destination = new URL(window.location.href);
     destination.searchParams.set('view', event.target.value);
-    window.location.href = destination.href;
+    const matchingLink = document.querySelector(`.info-nav a[href="?view=${event.target.value}"]`);
+    if (matchingLink && infoPages.some(([id]) => id === event.target.value) && infoPages.some(([id]) => id === document.body.dataset.appView)) matchingLink.click();
+    else window.location.href = destination.href;
   });
 }
 const restart = document.querySelector('[data-action="restart-module"]');
@@ -43,8 +47,42 @@ if (view === 'play') {
   if (view === 'guide') {
     const { mountCourseGuide } = await import('../features/entry/guide-screen.js');
     mountCourseGuide(app);
-  } else if (infoPages.some(([id]) => id === view)) mountInfoPage(app, view);
-  else if (view === 'home') app.innerHTML = renderHome(resume);
+  } else if (infoPages.some(([id]) => id === view) || view === 'home') {
+    let dispose = null;
+    let currentView = view;
+    const infoNav = document.querySelector('.info-nav');
+    const navigate = nextView => {
+      if (nextView !== 'home' && !infoPages.some(([id]) => id === nextView)) return false;
+      dispose?.();
+      dispose = null;
+      currentView = nextView;
+      document.body.dataset.appView = nextView;
+      if (nextView === 'home') app.innerHTML = renderHome(resumePath());
+      else dispose = mountInfoPage(app, nextView);
+      infoNav.querySelectorAll('a[href^="?view="]').forEach(link => {
+        if (new URL(link.href).searchParams.get('view') === nextView) link.setAttribute('aria-current', 'page');
+        else link.removeAttribute('aria-current');
+      });
+      const picker = infoNav.querySelector('.info-nav-select');
+      if (picker) picker.value = nextView;
+      return true;
+    };
+    navigate(view);
+    const navigateLink = event => {
+      const link = event.target.closest('a[href^="?view=home"], a[href^="?view=how-to-play"], a[href^="?view=about"], a[href^="?view=babbage"], a[href^="?view=privacy"]');
+      if (!link || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      const destination = new URL(link.href);
+      if (destination.origin !== location.origin || !navigate(destination.searchParams.get('view'))) return;
+      event.preventDefault();
+      history.pushState(null, '', destination.href);
+    };
+    // Intercept header/brand/footer Home and information links as well as the top tabs.
+    document.addEventListener('click', navigateLink);
+    window.addEventListener('popstate', () => {
+      const requestedView = new URL(location.href).searchParams.get('view');
+      if (!navigate(requestedView)) location.reload();
+    });
+  }
   else if (params.has('idea')) app.innerHTML = renderIdeaDetail(params.get('idea'), readWorkspace().exists);
   else {
     app.innerHTML = renderGallery();

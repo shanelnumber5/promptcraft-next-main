@@ -45,7 +45,7 @@ export function fillTestLesson(state, keyword = 'test') {
     openQuestions:'Can students complete the exchange in 60–90 minutes? What support is needed if a peer reply arrives late?'
   });
   state.completed=false;
-  state.phase='design'; state.designStep=2; state.designPanel='reason'; state.designReturnPanel=''; state.designReadPage=0;
+  state.phase='design'; state.designStep=2; state.designPanel='babbage'; state.designReturnPanel=''; state.designReadPage=0;
   if (sample === 'dev' && state.workspace) {
     // Seed inputs for a real conversation, never present canned text as AI output.
     state.design.revision=''; state.design.reason=''; state.designPanel='babbage';

@@ -139,7 +139,7 @@ export const teacherSetup = {
         ...assignmentSection.fields.slice(1),
         {
           id: 'alignmentGuide',
-          label: 'Optional assignment guide',
+          label: 'Optional: Which guide should inform this assignment?',
           help: 'Choose one lens, or leave this set to none. Babbage uses only the relevant guidance you provide; it does not verify official alignment.',
           type: 'select',
           options: [
@@ -151,8 +151,8 @@ export const teacherSetup = {
         },
         {
           id: 'alignmentReference',
-          label: 'Relevant standard, outcome, or rubric item',
-          help: 'Optional: paste source text, a standard number, or a rubric item, or leave blank. Montana K-12: include grade and subject. MSU: include course outcome.',
+          label: 'Relevant standard, outcome, or rubric item (optional)',
+          help: 'Paste the exact text, standard number, or rubric item you want Babbage to consider. For Montana K–12 standards, include the grade and subject; for MSU, include the course outcome. Leave blank if you do not have it handy.',
           type: 'textarea',
           rows: 4,
           placeholder: 'Paste a relevant excerpt or identifier here.',
@@ -173,10 +173,27 @@ export const teacherSetup = {
         'Choose how students complete the larger assignment and list what the discussion-board component must preserve.',
       fields: limitsSection.fields.slice(2),
     },
+    {
+      id: 'ai-policy',
+      title: 'Student AI use',
+      intro: 'Decide what students may do with AI before Babbage drafts your discussion. You can change this later.',
+      fields: [{
+        id: 'aiUse',
+        label: 'What AI use will students be allowed for this activity?',
+        help: 'Choose the closest option. Babbage will use this boundary when drafting student directions.',
+        type: 'radio',
+        options: [
+          ['No student AI use', 'No AI use for this activity'],
+          ['Ideas or feedback only; students create the final work', 'Brainstorming or feedback only'],
+          ['AI drafting allowed with limits; students verify and revise the work', 'Drafting allowed with limits'],
+          ['Not sure yet', 'Not sure yet; help me decide'],
+        ],
+      }],
+    },
   ].map((step, index) => ({
     ...step,
-    tabLabel: ['Class', 'Directions', 'Learning goal', 'Time', 'Requirements'][index],
-    label: `Step ${index + 1} of 5`,
+    tabLabel: ['Class', 'Directions', 'Learning goal', 'Time', 'Requirements', 'Student AI use'][index],
+    label: `Step ${index + 1} of 6`,
   })),
 };
 

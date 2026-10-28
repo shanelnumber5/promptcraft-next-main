@@ -1,7 +1,7 @@
-/* Component styles and responsive states; no late consistency override layers. */
+/* A calmer hierarchy: one workspace, restrained supporting actions. */
 .setup-shell {
   box-shadow: 0 12px 36px #12264d0b;
-  border-color: var(--border);
+  border-color: #c3ced9;
 }
 .setup-intro {
   padding-bottom: 18px;
@@ -29,7 +29,7 @@
 .babbage-prompt {
   background: #fffaed;
   border: 0;
-  border-left: 3px solid var(--border);
+  border-left: 3px solid #b58324;
   border-radius: 0 8px 8px 0;
 }
 .pixel-suggests-portrait {
@@ -38,7 +38,7 @@
   height: 92px;
 }
 .ai-panel {
-  border: 1px solid var(--border);
+  border: 1px solid #b4c5d4;
   box-shadow: none;
   background: #fff;
 }
@@ -51,7 +51,7 @@
   height: 48px;
 }
 .ai-panel-heading h2 {
-  font-size: 28px;
+  font-size: 23px;
 }
 .babbage-eyebrow {
   display: none;
@@ -63,7 +63,7 @@
   padding: 20px;
 }
 .babbage-mode-actions {
-  border-top: 1px solid var(--border);
+  border-top: 1px solid #dce3e9;
   margin: 24px 0 0;
   padding-top: 12px;
 }
@@ -74,9 +74,9 @@
 [data-action='copy-draft'],
 .design-starter {
   background: transparent;
-  color: var(--navy);
+  color: #095b80;
   border: 0;
-  border-radius: var(--button-radius);
+  border-radius: 4px;
   padding: 8px 4px;
   box-shadow: none;
   text-decoration: underline;
@@ -101,13 +101,13 @@
 .babbage-history .babbage-turn {
   padding: 14px 16px;
   border: 0;
-  border-left: 2px solid var(--border);
+  border-left: 2px solid #96b8ce;
   border-radius: 0;
   background: #f7f9fb;
 }
 .babbage-history .babbage-turn--user {
   background: #fffaed;
-  border-left-color: var(--border);
+  border-left-color: #c7a765;
   margin-left: 16px;
 }
 .babbage-history p {
@@ -115,20 +115,19 @@
 }
 .babbage-questions {
   border: 0;
-  border-top: 1px solid var(--border);
   border-radius: 0;
-  padding: 20px 0 0;
+  padding: 0;
   background: transparent;
 }
 .babbage-ready {
   background: transparent;
   border: 0;
   padding: 0;
-  color: var(--ink);
+  color: #286747;
 }
 .ai-suggestion {
   border: 0;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid #dce3e9;
   border-radius: 0;
   padding: 8px 0 0;
 }
@@ -137,7 +136,7 @@
 }
 .ai-suggestion-actions [data-action='dismiss-ai'] {
   background: #fff;
-  border-color: var(--border);
+  border-color: #b4c5d4;
 }
 .design-fields {
   margin-top: 18px;
@@ -152,7 +151,7 @@
 .final-check-card {
   background: #fff;
   border: 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid #dce3e9;
   border-radius: 0;
   padding: 20px 4px;
 }
@@ -166,25 +165,29 @@
   margin: 12px 0;
   padding: 12px 16px;
 }
-.final-check-card label,
+.final-check-card label {
+  margin-top: 12px;
+}
 .final-check-list > [data-action='edit-context'] {
   margin-top: 12px;
 }
 .final-check-layout .comparison-card {
-  border-color: var(--border);
+  border-color: #c6d2dd;
   background: #fff;
 }
 .final-check-layout .comparison-card header {
   background: #eef4f8;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid #c6d2dd;
   padding: 18px 20px;
 }
 .guide-access {
   box-shadow: none;
-  border: 1px solid var(--border);
+  border: 1px solid #d8c795;
   background: #fffaed;
 }
-.guide-access-label,
+.guide-access-label {
+  display: none;
+}
 .guide-access .final-check-status:empty {
   display: none;
 }
@@ -204,12 +207,12 @@
   gap: 20px;
 }
 .guide-access h2 {
-  font-size: 28px;
+  font-size: 22px;
   margin: 0 0 8px;
 }
 .guide-access-actions [data-action='preview-guide'] {
   background: transparent;
-  border: 1px solid var(--border);
+  border: 1px solid #a7b8c8;
 }
 .setup-actions > span:empty {
   display: none;
@@ -219,7 +222,7 @@
   border: 0;
   box-shadow: none;
   padding: 8px 4px;
-  color: var(--navy);
+  color: #095b80;
   text-decoration: underline;
   text-underline-offset: 4px;
   font-size: 16px;
@@ -230,6 +233,7 @@
   min-height: 78px;
   justify-content: center;
 }
+
 .closing-experience .service-flow li {
   min-width: 0;
 }
@@ -237,10 +241,10 @@
   overflow-y: auto;
 }
 .closing-board-recap h3 {
-  font-size: 24px;
+  font-size: 19px;
   line-height: 1.4;
   margin: 18px 0 6px;
-  color: var(--navy);
+  color: #12264d;
 }
 .closing-board-recap p {
   font-size: 16px;
@@ -248,12 +252,12 @@
   margin: 0 0 12px;
 }
 .closing-board-recap {
-  border-top: 1px solid var(--border);
+  border-top: 1px solid #8da7ba;
   margin-top: 18px;
   padding-top: 2px;
 }
 .closing-goal {
-  border-left: 3px solid var(--border);
+  border-left: 3px solid #09648b;
   padding-left: 12px;
 }
 .closing-experience .service-flow li {
@@ -267,12 +271,16 @@
 .closing-board-recap h3 {
   margin-top: 14px;
 }
+
+/* Wide classroom plate: preserve proportions and fill the scene edge to edge. */
 .classroom {
-  background-image: linear-gradient(#081a3610, #081a3633), url('../../assets/backgrounds/classroom.png');
+  background-image:
+    linear-gradient(#081a3610, #081a3633), url('../../assets/backgrounds/classroom.png');
   background-size: cover;
   background-position: center center;
   background-color: #c6b9a2;
 }
+
 @media (min-width: 1181px) and (min-height: 821px) {
   .classroom {
     padding-left: 22%;
@@ -283,7 +291,7 @@
     box-shadow: 0 10px 28px #081a3655;
   }
   .character,
-.character--right {
+  .character--right {
     height: min(67%, 420px);
   }
   .speech-bubble {
@@ -330,13 +338,19 @@
 .radio-cards label {
   box-shadow: none;
 }
+
 @media (max-width: 600px) {
+  .babbage-workspace,
+  .ai-panel-heading {
+    padding: 16px;
+  }
+
   .pixel-suggests-portrait {
     width: 64px;
     flex-basis: 64px;
   }
   .setup-intro h1 {
-    font-size: 32px;
+    font-size: 27px;
   }
   .setup-actions {
     gap: 10px;
@@ -385,12 +399,12 @@
   animation: engine-linkage 2.4s ease-in-out infinite;
 }
 @keyframes engine-turn {
-to {
+  to {
     transform: rotate(360deg);
   }
 }
 @keyframes engine-column {
-0%,
+  0%,
   100% {
     transform: translateY(0);
   }
@@ -400,12 +414,12 @@ to {
   }
 }
 @keyframes engine-digits {
-to {
+  to {
     transform: translateX(-57px);
   }
 }
 @keyframes engine-linkage {
-0%,
+  0%,
   100% {
     transform: translateX(0);
   }
@@ -428,11 +442,13 @@ to {
 }
 @media (prefers-reduced-motion: reduce) {
   .engine-gear,
-.engine-column,
-.engine-number-strip,
-.engine-linkage {
+  .engine-column,
+  .engine-number-strip,
+  .engine-linkage {
     animation: none;
   }
+}
+@media (prefers-reduced-motion: reduce) {
   .babbage-progress span {
     animation: none;
     background: repeating-linear-gradient(90deg, #6dc9e7 0 24px, #f6d57c 24px 48px);
@@ -443,7 +459,7 @@ to {
 }
 @media (max-width: 600px) {
   .ai-panel-heading,
-.babbage-workspace {
+  .babbage-workspace {
     padding: 16px;
   }
   .babbage-identity {
@@ -454,10 +470,10 @@ to {
     height: 50px;
   }
   .ai-panel-heading h2 {
-    font-size: 28px;
+    font-size: 23px;
   }
   .babbage-questions,
-.babbage-loading {
+  .babbage-loading {
     padding: 16px;
   }
   .babbage-history .babbage-turn--user {
@@ -467,10 +483,11 @@ to {
     padding: 4px 14px 16px;
   }
 }
+/* A consistent restart action and an explicit choice before clearing saved work. */
 .app-header .restart-module {
   flex-shrink: 0;
   background: transparent;
-  border-color: var(--border);
+  border-color: #a3bfd3;
   color: #fff;
   font-size: 16px;
   padding: 8px 14px;
@@ -494,7 +511,7 @@ to {
 }
 .restart-dialog h2 {
   margin: 0 0 12px;
-  font-size: 28px;
+  font-size: 24px;
   line-height: 1.3;
 }
 .restart-dialog p {

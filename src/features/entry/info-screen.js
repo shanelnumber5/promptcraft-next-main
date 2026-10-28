@@ -31,29 +31,39 @@ export function renderInfoPage(view, index = 0) {
 
 export function mountInfoPage(app, view) {
   app.innerHTML = renderInfoPage(view);
-  // The shared menu frame is viewport-sized in info.css, so changing pages or
-  // topics cannot move the footer. Keep content scrollable inside that frame.
-  const sizePanel = () => {
-    const panel = app.querySelector('.menu-board');
-    if (panel) app.style.setProperty('--info-panel-height', `${panel.getBoundingClientRect().height}px`);
-  };
-  const observer = new ResizeObserver(sizePanel);
-  observer.observe(app);
-  window.addEventListener('resize', sizePanel);
-  sizePanel();
+  // Keep the information-page frame at a consistent CSS-controlled height.
+  // Measuring and inserting hidden copies of every page caused layout shifts.
   const show = index => {
-    app.querySelector('.info-shell').outerHTML = renderInfoPage(view, index);
-    app.querySelector('#info-topic-title').focus({ preventScroll: true });
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    const next = document.createElement('div');
+    next.innerHTML = renderInfoPage(view, index);
+    const current = app.querySelector('.info-shell');
+    const updated = next.querySelector('.info-shell');
+    if (!current || !updated) return;
+    // Keep the menu and its scroll position stable; update only the selected topic.
+    current.querySelector('.info-reading').replaceWith(updated.querySelector('.info-reading'));
+    current.querySelector('.info-art').replaceWith(updated.querySelector('.info-art'));
+    current.querySelectorAll('[data-info-section]').forEach((button, offset) => {
+      if (offset === index) button.setAttribute('aria-current', 'step');
+      else button.removeAttribute('aria-current');
+    });
+    const select = current.querySelector('.info-topic-select');
+    if (select) select.value = String(index);
+    current.querySelector('.info-sidebar nav')?.setAttribute('data-current-topic', String(index));
+    current.querySelector('#info-topic-title')?.focus({ preventScroll: true });
   };
-  app.addEventListener('change', event => {
+  const onChange = event => {
     if (event.target.matches('.info-topic-select')) show(Number(event.target.value));
-  });
-  app.addEventListener('click', event => {
+  };
+  const onClick = event => {
     const button = event.target.closest('[data-info-section]');
     if (button && !button.disabled) show(Number(button.dataset.infoSection));
-  });
-
+  };
+  app.addEventListener('change', onChange);
+  app.addEventListener('click', onClick);
+  return () => {
+    app.removeEventListener('change', onChange);
+    app.removeEventListener('click', onClick);
+  };
 }
 
 const topicVisuals = {

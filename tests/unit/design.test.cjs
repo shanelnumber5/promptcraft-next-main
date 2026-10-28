@@ -12,7 +12,9 @@ const assert = require('node:assert/strict');
   const { renderTeacherStep, renderTeacherSummary } = await import(
     '../../src/features/setup/screen.js'
   );
-  assert.equal(teacherSetup.steps.length, 5);
+  assert.equal(teacherSetup.steps.length, 6);
+  assert.equal(teacherSetup.steps[5].fields[0].type, 'radio');
+  assert.match(teacherSetup.steps[5].fields[0].options.map(option => option[1]).join(' '), /Not sure yet/);
   const previewTeacher = {
     ...initialState(scenario).teacher,
     directions: '### First post\nDescribe your recommendation.',
@@ -380,7 +382,8 @@ const assert = require('node:assert/strict');
   assert.equal(saved().designPanel, 'notes');
   input('notes', 'Use evidence to reconsider a choice.');
   click('design-next');
-  assert.match(app.innerHTML, /Design one focused discussion-board activity/);
+  assert.match(app.innerHTML, /Work with Babbage/);
+  click('design-next'); // Continue to the editable draft if AI is unavailable.
   click('use-starter');
   assert.match(saved().design.revision, /Compare a classmate/);
   assert.equal(
@@ -499,7 +502,7 @@ const assert = require('node:assert/strict');
   sample.design.revision='Earlier draft'; sample.design.reason='Earlier reason';
   sample.finalCheck.approved=true; sample.babbage.mode='dev';
   fillTestLesson(sample);
-  assert.equal(sample.phase,'design'); assert.equal(sample.designPanel,'reason');
+  assert.equal(sample.phase,'design'); assert.equal(sample.designPanel,'babbage');
   assert.equal(sample.babbage.mode,'live'); assert.equal(sample.finalCheck.approved,false);
   assert.equal(sample.design.previousRevision,'Earlier draft');
   assert.equal(sample.design.sourceDirections,sample.teacher.directions);

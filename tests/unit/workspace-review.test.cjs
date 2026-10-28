@@ -1,0 +1,38 @@
+const assert = require('node:assert/strict');
+(async () => {
+  const { freshWorkspace, saveWorkspace, readWorkspace } = await import('../../src/features/workspace/storage.js');
+  const { reviewFingerprint, reviewNeedsCheck, requestWorkspaceReview, restoreReview } = await import('../../src/features/workspace/review-ai.js');
+  const { renderReview } = await import('../../src/features/workspace/review-view.js');
+  const { createProjectFile, parseProjectFile } = await import('../../src/features/workspace/project-file.js');
+  const state = freshWorkspace();
+  state.design.revision = 'Students compare evidence and revise a recommendation.';
+  state.design.reason = 'Support reasoning.';
+  const first = reviewFingerprint(state);
+  assert(reviewNeedsCheck(state));
+  let sent;
+  const feedback = await requestWorkspaceReview(state, null, { fetchImpl: async (_, options) => {
+    sent = JSON.parse(options.body);
+    return {ok:true, json: async () => ({ analysis: { feedback_summary: 'You ask students to compare evidence. How will they know what counts as a stronger reason? You could model one example.' } })};
+  }});
+  assert.equal(sent.analysis_type, 'scenario1');
+  assert.equal(JSON.parse(sent.messages.at(-1).content).workspace_review, true);
+  assert(!sent.system.includes('Return Markdown text'));
+  state.creative.review = {fingerprint:first,feedback,status:'complete',error:'',offeredMaya:''};
+  assert(!reviewNeedsCheck(state));
+  let html = renderReview(state,{pending:false},'rationale');
+  assert(html.includes("Babbage's perspective") && html.includes('Continue to Maya'));
+  assert(!html.includes('Check My Revision'));
+  state.design.revision += ' Students discuss responses with the instructor.';
+  assert(reviewNeedsCheck(state));
+  html = renderReview(state,{pending:false},'rationale');
+  assert(html.includes('Check My Revision') && html.includes('Earlier draft'));
+  assert(!renderReview(state,{pending:true},'rationale').includes('Check My Revision'));
+  const store = new Map();
+  assert(saveWorkspace(state,{setItem:(k,v)=>store.set(k,v)}));
+  const saved = readWorkspace({getItem:k=>store.get(k)}).state;
+  assert.equal(saved.creative.review.feedback, feedback);
+  assert.equal(parseProjectFile(createProjectFile(state)).creative.review.feedback, feedback);
+  assert.equal(restoreReview({...state.creative.review,status:'pending'}).status,'complete');
+  await assert.rejects(requestWorkspaceReview(state,null,{fetchImpl:async()=>({ok:true,json:async()=>({analysis:{}})})}),/incomplete/);
+  console.log('PASS: automatic review request contract, fingerprint, stale feedback, manual revision UI, persistence, import, errors. Mock only.');
+})().catch(error => {console.error(error);process.exitCode=1;});

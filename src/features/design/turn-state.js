@@ -10,13 +10,13 @@ function addRequiredClarifications(turn, teacher) {
     turn.ready = false;
     turn.suggestion = null;
   }
-  if (!teacher.aiUse?.trim()) {
+  if (!teacher.aiUse?.trim() || teacher.aiUse.trim() === 'Not sure yet') {
     turn.questions = turn.questions
       .filter((question) => !/(artificial intelligence|\bAI\b)/i.test(question.text))
       .slice(0, 2);
     turn.questions.unshift({
       id: 'ai-use',
-      text: 'What student AI use should this assignment allow? You can say none, ideas or feedback only, drafting with limits, or describe what you are unsure about.',
+      text: teacher.aiUse?.trim() === 'Not sure yet' ? 'What is your main concern about student AI use here, or which boundary would you like to try?' : 'What student AI use should this assignment allow? You can say none, ideas or feedback only, or drafting with limits.',
       field: 'aiUse',
     });
     turn.ready = false;
