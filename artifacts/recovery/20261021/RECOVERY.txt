@@ -1,6 +1,0 @@
-Restored verified snapshot 2989405c3325c4eb9d379bd4efad8fd80cb2209d to C:/Users/Admin/Desktop/promptcraft-next-main.
-Local recovery commit: 7456b27
-Branch: recovery/promptcraft-restored-20261021
-Before-recovery files: before-recovery.zip
-Recovered full snapshot: recovered-project.zip
-No changes were pushed or deployed. Original AI_Training_For_Educators repository was not changed.

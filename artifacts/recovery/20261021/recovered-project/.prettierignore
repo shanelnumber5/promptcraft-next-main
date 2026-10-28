@@ -1,6 +1,0 @@
-artifacts/
-qa-design/
-node_modules/
-assets/
-.env*
-debug.log
