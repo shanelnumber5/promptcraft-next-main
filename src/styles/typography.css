@@ -99,7 +99,7 @@ body[data-app-view='workspace'] #workspace-panel .workspace-build-label {
     font-size: 24px;
   }
 }
-body[data-app-view='workspace'] .workspace-shell :is(h1,h2,h3,h4,h5,label,legend,button,input,textarea,select,p,span) {
+body[data-app-view='workspace'] .workspace-shell :is(h1,label,legend,button,input,textarea,select,p,span) {
   font-family: var(--font-body) !important;
 }
 body[data-app-view='workspace'] .workspace-shell.workspace-shell--focused .workspace-heading h1 {
@@ -137,7 +137,7 @@ body[data-app-view='workspace'] .workspace-shell .partner-layout--utility .partn
   line-height: 1.55;
 }
 body[data-app-view='workspace'] .workspace-shell .workspace-option-group h3 {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: .04em;
 }
@@ -150,7 +150,7 @@ body[data-app-view='workspace'] .workspace-shell .partner-layout--focused .partn
     font-size: 28px;
   }
 }
-body[data-app-view='workspace'] .workspace-shell :is(h1,h2,h3,h4,h5,h6,p,label,legend,small,strong,button,a,input,textarea,select,span,li) {
+body[data-app-view='workspace'] .workspace-shell :is(h1,p,label,legend,small,strong,button,a,input,textarea,select,span,li) {
   font-family: var(--font-body) !important;
 }
 body[data-app-view='workspace'] .workspace-shell :is(h1,h2,h3,h4,h5,h6) {
@@ -190,8 +190,8 @@ body[data-app-view='workspace'] .workspace-shell :is(.workspace-build-label,.wor
   font-weight: 700;
   line-height: 1.4;
 }
-body[data-app-view='workspace'] .workspace-shell :is(.workspace-welcome-label,.partner-mode,.workspace-option-group h3,.workspace-option-action,.field-help,.ai-status,.final-check-status,.workspace-privacy,.save-notice,.design-notice,.app-footer-disclosure) {
-  font-size: 24px;
+body[data-app-view='workspace'] .workspace-shell :is(.workspace-welcome-label,.partner-mode,.workspace-option-action,.field-help,.ai-status,.final-check-status,.workspace-privacy,.save-notice,.design-notice,.app-footer-disclosure) {
+  font-size: 16px;
   font-weight: 400;
   line-height: 1.45;
 }
@@ -226,4 +226,12 @@ body[data-app-view='workspace'] .workspace-shell button.primary {
   body[data-app-view='workspace'] .workspace-shell:has(.partner-card--welcome) .partner-card--welcome .partner-content > h3 {
     font-size: 24px !important;
   }
+}
+
+/* Workspace controls and task headings match the bold scenario typography. */
+body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel :is(h2,h3,h4,h5,h6) {
+  font-family:Arial,Helvetica,sans-serif !important; font-weight:700; letter-spacing:normal;
+}
+body[data-app-view='workspace'] .workspace-shell.workspace-shell--focused .workspace-tabs button {
+  font-family:Arial,Helvetica,sans-serif !important; font-weight:700;
 }

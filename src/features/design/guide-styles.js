@@ -7,12 +7,12 @@ body { margin:0; padding:24px; background:#F2F2F2; color:#1E2D59; font: 16px/1.6
 main { max-width:1000px; margin:auto; }
 a { color:#1E2D59; text-underline-offset:3px; overflow-wrap:anywhere; }
 a:focus-visible { outline:3px solid #1E2D59; outline-offset:4px; }
-h1,h2 { font-family:Georgia,'Times New Roman',serif; font-weight:400; line-height:1.2; }
+h1,h2 { font-family:Arial,Helvetica,sans-serif; font-weight:700; line-height:1.2; }
 h1 { font-size: 32px; margin:0 0 12px; }
 h2 { font-size: 28px; margin:0 0 20px; }
-h3 { font-size: 24px; margin:24px 0 10px; }
-h4 { font-size: 22px; margin:24px 0 12px; }
-p { margin:0 0 16px; overflow-wrap:anywhere; white-space:pre-wrap; }
+h3 { font-size:22px; line-height:1.35; margin:24px 0 12px; }
+h4 { font-size:20px; line-height:1.35; margin:20px 0 8px; }
+p { margin:0 0 16px; overflow-wrap:anywhere; white-space:normal; }
 li { margin:8px 0; overflow-wrap:anywhere; }
 .guide-brand { display:flex; align-items:center; gap:12px; padding:18px 24px; background:#fff; }
 .guide-brand img { width:48px; height:48px; flex:none; }
@@ -37,7 +37,14 @@ li { margin:8px 0; overflow-wrap:anywhere; }
 .assignment-banner h2 { margin:6px 0 0; color:#fff; }
 .assignment-content { padding:28px 32px; }
 .assignment-content > h3:first-child { margin-top:0; }
-.assignment-directions { line-height:1.65; }
+.assignment-directions { line-height:1.55; }
+.assignment-directions p { margin:0 0 12px; }
+.assignment-directions .assignment-steps { margin:8px 0 14px; }
+.assignment-directions li { margin:5px 0; }
+.assignment-directions h4:first-child { margin-top:0; }
+.assignment-directions > h3 { padding:14px 16px; background:#F2F2F2; border-left:4px solid #1E2D59; }
+.assignment-directions li > p { margin:8px 0; }
+.assignment-directions li > ul { margin:10px 0; }
 .assignment-steps { padding-left:26px; }
 .assignment-steps li { padding-left:4px; }
 .rationale { margin-top:24px; padding:20px 24px; border-left:3px solid #D98F06; background:#F2F2F2; }
@@ -101,7 +108,7 @@ blockquote { padding:16px 20px; border-left:3px solid #D98F06; margin:20px 0; ba
 .toc a { display:inline-block; padding:5px 0; font-size: 16px; font-weight:600; text-decoration-thickness:1px; }
 .guide-section > section > h2 { margin:-28px -32px 24px; padding:20px 32px; background:#1E2D59; color:#fff; border-bottom:3px solid #D98F06; border-radius:4px 4px 0 0; }
 .guide-section > .guide-sources { border:0; }
-.guide-section > .guide-sources > h2 { margin:-20px -28px 16px; padding:16px 28px; font: 400 28px/1.25 Georgia,'Times New Roman',serif; }
+.guide-section > .guide-sources > h2 { margin:-20px -28px 16px; padding:16px 28px; font: 700 26px/1.3 Arial,Helvetica,sans-serif; }
 @media(max-width:600px) {
  .toc { padding:20px; }
  .guide-section > section > h2 { margin:-20px -20px 20px; padding:18px 20px; }
@@ -113,7 +120,7 @@ blockquote { padding:16px 20px; border-left:3px solid #D98F06; margin:20px 0; ba
 }
 
 .rationale { padding:0; border:0; background:transparent; margin-top:28px; }
-.rationale > h3 { background:#1E2D59; color:#fff; padding:14px 18px; font: 400 24px/1.3 Georgia,'Times New Roman',serif; border-bottom:3px solid #D98F06; }
+.rationale > h3 { background:#1E2D59; color:#fff; padding:14px 18px; font: 700 22px/1.3 Arial,Helvetica,sans-serif; border-bottom:3px solid #D98F06; }
 .rationale-prose { max-width:75ch; line-height:1.65; }
 .rationale .rationale-prose p { margin:0 0 16px; }
 @media print { .rationale > h3 { background:#fff; color:#1E2D59; padding:12px 0; } }
@@ -128,10 +135,10 @@ blockquote { padding:16px 20px; border-left:3px solid #D98F06; margin:20px 0; ba
 @media print { .rationale .rationale-prose { padding:12px 0 0; } }
 
 /* The three teaching moves echo the game's gold activity blocks. */
-.practice-title { background:#1E2D59; color:#fff; padding:14px 18px; margin:28px 0 14px; font: 400 23px/1.3 Georgia,'Times New Roman',serif; border-radius:4px; }
+.practice-title { background:#1E2D59; color:#fff; padding:14px 18px; margin:28px 0 14px; font: 700 22px/1.3 Arial,Helvetica,sans-serif; border-radius:4px; }
 .practice-steps { gap:14px; margin:0 0 22px; }
-.practice-steps li { background:#D98F06; color:#1E2D59; border:0; border-radius:4px; padding:22px 20px; }
-.practice-steps strong { display:block; font: 400 25px/1.2 Georgia,'Times New Roman',serif; margin-bottom:12px; }
+.practice-steps li { background:#D98F06; color:#111111; border:0; border-radius:4px; padding:22px 20px; }
+.practice-steps strong { display:block; font: 700 22px/1.3 Arial,Helvetica,sans-serif; margin-bottom:12px; }
 .practice-steps p { margin:0; font-size: 16px; line-height:1.55; }
 .practice-note { color:#1E2D59; font-size: 16px; line-height:1.6; margin:0 0 28px; }
 @media(max-width:600px) { .practice-steps { gap:10px; } .practice-steps li { padding:18px 20px; } }

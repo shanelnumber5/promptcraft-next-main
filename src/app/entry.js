@@ -1,6 +1,7 @@
+import { fitIdeaLab } from '../features/idea-lab/layout.js';
 import { campusSignature } from '../shared/lab-visuals.js';
 import { renderHome } from '../features/entry/screen.js';
-import { renderGallery, renderIdeaCards, renderIdeaDetail } from '../features/idea-lab/screen.js';
+import { renderGallery, renderIdeaCards, renderIdeaDetail, renderLabPagination } from '../features/idea-lab/screen.js';
 import { readWorkspace, rememberPath, resumePath } from '../features/workspace/storage.js';
 import { infoPages, renderInfoNavigation, mountInfoPage } from '../features/entry/info-screen.js';
 const params = new URLSearchParams(window.location.search);
@@ -83,15 +84,33 @@ if (view === 'play') {
       if (!navigate(requestedView)) location.reload();
     });
   }
-  else if (params.has('idea')) app.innerHTML = renderIdeaDetail(params.get('idea'), readWorkspace().exists);
+  else if (params.has('idea')) app.innerHTML = renderIdeaDetail(params.get('idea'), readWorkspace().exists, {query:params.get('q')||'',tag:params.get('category')||'',page:Number(params.get('page'))||0});
   else {
-    app.innerHTML = renderGallery();
-    const update = () => {
-      const results = renderIdeaCards(document.getElementById('idea-search').value, document.getElementById('idea-category').value);
-      document.getElementById('idea-cards').innerHTML = results.html;
-      document.getElementById('idea-results').textContent = `${results.count} of 12 ideas`;
+    let page=Number(params.get('page'))||0;
+    app.innerHTML = renderGallery(params.get('q')||'',params.get('category')||'',page);
+    const update = (reset=false) => {
+      if(reset) page=0;
+      const query=document.getElementById('idea-search').value, tag=document.getElementById('idea-category').value;
+      const results=renderIdeaCards(query,tag,page); page=results.page;
+      document.getElementById('idea-cards').innerHTML=results.html;
+      document.getElementById('idea-results').textContent=`${results.count} matching ideas`;
+      document.getElementById('lab-pagination').innerHTML=renderLabPagination(results);
+      const url=new URL(location.href);
+      for(const [key,value] of [['q',query],['category',tag],['page',page?String(page):'']]) { if(value) url.searchParams.set(key,value); else url.searchParams.delete(key); }
+      history.replaceState(null,'',url);
     };
-    document.getElementById('idea-search').addEventListener('input', update);
-    document.getElementById('idea-category').addEventListener('change', update);
+    document.getElementById('idea-search').addEventListener('input',()=>update(true));
+    document.getElementById('idea-category').addEventListener('change',()=>update(true));
+    app.addEventListener('click',event=>{
+      const clear=event.target.closest('[data-lab-clear]'), paging=event.target.closest('[data-lab-page]');
+      if(clear) { document.getElementById('idea-search').value=''; document.getElementById('idea-category').value=''; update(true); document.getElementById('idea-search').focus(); }
+      if(paging && !paging.disabled) { page=Number(paging.dataset.labPage); update(); document.querySelector('#idea-cards .lab-button')?.focus(); }
+    });
   }
+}
+
+if (view === 'lab') {
+  fitIdeaLab(app);
+  window.addEventListener('resize', () => fitIdeaLab(app));
+  document.fonts?.ready.then(() => fitIdeaLab(app));
 }

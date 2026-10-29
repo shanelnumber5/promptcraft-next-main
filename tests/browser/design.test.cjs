@@ -121,7 +121,7 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   console.log('Browser test output: ' + output);
   await new Promise((resolve) => server.listen(8783, '127.0.0.1', resolve));
   const chrome = spawn(
-    process.env.PC_CHROME_EXECUTABLE || 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    require('./chrome-path.cjs')(),
     [
       '--headless=new',
       '--disable-gpu',
@@ -326,6 +326,11 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     });
     const { initialState } = await import('../../src/app/storage.js'),
       { discussionOpening: scenario } = await import('../../src/features/opening/content.js');
+    if (process.env.PC_BROWSER_FEATURE === 'workspace-layout') {
+      await require('./workspace-layout-checks.cjs')({send,evaluate,waitFor,shot,key,keyboardReach,accessibleScreen});
+      assert.deepEqual(errors, []);
+      return;
+    }
     if (process.env.PC_BROWSER_FEATURE === 'guide') {
       await require('./guide-checks.cjs')({ send, evaluate, waitFor, shot, key, keyboardReach, accessibleScreen, initialState, scenario });
       assert.deepEqual(errors, []);

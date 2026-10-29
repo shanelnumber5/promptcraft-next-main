@@ -1,4 +1,7 @@
-import { reviewFingerprint, reviewEligible, requestWorkspaceReview, emptyReview } from './review-ai.js';
+import { adaptIdea } from '../idea-lab/adapt.js';
+import { fitWorkspace } from './layout.js';
+import { invalidateWorkspaceApproval } from './approval.js';
+import { reviewFingerprint, reviewEligible, requestWorkspaceReview, emptyReview, shouldOpenMaya } from './review-ai.js';
 import { workspaceViews } from './views.js';
 import { downloadProjectFile, parseProjectFile, MAX_PROJECT_BYTES } from './project-file.js';
 import { requestCreativeDirections, creativeBasis, combineDirections } from './creative.js';
@@ -24,6 +27,7 @@ export function mountWorkspace(app, params) {
   let state = restored.state, readError = restored.error;
   let designPage = state.design.revision.trim() ? 'draft' : 'start', partnerPage = 'work', reviewPage = state.finalCheck.approved ? 'guide' : 'rationale';
   let showingWrapUp = false;
+  let reworkForReview = false;
   // Track offers per draft for this open session; do not alter saved or research state.
   let reviewRequest = null;
   let reviewSequence = 0;
@@ -32,18 +36,8 @@ export function mountWorkspace(app, params) {
   if (params.get('mockBabbage') === '1') state.babbage.mode = 'dev';
   const idea = findIdea(params.get('adapt'));
   if (idea && !readError) {
-    const changedInspiration = state.workspace.ideaId !== idea.id;
-    state.workspace.ideaId = idea.id;
-    if (!state.teacher.directions.trim()) {
-      state.workspace.sourceKind = 'idea';
-      state.teacher.directions = idea.summary + '\n\nPossible student activity:\n' + idea.actions.join('\n');
-      state.design.sourceDirections = state.teacher.directions;
-    }
-    state.designPanel = 'babbage';
-    if (changedInspiration) {
-      state.babbage = { ...conversationDefaults(), mode: state.babbage.mode };
-      state.finalCheck = finalCheckDefaults();
-    }
+    adaptIdea(state, idea);
+    designPage = 'intentions';
     saveWorkspace(state);
   }
   if (params.has('adapt')) {
@@ -58,6 +52,7 @@ export function mountWorkspace(app, params) {
   };
   const render = ({ focus = false } = {}) => {
     app.innerHTML = showingWrapUp ? renderClosing(state) : renderWorkspace(state, ai, readError, designPage, partnerPage, reviewPage, ui);
+    fitWorkspace(app);
     showBabbageCameo(state, app);
     if (focus) document.getElementById('setup-title')?.focus({ preventScroll: true });
   };
@@ -66,7 +61,22 @@ export function mountWorkspace(app, params) {
     target?.setAttribute('tabindex','-1'); target?.focus({preventScroll:true});
     window.scrollTo({top:0,behavior:'instant'});
   }
-  const controller = createDesignController({ app, getState: () => state, ai, render, saveSafely, syncFinalCheck });
+  const controller = createDesignController({ app, getState: () => state, ai, render, saveSafely, syncFinalCheck,
+    onSuggestion(source, suggestion) {
+      if (!reworkForReview || source !== state || state.designPanel !== 'babbage' || ai.context !== assignmentContext(state)) return false;
+      reworkForReview = false;
+      state.design.previousRevision = state.design.revision;
+      state.design.previousReason = state.design.reason;
+      state.design.revision = suggestion.revision;
+      state.design.reason = suggestion.reason;
+      state.design.sourceDirections = state.teacher.directions;
+      ai.suggestion = null;
+      state.creative.review = emptyReview();
+      syncFinalCheck(); controller.syncBabbage();
+      enterReview();
+      return true;
+    }
+  });
   function saveAlternative(direction) {
     const exists = state.creative.alternatives.some(item => JSON.stringify(item) === JSON.stringify(direction));
     if (!exists && state.creative.alternatives.length >= 30) {
@@ -143,7 +153,10 @@ export function mountWorkspace(app, params) {
       approve.textContent = state.finalCheck.approved ? 'Saved to your Course Guide' : 'Save final design to Course Guide';
     }
     const download = app.querySelector('[data-action="download-guide"]');
-    if (download) download.disabled = !state.finalCheck.approved;
+    if (download) download.disabled = !state.finalCheck.approved || !finalCheckReady(state);
+    app.querySelectorAll('.workspace-save-status').forEach(status => {
+      status.textContent = state.saveNotice ? 'Not saved in this browser.' : 'Saved in this browser.';
+    });
     const status = app.querySelector('.final-check-status');
     if (status) status.textContent = state.finalCheck.approved ? 'This design is approved for your Course Guide.'
       : finalCheckReady(state) ? 'Ready to save. Select Save final design to Course Guide.' : 'Include your rationale and review all three checks before saving.';
@@ -153,18 +166,29 @@ export function mountWorkspace(app, params) {
   function input(control) {
     if (readError) return;
     if (control.closest('[data-setup-form]') && isTestLessonKeyword(control)) {
-      ai.requestController?.abort(); fillTestLesson(state, control.value);
+      ai.requestController?.abort();
+      reviewRequest?.abort(); reviewRequest=null; reviewSequence++;
+      const previousPanel = state.designPanel;
+      fillTestLesson(state, control.value);
+      state.designPanel = previousPanel;
+      reworkForReview = false;
+      state.creative.review = emptyReview();
       Object.assign(ai, {configured:null,pending:false,suggestion:null,error:'',context:''});
-      designPage='start'; partnerPage='work'; reviewPage='rationale';
-      if(control.value.trim().toLowerCase()==='dev') { state.designPanel='babbage'; ui=workspaceViews(); }
+      partnerPage='work'; reviewPage='rationale';
       saveSafely(); render({focus:true}); controller.refreshBabbageConnection(); return;
+    }
+    if (control.name === 'aiUseDetails' && control.closest('[data-setup-form]')) {
+      const previousContext = assignmentContext(state);
+      state.teacher.aiUse = control.value;
+      invalidateWorkspaceApproval(state, previousContext);
+      syncFinalCheck(); controller.syncBabbage(); saveSafely(); updateApproval(); return;
     }
     if (control.dataset?.creativeField === 'feedback') { state.creative.feedback = control.value.slice(0, 6000); saveSafely(); return; }
     if (control.dataset?.clarificationAnswer) return controller.updateClarificationAnswer(control);
+    const previousContext = assignmentContext(state);
     let movedDraft = false;
     if (control.dataset?.workspaceMeta) {
       state.workspace[control.dataset.workspaceMeta] = control.value.slice(0, 6000);
-      state.finalCheck = finalCheckDefaults();
       if (['creativeCore', 'instructorPlan', 'openQuestions'].includes(control.dataset.workspaceMeta)) {
         state.babbage.context = assignmentContext(state);
         ai.suggestion = null;
@@ -173,10 +197,15 @@ export function mountWorkspace(app, params) {
     else if (control.closest('[data-design-form]') && Object.hasOwn(state.design, control.name)) state.design[control.name] = control.value;
     else if (control.closest('[data-setup-form]') && Object.hasOwn(state.teacher, control.name)) {
       state.teacher[control.name] = control.type === 'checkbox' ? control.checked : control.value;
+      if (control.name === 'aiUse') {
+        const details = app.querySelector('#aiUseDetails');
+        if (details) details.value = state.teacher.aiUse;
+      }
       if (control.value.trim() && Object.hasOwn(state.teacher, control.name + 'Unsure')) state.teacher[control.name + 'Unsure'] = false;
       movedDraft = state.design.revision.trim() && state.design.sourceDirections !== state.teacher.directions;
       syncDraftAssignment(state.teacher, state.design);
     } else return;
+    invalidateWorkspaceApproval(state, previousContext);
     syncFinalCheck();
     controller.syncBabbage();
     saveSafely();
@@ -191,9 +220,27 @@ export function mountWorkspace(app, params) {
     if (useStarting) { useStarting.hidden = Boolean(state.design.revision.trim()); useStarting.disabled = !state.teacher.directions.trim(); }
     updateApproval();
   }
+  let editorFormatRange = null;
+  const rememberEditorRange = () => {
+    const editor=app.querySelector('[data-assignment-editor]'), selection=window.getSelection?.();
+    if(selection?.rangeCount && editor?.contains(selection.getRangeAt(0).commonAncestorContainer)) editorFormatRange=selection.getRangeAt(0).cloneRange();
+  };
+  app.addEventListener('focusin', event => { if(event.target.matches?.('[data-editor-style]')) rememberEditorRange(); });
   app.addEventListener('submit', event => event.preventDefault());
   app.addEventListener('input', event => input(event.target));
   app.addEventListener('change', event => {
+    if(event.target.matches?.('[data-editor-style]')) {
+      const editor=app.querySelector('[data-assignment-editor]'), value=event.target.value;
+      if(editor && ['p','h4'].includes(value)) {
+        editor.focus({preventScroll:true});
+        if(editorFormatRange && editor.contains(editorFormatRange.commonAncestorContainer)) {
+          const selection=window.getSelection(); selection.removeAllRanges(); selection.addRange(editorFormatRange);
+        }
+        formatDirectionsEditor(editor,'formatBlock',value);
+      }
+      event.target.value=''; return;
+    }
+
     if(event.target.matches('[data-workspace-section-picker]')) {
       const attribute=event.target.dataset.workspaceSectionPicker;
       if(!['data-design-page','data-review-page'].includes(attribute)) return;
@@ -237,7 +284,7 @@ export function mountWorkspace(app, params) {
     try {
       const feedback = source.babbage.mode === 'dev'
         ? 'Sample review only; no AI analysis was performed. Consider what students will produce, how you will respond to their thinking, and what changes would make the learning purpose clearer.'
-        : await requestWorkspaceReview(structuredClone(source), previous, { signal: abort.signal });
+        : await requestWorkspaceReview(structuredClone(source), previous, { signal: AbortSignal.any([abort.signal, AbortSignal.timeout(90000)]) });
       if (sequence !== reviewSequence || source !== state || abort.signal.aborted) return;
       review.fingerprint = fingerprint;
       review.feedback = feedback;
@@ -250,7 +297,17 @@ export function mountWorkspace(app, params) {
     } finally {
       if (sequence === reviewSequence) {
         reviewRequest = null;
-        if (source === state) { saveSafely(); if (state.designPanel === 'reason') render(); }
+        if (source === state) {
+          saveSafely();
+          if (state.designPanel === 'reason') {
+            render();
+            if (shouldOpenMaya(state)) {
+              review.offeredMaya = review.fingerprint;
+              saveSafely();
+              openMayaDialog(state, document.getElementById('review-title'), {autoStart:true});
+            }
+          }
+        }
       }
     }
   }
@@ -260,6 +317,7 @@ export function mountWorkspace(app, params) {
     void runAutomaticReview();
   }
   const setPanel = panel => {
+    reworkForReview = false;
     if (panel === 'reason') return enterReview();
     ui = workspaceViews(); state.designPanel = panel; saveSafely(); render();
     document.getElementById('workspace-tab-' + panel)?.focus();
@@ -272,7 +330,7 @@ export function mountWorkspace(app, params) {
     const index = panels.indexOf(tab.dataset.workspacePanel);
     setPanel(panels[event.key === 'Home' ? 0 : event.key === 'End' ? 2 : (index + (event.key === 'ArrowRight' ? 1 : 2)) % 3]);
   });
-  app.addEventListener('pointerdown', event => { if (event.target.closest('[data-editor-command]')) event.preventDefault(); });
+  app.addEventListener('pointerdown', event => { if(event.target.matches?.('[data-editor-style]')) rememberEditorRange(); if (event.target.closest('[data-editor-command]')) event.preventDefault(); });
   for (const kind of ['paste', 'drop']) app.addEventListener(kind, event => {
     const editor = event.target.closest('[data-assignment-editor]');
     if (!editor) return;
@@ -280,7 +338,7 @@ export function mountWorkspace(app, params) {
     formatDirectionsEditor(editor, 'insertHTML', renderAssignmentDirections((event.clipboardData || event.dataTransfer).getData('text/plain')));
   });
   async function reset() {
-    if (!(await confirmRestart({ title: 'Reset this discussion workspace?', description: 'This clears only the private workspace, including its draft, inspiration, and conversation. Scenario 1 progress stays saved.', confirmLabel: 'Reset workspace' }))) return;
+    if (!(await confirmRestart({ title: 'Reset this activity workspace?', description: 'This clears only the private workspace, including its draft, inspiration, and conversation. Scenario 1 progress stays saved.', confirmLabel: 'Reset workspace' }))) return;
     ai.requestController?.abort();
     reviewRequest?.abort(); reviewRequest = null; reviewSequence++;
     const mode = state.babbage.mode;
@@ -319,11 +377,13 @@ export function mountWorkspace(app, params) {
     Object.assign(ai, { pending: false, suggestion: null, error: '', context: '' });
     render({ focus: true });
     app.querySelector('.design-notice').textContent = 'Project opened. Your editable work has been restored.';
+    if (state.designPanel === 'reason') void runAutomaticReview();
   });
   app.addEventListener('click', async event => {
     const route = event.target.closest('[data-workspace-view]');
     if(route && !readError) {
       const screen=route.dataset.workspaceView;
+      if (screen === 'preview' && ai.pending) return;
       const allowed=['work','options','sections','preview','saved','combine','feedback','earlier','maya','review-options'];
       if(!allowed.includes(screen)) return;
       const active=document.activeElement;
@@ -393,10 +453,21 @@ export function mountWorkspace(app, params) {
     }
     if (action === 'check-workspace-revision') { await checkReview(); return; }
     if (action === 'continue-to-maya') {
+      if (reviewRequest || ai.pending || !reviewEligible(state)) return;
       const fingerprint = reviewFingerprint(state);
       state.creative.review.offeredMaya = fingerprint; saveSafely();
-      if (!state.creative.mayaPaused) openMayaDialog(state, event.target.closest('[data-action]'));
+      if (!state.creative.mayaPaused) openMayaDialog(state, event.target.closest('[data-action]'), {autoStart:true});
       else { app.querySelector('.design-notice').textContent = 'Maya is paused. You can continue to the final checks.'; }
+      return;
+    }
+    if (action === 'review-my-design' || action === 'consult-babbage') {
+      if (ai.pending || reviewRequest || !state.teacher.directions.trim()) return;
+      reworkForReview = action === 'review-my-design';
+      ui={...workspaceViews(),task:reworkForReview?'draft':'explore'}; partnerPage='work'; state.designPanel='babbage';
+      controller.syncBabbage();
+      if (reworkForReview && state.teacher.learningGoal.trim() && !state.teacher.learningGoalUnsure &&
+          state.teacher.aiUse.trim() && !['Not sure yet','unsure'].includes(state.teacher.aiUse.trim())) state.babbage.ready = true;
+      await controller.askBabbage(state.babbage.ready ? 'revise' : 'clarify');
       return;
     }
     if (action === 'explore-directions') { await exploreDirections(); return; }
@@ -414,7 +485,7 @@ export function mountWorkspace(app, params) {
     } else if (action === 'ask-ai') { partnerPage = 'work'; await controller.askBabbage(); }
     else if (action === 'next-question') controller.moveQuestion(1);
     else if (action === 'previous-question') controller.moveQuestion(-1);
-    else if (action === 'send-clarification') await controller.askBabbage('clarify', true);
+    else if (action === 'send-clarification') { ui={...workspaceViews(),task:reworkForReview?'draft':'explore'}; partnerPage='work'; state.designPanel='babbage'; await controller.askBabbage('clarify', true); }
     else if (action === 'generate-ai') { ui=workspaceViews(); partnerPage='work'; state.designPanel='babbage'; await controller.askBabbage('revise'); }
     else if (action === 'retry-babbage') await controller.refreshBabbageConnection();
     else if (action === 'toggle-dev') {
@@ -428,13 +499,15 @@ export function mountWorkspace(app, params) {
       if (state.design.revision.trim()) { state.design.previousRevision = state.design.revision; state.design.previousReason = state.design.reason; }
       state.design.revision = ai.suggestion.revision;
       state.design.reason = ai.suggestion.reason;
+      state.design.sourceDirections = state.teacher.directions;
       ai.suggestion = null;
       syncFinalCheck(); controller.syncBabbage();
       designPage = 'draft';
       setPanel('revision');
       document.getElementById('revision')?.focus();
+      app.querySelector('.design-notice').textContent = 'Babbage’s suggested draft is now in Write your draft. Review and adapt it before approving.';
     } else if (action === 'dismiss-ai') { ai.suggestion = null; ai.error = 'Your draft is unchanged.'; partnerPage = 'work'; render(); app.querySelector('[data-action="generate-ai"]')?.focus(); }
-    else if (action === 'hear-maya' && state.design.revision.trim() && !ai.pending) openMayaDialog(state, event.target.closest('[data-action]'));
+    else if (action === 'hear-maya' && state.design.revision.trim() && !ai.pending) openMayaDialog(state, event.target.closest('[data-action]'), {autoStart:true});
     else if (action === 'restore-earlier') {
       ui=workspaceViews(); designPage='draft'; state.designPanel='revision';
       state.design.revision = state.design.previousRevision;
@@ -462,6 +535,8 @@ export function mountWorkspace(app, params) {
   document.addEventListener('click', event => {
     if (event.target.closest('a[href^="?"]') && !readError && !saveSafely()) { event.preventDefault(); updateApproval(); }
   });
+  window.addEventListener('resize', () => fitWorkspace(app));
+  document.fonts?.ready.then(() => fitWorkspace(app));
   window.addEventListener('pagehide', () => { ai.requestController?.abort(); reviewRequest?.abort(); });
   render();
   if (state.designPanel === 'reason') void runAutomaticReview();

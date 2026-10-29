@@ -88,7 +88,15 @@ const assert = require('node:assert/strict');
   const {renderWorkspace}=await import('../../src/features/workspace/screen.js');
   const presenceState=structuredClone(state); presenceState.designPanel='revision';
   const presence=renderWorkspace(presenceState,{configured:true,pending:false},'', 'presence');
-  assert(presence.includes('proactive check-ins') && presence.includes('realistic for your workload'), 'Instructor presence asks about responsive and sustainable teaching');
+  assert(presence.includes('feedback, questions, or check-ins') && presence.includes('realistic for your workload'), 'Instructor presence asks about responsive and sustainable teaching');
+  const {buildPages}=await import('../../src/features/workspace/views.js');
+  assert.deepEqual(buildPages.map(([id])=>id), ['start','subject','ai-use','intentions','presence','draft']);
+  for (const [page, ids] of [['subject',['subject','learningGoal','learnerLevel','student-needs','workTime','daysAvailable']],['ai-use',['mustStay','aiUseDetails']],['presence',['instructor-plan','open-questions']]]) {
+    const html=renderWorkspace(presenceState,{configured:true,pending:false},'',page);
+    for(const id of ids) assert(html.includes(`id="${id}"`), `${page} retains ${id}`);
+    assert.equal((html.match(/aria-current="page"/g)||[]).length,1);
+    assert(!html.includes('workspace-sidebar-group'));
+  }
   assert.equal((renderUtility(state,{configured:true},{screen:'combine'}).match(/data-combine-direction=/g)||[]).length,3);
   const source='### A heading\n\n'+('A sentence with evidence. '.repeat(100));
   assert.equal(readingPages(source,120).join(''),source.trim(),'Reading sections preserve original text and line breaks');
@@ -101,7 +109,7 @@ const assert = require('node:assert/strict');
   state.creative.mayaPaused = false;
   assert(renderUtility(state,{},{screen:'maya'}).includes('data-action="hear-maya"'));
   const guide = createGuide(state.design, { teacher: state.teacher, workspace: state.workspace });
-  for (const text of [state.workspace.creativeCore, state.workspace.instructorPlan, state.workspace.openQuestions]) assert(guide.includes(text));
+  for (const text of [state.workspace.instructorPlan]) assert(guide.includes(text));
   const guidedRequest = buildBabbageRequest(initialState(discussionOpening), 'clarify');
   assert(!guidedRequest.system.includes('workspace.selectedDirection'));
   assert(buildCreativeRequest(state).system.includes('ONLY JSON'));

@@ -111,6 +111,17 @@ const assert = require('node:assert/strict');
     ['ai-use', 'learning-goal', 'activity'],
     'Required questions retain their established order and remove duplicate AI policy questions',
   );
+  const resolvedPolicyConversation = {
+    history: [], questions: [], answers: {}, ready: false, questionIndex: 0,
+  };
+  applyBabbageTurn(resolvedPolicyConversation, [], {
+    message: 'A review of your teaching context.',
+    questions: [{ id: 'q1', text: 'Must students disclose optional AI brainstorming?', field: '' }],
+    ready: false,
+    suggestion: null,
+  }, { learningGoal: 'Compare evidence.', learningGoalUnsure: false, aiUse: 'Ideas or feedback only; students create the final work' });
+  assert.deepEqual(resolvedPolicyConversation.questions, [], 'A settled setup policy is not re-asked after analysis');
+  assert.equal(resolvedPolicyConversation.ready, true, 'Filtering the redundant policy question does not trap Babbage in clarification');
   const clarificationConversation = {
     questions: [
       { id: 'learning-goal', text: 'What should students learn?', field: 'learningGoal' },
@@ -205,7 +216,7 @@ const assert = require('node:assert/strict');
     'OSCQR item on student interaction.',
   );
   assert.equal(JSON.parse(body.messages.at(-1).content).request_intent, 'clarify');
-  assert.ok(body.system.includes('comfort with student AI use'));
+  assert.ok(body.system.includes('Use the student AI-use boundary selected during setup'));
   assert.ok(body.system.includes("purposeful way classmates' contributions interact"));
   state.teacher.aiUse =
     'Feedback only; explain how it was used. Students interpret their own SPSS output.';

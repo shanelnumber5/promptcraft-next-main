@@ -28,22 +28,22 @@ module.exports = async ({send,evaluate,waitFor,fill,shot:capture,key,click,keybo
     const guidedRaw=JSON.stringify(initialState(scenario));
     await evaluate(`localStorage.setItem('promptcraft_next_opening_v1',${JSON.stringify(guidedRaw)})`);
     await goto('?view=workspace');await noAccordions();await fits();
-    assert(await evaluate('document.body.textContent.includes("What could your discussion become?")'));
+    assert(await evaluate('document.body.textContent.includes("What could your activity become?")'));
     await shot('workspace-'+device+'-start');
     await click('edit-context');await fill('directions','Replace an agreement-only management discussion.');
-    await section('time');
+    await section('ai-use');
     await shot('workspace-'+device+'-time');
     assert(await evaluate('(()=>{const work=document.getElementById("workTime").getBoundingClientRect(),days=document.getElementById("daysAvailable").getBoundingClientRect();return work.height>=40 && days.top>work.bottom+10;})()'),'Time inputs are separate, full-height, and do not overlap');
     await fill('workTime','60–90 minutes');
     await fill('daysAvailable','One week');
     await section('start');
-    await section('time');
+    await section('ai-use');
     assert(await evaluate('document.getElementById("workTime").value==="60–90 minutes" && document.getElementById("daysAvailable").value==="One week"'),'Both time estimates persist after navigating away');
     await section('start');
     const stableRect=await evaluate('document.getElementById("workspace-panel").getBoundingClientRect().toJSON()');
     const stableBar=await evaluate('document.querySelector(".workspace-section-main .workspace-view-actions").getBoundingClientRect().toJSON()');
     const buildTypes=[];
-    for(const destination of ['subject','learners','learner-group','needs','time','requirements','ai-use','concern','intentions','presence','questions','draft','start']) {
+    for(const destination of ['subject','ai-use','intentions','presence','draft','start']) {
       await section(destination);
       buildTypes.push(await evaluate('(()=>{const type=element=>{const style=getComputedStyle(element);return {family:style.fontFamily,size:style.fontSize,weight:style.fontWeight,line:style.lineHeight};};return {page:document.querySelector(".build-page-fields").dataset.buildPage,heading:type(document.getElementById("design-page-title")),labels:Array.from(document.querySelectorAll(".build-page-fields .setup-field > label,.build-page-fields .creative-core > label,.build-page-fields .workspace-writing > label,.build-page-fields fieldset > legend")).map(type)};})()'));
       const frame=await evaluate('document.getElementById("workspace-panel").getBoundingClientRect().toJSON()');
@@ -76,11 +76,11 @@ module.exports = async ({send,evaluate,waitFor,fill,shot:capture,key,click,keybo
     await choose('[data-workspace-panel=revision]');
     await section('start');
     await shot('workspace-'+device+'-build-start');await fits();
-    if(width>=700) { await keyboardReach('[data-workspace-section-picker]');await section('learners'); }
-    else { await keyboardReach('[data-workspace-section-picker]');await section('learners'); }
+    if(width>=700) { await keyboardReach('.workspace-section-sidebar [data-design-page=subject]');await section('subject'); }
+    else { await keyboardReach('.workspace-section-sidebar [data-design-page=subject]');await section('subject'); }
 
     await fill('learningGoal','Defend management decisions using evidence.');
-    await section('ai-use');await fill('aiUse','Feedback only; students verify their own decisions.');
+    await section('ai-use');await choose('input[name=aiUse][value=ideas]');
     await choose('[data-workspace-panel=babbage]');await shot('workspace-'+device+'-explore-ready');await waitFor('!document.querySelector("[data-action=explore-directions]")?.disabled');
     const conversation=await evaluate('JSON.stringify(JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.babbage.history)');
     await keyboardReach('[data-action=explore-directions]');await key('Enter','Enter',13);
@@ -93,7 +93,7 @@ module.exports = async ({send,evaluate,waitFor,fill,shot:capture,key,click,keybo
     await view('combine');await choose('[data-combine-direction="0"]');await choose('[data-combine-direction="1"]');await click('combine-directions');
     await meta('creative-core','Students defend a choice after encountering competing evidence.');await shot('workspace-'+device+'-core');await fits();
     if(width>=390) assert(await evaluate('(()=>{const fields=document.querySelector(".build-page-fields");return fields.scrollHeight<=fields.clientHeight+2;})()'),'The creative-core form fits without an outer scrollbar: '+JSON.stringify(await evaluate('Array.from(document.querySelectorAll(".build-page-fields,.creative-core,.creative-core > *")).map(e=>({c:e.className,tag:e.tagName,scroll:e.scrollHeight,client:e.clientHeight,rect:e.getBoundingClientRect().toJSON(),min:getComputedStyle(e).minHeight,margin:getComputedStyle(e).margin,padding:getComputedStyle(e).padding}))')));
-    await section('presence');await meta('instructor-plan','Question initial reasoning and provide final feedback.');await section('questions');await meta('open-questions','Can this fit one hour?');
+    await section('presence');await meta('instructor-plan','Question initial reasoning and provide final feedback.');await meta('open-questions','Can this fit one hour?');
     assert.equal(await evaluate('JSON.stringify(JSON.parse(localStorage.getItem("promptcraft_assignment_workspace_v1")).state.babbage.history)'),conversation);
     await section('draft');await fill('revision','Read the case, defend a choice, then reconsider after new evidence.');
     await evaluate('location.reload()');await waitFor('!!document.querySelector("#revision")');

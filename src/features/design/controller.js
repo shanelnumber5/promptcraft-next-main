@@ -17,7 +17,7 @@ import {
 import { highlightNextAction } from '../../shared/next-action.js';
 
 // Keeps asynchronous conversation work separate from app navigation.
-export function createDesignController({ app, getState, ai, render, saveSafely, syncFinalCheck }) {
+export function createDesignController({ app, getState, ai, render, saveSafely, syncFinalCheck, onSuggestion }) {
   function updateClarificationAnswer(control) {
     const state = getState();
     const id = control.dataset.clarificationAnswer;
@@ -132,6 +132,7 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
         ai.pending = false;
         ai.requestController = null;
         saveSafely();
+        if (ai.suggestion && onSuggestion?.(state, ai.suggestion)) return;
         if (autoDraft && state.phase === 'design' && state.designStep === 2 && state.designPanel === 'babbage') {
           queueMicrotask(() => { if (state === getState() && !ai.pending && state.designPanel === 'babbage') void askBabbage('revise'); });
         }

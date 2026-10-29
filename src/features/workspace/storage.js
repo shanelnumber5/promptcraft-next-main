@@ -32,6 +32,7 @@ export function readWorkspace(storage = window.localStorage) {
       if (typeof record.workspace?.[key] === 'string') metadata[key] = record.workspace[key].slice(0, 6000);
     }
     const state = loadState(discussionOpening, { getItem: () => JSON.stringify(record.state) }, metadata);
+    if (state.saveNotice) throw Error('Workspace restore failed');
     state.workspace = metadata;
     state.creative = restoreCreative(record.creative);
     state.phase = 'design';
@@ -49,7 +50,7 @@ export function saveWorkspace(state, storage = window.localStorage) {
     state.saveNotice = '';
     return true;
   } catch {
-    state.saveNotice = 'This browser could not save your workspace. Keep this page open and copy your draft or download an approved guide before leaving.';
+    state.saveNotice = 'This browser could not save your workspace. Keep this page open and download your project from Options to preserve your editable work.';
     return false;
   }
 }

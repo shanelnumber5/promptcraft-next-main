@@ -6,7 +6,6 @@ import { escapeHTML as e } from '../../shared/html.js';
 import { discussionOpening } from '../opening/content.js';
 import { lemonadeVisual, planVisuals } from '../../shared/lemonade-visuals.js';
 import { designEvidence, renderDesignRationale } from '../../shared/design-evidence.js';
-import { findIdea } from '../idea-lab/ideas.js';
 
 function lemonadeExample() {
   const scene = (id) => discussionOpening.scenes.find((item) => item.id === id);
@@ -55,23 +54,18 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
     design = { ...design, revision: '', reason: '' };
     approved = false;
   }
-  const chosenTitle = workspace ? 'Your chosen assignment design' : 'Your revised discussion board';
-  const milestoneTitle = 'Your assignment design summary';
-  const inspiration = workspace && findIdea(workspace.ideaId);
+  const chosenTitle = workspace ? 'Activity directions' : 'Your revised discussion board';
+  const milestoneTitle = workspace ? 'Teaching notes' : 'Your assignment design summary';
   const sections = workspace ? [] : [
     { id: 'lemonade-example', title: 'The lemonade example', body: lemonadeExample() },
   ];
-  if (workspace && (workspace.selectedDirection || workspace.creativeCore || workspace.instructorPlan || workspace.openQuestions)) {
-    sections.push({ id: 'creative-intentions', title: 'Creative core and design intentions', body: `<section><h2>Creative core and design intentions</h2>${workspace.selectedDirection ? `<h3>Chosen possibility</h3><p>${e(workspace.selectedDirection.title)}</p><p>${e(workspace.selectedDirection.description)}</p>` : ''}<h3>The creative core I want to protect</h3><p>${e(workspace.creativeCore || 'Not recorded yet.')}</p><h3>My instructor interaction plan</h3><p>${e(workspace.instructorPlan || 'Not recorded yet.')}</p><h3>Questions to revisit</h3><p>${e(workspace.openQuestions || 'No questions recorded. This does not establish that every issue is resolved.')}</p><p>These are the educator’s design intentions. Peer interaction and simulated AI responses are distinct from instructor interaction. Approval does not certify compliance or establish learning outcomes.</p></section>` });
-  }
   const alignmentSection = teacher && alignmentGuidance(teacher);
   if (alignmentSection) sections.push({ id: 'assignment-guidance', title: 'Optional assignment guidance', body: alignmentSection });
-  if (inspiration) sections.push({ id: 'idea-inspiration', title: 'Idea Lab inspiration', body: `<section><h2>Idea Lab inspiration: ${e(inspiration.title)}</h2><p>Illustrative AI-assisted starter idea · not a faculty submission or tested intervention.</p><p>${e(inspiration.summary)}</p><p>The educator adapted this starting point; the final choices are their own.</p></section>` });
   if (workspace && teacher && design.revision.trim())
     sections.push({
       id: 'decision-milestone',
       title: milestoneTitle,
-      body: `<section><h2>${e(milestoneTitle)}</h2><p>${approved ? 'Approved milestone' : 'Draft milestone · awaiting your approval'}</p><h3>${workspace ? 'Design purpose or challenge' : 'Instructional challenge'}</h3><p>${e(design.concern || 'Not recorded in this saved version.')}</p><h3>Learning goal</h3><p>${e(teacher.learningGoal || 'Not recorded in this saved version.')}</p><h3>Chosen improvement</h3><p>Your complete chosen directions appear in <a href="#revised-directions">${e(chosenTitle)}</a>.</p><h3>Why I chose it and how I will recognize progress</h3>${design.reason?.trim() ? renderDesignRationale(design.reason, { showSources: false, paragraphBreaks: true }) : '<p>Not recorded in this saved version.</p>'}<p>This is your design expectation. Look for evidence in student work when you try the activity; approval does not establish that learning improved.</p></section>`,
+      body: `<section><h2>${e(milestoneTitle)}</h2>${teacher.learningGoal?.trim() ? `<h3>Learning goal</h3><p>${e(teacher.learningGoal)}</p>` : ''}${design.reason?.trim() ? `<h3>Why this design?</h3>${renderDesignRationale(design.reason, { showSources: false, paragraphBreaks: true })}` : ''}${workspace.instructorPlan?.trim() && !/^(?:i am not sure(?: yet)?|not sure(?: yet)?|not recorded(?: yet)?)\.?$/i.test(workspace.instructorPlan.trim()) ? `<h3>Instructor interaction</h3><p>${e(workspace.instructorPlan)}</p>` : ''}</section>`,
     });
   if (teacher && !design.revision.trim())
     sections.push({
@@ -85,14 +79,14 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
     sections.push({
       id: 'your-assignment',
       title: chosenTitle,
-      body: `<section class="assignment"><div class="assignment-banner"><span>Your course · ${approved ? 'Approved version' : 'Draft'}</span><h2>${e(chosenTitle)}</h2></div><div class="assignment-content">${!workspace && teacher?.learningGoal ? `<p><strong>Learning goal:</strong> ${e(teacher.learningGoal)}</p>` : ''}${design.revision.trim() ? `<h3 id="revised-directions">Discussion-board directions</h3><div class="assignment-directions">${renderAssignmentDirections(design.revision, { approved })}</div>` : ''}${design.reason.trim() && !workspace ? `<aside class="rationale"><h3 id="change-reason">Why I made this change</h3><div class="design-rationale">${renderDesignRationale(design.reason, { showSources: false, paragraphBreaks: true })}</div></aside>` : ''}</div></section>`,
+      body: `<section class="assignment"><div class="assignment-banner"><span>Your course · ${approved ? 'Approved version' : 'Draft'}</span><h2>${e(chosenTitle)}</h2></div><div class="assignment-content">${!workspace && teacher?.learningGoal ? `<p><strong>Learning goal:</strong> ${e(teacher.learningGoal)}</p>` : ''}${design.revision.trim() ? `${workspace ? '' : '<h3 id="revised-directions">Discussion-board directions</h3>'}<div class="assignment-directions"${workspace ? ' id="revised-directions"' : ''}>${renderAssignmentDirections(design.revision, { approved })}</div>` : ''}${design.reason.trim() && !workspace ? `<aside class="rationale"><h3 id="change-reason">Why I made this change</h3><div class="design-rationale">${renderDesignRationale(design.reason, { showSources: false, paragraphBreaks: true })}</div></aside>` : ''}</div></section>`,
     });
   sections.push({
     id: 'design-sources',
-    title: 'Sources',
-    body: '<section class="guide-sources"><h2>Sources</h2><p>References behind the teaching moves. The lemonade example is a fictional illustration.</p><ul>'+designEvidence.map(source=>'<li><a href="'+e(source.url)+'" target="_blank" rel="noopener noreferrer">'+e(source.short)+'</a><span>'+e(source.citation)+'</span></li>').join('')+'</ul></section>',
+    title: workspace ? 'Design references' : 'Sources',
+    body: `<section class="guide-sources"><h2>${workspace ? 'Design references' : 'Sources'}</h2><p>${workspace ? 'References supporting the teaching and design choices.' : 'References behind the teaching moves. The lemonade example is a fictional illustration.'}</p><ul>`+designEvidence.map(source=>'<li><a href="'+e(source.url)+'" target="_blank" rel="noopener noreferrer">'+e(source.short)+'</a><span>'+e(source.citation)+'</span></li>').join('')+'</ul></section>',
   });
-  sections.push({ id:'using-guide',title:'Using your downloaded guide',body:'<section class="guide-help-section">'+renderGuideHelp({standalone:true})+'</section>' });
+  if (!workspace) sections.push({ id:'using-guide',title:'Using your downloaded guide',body:'<section class="guide-help-section">'+renderGuideHelp({standalone:true})+'</section>' });
   const order = ['lemonade-example','your-assignment','assignment-pending','decision-milestone','assignment-guidance','creative-intentions','idea-inspiration','design-sources','using-guide'];
   sections.sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id));
   const contents = sections.map(section => '<li><a href="#'+section.id+'">'+e(section.title)+'</a></li>').join('');
@@ -101,7 +95,7 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
 <style>${guideStyles}</style></head>
 
 
-<body><main><header><div class="guide-brand">${logo ? `<img src="${e(logo)}" alt="PromptCraft Babbage emblem">` : ''}<div><div class="wordmark">Prompt<span>Craft</span></div><small>The Prompt Lab · Great Falls College MSU</small></div></div><div class="guide-heading"><h1>${workspace ? 'Course Guide · Your discussion forum' : 'Discussion guide'}</h1><p>${approved ? 'Your approved version' : 'Draft preview · Not yet approved'}</p><p>${workspace ? 'Your forum design, teaching decisions, and ideas to carry into your course.' : 'Your discussion directions, teaching decisions, and a worked example to revisit.'}</p></div></header><nav class="toc" aria-labelledby="contents-title"><h2 id="contents-title">In this guide</h2><ol>${contents}</ol></nav>${sections.map((section) => `<div class="guide-section" id="${section.id}">${section.body}</div>`).join('')}</main></body></html>`;
+<body><main><header><div class="guide-brand">${logo ? `<img src="${e(logo)}" alt="PromptCraft Babbage emblem">` : ''}<div><div class="wordmark">Prompt<span>Craft</span></div><small>The Prompt Lab · Great Falls College MSU</small></div></div><div class="guide-heading"><h1>${workspace ? 'Course Guide · Your activity' : 'Discussion guide'}</h1><p>${approved ? 'Your approved version' : 'Draft preview · Not yet approved'}</p><p>${workspace ? 'Your activity directions and teaching notes.' : 'Your discussion directions, teaching decisions, and a worked example to revisit.'}</p></div></header>${workspace ? '' : `<nav class="toc" aria-labelledby="contents-title"><h2 id="contents-title">In this guide</h2><ol>${contents}</ol></nav>`}${sections.map((section) => `<div class="guide-section" id="${section.id}">${section.body}</div>`).join('')}</main></body></html>`;
 }
 
 export function downloadGuide(design, options) {

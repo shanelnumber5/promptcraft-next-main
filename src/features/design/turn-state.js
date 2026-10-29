@@ -1,6 +1,20 @@
 import { answerIssue } from './input-quality.js';
 
+function hasResolvedAiUsePolicy(teacher) {
+  const choice = teacher.aiUse?.trim();
+  return Boolean(choice && choice !== 'Not sure yet');
+}
+
+function isAiPolicyQuestion(question) {
+  // Disclosure and permitted-use questions belong to setup, not drafting.
+  return /disclos(?:e|ure)|(?:AI|artificial intelligence|generative tools).{0,45}(?:allow|permi|polic|brainstorm|requir|use)|(?:allow|permi|polic|brainstorm|requir|use).{0,45}(?:AI|artificial intelligence|generative tools)/i.test(question.text);
+}
+
 function addRequiredClarifications(turn, teacher) {
+  if (hasResolvedAiUsePolicy(teacher)) {
+    turn.questions = turn.questions.filter((question) => !isAiPolicyQuestion(question));
+    if (!turn.questions.length) turn.ready = true;
+  }
   if (!teacher.learningGoal.trim() || teacher.learningGoalUnsure) {
     turn.questions.unshift({
       id: 'learning-goal',
@@ -12,7 +26,7 @@ function addRequiredClarifications(turn, teacher) {
   }
   if (!teacher.aiUse?.trim() || teacher.aiUse.trim() === 'Not sure yet') {
     turn.questions = turn.questions
-      .filter((question) => !/(artificial intelligence|\bAI\b)/i.test(question.text))
+      .filter((question) => !isAiPolicyQuestion(question))
       .slice(0, 2);
     turn.questions.unshift({
       id: 'ai-use',

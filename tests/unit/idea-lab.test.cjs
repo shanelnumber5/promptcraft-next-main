@@ -52,7 +52,7 @@ const assert = require('node:assert/strict');
   const { createGuide } = await import('../../src/features/design/guide.js');
   const { renderWorkspace } = await import('../../src/features/workspace/screen.js');
   const { renderHome } = await import('../../src/features/entry/screen.js');
-  const { renderGallery, renderIdeaDetail } = await import('../../src/features/idea-lab/screen.js');
+  const { renderGallery, renderIdeaDetail, renderIdeaCards, categoryColors } = await import('../../src/features/idea-lab/screen.js');
   state.teacher.learningGoal = 'Explain a fair staffing decision.';
   state.design.reason = 'Compare tradeoffs and look for a supported choice.';
   state.babbage.context = assignmentContext(state);
@@ -72,8 +72,8 @@ const assert = require('node:assert/strict');
   assert.notEqual(mayaContext(state), beforeNeeds, 'Changed learner needs invalidate a cached student reading');
   const guide = createGuide(state.design, { teacher: state.teacher, workspace: state.workspace });
   assert(!guide.includes('id="original-assignment"'));
-  assert(guide.includes('Your chosen assignment design'));
-  assert(guide.includes('Shift-Change Challenge'));
+  assert(guide.includes('Activity directions') && guide.includes('Teaching notes'));
+  assert(!guide.includes('Idea Lab inspiration') && !guide.includes('Shift-Change Challenge'), 'Inspiration history stays out of the teaching guide');
   assert(!guide.includes('id="lemonade-example"'));
   assert(!guide.includes('Scenario 1 ·'));
   state.workspace.sourceKind = 'existing';
@@ -89,22 +89,70 @@ const assert = require('node:assert/strict');
   assert(home.includes('class="home-board menu-board home-studio"'));
   assert(!home.includes('Private work · Progress saves in this browser'));
   const gallery = renderGallery();
-  assert(gallery.includes('Twelve ways to rethink a discussion.'));
-  assert(gallery.includes('class="library-toolbar"'));
-  assert(gallery.includes('12 illustrative, AI-assisted starters'));
+  assert(gallery.includes('Find a spark.'));
+  assert(gallery.includes('class="lab-filters"'));
+  assert(gallery.includes('Illustrative, AI-assisted starters'));
 
-  assert(renderIdeaDetail('failure-file').includes('Discussion forum flow'));
+  assert(renderIdeaDetail('failure-file').includes('The learning experience'));
   assert(renderIdeaDetail('shift-change', true).includes('Your starting material and draft stay intact'));
+  const luminance=hex=>{
+    const rgb=hex.match(/[a-f\d]{2}/gi).map(value=>parseInt(value,16)/255).map(value=>value<=0.04045?value/12.92:((value+0.055)/1.055)**2.4);
+    return rgb[0]*0.2126+rgb[1]*0.7152+rgb[2]*0.0722;
+  };
+  for(const color of Object.values(categoryColors)) assert((luminance(color)+0.05)/(luminance('#1E2D59')+0.05)>=7, `${color} supports 7:1 text contrast`);
+  assert.equal(new Set(Object.values(categoryColors)).size,Object.keys(categoryColors).length);
+  for(const item of ideas) assert(categoryColors[item.tags.find(tag=>tag!=='Discussion')], 'Every primary category has a color');
+  const {fitIdeaLab}=await import('../../src/features/idea-lab/layout.js');
+  let frameHeight;
+  fitIdeaLab({querySelector:()=>({getBoundingClientRect:()=>({top:100}),style:{setProperty:(key,value)=>{assert.equal(key,'--lab-available-height');frameHeight=value;}}})},{innerHeight:800,scrollY:0});
+  assert.equal(frameHeight,'684px');
+  fitIdeaLab({querySelector:()=>null},{innerHeight:800,scrollY:0});
+  const firstPage=renderIdeaCards('', '', 0), secondPage=renderIdeaCards('', '', 1);
+  assert.equal(firstPage.count,12); assert.equal(firstPage.pages,2);
+  assert.equal((firstPage.html.match(/class="lab-card"/g)||[]).length,6);
+  for(const item of ideas) assert(firstPage.html.includes(item.title)!==secondPage.html.includes(item.title), 'Each idea appears once across pages');
+  assert.equal(renderIdeaCards('', '', -5).page,0);
+  assert.equal(renderIdeaCards('', '', 999).page,1);
+  assert(renderIdeaCards('zzzz').html.includes('data-lab-clear'));
+  const filteredDetail=renderIdeaDetail('shift-change',true,{query:'workplace',tag:'Workplace',page:1});
+  assert(filteredDetail.includes('q=workplace') && filteredDetail.includes('category=Workplace') && filteredDetail.includes('page=1'));
+  assert(!renderGallery('<script>').includes('<script>'));
+  const {adaptIdea}=await import('../../src/features/idea-lab/adapt.js');
+  const switching=structuredClone(state);
+  switching.workspace.selectedDirection={title:'Previous sketch',core:'Previous mechanism'};
+  switching.workspace.creativeCore='Previous mechanism';
+  switching.finalCheck.approved=true;
+  const beforeDraft=switching.design.revision, beforeStarting=switching.teacher.directions;
+  assert(adaptIdea(switching,findIdea('failure-file')));
+  assert.equal(switching.design.revision,beforeDraft);
+  assert.equal(switching.teacher.directions,beforeStarting);
+  assert.equal(switching.workspace.selectedDirection,undefined);
+  assert.equal(switching.workspace.creativeCore,'');
+  assert.equal(switching.finalCheck.approved,false);
+  assert.equal(switching.designPanel,'revision');
+  assert.equal(adaptIdea(switching,findIdea('failure-file')),false);
+  const newProject=freshWorkspace(); adaptIdea(newProject,findIdea('shift-change'));
+  assert(newProject.teacher.directions.includes('Students propose a workplace plan'));
   assert(renderWorkspace(state, { configured: true }).includes('Creative Workspace'));
   const empty = freshWorkspace();
   const invitation = renderWorkspace(empty, { configured: true });
-  assert(invitation.includes('What could your discussion become?'));
+  assert(invitation.includes('What could your activity become?'));
   assert(invitation.includes('Bring an activity or a rough idea'));
   assert(invitation.indexOf('>Explore</button>') < invitation.indexOf('>Build</button>'));
   empty.designPanel = 'revision';
   const build = renderWorkspace(empty, { configured: true }, '', 'start', 'work', 'rationale', {screen:'sections'});
-  for (const section of ['start', 'learners', 'time', 'requirements', 'draft'])
-    assert(build.includes('data-design-page="' + section + '"'), 'Every Build section is directly reachable');
+  for (const section of ['start', 'subject', 'ai-use', 'intentions', 'presence', 'draft'])
+    assert(build.includes('data-design-page="' + section + '"'), 'Every combined Build section is directly reachable');
+  // Combining screens must retain all persisted form fields and editable IDs.
+  const subjectPage = renderWorkspace(empty, { configured: true }, '', 'subject');
+  for (const field of ['subject', 'learningGoal', 'learnerLevel', 'student-needs'])
+    assert(subjectPage.includes(field), 'Combined course context retains ' + field);
+  const requirementsPage = renderWorkspace(empty, { configured: true }, '', 'ai-use');
+  for (const field of ['aiUse', 'mustStay', 'aiUseDetails'])
+    assert(requirementsPage.includes(field), 'Combined activity decisions retain ' + field);
+  const presencePage = renderWorkspace(empty, { configured: true }, '', 'presence');
+  for (const field of ['instructor-plan', 'open-questions'])
+    assert(presencePage.includes(field), 'Combined interaction page retains ' + field);
   assert(!build.includes('Next:'));
   for (const panel of ['babbage', 'revision', 'reason']) {
     state.designPanel = panel;
