@@ -12,6 +12,7 @@ module.exports = async ({send,evaluate,waitFor,shot,key,keyboardReach,accessible
       const state=freshWorkspace();
       state.designPanel='revision';
       Object.assign(state.teacher,{directions:'Compare two case studies.',subject:'Introduction to management',learningGoal:'Evaluate competing evidence.',learnerLevel:'First-year students'});
+      state.creative.mayaPaused=true;
       Object.assign(state.design,{sourceDirections:state.teacher.directions,revision:'Compare the evidence, choose a response, and explain your reasoning.',reason:'Make students’ reasoning visible.'});
       state.creative.review={fingerprint:reviewFingerprint(state),feedback:'Which evidence would help students test their decision?',status:'complete',error:'',offeredMaya:''};
       saveWorkspace(state);
@@ -60,7 +61,7 @@ module.exports = async ({send,evaluate,waitFor,shot,key,keyboardReach,accessible
     assert(focus.width>=3);
     await key('Enter','Enter',13);
     await choose('[data-workspace-panel="reason"]');
-    for(const page of ['rationale','checks','guide','help']) {
+    for(const page of ['rationale','reasoning','checks','help']) {
       await choose(`[data-review-page="${page}"]`);
       assert(await evaluate('document.documentElement.scrollWidth<=innerWidth'),`${device}/${page}: no document overflow`);
       assert.equal(await evaluate('document.querySelectorAll(".review-actions").length'),1);

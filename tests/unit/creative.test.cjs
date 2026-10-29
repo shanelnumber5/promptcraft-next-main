@@ -39,6 +39,38 @@ const assert = require('node:assert/strict');
   assert(sent.system.includes('Do not promise') || sent.system.includes('Do not invent compliance'), 'Do not certify RSI');
   assert.equal(JSON.parse(sent.messages.at(-1).content).educator_feedback, state.creative.feedback);
   assert.deepEqual(directions, fixtures);
+  const improved=fixtures.map((item,i)=>({...item,title:'Improved '+i,experience:item.experience+' and test a peer counterexample.'}));
+  const improvedResponse={analysis:{feedback_summary:JSON.stringify({version:1,directions:improved})}};
+  const calls=[],stages=[];
+  const refined=await requestCreativeDirections(state,{onStage:stage=>stages.push(stage),fetchImpl:async(_,options)=>{
+    const body=JSON.parse(options.body); calls.push(body);
+    return {ok:true,json:async()=>calls.length===1?response:improvedResponse};
+  }});
+  assert.deepEqual(refined,improved,'Return the improvement pass rather than the initial candidates');
+  assert.equal(calls.length,2,'Exactly one generation and one improvement request');
+  assert.deepEqual(stages,['refining']);
+  const refinement=JSON.parse(calls[1].messages.at(-1).content);
+  assert.deepEqual(refinement.candidate_possibilities,fixtures);
+  assert.equal(refinement.educator_feedback,state.creative.feedback);
+  assert.equal(refinement.creative_refinement,true);
+  assert(calls[1].system.includes('Could we swap the course name'));
+  assert(calls[1].system.includes('Do not weaken an explicit constraint'));
+  assert.equal(calls[1].analysis_type,'scenario1');
+  assert.equal(JSON.stringify(state),before,'Both passes preserve the active project');
+  for(const failure of ['http','malformed']) {
+    let count=0,notice='';
+    const fallback=await requestCreativeDirections(state,{onRefinementFailure:text=>notice=text,fetchImpl:async()=>{
+      count++;return count===1?{ok:true,json:async()=>response}:failure==='http'?{ok:false,status:503}:{ok:true,json:async()=>({analysis:{feedback_summary:'unreadable'}})};
+    }});
+    assert.deepEqual(fallback,fixtures,'A failed second pass preserves the readable initial ideas');
+    assert.equal(count,2);assert(notice.includes('initial possibilities'),'Fallback is explicitly identified');
+  }
+  const midAbort=new AbortController();let midCalls=0,fallbackNotice=false;
+  await assert.rejects(requestCreativeDirections(state,{signal:midAbort.signal,onRefinementFailure:()=>fallbackNotice=true,fetchImpl:async()=>{
+    midCalls++;if(midCalls===2) midAbort.abort();return {ok:true,json:async()=>response};
+  }}),{name:'AbortError'});
+  assert.equal(midCalls,2);assert.equal(fallbackNotice,false,'Cancellation must not publish fallback candidates');
+
   assert.throws(() => normalizeCreativeResponse({ analysis: { feedback_summary: 'a prose response' } }), /three readable/);
   assert.throws(() => normalizeCreativeResponse({ analysis: { feedback_summary: JSON.stringify({ version: 1, directions: [fixtures[0], fixtures[0], fixtures[1]] }) } }), /repeated/);
   assert.throws(() => normalizeCreativeResponse({ analysis: { feedback_summary: JSON.stringify({ version: 1, directions: [{...fixtures[0], core: ''}, fixtures[1], fixtures[2]] }) } }), /incomplete/);
@@ -98,6 +130,10 @@ const assert = require('node:assert/strict');
     assert(!html.includes('workspace-sidebar-group'));
   }
   assert.equal((renderUtility(state,{configured:true},{screen:'combine'}).match(/data-combine-direction=/g)||[]).length,3);
+  const {renderReading}=await import('../../src/features/workspace/views.js');
+  const fullReading='First paragraph. '+('More course detail. '.repeat(100))+'Final decision.';
+  assert(renderReading(fullReading).includes('Final decision.'),'Reading uses all available text instead of short fragments');
+  assert(!renderReading(fullReading).includes('data-reading-page'));
   const source='### A heading\n\n'+('A sentence with evidence. '.repeat(100));
   assert.equal(readingPages(source,120).join(''),source.trim(),'Reading sections preserve original text and line breaks');
   assert(readingPages(source,120).length>1);

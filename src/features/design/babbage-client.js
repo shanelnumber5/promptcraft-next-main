@@ -1,3 +1,4 @@
+import { parseBabbageFeedback } from '../../shared/babbage-feedback.js';
 import { postJSON } from '../../shared/json-request.js';
 import { instructions } from './babbage-prompt.js';
 import { workspaceInstructions } from '../workspace/prompt.js';
@@ -60,8 +61,12 @@ export function normalizeBabbageResponse(data, intent) {
       : '';
   if (intent === 'revise' && ready && (!revision.trim() || !reason.trim()))
     throw Error('Babbage returned an incomplete revision. Your draft is unchanged.');
+  const feedback = parseBabbageFeedback(a.feedback_summary);
+  if (a.feedback_summary.trim().startsWith('{') && !feedback.structured) throw Error('Babbage returned unreadable feedback. Your draft is unchanged.');
   return {
-    message: a.feedback_summary,
+    message: feedback.message,
+    aside: feedback.aside,
+    tone: feedback.tone,
     questions,
     ready,
     suggestion: intent === 'revise' && ready ? { revision, reason, questions: '' } : null,

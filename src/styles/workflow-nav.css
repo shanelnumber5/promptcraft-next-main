@@ -148,7 +148,6 @@ body[data-app-view='play'] .focused-scene.camera--right .speaker-panel > .speech
   }
 }
 
-
 /* River Otter theme: consolidated from contrast/brand patches (Passes 5–8).
    Text on authored surfaces targets 7:1; meaningful nontext visuals target 4:1.
    Surface-specific rules deliberately override generic legacy text rules. */
@@ -297,7 +296,6 @@ body[data-app-view='workspace'] .workspace-shell .partner-card--welcome .workspa
 body[data-app-view='workspace'] .workspace-shell .partner-card--welcome .partner-content .workspace-welcome-label {
   color: #fff; font-weight: 700;
 }
-
 
 /* Home and top navigation: dark navy backgrounds require white copy. */
 body[data-app-view] .info-nav { background: var(--pc-brand-navy); border-bottom-color: var(--pc-brand-sky); }
@@ -461,8 +459,6 @@ body[data-app-view='workspace'] .workspace-ai-review h3 { font-size:22px; line-h
 body[data-app-view='workspace'] .workspace-ai-review { max-width:100%; margin:0 0 20px; }
 body[data-app-view='workspace'] .workspace-reason textarea { box-sizing:border-box; max-width:100%; }
 body[data-app-view='workspace'] .workspace-project-actions { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin:12px 0; }
-body[data-app-view='workspace'] .workspace-options-menu .workspace-project-actions button { min-height:44px; border:2px solid #1E2D59; padding:9px 14px; background:white; color:#1E2D59; font:700 16px/1.4 Arial,Helvetica,sans-serif; border-radius:5px; }
-body[data-app-view='workspace'] .workspace-options-menu .workspace-project-actions button:hover { background:#F2F2F2; }
 
 /* Info pages: one accessible footer link and readable gold selection. */
 body[data-info-reader] .app-footer-disclosure { display:none; }
@@ -728,8 +724,8 @@ body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel :is(.
 }
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel :is(.design-page-heading,.partner-heading) { flex:none; }
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel :is(h1,h2,h3)[tabindex='-1']:focus { outline:none; }
-body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel :is(.design-page-heading,.partner-content,.workspace-view-body) { padding:20px 24px; }
-body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .design-page-heading { padding-bottom:0; }
+body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel :is(.design-page-heading,.partner-heading,.partner-content,.workspace-view-body) { padding:20px 24px; }
+body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel :is(.design-page-heading,.partner-heading) { padding-bottom:0; }
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .design-page-heading h2 { margin:0 0 16px; }
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .review-layout { width:100%; max-width:none; margin:0; padding:0; }
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .review-card { padding:0; border:0; border-radius:0; }
@@ -835,7 +831,7 @@ body[data-app-view='workspace'] .workspace-shell .workspace-section-frame--sideb
     white-space: nowrap;
     flex-shrink: 0;
   }
-  body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel :is(.design-page-heading,.partner-content,.workspace-view-body) { padding-inline:16px; }
+  body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel :is(.design-page-heading,.partner-heading,.partner-content,.workspace-view-body) { padding-inline:16px; }
 }
 
 /* Workspace shared section navigation and compact, fixed-height actions. */
@@ -935,16 +931,11 @@ body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .work
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-welcome-actions :is(button,a) { display:flex; align-items:center; justify-content:flex-start; min-height:64px; width:100%; box-sizing:border-box; padding:14px 18px; margin:0; border:2px solid #1E2D59; border-radius:5px; background:#F2F2F2; color:#1E2D59; font:700 16px/1.4 Arial,Helvetica,sans-serif; text-align:left; text-decoration:none; }
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-welcome-actions button.primary { background:#1E2D59; color:#fff; }
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-welcome-actions :is(button,a):hover { background:#fff; color:#1E2D59; }
-/* Options use four compact groups without a second page title or introduction. */
-body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-options-menu { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
-body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-option-group { padding:14px; margin:0; min-width:0; }
-body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-option-group h3 { margin:0 0 10px; font-size:20px; letter-spacing:normal; text-transform:none; }
-body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-option-group p { margin:0 0 10px; }
+
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-option { padding:10px 12px; min-height:52px; }
-body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-option-list { gap:8px; }
-body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-options-menu .workspace-project-actions { margin:0; gap:8px; }
+
 @media(max-width:700px) {
- body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel :is(.workspace-welcome-board,.workspace-options-menu) { grid-template-columns:minmax(0,1fr); gap:12px; }
+ body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-welcome-board { grid-template-columns:minmax(0,1fr); gap:12px; }
 }
 
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .design-page-heading h2 {
@@ -952,10 +943,8 @@ body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .desi
 }
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-section-sidebar button:hover { background:#fff; color:#1E2D59; }
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-section-sidebar button[aria-current='page']:hover { background:#1E2D59; color:#fff; }
-
 /* Consistent cards and full-width check rows inside the workspace. */
-body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-options-menu { align-items:stretch; grid-auto-rows:1fr; }
-body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-option-group { box-sizing:border-box; height:100%; display:flex; flex-direction:column; }
+
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-checks { display:grid; gap:12px; }
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-check { display:grid; grid-template-columns:24px minmax(0,1fr); align-items:start; gap:12px; padding:16px; margin:0; background:#F2F2F2; border:1px solid #1E2D59; border-radius:5px; }
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-check > span { display:grid; gap:6px; }
@@ -963,9 +952,18 @@ body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .work
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-check input { margin:3px 0 0; width:22px; height:22px; }
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .radio-cards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); grid-auto-rows:minmax(64px,auto); gap:8px; }
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .radio-cards label { display:flex; align-items:center; gap:10px; height:100%; min-height:64px; box-sizing:border-box; margin:0; padding:10px 12px; }
-body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-guide-summary { max-width:72ch; background:#F2F2F2; border:1px solid #1E2D59; border-radius:5px; padding:20px; }
-body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-guide-summary h3 { margin:0 0 12px; font-size:22px; }
-body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-guide-summary p { margin:0 0 16px; }
+/* Read the actual activity alongside approval checks; the gold footer stays in its frame. */
+#workspace-panel .review-content--final { display:flex; flex-direction:column; }
+#workspace-panel .workspace-final-review { flex:1; height:100%; display:grid; grid-template-columns:minmax(0, 3fr) minmax(280px, 2fr); gap:24px; min-height:0; }
+#workspace-panel .workspace-check-reference { overflow:auto; min-width:0; padding-right:24px; border-right:1px solid #1E2D59; }
+#workspace-panel .workspace-check-reference h3 { margin:24px 0 12px; scroll-margin-top:16px; }
+#workspace-panel .workspace-check-reference h3:first-child { margin-top:0; }
+#workspace-panel .workspace-check-tools { overflow:auto; min-width:0; }
+#workspace-panel .workspace-check-item { background:#F2F2F2; padding:12px; border:1px solid #1E2D59; border-radius:4px; }
+body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-check-item .workspace-check { border:0; padding:0; background:transparent; }
+#workspace-panel .workspace-check-item a { display:inline-block; margin:8px 0 0 32px; color:#1E2D59; text-decoration:underline; font-weight:700; }
+#workspace-panel .workspace-check-tools .final-check-status { margin:16px 0; }
+@media(max-width:900px) { #workspace-panel .workspace-final-review { grid-template-columns:1fr; height:auto; } #workspace-panel :is(.workspace-check-reference,.workspace-check-tools) { overflow:visible; } #workspace-panel .workspace-check-reference { border-right:0; padding-right:0; } }
 body[data-app-view='workspace'] .workspace-shell--focused:focus,
 body[data-app-view='workspace'] .workspace-shell--focused .workspace-heading h1:focus { outline:none; }
 @media(max-width:480px) { body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .radio-cards { grid-template-columns:minmax(0,1fr); } }
@@ -1006,10 +1004,6 @@ body[data-app-view] .maya-dialog--workspace:not(.maya-dialog--novel)[data-speake
 #workspace-panel .workspace-ai-disclosure { max-width:none; width:100%; }
 #workspace-panel .workspace-ai-review { border:0; }
 
-#workspace-panel .workspace-options-simple h2 { margin:0 0 12px; }
-#workspace-panel .workspace-more-tools { margin-top:28px; border-top:1px solid #1E2D59; padding-top:16px; }
-#workspace-panel .workspace-more-tools .workspace-project-actions { margin:12px 0; }
-
 /* Assignment prose has its own scale, independent of application headings. */
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel :is(.workspace-reading-preview,.partner-suggestion,.workspace-writing .directions-editor) h4 { font:700 20px/1.35 Arial,Helvetica,sans-serif !important; margin:20px 0 8px; }
 #workspace-panel :is(.workspace-reading-preview,.partner-suggestion,.workspace-writing .directions-editor) h4:first-child { margin-top:0; }
@@ -1039,3 +1033,9 @@ body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .babb
 #workspace-panel .babbage-questions .answer-guidance { margin:8px 0 0; font-size:16px; }
 #workspace-panel .partner-content > .ai-status { max-width:none; line-height:1.5; margin:0 0 16px; }
 #workspace-panel .partner-content > .ai-status:empty { display:none; }
+
+body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .creative-possibilities > .workspace-short-list { display:grid; gap:16px; }
+body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .creative-possibilities .creative-sketch { margin:0; padding:16px 20px; }
+#workspace-panel .workspace-reading { width:100%; max-width:none; overflow-wrap:anywhere; }
+#workspace-panel .workspace-reading .rationale-prose { max-width:none; }
+#workspace-panel .clarification-support { margin:12px 0 0; font-size:16px; line-height:1.5; }

@@ -8,9 +8,10 @@ import {
   devBabbageTurn,
 } from './babbage-client.js';
 import { syncDraftAssignment } from './content.js';
-import { answerIssue } from './input-quality.js';
+import { answerIssue, clarificationSupport } from './input-quality.js';
 import {
   applyBabbageTurn,
+  clarificationLimitReached,
   hasCompleteClarificationAnswers,
   prepareClarificationAnswers,
 } from './turn-state.js';
@@ -18,11 +19,18 @@ import { highlightNextAction } from '../../shared/next-action.js';
 
 // Keeps asynchronous conversation work separate from app navigation.
 export function createDesignController({ app, getState, ai, render, saveSafely, syncFinalCheck, onSuggestion }) {
+  let connectionSequence = 0;
+
   function updateClarificationAnswer(control) {
     const state = getState();
     const id = control.dataset.clarificationAnswer;
     if (!state.babbage.questions.some((q) => q.id === id)) return;
     state.babbage.answers[id] = control.value.slice(0, 24000);
+    const support = document.getElementById(id + '-support');
+    if (support) {
+      support.textContent = clarificationSupport(state.babbage.questions.find(question=>question.id===id), control.value);
+      support.hidden = !support.textContent;
+    }
     saveSafely();
     const send = app.querySelector('[data-action="send-clarification"]');
     if (send) send.disabled = ai.pending || (state.babbage.mode !== 'dev' && ai.configured !== true) || !hasCompleteClarificationAnswers(state.babbage);
@@ -67,6 +75,7 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
     const dev = state.babbage.mode === 'dev';
     if (ai.pending || (!dev && ai.configured !== true) || !state.teacher.directions.trim()) return;
     syncBabbage();
+    if (clarificationLimitReached(state.babbage)) { render(); return; }
     if (intent === 'revise' && !state.babbage.ready) return;
     const history = [...state.babbage.history];
     let autoDraft = false;
@@ -78,7 +87,8 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
       history.push(clarification.historyEntry);
     }
     ai.pending = true;
-    ai.requestController = new AbortController();
+    const request = new AbortController();
+    ai.requestController = request;
     ai.stage = 'waiting';
     ai.intent = intent;
     const started = performance.now();
@@ -99,13 +109,13 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
       const turn = dev
         ? devBabbageTurn(requestState, intent)
         : await requestBabbageTurn(requestState, intent, {
-            signal: AbortSignal.any([ai.requestController.signal, AbortSignal.timeout(90000)]),
+            signal: AbortSignal.any([request.signal, AbortSignal.timeout(90000)]),
           });
-      if (state !== getState()) return;
+      if (state !== getState() || request.signal.aborted || ai.requestController !== request) return;
       ai.stage = 'received';
       updateLoadingStage(app, ai.stage);
       await keepLoadingVisible();
-      if (state !== getState()) return;
+      if (state !== getState() || request.signal.aborted || ai.requestController !== request) return;
       if (context !== aiContext(state)) {
         ai.error =
           'Your assignment changed while Babbage was working. Ask again to use the latest details.';
@@ -119,7 +129,7 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
       updateLoadingStage(app, ai.stage);
       await new Promise((resolve) => setTimeout(resolve, 400));
     } catch (error) {
-      if (state !== getState()) return;
+      if (state !== getState() || request.signal.aborted || ai.requestController !== request) return;
       ai.error =
         error.name === 'TimeoutError'
           ? 'Babbage took too long to respond. Your draft is unchanged; try again.'
@@ -128,9 +138,10 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
             : error.message;
     } finally {
       await keepLoadingVisible();
-      if (state === getState()) {
+      if (state === getState() && ai.requestController === request) {
         ai.pending = false;
         ai.requestController = null;
+        if (request.signal.aborted) return;
         saveSafely();
         if (ai.suggestion && onSuggestion?.(state, ai.suggestion)) return;
         if (autoDraft && state.phase === 'design' && state.designStep === 2 && state.designPanel === 'babbage') {
@@ -158,13 +169,17 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
 
   async function refreshBabbageConnection() {
     const state = getState();
+    const sequence = ++connectionSequence;
     ai.configured = null;
+    let configured;
     try {
-      ai.configured = await checkBabbage({ signal: AbortSignal.timeout(10000) });
+      configured = await checkBabbage({ signal: AbortSignal.timeout(10000) });
     } catch {
-      ai.configured = false;
+      configured = false;
     }
-    if (state === getState() && state.phase === 'design' && !ai.pending && (!state.workspace || state.designPanel === 'babbage')) render();
+    if (sequence !== connectionSequence || state !== getState()) return;
+    ai.configured = configured;
+    if (state.phase === 'design' && !ai.pending && (!state.workspace || state.designPanel === 'babbage')) render();
   }
   return { updateClarificationAnswer, moveQuestion, syncBabbage, askBabbage, refreshBabbageConnection };
 }

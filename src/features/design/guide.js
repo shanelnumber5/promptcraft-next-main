@@ -87,7 +87,7 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
     body: `<section class="guide-sources"><h2>${workspace ? 'Design references' : 'Sources'}</h2><p>${workspace ? 'References supporting the teaching and design choices.' : 'References behind the teaching moves. The lemonade example is a fictional illustration.'}</p><ul>`+designEvidence.map(source=>'<li><a href="'+e(source.url)+'" target="_blank" rel="noopener noreferrer">'+e(source.short)+'</a><span>'+e(source.citation)+'</span></li>').join('')+'</ul></section>',
   });
   if (!workspace) sections.push({ id:'using-guide',title:'Using your downloaded guide',body:'<section class="guide-help-section">'+renderGuideHelp({standalone:true})+'</section>' });
-  const order = ['lemonade-example','your-assignment','assignment-pending','decision-milestone','assignment-guidance','creative-intentions','idea-inspiration','design-sources','using-guide'];
+  const order = ['lemonade-example','your-assignment','assignment-pending','decision-milestone','assignment-guidance','design-sources','using-guide'];
   sections.sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id));
   const contents = sections.map(section => '<li><a href="#'+section.id+'">'+e(section.title)+'</a></li>').join('');
   return `<!doctype html>
@@ -95,7 +95,7 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
 <style>${guideStyles}</style></head>
 
 
-<body><main><header><div class="guide-brand">${logo ? `<img src="${e(logo)}" alt="PromptCraft Babbage emblem">` : ''}<div><div class="wordmark">Prompt<span>Craft</span></div><small>The Prompt Lab · Great Falls College MSU</small></div></div><div class="guide-heading"><h1>${workspace ? 'Course Guide · Your activity' : 'Discussion guide'}</h1><p>${approved ? 'Your approved version' : 'Draft preview · Not yet approved'}</p><p>${workspace ? 'Your activity directions and teaching notes.' : 'Your discussion directions, teaching decisions, and a worked example to revisit.'}</p></div></header>${workspace ? '' : `<nav class="toc" aria-labelledby="contents-title"><h2 id="contents-title">In this guide</h2><ol>${contents}</ol></nav>`}${sections.map((section) => `<div class="guide-section" id="${section.id}">${section.body}</div>`).join('')}</main></body></html>`;
+<body${workspace ? ' class="workspace-guide"' : ''}><main><header><div class="guide-brand">${logo ? `<img src="${e(logo)}" alt="PromptCraft Babbage emblem">` : ''}<div><div class="wordmark">Prompt<span>Craft</span></div><small>The Prompt Lab · Great Falls College MSU</small></div></div><div class="guide-heading"><h1>${workspace ? 'Course Guide · Your activity' : 'Discussion guide'}</h1><p>${approved ? 'Your approved version' : 'Draft preview · Not yet approved'}</p><p>${workspace ? 'Your activity directions and teaching notes.' : 'Your discussion directions, teaching decisions, and a worked example to revisit.'}</p></div></header>${workspace ? '' : `<nav class="toc" aria-labelledby="contents-title"><h2 id="contents-title">In this guide</h2><ol>${contents}</ol></nav>`}${sections.map((section) => `<div class="guide-section" id="${section.id}">${section.body}</div>`).join('')}</main></body></html>`;
 }
 
 export function downloadGuide(design, options) {

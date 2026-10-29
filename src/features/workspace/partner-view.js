@@ -1,3 +1,4 @@
+import { clarificationLimitReached, renderClarificationPause } from '../design/turn-state.js';
 import { renderWorkspaceDisclosure } from './disclosure.js';
 import { renderBabbageCameo } from '../../shared/babbage-cameo.js';
 import { renderReading } from './views.js';
@@ -40,6 +41,8 @@ export function renderPartner(state, ai, page, preview, ui = {readingPage:0}) {
     content = '<h3>You can keep designing.</h3><p>Babbage is unavailable right now. Continue with your idea in Build, or try the connection again.</p>';
     actions = '<button type="button" class="primary" data-action="edit-context">Continue in Build</button><button type="button" data-action="retry-babbage">Retry connection</button>';
     if (hasIdeas) actions += '<button type="button" data-partner-page="ideas">View ideas</button>';
+  } else if (clarificationLimitReached(conversation)) {
+    content = renderClarificationPause();
   } else if (!hasDirections) {
     welcome = true;
     content = '<h3>What could your activity become?</h3><p>Bring an activity or a rough idea. Explore three possibilities, combine what works, and make the design your own.</p>';
@@ -49,9 +52,9 @@ export function renderPartner(state, ai, page, preview, ui = {readingPage:0}) {
     content = '<h3>Give your activity a new purpose.</h3><p>Explore three possibilities for your activity. Keep what matters, challenge the familiar parts, and shape a design of your own.</p>';
     actions = `<button type="button" class="primary" data-action="explore-directions"${available ? '' : ' disabled'}>Start exploring</button>`;
   } else if (conversation.questions.length) {
-    const questions = renderQuestion(conversation, available, false, true);
+    const questions = renderQuestion(conversation, available, false, true, '', {workspace:true});
     const questionActions = questions.match(/<div class="question-actions">([\s\S]*?)<\/div>/);
-    content = '<p class="workspace-draft-status" role="status">Your current draft is unchanged. Answer Babbage’s question to finish preparing the revised activity.</p>' + questions.replace(/<div class="question-actions">[\s\S]*?<\/div>/, '');
+    content = questions.replace(/<div class="question-actions">[\s\S]*?<\/div>/, '');
     actions = (questionActions?.[1] || '') + '<span class="workspace-save-status">Saved in this browser.</span>';
   } else if (state.workspace.selectedDirection) {
     content = `<h3>Build on your chosen idea</h3><p>${e(state.workspace.selectedDirection.title)}</p><p>${e(state.workspace.creativeCore || state.workspace.selectedDirection.core)}</p>`;
@@ -77,6 +80,7 @@ export function renderPartner(state, ai, page, preview, ui = {readingPage:0}) {
     content=`<div class="workspace-welcome-board"><div class="workspace-welcome-intro">${content}</div><nav class="workspace-welcome-choices" aria-label="Explore starting points"><h3>Choose where to begin</h3><div class="workspace-welcome-actions">${choices}<button type="button" data-workspace-view="options">Project backup &amp; options</button><a href="?view=lab">Browse Babbage’s Idea Lab</a></div></nav></div>`;
     actions='<span class="workspace-save-status">Saved in this browser.</span>';
   }
-  const status = ai.error || (!dev && ai.configured === null ? 'Checking the Babbage connection…' : '');
-  return `<div class="workspace-design workspace-design--focused partner-layout partner-layout--focused${utilityPage ? ' partner-layout--utility' : ''}"><section class="workspace-context workspace-page partner-card ai-panel${welcome ? ' partner-card--welcome' : ''}" aria-labelledby="ai-title"><header class="partner-heading ai-panel-heading"><h2 class="workspace-build-title" id="ai-title" tabindex="-1">${page==='options'?'Babbage connection':ui.task==='draft'?'Develop your activity with Babbage':'Explore with Babbage'}</h2>${dev ? '<p class="partner-mode">Sample simulation · no AI call</p>' : ''}</header><div class="design-page-fields partner-content"><p class="ai-status" role="status" aria-live="polite">${e(status)}</p>${renderWorkspaceDisclosure(state)}${content}</div>${actions ? `<footer class="workspace-action-bar partner-actions">${actions}</footer>` : ''}</section></div>`;
+  const latestMessage = conversation.history.findLast(turn=>turn.role==='assistant')?.display || '';
+  const status = ai.error || (!ai.pending && conversation.questions.length ? latestMessage : '') || (!dev && ai.configured === null ? 'Checking the Babbage connection…' : '');
+  return `<div class="workspace-design workspace-design--focused partner-layout partner-layout--focused${utilityPage ? ' partner-layout--utility' : ''}"><section class="workspace-context workspace-page partner-card ai-panel${welcome ? ' partner-card--welcome' : ''}" aria-labelledby="ai-title"><header class="partner-heading ai-panel-heading"><h2 class="workspace-build-title" id="ai-title" tabindex="-1">${page==='options'?'Babbage connection':ui.task==='draft'?'Develop your activity with Babbage':'Explore with Babbage'}</h2>${dev ? '<p class="partner-mode">Sample simulation · no AI call</p>' : ''}</header><div class="design-page-fields partner-content">${renderWorkspaceDisclosure(state)}${renderBabbageCameo(state,status)}<p class="ai-status" role="status" aria-live="polite">${e(status)}</p>${content}</div>${actions ? `<footer class="workspace-action-bar partner-actions">${actions}</footer>` : ''}</section></div>`;
 }

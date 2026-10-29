@@ -144,7 +144,7 @@ body[data-app-view='workspace'] :is(.workspace-build-menu,.workspace-utility-lis
 body[data-app-view='workspace'] .workspace-part-nav { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 16px; }
 body[data-app-view='workspace'] .workspace-part-nav button { background: transparent; border-color: transparent; font-size: 14px; padding: 8px; }
 body[data-app-view='workspace'] .workspace-part-nav button[aria-current] { font-weight: 700; color: #001f5b; border-bottom: 2px solid #001f5b; }
-body[data-app-view='workspace'] .workspace-reading { max-width: 72ch; font-size: 16px; line-height: 1.55; }
+body[data-app-view='workspace'] .workspace-reading { max-width: none; font-size: 16px; line-height: 1.55; }
 body[data-app-view='workspace'] .workspace-reading h4 { font-size: 20px; margin: 8px 0; }
 body[data-app-view='workspace'] .workspace-reading :is(p,ol,ul) { margin-top: 8px; margin-bottom: 12px; }
 body[data-app-view='workspace'] .workspace-reading li { margin-bottom: 6px; }
@@ -152,7 +152,7 @@ body[data-app-view='workspace'] .workspace-reading-nav { font-size: 14px; }
 body[data-app-view='workspace'] .partner-layout--focused .partner-heading.ai-panel-heading { display: block; padding: 0; margin: 0; }
 body[data-app-view='workspace'] .partner-layout--focused .partner-content { padding: 0; overflow: visible; }
 body[data-app-view='workspace'] .partner-layout--focused .partner-content h3 { font-family: Georgia,'Times New Roman',serif; font-size: 26px; font-weight: 400; line-height: 1.2; margin: 12px 0 16px; }
-body[data-app-view='workspace'] .partner-layout--focused .partner-content > p { max-width: 66ch; }
+body[data-app-view='workspace'] .partner-layout--focused .partner-content > p { max-width: none; }
 body[data-app-view='workspace'] .partner-layout--focused .partner-actions { padding: 0; margin-top: 16px; }
 body[data-app-view='workspace'] .partner-layout--focused .babbage-questions h3 { font-family: Arial,Helvetica,sans-serif; font-size: 14px; font-weight: 400; color: #405674; margin: 0 0 12px; }
 body[data-app-view='workspace'] .partner-layout--focused .babbage-questions label { font-family: Georgia,'Times New Roman',serif; font-size: 26px; font-weight: 400; line-height: 1.3; margin: 0 0 16px; }
@@ -189,24 +189,6 @@ body[data-app-view='workspace'] .workspace-shell .workspace-short-list .creative
  body[data-app-view='workspace'] .workspace-shell .workspace-tabs button:last-child { grid-column: auto; }
 }
 
-body[data-app-view='workspace'] .workspace-options-menu { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
-body[data-app-view='workspace'] .workspace-options-intro { grid-column: 1 / -1; max-width: 60ch; margin: 0; color: #405674; font-size: 15px; line-height: 1.5; }
-body[data-app-view='workspace'] .workspace-option-group { align-self: start; padding: 18px; background: #fff; border: 1px solid #dce5ef; border-radius: 6px; }
-body[data-app-view='workspace'] .workspace-option-group h3 { margin: 0 0 12px; color: #405674; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
-body[data-app-view='workspace'] .workspace-option-list { display: grid; gap: 8px; }
-body[data-app-view='workspace'] .workspace-option-list .workspace-option { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 68px; padding: 10px 12px; color: #001f5b; background: #faf9f5; border: 1px solid #e5e9ec; border-radius: 4px; text-align: left; text-decoration: none; transition: background-color .15s ease,border-color .15s ease; }
-body[data-app-view='workspace'] .workspace-option-list .workspace-option:hover { background: #f3f1e9; border-color: #b8c5d2; }
-body[data-app-view='workspace'] .workspace-option-list .workspace-option:focus-visible { outline: 3px solid #e8ad00; outline-offset: 2px; }
-body[data-app-view='workspace'] .workspace-option-list .workspace-option > span:first-child { display: grid; gap: 3px; }
-body[data-app-view='workspace'] .workspace-option-list .workspace-option strong { font-size: 15px; line-height: 1.3; }
-body[data-app-view='workspace'] .workspace-option-list .workspace-option small { color: #405674; font-size: 13px; font-weight: 400; line-height: 1.35; }
-body[data-app-view='workspace'] .workspace-option-list .workspace-option .workspace-option-action { flex: none; color: #405674; font-size: 12px; font-weight: 700; }
-body[data-app-view='workspace'] .workspace-option-list .workspace-option:disabled { cursor: not-allowed; opacity: .55; }
-@media (max-width: 700px) {
-  body[data-app-view='workspace'] .workspace-options-menu { grid-template-columns: minmax(0,1fr); gap: 12px; }
-  body[data-app-view='workspace'] .workspace-options-intro { grid-column: auto; }
-  body[data-app-view='workspace'] .workspace-option-group { padding: 14px; }
-}
 body[data-app-view='workspace']:has(.workspace-shell) .app-footer-disclosure { background: transparent; padding: 0; color: #405674; font-size: 12px; font-weight: 400; }
 /* Scenario scenes carry Home's navy welcome and gold navigation accents. */
 body[data-app-view] .focused-scene .chapter-line { background: #001f5b; color: #fff; border: 0; }
@@ -563,7 +545,6 @@ body[data-app-view='play'] .setup-shell.design-shell--guided .ai-suggestion--foc
  body[data-app-view='play'] .setup-shell.design-shell--guided .ai-suggestion--focused .ai-suggestion-actions { grid-column: 2; grid-row: 2; }
 }
 /* More writing room for the educator's explanation. */
-
 
 /* Quiet feedback reference beside the explanation task. */
 body[data-app-view] .design-shell--guided .setup-actions button.guided-feedback-nav {

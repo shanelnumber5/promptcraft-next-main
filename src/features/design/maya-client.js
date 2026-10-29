@@ -62,10 +62,10 @@ export function normalizeMayaScene(text, revision) {
     return { version: 0, maya: { emotion: 'neutral', text: text.trim() }, pixel: null };
   }
   let scene;
-  try { scene = JSON.parse(text); } catch { throw Error('Maya returned an unreadable scene. Your draft is unchanged. Try again.'); }
+  try { scene = JSON.parse(text); } catch { throw Object.assign(Error('Maya returned an unreadable scene. Your draft is unchanged. Try again.'), {code:'MAYA_SCENE_FORMAT'}); }
   if (scene.version !== 1 || !mayaEmotions.has(scene.maya?.emotion) || !pixelEmotions.has(scene.pixel?.emotion) ||
       [scene.maya, scene.pixel].some(turn => typeof turn.text !== 'string' || !turn.text.trim() || turn.text.length > 2500))
-    throw Error('Maya returned an unreadable scene. Your draft is unchanged. Try again.');
+    throw Object.assign(Error('Maya returned an unreadable scene. Your draft is unchanged. Try again.'), {code:'MAYA_SCENE_FORMAT'});
   if (![scene.maya, scene.pixel].every(turn => grounded(turn.text, revision)))
     throw draftQuoteFailure('The scene did not reference the current directions. Your draft is unchanged. Try again.');
   return { version: 1, maya: { emotion: scene.maya.emotion, text: scene.maya.text.trim() },
@@ -118,7 +118,7 @@ export async function requestMayaResponse(state, previous = [], { fetchImpl = fe
       httpError: (status) => {
         const error = Error(
           status === 429
-            ? 'Maya’s AI service has reached a usage limit (HTTP 429). Your draft is unchanged. Try later or use the excerpt preview.'
+            ? 'Maya’s AI service has reached a usage limit (HTTP 429). Your draft is unchanged. Try again later.'
             : 'Maya’s AI service is unavailable for this reading (HTTP ' + status + '). Your draft is unchanged. Try again later.',
         );
         error.status = status;
@@ -129,14 +129,14 @@ export async function requestMayaResponse(state, previous = [], { fetchImpl = fe
     try {
       return normalizeMayaResponse(data, draft);
     } catch (error) {
-      if (attempt || error.code !== 'MAYA_DRAFT_QUOTE_MISMATCH') throw error;
+      if (attempt || !['MAYA_DRAFT_QUOTE_MISMATCH','MAYA_SCENE_FORMAT'].includes(error.code)) throw error;
       signal?.throwIfAborted();
       const last = request.messages.at(-1);
       request.messages[request.messages.length - 1] = {
         ...last,
         content: JSON.stringify({
           ...JSON.parse(last.content),
-          maya_quote_repair: 'The previous scene did not include verifiable draft quotations in both character turns. Generate the full version-1 scene again. In EACH turn, copy one current_draft_quote_options entry exactly inside double quotation marks. Base the reaction on the complete current draft. Do not invent improvements or change the assignment.',
+          maya_quote_repair: 'The previous scene had an invalid format or missing draft quotations. Return valid JSON with version:1, maya and pixel objects, each with an allowed emotion and a nonempty text string. Generate the full version-1 scene again. In EACH turn, copy one current_draft_quote_options entry exactly inside double quotation marks. Base the reaction on the complete current draft. Do not invent improvements or change the assignment.',
         }),
       };
     }

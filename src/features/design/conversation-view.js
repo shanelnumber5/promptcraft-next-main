@@ -3,19 +3,19 @@ import { renderLoading } from './loading.js';
 import { renderAssignmentDirections } from '../../shared/directions.js';
 import { escapeHTML as e } from '../../shared/html.js';
 import { conversationDefaults, assignmentContext } from './babbage-client.js';
-import { answerIssue } from './input-quality.js';
-import { hasCompleteClarificationAnswers } from './turn-state.js';
+import { answerIssue, clarificationSupport } from './input-quality.js';
+import { hasCompleteClarificationAnswers, clarificationLimitReached, renderClarificationPause } from './turn-state.js';
 import { renderDesignRationale } from '../../shared/design-evidence.js';
 import { renderPagedDirections } from '../../shared/paged-directions.js';
 export const aiContext = assignmentContext;
 
-export function renderQuestion(conversation, available, pending, compact = false, extraAction = '') {
+export function renderQuestion(conversation, available, pending, compact = false, extraAction = '', { workspace = false } = {}) {
   const questions = conversation.questions;
   const ready = hasCompleteClarificationAnswers(conversation);
-  return `<div class="babbage-questions"><h3>One quick check with Babbage</h3><p>Answer these together, then Babbage will prepare your draft. You will not need to confirm each question separately.</p>${questions.map((question, index) => {
+  return `<div class="babbage-questions"><h3>${workspace ? 'Clarify your activity' : 'One quick check with Babbage'}</h3><p>${workspace ? 'Answer below so Babbage can finish your draft.' : 'Answer these together, then Babbage will prepare your draft. You will not need to confirm each question separately.'}</p>${questions.map((question, index) => {
     const answer = conversation.answers[question.id] || '';
-    return `<div class="babbage-question"><label for="${e(question.id)}">${index + 1}. ${e(question.text)}</label><textarea id="${e(question.id)}" data-clarification-answer="${e(question.id)}" rows="3"${pending ? ' disabled' : ''}>${e(answer)}</textarea></div>`;
-  }).join('')}<p class="answer-guidance" role="status">${ready ? 'Ready to send.' : 'Please answer each question before continuing.'}</p><div class="question-actions">${extraAction}<button type="button" class="primary" data-action="send-clarification"${available && ready && !pending ? '' : ' disabled'}>Send answers and draft with Babbage</button></div></div>`;
+    return `<div class="babbage-question"><label for="${e(question.id)}">${workspace ? `<span class="workspace-question-number">Question ${index+1} of ${questions.length}</span>` : `${index+1}. `}${e(question.text)}</label><textarea id="${e(question.id)}" data-clarification-answer="${e(question.id)}" aria-describedby="${e(question.id)}-support" rows="3"${pending ? ' disabled' : ''}>${e(answer)}</textarea><p id="${e(question.id)}-support" class="clarification-support" data-answer-support="${e(question.id)}"${clarificationSupport(question,answer)?'':' hidden'}>${e(clarificationSupport(question,answer))}</p></div>`;
+  }).join('')}<p class="answer-guidance" role="status">${ready ? 'Ready to send.' : 'Please answer each question before continuing.'}</p><div class="question-actions">${extraAction}<button type="button" class="primary" data-action="send-clarification"${available && ready && !pending ? '' : ' disabled'}>${workspace ? 'Send answers and draft' : 'Send answers and draft with Babbage'}</button></div></div>`;
 }
 
 export function renderAiPanel(state, ai, { compact = false } = {}) {
@@ -30,6 +30,8 @@ export function renderAiPanel(state, ai, { compact = false } = {}) {
     ? `<section class="ai-suggestion ai-suggestion--focused" aria-label="Suggested draft"><div class="suggestion-reading">${renderPagedDirections(ai.suggestion.revision,state.designReadPage,{sectionSelect:true})}</div><div class="ai-suggestion-actions"><button type="button" data-action="dismiss-ai">Keep my draft</button></div></section>`
     : ai.suggestion
     ? `<div class="ai-suggestion"><h3>${dev ? 'Simulated directions' : 'Suggested directions'}</h3>${compact ? renderPagedDirections(ai.suggestion.revision, state.designReadPage) : `<div class="suggested-assignment"><div class="assignment-document-label">Student-facing assignment · Suggested version</div><div class="assignment-directions">${renderAssignmentDirections(ai.suggestion.revision)}</div></div>`}${compact ? '<button type="button" data-action="design-panel" data-design-panel="rationale">Read why Babbage suggests this change</button>' : `<section><h3>Why Babbage suggests this change</h3><div class="design-rationale">${renderDesignRationale(ai.suggestion.reason)}</div></section>`}<p>Consider how this suggestion fits your learning goal and students. You can use and adapt it, or keep your draft. Make the explanation your own before approving.</p><div class="ai-suggestion-actions"><button type="button" class="primary" data-action="apply-ai">Use these directions in my draft</button><button type="button" data-action="dismiss-ai">Keep my draft</button></div></div>`
+    : clarificationLimitReached(conversation)
+      ? renderClarificationPause()
     : conversation.questions.length
       ? renderQuestion(conversation, available, ai.pending, compact)
       : conversation.ready

@@ -75,6 +75,27 @@ const assert = require('node:assert/strict');
   assert.equal(repairCalls,2);
   assert.equal(repaired,validScene);
   assert.equal(JSON.stringify(repairState),repairBefore);
+  for (const broken of ['{bad json}', JSON.stringify({version:1,maya:{emotion:'unknown',text:'Hello'},pixel:{emotion:'thoughtful',text:'Hello'}})]) {
+    let calls=0;
+    const result=await requestMayaResponse(repairState,[],{fetchImpl:async()=>({ok:true,json:async()=>({analysis:{feedback_summary:++calls===1?broken:validScene}})})});
+    assert.equal(result,validScene,'Malformed scene receives one format-repair request');
+    assert.equal(calls,2);
+  }
+  let formatCalls=0;
+  await assert.rejects(requestMayaResponse(repairState,[],{fetchImpl:async()=>{formatCalls++;return {ok:true,json:async()=>({analysis:{feedback_summary:'{bad json}'}})};}}),/unreadable/);
+  assert.equal(formatCalls,2,'Invalid scenes stop after one repair');
+  const {prepareMayaReading,mayaFeedbackReference}=await import('../../src/features/design/maya-dialog.js');
+  const preparedState=stateFor(assignments[0]);
+  let preparedCalls=0;
+  const prepareOptions={fetchImpl:async()=>{preparedCalls++;return {ok:true,json:async()=>({analysis:{feedback_summary:validScene}})};}};
+  await prepareMayaReading(preparedState,prepareOptions);
+  assert.equal(mayaFeedbackReference(preparedState).maya.text,assignments[0].response,'Prepared student feedback is cached before presentation');
+  await prepareMayaReading(preparedState,prepareOptions);
+  assert.equal(preparedCalls,1,'Opening the prepared scene needs no second AI request');
+  preparedState.design.revision+=' Compare the evidence.';
+  assert.equal(mayaFeedbackReference(preparedState),null,'Edited directions do not reuse an earlier reading');
+  await prepareMayaReading(preparedState,prepareOptions);
+  assert.equal(preparedCalls,2);
   let invalidCalls=0;
   await assert.rejects(requestMayaResponse(repairState,[],{fetchImpl:async()=>{invalidCalls++;return {ok:true,json:async()=>({analysis:{feedback_summary:'An unrelated response.'}})};}}),/current directions/);
   assert.equal(invalidCalls,2,'Repair is bounded and unrelated readings remain rejected');

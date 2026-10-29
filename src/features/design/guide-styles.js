@@ -1,6 +1,12 @@
 // Embedded so the downloaded guide remains readable offline and in print.
 export const guideStyles = `
 * { box-sizing:border-box; }
+.workspace-guide .guide-heading { background:#fff; color:#1E2D59; padding:22px 32px; border-bottom:0; }
+.workspace-guide .guide-heading p:first-of-type { color:#1E2D59; }
+.workspace-guide #decision-milestone h2 { font-size:25px; padding-bottom:12px; border-bottom:2px solid #1E2D59; }
+.workspace-guide #decision-milestone h3 { margin:20px 0 8px; font-size:20px; }
+.workspace-guide #decision-milestone p { margin-bottom:12px; }
+.workspace-guide #decision-milestone p:last-child { margin-bottom:0; }
 html { scroll-behavior:auto; }
 ::selection { background:#D98F06; color:#111111; }
 body { margin:0; padding:24px; background:#F2F2F2; color:#1E2D59; font: 16px/1.6 Arial,Helvetica,sans-serif; }

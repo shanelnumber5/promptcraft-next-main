@@ -357,7 +357,7 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       return;
     }
     if (process.env.PC_BROWSER_FEATURE === 'lab')
-      await require('./idea-lab-checks.cjs')({ send, evaluate, waitFor, click, fill, shot, key, keyboardReach, keyboardActivate, accessibleScreen, root, apiRequests, initialState, scenario });
+      await require('./idea-lab-browser-checks.cjs')({ send, evaluate, waitFor, click, fill, shot, key, keyboardReach, keyboardActivate, accessibleScreen, root, apiRequests, initialState, scenario });
     for (const [device, width, height] of [
       ['desktop', 1440, 1000],
       ['wide-review', 1892, 907],

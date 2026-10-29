@@ -136,14 +136,7 @@ body[data-app-view='workspace'] .workspace-shell .partner-layout--utility .partn
   font-weight: 400;
   line-height: 1.55;
 }
-body[data-app-view='workspace'] .workspace-shell .workspace-option-group h3 {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: .04em;
-}
-body[data-app-view='workspace'] .workspace-shell .workspace-option-list .workspace-option strong {
-  font-weight: 700;
-}
+
 @media(max-width:700px) {
   body[data-app-view='workspace'] .workspace-shell .workspace-view > h2,
 body[data-app-view='workspace'] .workspace-shell .partner-layout--focused .partner-content > h3 {
@@ -172,7 +165,7 @@ body[data-app-view='workspace'] .workspace-shell .partner-content > h3 {
   font-weight: 700;
   line-height: 1.25;
 }
-body[data-app-view='workspace'] .workspace-shell :is(.workspace-reading h4,.workspace-short-list :is(h3,h4),.workspace-shell .workspace-option-group h3) {
+body[data-app-view='workspace'] .workspace-shell :is(.workspace-reading h4,.workspace-short-list :is(h3,h4)) {
   font-size: 24px;
   font-weight: 700;
   line-height: 1.35;
@@ -195,7 +188,7 @@ body[data-app-view='workspace'] .workspace-shell :is(.workspace-welcome-label,.p
   font-weight: 400;
   line-height: 1.45;
 }
-body[data-app-view='workspace'] .workspace-shell :is(.workspace-welcome-label,.workspace-option-group h3,.workspace-option-action) {
+body[data-app-view='workspace'] .workspace-shell :is(.workspace-welcome-label,.workspace-option-action) {
   font-weight: 700;
 }
 body[data-app-view='workspace'] .workspace-shell:has(.partner-card--welcome) .partner-card--welcome .partner-content > h3 {
@@ -208,11 +201,7 @@ body[data-app-view='workspace'] .workspace-shell :is(.workspace-tabs button,.wor
   font-weight: 700;
   line-height: 1.4;
 }
-body[data-app-view='workspace'] .workspace-shell :is(.workspace-option-list button,.workspace-option-list a,.workspace-build-menu button,.workspace-utility-list a,.workspace-utility-list button) {
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 1.4;
-}
+
 body[data-app-view='workspace'] .workspace-shell button.primary {
   font-weight: 700;
 }

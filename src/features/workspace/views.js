@@ -2,7 +2,7 @@ import { escapeHTML as e } from '../../shared/html.js';
 import { renderAssignmentDirections } from '../../shared/directions.js';
 
 export const workspaceViews = () => ({ screen: 'work', index: 0, saved: false, part: 'overview', readingPage: 0 });
-export const buildPages = [['start','Starting point'],['subject','Course & learners'],['ai-use','Activity requirements'],['intentions','Creative direction'],['presence','Instructor interaction'],['draft','Write your draft']];
+export const buildPages = [['start','Starting point'],['subject','Course & learners'],['ai-use','Activity requirements'],['intentions','Creative direction'],['presence','Instructor interaction'],['draft','Your activity']];
 export function readingPages(text, size = typeof window !== 'undefined' && window.innerHeight < 650 ? 240 : typeof window !== 'undefined' && (window.innerWidth < 700 || window.innerHeight < 750) ? 420 : 650) {
   const words = text.trim().match(/\S+\s*/g) || [];
   const pages = []; let page = '';
@@ -14,9 +14,7 @@ export function readingPages(text, size = typeof window !== 'undefined' && windo
   return pages.length ? pages : ['Nothing recorded yet.'];
 }
 export function renderReading(text, index = 0, renderer = renderAssignmentDirections) {
-  const pages = readingPages(text);
-  const current = Math.max(0,Math.min(index,pages.length-1));
-  return `<div class="workspace-reading">${renderer(pages[current])}</div>${pages.length > 1 ? `<nav class="workspace-reading-nav" aria-label="Reading sections"><button type="button" data-reading-page="${current-1}"${current===0?' disabled':''}>Earlier section</button><span>${current+1} / ${pages.length}</span><button type="button" data-reading-page="${current+1}"${current===pages.length-1?' disabled':''}>Next section</button></nav>` : ''}`;
+  return `<div class="workspace-reading">${renderer(text)}</div>`;
 }
 export function renderUtility(state, ai, ui) {
   let title, body;

@@ -16,7 +16,19 @@ export function requireMayaReview(state, opener, onComplete) {
   openMayaDialog(state, opener, {autoStart:true,onComplete});
 }
 
-export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,novel=false} = {}) {
+// Prepare without opening a second loading scene. Reuse the normal session cache.
+export async function prepareMayaReading(state, {signal, fetchImpl} = {}) {
+  const context = mayaContext(state);
+  const previous = readings.get(state) || [];
+  if (previous.some(reading => reading.context === context)) return;
+  const snapshot = structuredClone(state);
+  const text = await requestMayaResponse(snapshot, previous, {signal, ...(fetchImpl ? {fetchImpl} : {})});
+  if (context !== mayaContext(state)) throw Error('Your draft has changed. Read the latest version again.');
+  readings.set(state, [...previous, {context, reviewContext:reviewContext(state), response:text,
+    assignment:buildMayaRequest(snapshot).messages[0].content}].slice(-2));
+}
+
+export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,novel=false,initialError=null} = {}) {
   let completed = false;
   const reviewedContext = reviewContext(state);
   const context = mayaContext(state);
@@ -105,6 +117,7 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
     try { showScene(cached.response); status.textContent = 'Maya’s earlier response to this version. You decide what to use.'; }
     catch (error) { showState('error',mayaFailureHeading(error),error.message); }
   }
+  if (initialError && !cached) showState('error',mayaFailureHeading(initialError),initialError.message);
   const showPreview = () => {
     portrait.src = characterArt.maya.neutral;
     controller?.abort();
@@ -150,7 +163,7 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
       const message = error.name === 'TimeoutError'
         ? 'Maya took too long. Your draft is unchanged. Try again.'
         : error instanceof TypeError ? 'The AI connection is unavailable. Your draft is saved. Retry when the service is available, or return to your draft.' : error.message;
-      showState('error',mayaFailureHeading(error),(onComplete || novel) ? message.replace(' or use the excerpt preview','') : message);
+      showState('error',mayaFailureHeading(error),message.replace(' or use the excerpt preview',''));
     } finally {
       if (controller === requestController) {
         response.removeAttribute('aria-busy');
@@ -158,7 +171,6 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
       }
     }
   });
-  dialog.querySelector('[data-maya-preview]')?.addEventListener('click', showPreview);
   dialog.querySelector('[data-maya-close]').addEventListener('click', () => dialog.close());
   dialog.addEventListener('close', () => {
     controller?.abort();
@@ -170,5 +182,5 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
   document.body.append(dialog);
   dialog.showModal();
   dialog.querySelector('[data-maya-close]').focus();
-  if (autoStart && !cached) ask.click();
+  if (autoStart && !cached && !initialError) ask.click();
 }

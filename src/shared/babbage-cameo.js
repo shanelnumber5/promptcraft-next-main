@@ -1,24 +1,17 @@
 import { escapeHTML as e } from './html.js';
 
-// A playful *premise* is not sufficient by itself: the joke comes from Babbage's
-// own contextual AI reply, never a fixed lookup-table of canned puns.
-export function isAbsurdPremise(state) {
-  const source = [state.teacher?.subject, state.teacher?.directions, state.design?.concern, state.workspace?.idea?.summary, state.design?.revision].filter(Boolean).join(' ').toLowerCase();
-  if (!source || /\b(trauma|suicide|assault|abuse|bereavement|self.harm|harassment)\b/.test(source)) return false;
-  return /\b(printer|photocopier|stapler|toaster|refrigerator|coffee machine|vacuum cleaner|potato|banana)\b.{0,140}\b(promot\w*|dean|president|professor|manager|teach|grade|hire|election|ceo)\b|\b(promot\w*|dean|president|professor|manager|teach|grade|hire|election|ceo)\b.{0,140}\b(printer|photocopier|stapler|toaster|refrigerator|coffee machine|vacuum cleaner|potato|banana)\b|\b(cat|kitten|dragon|unicorn|alien)\b.{0,140}\b(dean|professor|teach|grade|department chair|run the class)\b|\b(dean|professor|teach|grade|department chair)\b.{0,140}\b(cat|kitten|dragon|unicorn|alien)\b|\b(potato|banana|toaster|robot|llama|raccoon|penguin|dinosaur|ghost|zombie|sentient|talking|intergalactic)\b.{0,120}\b(debate|committee|tenure|enroll|discuss|grade|teach|exam|syllabus|university|class|assignment|campus|faculty)\b|\b(debate|committee|tenure|enroll|discuss|grade|teach|exam|syllabus|university|class|assignment|campus|faculty)\b.{0,120}\b(potato|banana|toaster|robot|llama|raccoon|penguin|dinosaur|ghost|zombie|sentient|talking|intergalactic)\b/.test(source);
-}
+import { parseBabbageFeedback } from './babbage-feedback.js';
 
+const educatorClarifications = state => (state.babbage?.history || []).filter(turn=>turn.role==='user').map(turn=>turn.content).join('|');
+
+// Only an explicitly separated AI aside can trigger the portrait. No keyword list
+// and no guessing that an ordinary opening sentence must be a joke.
 export function babbageCameoFor(state, feedback) {
-  if (!isAbsurdPremise(state) || state.babbage?.mode === 'dev' || !feedback?.trim()) return null;
-  // Babbage's prompt requests that its contextual joke lead feedback_summary.
-  // Use Babbage's own opening joke, rooted in the particular scenario.
-  // Prefer the first two short sentences when the punchline needs a setup.
-  const opening = feedback.trim().replace(/^(?:Babbage:|Charles Babbage:)\s*/i, '');
-  const sentences = opening.match(/[^.!?]+[.!?]+(?:[\"'’”]+)?/g);
-  if (!sentences?.length) return opening.length <= 220 ? opening : null;
-  const first = sentences[0].trim();
-  const second = sentences[1]?.trim();
-  return first.length < 75 && second && first.length + second.length < 270 ? `${first} ${second}` : first.slice(0, 270);
+  if (state.babbage?.mode === 'dev' || !feedback?.trim()) return null;
+  const direct=parseBabbageFeedback(feedback);
+  if(direct.structured) return direct.aside || null;
+  const turn=state.babbage?.history?.findLast(turn=>turn.role==='assistant' && turn.display===feedback);
+  return turn ? parseBabbageFeedback(turn.content).aside || null : null;
 }
 
 export function renderBabbageCameo(state, feedback) {
@@ -31,11 +24,11 @@ export function renderBabbageCameo(state, feedback) {
 // Store only a compact key in this tab; nothing is uploaded or persisted.
 const shown = new Set();
 const MAX_SHOWN = 80;
-export function showBabbageCameo(state, root) {
+export function showBabbageCameo(state, root, feedback = '') {
   if (document.querySelector('.babbage-cameo-dialog[open]')) return;
   const marker = root.querySelector('[data-babbage-cameo]');
-  const joke = marker?.getAttribute('data-babbage-cameo');
-  const premise = [state.teacher?.subject, state.teacher?.directions, state.design?.concern, state.workspace?.idea?.summary].filter(Boolean).join('|');
+  const joke = marker?.getAttribute('data-babbage-cameo') || babbageCameoFor(state, feedback);
+  const premise = [state.teacher?.subject, state.teacher?.directions, state.design?.concern, state.workspace?.idea?.summary, educatorClarifications(state)].filter(Boolean).join('|');
   const key = `${state.workspace ? 'workspace' : 'guided'}:${premise}`;
   if (!joke || shown.has(key)) return;
   if (shown.size >= MAX_SHOWN) shown.clear();

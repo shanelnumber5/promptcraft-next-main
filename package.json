@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node server/index.js",
-    "test": "node tests/unit/json-request.test.cjs && node tests/unit/design.test.cjs && node tests/unit/babbage.test.cjs && node tests/unit/maya.test.cjs && node tests/unit/characters.test.cjs && node tests/unit/idea-lab.test.cjs && node tests/unit/creative.test.cjs && node tests/unit/server.test.cjs && node tests/unit/repository.test.cjs && node tests/unit/workspace-review.test.cjs && node tests/unit/workspace-project.test.cjs",
+    "test": "node tests/run-unit.cjs && node tests/unit/server.test.cjs",
     "test:lab": "node tests/browser/idea-lab.test.cjs",
     "test:design": "node tests/unit/design.test.cjs",
     "test:babbage": "node tests/unit/babbage.test.cjs",
@@ -20,7 +20,8 @@
     "format:check": "prettier --check index.html package.json README.md docs src server tests",
     "test:workspace-layout": "node tests/browser/workspace-layout.test.cjs",
     "test:creative": "node tests/browser/creative.test.cjs",
-    "test:stabilization": "node tests/browser/stabilization.test.cjs"
+    "test:stabilization": "node tests/browser/stabilization.test.cjs",
+    "test:unit": "node tests/run-unit.cjs"
   },
   "devDependencies": {
     "prettier": "3.6.2"

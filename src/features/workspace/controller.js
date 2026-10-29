@@ -1,3 +1,6 @@
+import { isUncertainAnswer } from '../design/input-quality.js';
+import { applySuggestedDraft } from './draft.js';
+import { clarificationLimitReached } from '../design/turn-state.js';
 import { adaptIdea } from '../idea-lab/adapt.js';
 import { fitWorkspace } from './layout.js';
 import { invalidateWorkspaceApproval } from './approval.js';
@@ -16,7 +19,7 @@ import { finalCheckDefaults, finalCheckContext, finalCheckReady, syncDraftAssign
 import { renderAssignmentDirections } from '../../shared/directions.js';
 import { serializeDirectionsEditor, formatDirectionsEditor } from '../../shared/directions-editor.js';
 import { showBabbageCameo } from '../../shared/babbage-cameo.js';
-import { openMayaDialog } from '../design/maya-dialog.js';
+import { prepareMayaReading, openMayaDialog } from '../design/maya-dialog.js';
 import { openGuidePreview } from '../design/guide-preview.js';
 import { downloadGuide, loadGuideLogo } from '../design/guide.js';
 import { confirmRestart } from '../../shared/restart-dialog.js';
@@ -28,6 +31,7 @@ export function mountWorkspace(app, params) {
   let designPage = state.design.revision.trim() ? 'draft' : 'start', partnerPage = 'work', reviewPage = state.finalCheck.approved ? 'guide' : 'rationale';
   let showingWrapUp = false;
   let reworkForReview = false;
+  let draftDestination = 'review';
   // Track offers per draft for this open session; do not alter saved or research state.
   let reviewRequest = null;
   let reviewSequence = 0;
@@ -37,7 +41,7 @@ export function mountWorkspace(app, params) {
   const idea = findIdea(params.get('adapt'));
   if (idea && !readError) {
     adaptIdea(state, idea);
-    designPage = 'intentions';
+    designPage = 'subject';
     saveWorkspace(state);
   }
   if (params.has('adapt')) {
@@ -65,15 +69,15 @@ export function mountWorkspace(app, params) {
     onSuggestion(source, suggestion) {
       if (!reworkForReview || source !== state || state.designPanel !== 'babbage' || ai.context !== assignmentContext(state)) return false;
       reworkForReview = false;
-      state.design.previousRevision = state.design.revision;
-      state.design.previousReason = state.design.reason;
-      state.design.revision = suggestion.revision;
-      state.design.reason = suggestion.reason;
-      state.design.sourceDirections = state.teacher.directions;
+      applySuggestedDraft(state, suggestion);
       ai.suggestion = null;
       state.creative.review = emptyReview();
       syncFinalCheck(); controller.syncBabbage();
-      enterReview();
+      if (draftDestination === 'draft') {
+        designPage = 'draft'; setPanel('revision');
+        app.querySelector('.design-notice').textContent = 'Your activity was compiled from your Build choices. Review the directions and edit anything you want to change.';
+      } else enterReview();
+      showBabbageCameo(state, app, state.babbage.history.findLast(turn => turn.role === 'assistant')?.display || '');
       return true;
     }
   });
@@ -101,7 +105,7 @@ export function mountWorkspace(app, params) {
     state.babbage.context = assignmentContext(state);
     ai.suggestion = null;
     controller.syncBabbage();
-    designPage = 'intentions';
+    designPage = 'subject';
     setPanel('revision');
     document.getElementById('creative-core')?.focus();
   }
@@ -116,13 +120,21 @@ export function mountWorkspace(app, params) {
     const basis = creativeBasis(state);
     const snapshot = structuredClone(state);
     const request = new AbortController();
-    Object.assign(ai, { pending: true, requestController: request, error: '', stage: 'working' });
+    Object.assign(ai, { pending: true, requestController: request, error: '', stage: 'working', intent:'explore' });
     partnerPage = 'work';
     state.designPanel = 'babbage';
     ui = workspaceViews();
     render();
     try {
-      const directions = await requestCreativeDirections(snapshot, { signal: AbortSignal.any([request.signal, AbortSignal.timeout(90000)]) });
+      const directions = await requestCreativeDirections(snapshot, {
+        signal: AbortSignal.any([request.signal, AbortSignal.timeout(90000)]),
+        onStage: stage => {
+          if (source !== state || request.signal.aborted || ai.requestController !== request) return;
+          ai.stage=stage;
+          if (state.designPanel === 'babbage') render();
+        },
+        onRefinementFailure: message => { if (source === state && !request.signal.aborted) ai.error=message; },
+      });
       if (request.signal.aborted || source !== state) return;
       if (basis !== creativeBasis(state)) { ai.error = 'Your context changed while Babbage was exploring. Ask again for possibilities based on your latest work.'; return; }
       state.creative.directions = directions;
@@ -262,12 +274,15 @@ export function mountWorkspace(app, params) {
     if (readError || showingWrapUp || state.designPanel !== 'reason' || !reviewEligible(state) || ai.pending || reviewRequest) return;
     const savedReview = state.creative.review;
     const fingerprint = reviewFingerprint(state);
-    if (savedReview.fingerprint === fingerprint && savedReview.feedback) return;
+    if (savedReview.fingerprint === fingerprint && savedReview.feedback) {
+      if (shouldOpenMaya(state)) await checkReview(true);
+      return;
+    }
     // A changed draft is checked only at the educator's request, not on tab re-entry.
     if (savedReview.feedback || savedReview.error || savedReview.status === 'complete') return;
     await checkReview();
   }
-  async function checkReview() {
+  async function checkReview(reuseReview = false) {
     if (reviewRequest || !reviewEligible(state)) return;
     const source = state;
     const fingerprint = reviewFingerprint(state);
@@ -279,10 +294,11 @@ export function mountWorkspace(app, params) {
     const sequence = ++reviewSequence;
     reviewRequest = abort;
     const review = source.creative.review;
+    let mayaError = null;
     review.status = 'pending'; review.error = '';
     saveSafely(); render();
     try {
-      const feedback = source.babbage.mode === 'dev'
+      const feedback = reuseReview ? review.feedback : source.babbage.mode === 'dev'
         ? 'Sample review only; no AI analysis was performed. Consider what students will produce, how you will respond to their thinking, and what changes would make the learning purpose clearer.'
         : await requestWorkspaceReview(structuredClone(source), previous, { signal: AbortSignal.any([abort.signal, AbortSignal.timeout(90000)]) });
       if (sequence !== reviewSequence || source !== state || abort.signal.aborted) return;
@@ -290,6 +306,10 @@ export function mountWorkspace(app, params) {
       review.feedback = feedback;
       review.status = 'complete';
       review.error = '';
+      if (shouldOpenMaya(state)) {
+        try { await prepareMayaReading(state, {signal:AbortSignal.any([abort.signal, AbortSignal.timeout(90000)])}); }
+        catch (error) { mayaError = error; }
+      }
     } catch (error) {
       if (sequence !== reviewSequence || source !== state || abort.signal.aborted) return;
       review.status = 'error';
@@ -301,10 +321,16 @@ export function mountWorkspace(app, params) {
           saveSafely();
           if (state.designPanel === 'reason') {
             render();
-            if (shouldOpenMaya(state)) {
-              review.offeredMaya = review.fingerprint;
-              saveSafely();
-              openMayaDialog(state, document.getElementById('review-title'), {autoStart:true});
+            if (!abort.signal.aborted && shouldOpenMaya(state)) {
+              const open = () => {
+                if (source !== state || !shouldOpenMaya(state)) return;
+                review.offeredMaya = review.fingerprint;
+                saveSafely();
+                openMayaDialog(state, document.getElementById('review-title'), {initialError:mayaError});
+              };
+              const cameo = document.querySelector('.babbage-cameo-dialog[open]');
+              if (cameo) cameo.addEventListener('close', open, {once:true});
+              else open();
             }
           }
         }
@@ -412,8 +438,8 @@ export function mountWorkspace(app, params) {
       const destination = review.dataset.reviewPage;
       const show = () => { ui=workspaceViews(); state.designPanel='reason'; reviewPage=destination; render(); document.getElementById('review-title')?.focus({preventScroll:true}); };
       if (destination === 'checks' && !state.finalCheck.approved) {
-        if (!state.design.revision.trim() || !state.design.reason.trim()) {
-          app.querySelector('.design-notice').textContent='Add your draft and design reasoning before checking the design.'; return;
+        if (!state.design.revision.trim()) {
+          app.querySelector('.design-notice').textContent='Add your activity in Build before checking the design.'; return;
         }
         show();
       } else show();
@@ -460,13 +486,15 @@ export function mountWorkspace(app, params) {
       else { app.querySelector('.design-notice').textContent = 'Maya is paused. You can continue to the final checks.'; }
       return;
     }
-    if (action === 'review-my-design' || action === 'consult-babbage') {
+    if (action === 'compile-activity' || action === 'review-my-design' || action === 'consult-babbage') {
       if (ai.pending || reviewRequest || !state.teacher.directions.trim()) return;
-      reworkForReview = action === 'review-my-design';
+      reworkForReview = action !== 'consult-babbage';
+      draftDestination = action === 'compile-activity' ? 'draft' : 'review';
       ui={...workspaceViews(),task:reworkForReview?'draft':'explore'}; partnerPage='work'; state.designPanel='babbage';
       controller.syncBabbage();
-      if (reworkForReview && state.teacher.learningGoal.trim() && !state.teacher.learningGoalUnsure &&
-          state.teacher.aiUse.trim() && !['Not sure yet','unsure'].includes(state.teacher.aiUse.trim())) state.babbage.ready = true;
+      if (clarificationLimitReached(state.babbage)) { render(); return; }
+      if (reworkForReview && state.teacher.learningGoal.trim() && !state.teacher.learningGoalUnsure && !isUncertainAnswer(state.teacher.learningGoal) &&
+          state.teacher.aiUse.trim() && !isUncertainAnswer(state.teacher.aiUse)) state.babbage.ready = true;
       await controller.askBabbage(state.babbage.ready ? 'revise' : 'clarify');
       return;
     }
@@ -496,16 +524,13 @@ export function mountWorkspace(app, params) {
       if (state.babbage.mode === 'live') await controller.refreshBabbageConnection();
     } else if (action === 'apply-ai') {
       if (!ai.suggestion || ai.context !== assignmentContext(state)) return;
-      if (state.design.revision.trim()) { state.design.previousRevision = state.design.revision; state.design.previousReason = state.design.reason; }
-      state.design.revision = ai.suggestion.revision;
-      state.design.reason = ai.suggestion.reason;
-      state.design.sourceDirections = state.teacher.directions;
+      applySuggestedDraft(state, ai.suggestion);
       ai.suggestion = null;
       syncFinalCheck(); controller.syncBabbage();
       designPage = 'draft';
       setPanel('revision');
       document.getElementById('revision')?.focus();
-      app.querySelector('.design-notice').textContent = 'Babbage’s suggested draft is now in Write your draft. Review and adapt it before approving.';
+      app.querySelector('.design-notice').textContent = 'Babbage’s suggested draft is now in Your activity. Review and adapt it before approving.';
     } else if (action === 'dismiss-ai') { ai.suggestion = null; ai.error = 'Your draft is unchanged.'; partnerPage = 'work'; render(); app.querySelector('[data-action="generate-ai"]')?.focus(); }
     else if (action === 'hear-maya' && state.design.revision.trim() && !ai.pending) openMayaDialog(state, event.target.closest('[data-action]'), {autoStart:true});
     else if (action === 'restore-earlier') {

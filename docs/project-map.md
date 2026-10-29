@@ -1,6 +1,6 @@
 # Where to make changes
 
-Open `index.html` to run the app. Use this map to edit it.
+Run the app through the local static server (`npm start` or the Windows launcher). Opening `index.html` directly does not provide the module-serving environment. Use this map to edit the current source.
 
 | Change                                                      | File                                                        |
 | ----------------------------------------------------------- | ----------------------------------------------------------- |
@@ -47,9 +47,9 @@ Open `index.html` to run the app. Use this map to edit it.
 
 The guide embeds its own styles because downloads must work offline.
 
-`idea-lab.css` adds the entry, gallery, and workspace layouts using existing colors and controls. The workspace reuses the design editor, AI controller/panel, Maya dialog, final checks, and guide exporter. Its state wrapper is separate from the original guided save. `docs/briefs/` preserves the original requests; `docs/idea-lab-implementation.md` records architecture, sharing plans, research boundaries, and actual validation results.
+`idea-lab.css` owns the `.lab-*` Idea Lab browser and detail layout. `workflow-nav.css` owns the focused Workspace frame, navigation, fields, and gold footer. `workspace.css` is not imported by the entry stylesheet and should not receive new fixes. The workspace reuses the design editor, AI controller/panel, Maya dialog, final checks, and guide exporter. Its state wrapper is separate from the original guided save. `docs/briefs/` preserves the original requests; `docs/idea-lab-implementation.md` records architecture, sharing plans, research boundaries, and actual validation results.
 
-`responsive.css` controls the phone classroom layout, with one portrait beside the dialogue and reachable navigation. `tablet-classroom.css` is imported last: portrait tablets show a landscape-shaped board with dialogue above the current speaker, while landscape tablets and Nest Hub displays use the desktop arrangement with the board between Maya and Pixel. Tablet opening scenes keep their questions and navigation within the viewport.
+`responsive.css` controls the phone classroom layout, with one portrait beside the dialogue and reachable navigation. The currently imported classroom and portrait styles handle tablet layouts: portrait tablets show a landscape-shaped board with dialogue above the current speaker, while landscape tablets and Nest Hub displays use the desktop arrangement with the board between Maya and Pixel. Tablet opening scenes keep their questions and navigation within the viewport.
 
 ## Assets and supporting files
 
@@ -66,3 +66,17 @@ The guide embeds its own styles because downloads must work offline.
 Windows currently locks part of the retired `qa-design/browser-profile` folder. It is ignored, hidden in the editor, and unused by the app and tests. The unlocked contents were removed during cleanup; the remainder can be deleted after Windows releases it.
 
 No build output, retired local AI provider, legacy Playwright suite, or private environment template is required. The deployed Babbage backend and its key remain outside this repository.
+
+## Current maintenance boundaries (2026-10-29)
+
+- `src/shared/purposeful-redesign.js`: shared creative-redesign and clarification expectations. Scenario 1 and Workspace retain their separate prompts and the existing response envelope.
+- `src/features/design/controller.js`: shared asynchronous AI work. Each completion must still own the active request before changing state or UI.
+- `src/features/workspace/draft.js`: applies a suggested draft, preserves a nonempty predecessor, records the starting directions, and invalidates final approval. Navigation and review sequencing remain in the Workspace controller.
+- `src/shared/directions-editor.js`: rich-text rendering and text serialization, shared by Scenario 1 and Workspace.
+- `src/features/idea-lab/adapt.js`: switches inspiration without replacing authored directions; invalidates old AI context and approval.
+- `src/features/idea-lab/layout.js`: measures the browser frame so content scrolls above the gold footer.
+- Workspace storage remains `promptcraft_assignment_workspace_v1`; Scenario 1 storage remains separate. No migration is part of this audit.
+
+## Verification
+
+`npm run test:unit` runs the offline unit suites, with accidental global `fetch` calls blocked unless a test explicitly installs its own fixture. `npm test` runs those suites and the separate local static-server suite. Browser suites require a supported Chrome installation; source updates to those checks are not evidence that browser verification passed. Live AI output quality is a separate validation task.
