@@ -1,21 +1,15 @@
+import { renderLoading } from './loading.js';
 import { characterArt } from '../../shared/character-art.js';
 import { buildMayaRequest, mayaContext, mayaExcerptPreview, requestMayaResponse, normalizeMayaScene, mayaSceneBeats, mayaFailureHeading } from './maya-client.js';
 
 // Session-only readings: not participant data, not a new saved/research schema.
 const readings = new WeakMap();
-const reviewed = new WeakMap();
 const reviewContext = state => JSON.stringify([state.teacher,state.design.revision,state.workspace || null]);
 export function mayaFeedbackReference(state) {
   const reading = readings.get(state)?.findLast(entry => entry.reviewContext === reviewContext(state));
   if (!reading) return null;
   try { return normalizeMayaScene(reading.response, state.design.revision); } catch { return null; }
 }
-export const hasMayaReview = state => reviewed.get(state) === reviewContext(state);
-export function requireMayaReview(state, opener, onComplete) {
-  if (hasMayaReview(state)) return onComplete();
-  openMayaDialog(state, opener, {autoStart:true,onComplete});
-}
-
 // Prepare without opening a second loading scene. Reuse the normal session cache.
 export async function prepareMayaReading(state, {signal, fetchImpl} = {}) {
   const context = mayaContext(state);
@@ -28,7 +22,7 @@ export async function prepareMayaReading(state, {signal, fetchImpl} = {}) {
     assignment:buildMayaRequest(snapshot).messages[0].content}].slice(-2));
 }
 
-export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,novel=false,initialError=null} = {}) {
+export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,novel=false,initialError=null,onReturn=null} = {}) {
   let completed = false;
   const reviewedContext = reviewContext(state);
   const context = mayaContext(state);
@@ -41,7 +35,7 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
   if(novel) window.scrollTo({top:0,behavior:'instant'});
   if(novel) dialog.style.setProperty('--maya-header-height',(document.querySelector('.app-header')?.getBoundingClientRect().height || 80)+'px');
   dialog.setAttribute('aria-labelledby', 'maya-title');
-  dialog.innerHTML = `<header>${novel ? '<span class="maya-scene-label">Student perspective</span>' : ''}<div><h2 id="maya-title" class="${novel ? 'sr-only' : ''}">Maya’s first read</h2></div><button type="button" data-maya-close aria-label="${novel ? 'Skip reading and return to explanation' : 'Close Maya’s response'}">${novel ? 'Skip reading' : onComplete ? 'Back to draft' : 'Close'}</button></header><div class="maya-stage"><div class="maya-actor" aria-hidden="true" hidden><img data-maya-portrait src="${characterArt.maya.neutral}" alt=""></div><div class="maya-state"><h3 data-maya-state-title>Read your draft with Maya</h3><p data-maya-state-copy>Start a reading to hear Maya’s reaction and then Pixel’s teaching perspective.</p></div><section class="maya-dialogue" aria-label="Dialogue" hidden><h3 id="maya-speaker" data-maya-speaker>Maya’s first read</h3><div data-maya-response role="region" aria-labelledby="maya-speaker" aria-live="polite" aria-atomic="true" tabindex="-1"></div></section></div><div class="maya-body"><p class="sr-only" data-maya-status role="status" aria-live="polite" aria-atomic="true"></p><nav class="maya-scene-nav" aria-label="Dialogue navigation" hidden><button type="button" data-maya-back>Back</button><button type="button" class="primary" data-maya-next>Next</button></nav><div class="maya-actions"><button type="button" class="primary" data-maya-ask>${dev ? 'Preview assignment excerpts' : 'Ask Maya to read this draft'}</button></div>${novel ? `<p class="maya-reading-note">${dev ? 'Excerpt preview only · no AI interpretation or API call.' : 'AI request: your current draft and design notes go to the PromptCraft Babbage service and OpenAI.'}</p>` : ''}</div>`;
+  dialog.innerHTML = `<header>${novel ? '<span class="maya-scene-label">Student perspective</span>' : ''}<div><h2 id="maya-title" class="${novel ? 'sr-only' : ''}">Maya’s first read</h2></div><button type="button" data-maya-close aria-label="${novel ? 'Skip reading and return to explanation' : 'Close Maya’s response'}">${novel ? 'Skip reading' : onComplete ? 'Back to draft' : 'Close'}</button></header><div class="maya-stage"><div class="maya-actor" aria-hidden="true" hidden><img data-maya-portrait src="${characterArt.maya.neutral}" alt=""></div><div class="maya-state"><div data-maya-loading hidden></div><h3 data-maya-state-title>Read your draft with Maya</h3><p data-maya-state-copy>Start a reading to hear Maya’s reaction and then Pixel’s teaching perspective.</p></div><section class="maya-dialogue" aria-label="Dialogue" hidden><h3 id="maya-speaker" data-maya-speaker>Maya’s first read</h3><div data-maya-response role="region" aria-labelledby="maya-speaker" aria-live="polite" aria-atomic="true" tabindex="-1"></div></section></div><div class="maya-body"><p class="sr-only" data-maya-status role="status" aria-live="polite" aria-atomic="true"></p><nav class="maya-scene-nav" aria-label="Dialogue navigation" hidden><button type="button" data-maya-back>Back</button><button type="button" class="primary" data-maya-next>Next</button></nav><div class="maya-actions"><button type="button" class="primary" data-maya-ask>${dev ? 'Preview assignment excerpts' : 'Ask Maya to read this draft'}</button></div>${novel ? `<p class="maya-reading-note">${dev ? 'Excerpt preview only · no AI interpretation or API call.' : 'AI request: draft and notes shared with PromptCraft and OpenAI.'}</p>` : ''}</div>`;
   const portrait = dialog.querySelector('[data-maya-portrait]');
   const status = dialog.querySelector('[data-maya-status]');
   const response = dialog.querySelector('[data-maya-response]');
@@ -54,7 +48,12 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
   const showState = (kind, title, message) => {
     dialog.dataset.state = kind;
     actor.hidden=true; dialogue.hidden=true; stateCard.hidden=false; navigation.hidden=true;
-    heading.textContent='Maya’s first read';
+    heading.textContent=novel && kind==='loading' ? 'Preparing your feedback' : 'Maya’s first read';
+    const engine=dialog.querySelector('[data-maya-loading]');
+    engine.hidden=!(novel && kind==='loading');
+    engine.innerHTML=engine.hidden ? '' : renderLoading({pending:true,stage:'working',intent:'review'},dev);
+    dialog.querySelector('[data-maya-state-title]').hidden=!engine.hidden;
+    dialog.querySelector('[data-maya-state-copy]').hidden=!engine.hidden;
     dialog.querySelector('[data-maya-state-title]').textContent=title;
     dialog.querySelector('[data-maya-state-copy]').textContent=message;
     status.textContent=message;
@@ -64,7 +63,7 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
   const navigation = dialog.querySelector('.maya-scene-nav');
   const back = dialog.querySelector('[data-maya-back]');
   const next = dialog.querySelector('[data-maya-next]');
-  let beats = [], beatIndex = 0, hasPixel = false;
+  let beats = [], beatIndex = 0;
   const showBeat = () => {
     const beat = beats[beatIndex];
     dialog.dataset.speaker = beat.speaker;
@@ -74,12 +73,11 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
     speaker.textContent = beat.speaker === 'maya' ? 'Maya' : 'Professor Pixel';
     response.querySelectorAll('[data-dialogue-beat]').forEach((el, index) => { el.hidden = index !== beatIndex; });
     back.disabled = beatIndex === 0;
-    next.textContent = beatIndex === beats.length - 1 ? (novel ? 'Explain the change' : onComplete ? 'Continue to design checks' : 'Return to your draft') : novel ? 'Continue' : 'Next';
+    next.textContent = beatIndex === beats.length - 1 ? (novel ? 'Explain the change' : onComplete ? 'Continue to design checks' : onReturn ? 'Clarify feedback' : 'Return to your draft') : novel ? 'Continue' : 'Next';
   };
   const showScene = text => {
     const scene = normalizeMayaScene(text, snapshot.design.revision);
     if (onComplete && !scene.pixel) throw Error('The reading did not include Pixel’s explanation. Please retry before continuing to the checks.');
-    hasPixel = Boolean(scene.pixel);
     beats = mayaSceneBeats(scene); beatIndex = 0;
     response.replaceChildren(...beats.map(beat => {
       const line = document.createElement('p');
@@ -96,7 +94,7 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
   next.addEventListener('click', () => {
     if (beatIndex === beats.length - 1) {
       if (context !== mayaContext(state)) { showState('error','Your draft has changed','Return to your draft and check the latest version again.'); return; }
-      completed=true; if (hasPixel) reviewed.set(state,reviewedContext); dialog.close();
+      completed=true; dialog.close();
     }
     else { beatIndex++; showBeat(); }
   });
@@ -178,6 +176,7 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
     if (completed && onComplete) onComplete();
     else if (opener?.isConnected) opener.focus();
     else if (novel) document.getElementById('setup-title')?.focus({preventScroll:true});
+    onReturn?.();
   }, { once: true });
   document.body.append(dialog);
   dialog.showModal();

@@ -40,7 +40,7 @@ The QR code now sits beside the introduction, separate from the full-width chara
 
 ## Expanded topic screens
 
-How to Play, About PromptCraft, Meet the Characters, and Privacy & Progress now provide practical explanations in short, separate topics. Desktop artwork has a wider column. The newly supplied transparent `assets/people/babbage-engine.png` replaces the earlier photograph; a display frame removes excess canvas margins while preserving the machinery. Menu heights and saved progress remain unchanged.
+How to Play, About PromptCraft, Meet the Characters, and Privacy & Progress now provide practical explanations in short, separate topics. Desktop artwork has a wider column. The supplied engine, now displayed as `assets/people/babbage-engine-repaired.png`, replaces the earlier photograph; a display frame removes excess canvas margins while preserving the machinery. Menu heights and saved progress remain unchanged.
 
 
 ## Maya and Pixel draft dialogue

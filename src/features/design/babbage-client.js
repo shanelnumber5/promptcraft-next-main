@@ -18,7 +18,7 @@ export const assignmentContext = (state) =>
 
 export function buildBabbageRequest(state, intent) {
   const conversation = state.babbage ?? conversationDefaults();
-  const { concern, exchange, notes, revision, reason } = state.design;
+  const { concern, exchange, notes, revision, reason, instructorPlan, feedbackClarifications } = state.design;
   return {
     analysis_type: 'scenario1',
     max_output_tokens: intent === 'revise' ? 3500 : 1600,
@@ -28,7 +28,7 @@ export function buildBabbageRequest(state, intent) {
         role: 'user',
         content: JSON.stringify({
           teacher: state.teacher,
-          design: { concern, exchange, notes, revision, reason },
+          design: { concern, exchange, notes, revision, reason, ...(instructorPlan ? {instructorPlan} : {}), ...(feedbackClarifications ? {feedbackClarifications} : {}) },
           ...(state.workspace ? { workspace: { ...state.workspace, idea: findIdea(state.workspace.ideaId) || null } } : {}),
         }),
       },
@@ -69,7 +69,12 @@ export function normalizeBabbageResponse(data, intent) {
     tone: feedback.tone,
     questions,
     ready,
-    suggestion: intent === 'revise' && ready ? { revision, reason, questions: '' } : null,
+    suggestion: intent === 'revise' && ready ? { revision, reason, questions: '', ...(() => {
+      let data; try { data=JSON.parse(a.feedback_summary).teaching_notes; } catch { return {}; }
+      if(!data || typeof data!=='object') return {};
+      const entries=['learningGoal','instructorPlan'].filter(key=>typeof data[key]==='string' && data[key].trim() && data[key].length<=2000).map(key=>[key,data[key].trim()]);
+      return entries.length ? {teachingNotes:Object.fromEntries(entries)} : {};
+    })() } : null,
   };
 }
 export async function checkBabbage({ fetchImpl = fetch, signal } = {}) {

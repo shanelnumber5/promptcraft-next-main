@@ -39,8 +39,8 @@ export function renderScene(scenario, scene, state, index, options = {}) {
   const ready = !showingQuestion || scene.choice.options.some((o) => o.id === answer && o.correct);
   const isLast = index === scenario.scenes.length - 1;
   const boardContent = options.boardContent ?? '';
-  const nextAction = !showingBoard ? 'reveal-board' : scene.choice && !showingQuestion ? 'reveal-question' : isLast ? 'start-setup' : 'next';
-  const nextLabel = !showingBoard ? 'View smartboard' : scene.choice && !showingQuestion ? 'See the question' : isLast ? 'Set up my discussion' : 'Continue';
+  const nextAction = !showingBoard ? 'reveal-board' : scene.choice && !showingQuestion ? 'reveal-question' : isLast ? 'start-design-studio' : 'next';
+  const nextLabel = !showingBoard ? 'View smartboard' : scene.choice && !showingQuestion ? 'See the question' : isLast ? 'Design my activity' : 'Continue';
   const cast = Object.values(scenario.characters).map((c) => ({
     ...c,
     src: scene.portraits?.[c.id] || c.src,
@@ -54,7 +54,7 @@ export function renderScene(scenario, scene, state, index, options = {}) {
   const content = showingQuestion
     ? renderBoard({ label: 'Think it through', title: scene.board.title }, { afterContent: renderChoices(scene.choice, answer) })
     : showingBoard
-    ? renderBoard(scene.board, { afterContent: boardContent + (isLast && options.showHandoff !== false ? `<div class="handoff"><strong>Your discussion design comes next</strong><p>${e(scenario.endNote)}</p></div>` : '') })
+    ? renderBoard(scene.board, { afterContent: boardContent + (isLast && options.showHandoff !== false ? `<div class="handoff"><strong>Explore, build, and review your activity</strong><p>${e(scenario.endNote)}</p></div>` : '') })
     : `<div class="speaker-panel"><div class="cast">${renderCharacter(speaker, true)}</div><section class="speech-bubble speech-bubble--${e(speaker.side)}" aria-labelledby="speaker-label"><span class="eyebrow">${e(scene.part)}</span><h2 id="speaker-label">${e(speaker.name)}</h2><p>${e(scene.dialogue)}</p></section></div>`;
   return `<section class="experience focused-scene focus--${e(stage)} camera--${e(speaker.side)}${options.className ? ' ' + e(options.className) : ''}" aria-label="${e(scenario.title)}"><div class="chapter-line"><span>${e(scenario.title)}</span><span>${e(progressLabel)} · ${showingQuestion ? 'Question' : showingBoard ? 'Smartboard' : 'Dialogue'}</span></div><h1 id="${e(options.titleId ?? 'scene-title')}" class="sr-only" tabindex="-1">${e(scene.title)}</h1><div class="classroom">${content}</div><section class="dialogue" aria-label="Story navigation">${navigation}</section>${options.designNotice ? '<p class="design-notice" role="status"></p>' : ''}<p class="save-notice" role="status">${e(state.saveNotice || '')}</p></section>`;
 }

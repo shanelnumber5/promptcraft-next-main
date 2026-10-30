@@ -48,7 +48,7 @@ export function renderAssignmentDirections(text, { approved = false, links = [] 
   };
   for (const line of source.split(/\r?\n/)) {
     const discussionHeading = line.match(
-        /^\s*((?:first|initial|opening|main|original)\s+post|(?:peer|classmate)\s+(?:reply|response)|reply(?:\s+to\s+a\s+classmate)?|follow[- ]?up|reflection|discussion question|what to submit|how to reply)\s*:?\s*(.*)$/i,
+        /^\s*((?:first|initial|opening|main|original)\s+post|(?:peer|classmate)\s+(?:reply|response)|reply(?:\s+to\s+a\s+classmate)?|follow[- ]?up|reflection|discussion question|what to submit|how to reply)(?:\s*:\s*(.*)|\s*)$/i,
       ),
       heading =
         line.match(/^\s{0,3}#{1,6}\s+(.+?)(?:\s+#+)?\s*$/) ||

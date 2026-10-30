@@ -7,8 +7,8 @@ import { infoPages, renderInfoNavigation, mountInfoPage } from '../features/entr
 const params = new URLSearchParams(window.location.search);
 const requested = params.get('view');
 const resume = resumePath();
-const view = ['home', 'play', 'lab', 'workspace', 'guide', ...infoPages.map(([id]) => id)].includes(requested) ? requested : 'home';
-document.body.dataset.appView = view;
+const view = ['home', 'play', 'lab', 'workspace', 'scenario', 'guide', ...infoPages.map(([id]) => id)].includes(requested) ? requested : 'home';
+document.body.dataset.appView = view==='scenario' ? 'workspace' : view;
 const app = document.getElementById('app');
 if (['home', 'guide', ...infoPages.map(([id]) => id)].includes(view)) document.body.dataset.infoReader = '';
 if (['home', 'guide'].includes(view) || infoPages.some(([id]) => id === view)) {
@@ -34,14 +34,19 @@ if (params.get('mockBabbage') === '1') document.addEventListener('click', event 
   link.href = url.href;
 });
 if (restart) restart.hidden = view !== 'play';
-document.querySelector('.skip-link')?.setAttribute('href', view === 'play' ? '#scene-title' : view === 'workspace' ? '#setup-title' : '#entry-title');
+document.querySelector('.skip-link')?.setAttribute('href', view === 'play' ? '#scene-title' : ['workspace','scenario'].includes(view) ? '#setup-title' : '#entry-title');
 if (view === 'play') {
   rememberPath('play');
-  await import('./app.js');
-} else if (view === 'workspace') {
-  rememberPath('workspace');
+  const {readScenarioStudio}=await import('../features/workspace/scenario-storage.js');
+  const scenarioState=readScenarioStudio();
+  if(!scenarioState.needsIntro || scenarioState.error) {
+    const destination=new URL(window.location.href);destination.searchParams.set('view','scenario');
+    window.location.replace(destination);
+  } else await import('./app.js');
+} else if (view === 'workspace' || view === 'scenario') {
+  rememberPath(view==='scenario'?'play':'workspace');
   const { mountWorkspace } = await import('../features/workspace/controller.js');
-  mountWorkspace(app, params);
+  mountWorkspace(app, params,{scenario:view==='scenario'});
 } else {
   const references = document.querySelector('[data-action="open-references"]');
   if (references) references.hidden = true;

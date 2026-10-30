@@ -77,7 +77,7 @@ export function renderPartner(state, ai, page, preview, ui = {readingPage:0}) {
   if (!actions) actions = `<span class="workspace-save-status" role="status">${ai.pending ? '' : 'Saved in this browser.'}</span>`;
   if (welcome) {
     const choices=actions.replace(/<span class="workspace-save-status">.*?<\/span>/g,'');
-    content=`<div class="workspace-welcome-board"><div class="workspace-welcome-intro">${content}</div><nav class="workspace-welcome-choices" aria-label="Explore starting points"><h3>Choose where to begin</h3><div class="workspace-welcome-actions">${choices}<button type="button" data-workspace-view="options">Project backup &amp; options</button><a href="?view=lab">Browse Babbage’s Idea Lab</a></div></nav></div>`;
+    content=`<div class="workspace-welcome-board"><div class="workspace-welcome-intro">${content}</div><nav class="workspace-welcome-choices" aria-label="Explore starting points"><h3>Choose where to begin</h3><div class="workspace-welcome-actions">${choices}<button type="button" data-workspace-view="options">Project backup &amp; options</button><a href="?view=lab">${state.experience==='scenario'?'Browse Idea Lab in Creative Workspace':'Browse Babbage’s Idea Lab'}</a></div></nav></div>`;
     actions='<span class="workspace-save-status">Saved in this browser.</span>';
   }
   const latestMessage = conversation.history.findLast(turn=>turn.role==='assistant')?.display || '';

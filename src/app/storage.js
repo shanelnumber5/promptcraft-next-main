@@ -89,6 +89,9 @@ export function loadState(scenario, storage = window.localStorage, workspace = n
       'reason',
       'previousRevision',
       'previousReason',
+      'instructorPlan',
+      'feedbackClarifications',
+      'teachingNoteReview',
     ])
       if (typeof saved.design?.[key] === 'string') design[key] = saved.design[key];
     const example = teacherSetup.steps[1].example.directions;

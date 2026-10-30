@@ -84,12 +84,12 @@ const pages = {
     "sections": [
       {
         "title": "Encounter",
-        "body": "<p>Start with a teaching challenge in Professor Pixel’s guided scenario. Read the dialogue, examine the discussion activity, and choose a response on the board.</p><p>Look for the problem students are experiencing before choosing a solution. The example gives you a shared situation to explore before you work on your own course.</p>",
+        "body": "<p>Start with Professor Pixel’s teaching challenge. Read the dialogue, examine the activity, and choose a response on the board.</p><p>Look for the problem students are experiencing before choosing a solution. Then enter Explore, Build, and Review. These are the same design screens used in Creative Workspace, with a separate scenario save.</p>",
         "visual": "pixel"
       },
       {
         "title": "Explore",
-        "body": "<p>In Creative Workspace, bring a discussion or a rough idea and a working learning goal. Ask Babbage for three different creative sketches, then choose, combine, reject, or request new possibilities.</p><p>Save promising alternatives for later. Explore and Build are connected spaces: move between them whenever useful, without completing a questionnaire first.</p>",
+        "body": "<p>In Creative Workspace, bring a discussion or a rough idea; develop the learning goal as your design takes shape. Ask Babbage for three different creative sketches, then choose, combine, reject, or request new possibilities.</p><p>Save promising alternatives for later. Explore and Build are connected spaces: move between them whenever useful, without completing a questionnaire first.</p>",
         "visual": "pixelThinking"
       },
       {
@@ -114,7 +114,7 @@ const pages = {
       },
       {
         "title": "Choose where to begin",
-        "body": "<p>Play the Scenario opens Scenario 1 with Pixel. Creative Workspace lets you explore and build your own discussion. Babbage’s Idea Lab offers 12 illustrative discussion starters.</p><p>The current prototype supports discussion forums. Scenario and workspace saves are separate. Course Guide previews either saved design; Continue Where You Left Off resumes your recent path.</p>",
+        "body": "<p>Guided Scenario begins with Pixel’s example, then opens the shared Explore, Build, and Review screens. Creative Workspace opens those design tools directly. Babbage’s Idea Lab offers 12 illustrative discussion starters.</p><p>The current prototype uses discussion boards as spaces for sharing work, peer review, collaboration, direct responses, or discussion. Scenario and workspace saves are separate. Course Guide previews either saved design; Continue Where You Left Off resumes your recent path.</p>",
         "visual": "pixel"
       }
     ]
@@ -139,7 +139,7 @@ const pages = {
       },
       {
         "title": "Prototype status",
-        "body": "<p>The current prototype includes one guided scenario, Creative Workspace for discussion redesign, and 12 illustrative Idea Lab starters. The workspace supports three creative sketches, combinations, saved alternatives, and an editable creative core.</p><p>Independent projects, project-file import/export, and other activity types are still to come. Playing does not enroll you in research, and effectiveness has not been established.</p>",
+        "body": "<p>The current prototype includes one guided scenario, Creative Workspace for discussion redesign, and 12 illustrative Idea Lab starters. The workspace supports three creative sketches, combinations, saved alternatives, and an editable creative core.</p><p>Project backup and import are available. Other activity formats are still to come. Playing does not enroll you in research, and effectiveness has not been established.</p>",
         "visual": "classroom"
       },
       {

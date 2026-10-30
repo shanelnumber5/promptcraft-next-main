@@ -19,7 +19,7 @@ export function renderReading(text, index = 0, renderer = renderAssignmentDirect
 export function renderUtility(state, ai, ui) {
   let title, body;
   if (ui.screen === 'options') {
-    title = 'Workspace options';
+    title = state.experience==='scenario'?'Scenario options':'Workspace options';
     const connectionDescription = ai.configured === true
       ? 'Babbage is connected. View details or retry the connection.'
       : ai.configured === false
@@ -56,7 +56,7 @@ export function renderUtility(state, ai, ui) {
     title = item.title;
     const parts = [['overview','The experience'],['learning','Learning & core'],['online','Online approach']];
     const text = ui.part === 'learning' ? `${item.learning}\n\nCreative core: ${item.core}` : ui.part === 'online' ? item.online : `${item.description}\n\n${item.experience}`;
-    body = `<nav class="workspace-part-nav" aria-label="Idea sections">${parts.map(([id,label])=>`<button type="button" data-idea-part="${id}"${ui.part===id?' aria-current="page"':''}>${label}</button>`).join('')}</nav>${renderReading(text,ui.readingPage)}<div class="workspace-project-actions"><button type="button" class="primary" data-develop-direction="${ui.index}"${ui.saved?' data-saved-direction':''}>Develop this idea</button>${!ui.saved?`<button type="button" data-save-direction="${ui.index}">Save for later</button>`:''}</div>`;
+    body = `<nav class="workspace-part-nav workspace-project-actions" aria-label="Idea sections">${parts.map(([id,label])=>`<button type="button" data-idea-part="${id}"${ui.part===id?' aria-current="page"':''}>${label}</button>`).join('')}</nav>${renderReading(text,ui.readingPage)}<div class="workspace-project-actions"><button type="button" class="primary" data-develop-direction="${ui.index}"${ui.saved?' data-saved-direction':''}>Develop this idea</button>${!ui.saved?`<button type="button" data-save-direction="${ui.index}">Save for later</button>`:''}</div>`;
   } else if (ui.screen === 'saved') {
     title = 'Saved ideas';
     const start = Math.max(0,Math.min(ui.index,Math.max(0,state.creative.alternatives.length-1)));

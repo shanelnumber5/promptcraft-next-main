@@ -29,11 +29,6 @@ export const designEvidence = [
   },
 ];
 
-export function renderDesignEvidence(ids = designEvidence.map((source) => source.id), { expanded = false } = {}) {
-  const sources = designEvidence.filter((source) => ids.includes(source.id));
-  return `<details class="design-evidence"${expanded ? ' open' : ''}><summary>Why this design? Sources and examples</summary><p>The lemonade story is a fictional illustration. These sources inform the teaching moves; they do not test this module or guarantee outcomes.</p><ul>${sources.map((source) => `<li><p>${e(source.claim)} <a href="${e(source.url)}" target="_blank" rel="noopener noreferrer">${e(source.short)}</a></p><p><strong>How we apply it:</strong> ${e(source.application)}</p>${expanded ? `<p class="evidence-citation">${e(source.citation)}</p>` : ''}</li>`).join('')}</ul></details>`;
-}
-
 // Display citations separately; preserve the educator's saved explanation verbatim.
 export function separateRationaleReferences(text) {
   const sources=designEvidence.filter(source=>text.includes(source.url));

@@ -6,7 +6,7 @@ import { conversationDefaults, assignmentContext } from './babbage-client.js';
 import { answerIssue, clarificationSupport } from './input-quality.js';
 import { hasCompleteClarificationAnswers, clarificationLimitReached, renderClarificationPause } from './turn-state.js';
 import { renderDesignRationale } from '../../shared/design-evidence.js';
-import { renderPagedDirections } from '../../shared/paged-directions.js';
+import { renderScrollableDirections, renderPagedDirections } from '../../shared/paged-directions.js';
 export const aiContext = assignmentContext;
 
 export function renderQuestion(conversation, available, pending, compact = false, extraAction = '', { workspace = false } = {}) {
@@ -27,7 +27,7 @@ export function renderAiPanel(state, ai, { compact = false } = {}) {
     ? `<section class="babbage-history"><h3>Earlier conversation</h3>${conversation.history.slice(-4).map((turn) => `<article class="babbage-turn babbage-turn--${turn.role}"><strong>${turn.role === 'assistant' ? 'Babbage' : 'Your answers'}</strong><p>${e(turn.display || turn.content)}</p></article>`).join('')}</section>`
     : '';
   const action = ai.pending && compact ? renderLoading(ai, dev) : compact && ai.suggestion
-    ? `<section class="ai-suggestion ai-suggestion--focused" aria-label="Suggested draft"><div class="suggestion-reading">${renderPagedDirections(ai.suggestion.revision,state.designReadPage,{sectionSelect:true})}</div><div class="ai-suggestion-actions"><button type="button" data-action="dismiss-ai">Keep my draft</button></div></section>`
+    ? `<section class="ai-suggestion ai-suggestion--focused" aria-label="Suggested draft"><div class="suggestion-reading">${renderScrollableDirections(ai.suggestion.revision)}</div><div class="ai-suggestion-actions"><button type="button" data-action="dismiss-ai">Keep my draft</button></div></section>`
     : ai.suggestion
     ? `<div class="ai-suggestion"><h3>${dev ? 'Simulated directions' : 'Suggested directions'}</h3>${compact ? renderPagedDirections(ai.suggestion.revision, state.designReadPage) : `<div class="suggested-assignment"><div class="assignment-document-label">Student-facing assignment · Suggested version</div><div class="assignment-directions">${renderAssignmentDirections(ai.suggestion.revision)}</div></div>`}${compact ? '<button type="button" data-action="design-panel" data-design-panel="rationale">Read why Babbage suggests this change</button>' : `<section><h3>Why Babbage suggests this change</h3><div class="design-rationale">${renderDesignRationale(ai.suggestion.reason)}</div></section>`}<p>Consider how this suggestion fits your learning goal and students. You can use and adapt it, or keep your draft. Make the explanation your own before approving.</p><div class="ai-suggestion-actions"><button type="button" class="primary" data-action="apply-ai">Use these directions in my draft</button><button type="button" data-action="dismiss-ai">Keep my draft</button></div></div>`
     : clarificationLimitReached(conversation)

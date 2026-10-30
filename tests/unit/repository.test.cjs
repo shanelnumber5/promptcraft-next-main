@@ -37,21 +37,8 @@ for (const file of sources) {
     usedAssets.add(target);
   }
 }
-// Retain retired illustrations and the original Babbage portrait (superseded by full-length artwork).
-const archivedPortraits = new Set(['assets/people/charles-babbage.png'].map(relative => path.join(root, relative)));
-// Retain the original images without rendering identities superseded by the supplied guide.
-const referenceAssets = new Set([
-  'assets/people/babbage-engine.png',
-  'assets/characters/maya/neutral.png', 'assets/characters/maya/confident.png',
-  'assets/characters/pixel/listening.png', 'assets/characters/pixel/thinking.png',
-  'assets/characters/pixel/encouraging.png',
-].map(relative => path.join(root, relative)));
-for (const asset of referenceAssets) {
-  // Reference files may be archived or removed separately; none may become active again.
-  assert.ok(!usedAssets.has(asset), `Retired character artwork is still active: ${asset}`);
-}
 for (const asset of filesIn(path.join(root, 'assets')))
-  assert.ok(usedAssets.has(asset) || referenceAssets.has(asset) || archivedPortraits.has(asset), `Unreferenced asset: ${path.relative(root, asset)}`);
+  assert.ok(usedAssets.has(asset), `Unreferenced asset: ${path.relative(root, asset)}`);
 const entry = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 for (const match of entry.matchAll(/(?:src|href)="([^"#]+)"/g)) {
   const pathname = match[1].split(/[?#]/)[0];

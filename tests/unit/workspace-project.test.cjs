@@ -22,6 +22,22 @@ const assert = require('node:assert/strict');
     state.creative.review={fingerprint,feedback:'Consider which evidence students need.',status:'complete',error:'',offeredMaya:fingerprint};
     return state;
   }
+  for (const experience of ['workspace','scenario']) {
+    const interaction=approvedProject();
+    if(experience==='scenario') interaction.experience='scenario';
+    const original=interaction.design.revision;
+    const oldFingerprint=reviewFingerprint(interaction);
+    Object.assign(interaction.workspace,{studentContribution:'Share a sculpture in progress.',peerInteraction:'Give focused material feedback.'});
+    const restored=parseProjectFile(createProjectFile(interaction));
+    assert.equal(restored.workspace.studentContribution,interaction.workspace.studentContribution);
+    assert.equal(restored.workspace.peerInteraction,interaction.workspace.peerInteraction);
+    assert.equal(restored.design.revision,original,'Planning does not overwrite student directions');
+    assert.notEqual(reviewFingerprint(interaction),oldFingerprint,'Changed interaction plan needs a current review');
+    restored.designPanel='revision';
+    const html=renderWorkspace(restored,{pending:false,configured:true},'','intentions');
+    for(const label of ['What will students share, create, decide, or investigate?','How will students interact with one another’s work?','What should the interaction help students notice, improve, or reconsider?']) assert(html.includes(label));
+    assert(assignmentContext(restored).includes('Give focused material feedback.'));
+  }
   const state=approvedProject();
   assert(finalCheckReady(state));
   assert(state.creative.review.fingerprint.length>1000);

@@ -6,7 +6,7 @@ export function highlightNextAction(app, state, ai) {
     button.removeAttribute('aria-description');
   });
   let actions;
-  if (state.phase === 'opening') actions = ['reveal-board', 'reveal-question', 'next', 'start-setup'];
+  if (state.phase === 'opening') actions = ['reveal-board', 'reveal-question', 'next', 'start-design-studio'];
   else if (state.phase === 'setup') actions = ['setup-next'];
   else if (state.phase === 'summary') actions = ['start-design'];
   else if (state.phase === 'closing') actions = ['preview-guide'];

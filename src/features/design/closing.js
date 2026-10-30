@@ -3,8 +3,14 @@ import { renderScene } from '../opening/screen.js';
 import { discussionOpening } from '../opening/content.js';
 import { escapeHTML as e } from '../../shared/html.js';
 
-export function renderClosing(state) {
-  const completion = state.workspace ? 'Design complete' : 'Module complete';
+export function renderClosing(state, stage) {
+  const workspace=Boolean(state.workspace && state.experience!=='scenario');
+  stage ||= workspace ? 'dialogue' : 'board';
+  const closingDialogue = stage === 'dialogue';
+  const goal = (state.teacher.learningGoal || '').trim();
+  const intention = (state.workspace?.creativeCore || '').trim();
+  const brief = text => text.length > 180 ? text.slice(0,177) + '…' : text;
+  const completion = workspace ? 'Design complete' : 'Module complete';
   const scene = {
     id: 'module-closing',
     title: 'Make the conversation count',
@@ -33,9 +39,7 @@ export function renderClosing(state) {
       ],
       flowLabel: 'Three moves that make a discussion meaningful',
     },
-    dialogue: state.workspace
-      ? 'Your design and reasoning are saved. When you try this activity, look for how students use one another’s ideas. Use that evidence to decide what to keep or revise.'
-      : 'Give the conversation a job. A useful reply helps students examine their reasoning, and the follow-up shows how they used it.',
+    dialogue: `You’ve brought your activity, design choices, and reasoning together.${goal ? ' Your learning goal is “' + brief(goal) + '”' + '.' : ''}${intention ? ' Your chosen design intention was: “' + brief(intention) + '”.' : ' Consider what sharing or feedback adds to the work students actually do.'} The setting can give the activity personality; the goal should guide what students practice. When you try it, look at their work and how they use feedback. That will help you decide what to keep or change. Your guide is ready to take with you.`,
   };
   // Reuse the opening's classroom, smartboard, portraits, and speech bubble.
   const scenario = {
@@ -44,10 +48,10 @@ export function renderClosing(state) {
     scenes: [scene],
   };
   const recap = '<div class="closing-board-recap"><section><h3>Keep it realistic</h3><p>Match the goal, requirements, and time available. If AI is allowed, students still verify claims and explain decisions.</p></section><section><h3>Look for evidence</h3><p>Notice how students use a peer’s contribution to examine their decision. Use what you learn to improve the next discussion.</p></section>'+(state.teacher.learningGoal ? '<div class="closing-goal"><strong>Your learning goal</strong><span>'+e(state.teacher.learningGoal)+'</span></div>' : '')+'</div>';
-  const navigation = `<nav class="scene-actions" aria-label="Module navigation"><button type="button" class="nav-button nav-button--back" data-action="return-assignment"><span>${state.workspace ? 'Your Course Guide' : 'Your assignment'}</span></button><span class="navigation-hint">${completion} · Take your learning into your course</span><button type="button" class="primary nav-button nav-button--next" data-action="${state.workspace ? 'workspace-home' : 'preview-guide'}"><span>${state.workspace ? 'Return Home' : 'View guide'}</span></button></nav>`;
+  const navigation = `<nav class="scene-actions" aria-label="Module navigation"><button type="button" class="nav-button nav-button--back" data-action="return-assignment"><span>${workspace ? 'Your Course Guide' : 'Your assignment'}</span></button><span class="navigation-hint">${completion} · Take your learning into your course</span><button type="button" class="primary nav-button nav-button--next" data-action="${!closingDialogue ? 'closing-pixel' : workspace ? 'workspace-home' : 'preview-guide'}"><span>${!closingDialogue ? 'Continue with Pixel' : workspace ? 'Return Home' : 'View guide'}</span></button></nav>`;
   return renderScene(scenario, scene, state, 0, {
     className: 'closing-experience',
-    stage: state.workspace ? 'dialogue' : 'board',
+    stage,
     titleId: 'setup-title',
     progressLabel: completion,
     showHandoff: false,

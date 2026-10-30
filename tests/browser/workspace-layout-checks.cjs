@@ -1,6 +1,25 @@
 const assert = require('node:assert/strict');
-module.exports = async ({send,evaluate,waitFor,shot,key,keyboardReach,accessibleScreen}) => {
+module.exports = async ({send,evaluate,waitFor,shot,key,keyboardReach,accessibleScreen,scenarioMode=false}) => {
   const choose = selector=>evaluate(`document.querySelector(${JSON.stringify(selector)}).click()`);
+  if(scenarioMode) {
+    await send('Page.navigate',{url:'http://127.0.0.1:8783/?view=home'});
+    await waitFor('document.readyState==="complete"');
+    await evaluate(`(async()=>{
+      localStorage.clear();
+      const {initialState,saveState}=await import('/src/app/storage.js');
+      const {discussionOpening}=await import('/src/features/opening/content.js');
+      const state=initialState(discussionOpening);
+      state.sceneId=discussionOpening.scenes.at(-1).id;state.storyStage='board';
+      for(const scene of discussionOpening.scenes) if(scene.choice) state.answers[scene.id]=scene.choice.options.find(option=>option.correct).id;
+      saveState(state);
+    })()`);
+    await send('Page.navigate',{url:'http://127.0.0.1:8783/?view=play'});
+    await waitFor('!!document.querySelector("[data-action=start-design-studio]")');
+    await choose('[data-action="start-design-studio"]');
+    await waitFor('!!document.querySelector(".workspace-shell")');
+    assert(await evaluate('new URL(location.href).searchParams.get("view")==="scenario"'));
+    assert(!await evaluate('!!document.querySelector(".summary-shell,.setup-shell--teacher")'),'Opening hands off directly without the retired intake');
+  }
   for(const [device,width,height] of [['desktop',1280,800],['tablet',820,1024],['phone',390,844],['small-phone',320,568]]) {
     await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<600});
     await send('Page.navigate',{url:'http://127.0.0.1:8783/?view=home'});
@@ -15,9 +34,9 @@ module.exports = async ({send,evaluate,waitFor,shot,key,keyboardReach,accessible
       state.creative.mayaPaused=true;
       Object.assign(state.design,{sourceDirections:state.teacher.directions,revision:'Compare the evidence, choose a response, and explain your reasoning.',reason:'Make students’ reasoning visible.'});
       state.creative.review={fingerprint:reviewFingerprint(state),feedback:'Which evidence would help students test their decision?',status:'complete',error:'',offeredMaya:''};
-      saveWorkspace(state);
+      ${scenarioMode ? "state.experience='scenario';const {saveScenarioStudio}=await import('/src/features/workspace/scenario-storage.js');saveScenarioStudio(state);" : 'saveWorkspace(state);'}
     })()`);
-    await send('Page.navigate',{url:'http://127.0.0.1:8783/?view=workspace'});
+    await send('Page.navigate',{url:'http://127.0.0.1:8783/?view='+ (scenarioMode?'scenario':'workspace')});
     await waitFor('!!document.querySelector(".workspace-section-sidebar")');
     const sidebar=await evaluate('[...document.querySelectorAll(".workspace-section-sidebar button")].map(el=>el.dataset.designPage)');
     assert.deepEqual(sidebar,['start','subject','ai-use','intentions','presence','draft']);
@@ -61,7 +80,7 @@ module.exports = async ({send,evaluate,waitFor,shot,key,keyboardReach,accessible
     assert(focus.width>=3);
     await key('Enter','Enter',13);
     await choose('[data-workspace-panel="reason"]');
-    for(const page of ['rationale','reasoning','checks','help']) {
+    for(const page of ['rationale','clarify','reasoning','checks','help']) {
       await choose(`[data-review-page="${page}"]`);
       assert(await evaluate('document.documentElement.scrollWidth<=innerWidth'),`${device}/${page}: no document overflow`);
       assert.equal(await evaluate('document.querySelectorAll(".review-actions").length'),1);
@@ -80,6 +99,6 @@ module.exports = async ({send,evaluate,waitFor,shot,key,keyboardReach,accessible
     await choose('[data-workspace-view="options"]');
     await sameFooter(`${device}/options`);
     await shot(`layout-${device}-options`);
-    console.log(`${device} PASS: six Build pages, four Review pages, Explore, keyboard focus, footer placement, rendered contrast. Mocked service only.`);
+    console.log(`${device} PASS: six Build pages, five Review pages, Explore, keyboard focus, footer placement, rendered contrast. Mocked service only.`);
   }
 };

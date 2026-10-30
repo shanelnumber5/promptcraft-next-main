@@ -19,6 +19,7 @@ export function parseProjectFile(text) {
   const raw = JSON.stringify(file.project);
   const parsed = readWorkspace({ getItem(key) { return key === WORKSPACE_KEY ? raw : null; } });
   if (!parsed.exists || parsed.error) throw new Error('This project is damaged or incompatible with this version of PromptCraft.');
+  if(file.project.state?.experience==='scenario') parsed.state.experience='scenario';
   return parsed.state;
 }
 

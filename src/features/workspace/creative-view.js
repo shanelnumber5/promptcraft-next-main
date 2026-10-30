@@ -11,5 +11,5 @@ export function renderPossibilityActions(state, ai, extraActions='') {
     +extraActions+(state.creative.alternatives.length?`<button type="button" data-workspace-view="saved">Saved possibilities (${state.creative.alternatives.length})</button>`:'');
 }
 export function renderCreativeCore(state) {
-  return `<div class="creative-core">${state.workspace.selectedDirection?`<p>${e(state.workspace.selectedDirection.title)}</p>`:''}<label for="creative-core">What do you want students to do differently?</label><textarea id="creative-core" data-workspace-meta="creativeCore" rows="3">${e(state.workspace.creativeCore||'')}</textarea><p>Keep or change this starting point. If you are unsure, ask Babbage for examples.</p></div>`;
+  return `<div class="creative-core">${state.workspace.selectedDirection?`<p>${e(state.workspace.selectedDirection.title)}</p>`:''}<label for="creative-core">What should the interaction help students notice, improve, or reconsider?</label><textarea id="creative-core" data-workspace-meta="creativeCore" rows="3">${e(state.workspace.creativeCore||'')}</textarea><p>Keep or change the learning mechanism in this starting point. If you are unsure, ask Babbage for examples.</p></div>`;
 }

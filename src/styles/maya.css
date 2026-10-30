@@ -288,8 +288,8 @@ body[data-app-view] .maya-dialog--novel[data-speaker='pixel'] .maya-actor {
   right: 2%;
 }
 body[data-app-view] .maya-dialog--novel[data-speaker='pixel'] .maya-dialogue {
-  width: 60%;
-  margin-left: 0;
+  width: 52%;
+  margin-left: clamp(24px,4vw,56px);
 }
 body[data-app-view] .maya-dialog--novel .maya-body {
   background: var(--gold);

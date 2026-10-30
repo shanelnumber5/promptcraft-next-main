@@ -10,7 +10,7 @@ export function openGuidePreview(state, app) {
   const options = {
     approved: state.finalCheck.approved,
     teacher: { ...state.teacher },
-    workspace: state.workspace ? { ...state.workspace } : null,
+    workspace: state.experience==='scenario' ? null : state.workspace ? { ...state.workspace } : null,
   };
   loadGuideLogo().then((logo) => {
     if (!dialog.open) return;

@@ -348,122 +348,8 @@ body[data-app-view='play'] .setup-shell.setup-shell--teacher.setup-step--class .
  body[data-app-view='play'] .setup-shell.setup-shell--teacher.summary-shell .summary-sections > section { padding: 12px; }
  body[data-app-view='play'] .setup-shell.setup-shell--teacher.setup-step--class .setup-fields { padding-top: 20px; padding-bottom: 24px; }
 }
-/* Guided design follows the same frame as the five setup sections. */
-body:has(.design-shell--guided) #app { max-width: 1240px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .setup-header { padding: 14px 20px; background: #001f5b; color: #fff; border-radius: 4px 4px 0 0; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .setup-header strong { color: #fff; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .setup-form { gap: 18px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .setup-intro { width: 100%; max-width: 960px; margin: 0 auto; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .design-body.guided-screen { flex: 0 1 auto; width: 100%; max-width: 960px; margin: 0 auto; padding: 20px; background: #fff; border: 1px solid #e0e5eb; border-radius: 4px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .babbage-prompt { padding: 0; gap: 16px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .babbage-says-label { color: #001f5b; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-reference-actions { gap: 12px; margin-bottom: 18px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-reference-actions > span { flex-basis: 100%; padding: 12px 14px; background: #edf3f9; border-radius: 3px; font-size: 15px; line-height: 1.5; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-reference-actions button { min-height: 44px; font-size: 15px; border-radius: 3px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .design-fields textarea { height: 140px; min-height: 100px; padding: 12px; font-size: 16px; line-height: 1.5; background: #f7f9fc; border: 1px solid #9aabbd; border-bottom: 2px solid #001f5b; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .setup-actions { margin-top: auto; padding: 12px 16px; background: #edaa00; border: 0; border-radius: 4px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .setup-actions > span { color: #001f5b; font-size: 14px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .setup-actions button.nav-button--back { background: #fff; color: #001f5b; border: 2px solid #001f5b; border-radius: 3px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .setup-actions button.primary.nav-button--next:enabled { background: #001f5b; color: #fff; border: 2px solid #fff; border-radius: 3px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided.guided-panel--revision .design-body.guided-screen { flex: 1; max-width: none; }
-@media (min-width: 700px) and (min-height: 650px) and (max-height: 820px) {
- body[data-app-view='play'] .setup-shell.design-shell--guided .setup-header { padding: 10px 18px; }
- body[data-app-view='play'] .setup-shell.design-shell--guided .setup-form { gap: 12px; }
- body[data-app-view='play'] .setup-shell.design-shell--guided .design-body.guided-screen { padding: 14px 18px; }
- body[data-app-view='play'] .setup-shell.design-shell--guided .setup-actions { padding: 8px 12px; }
- body[data-app-view='play'] .setup-shell.design-shell--guided .guided-reference-actions { margin-bottom: 12px; }
-}
-@media (max-width: 700px) {
- body[data-app-view='play'] .setup-shell.design-shell--guided .setup-header { padding: 12px; }
- body[data-app-view='play'] .setup-shell.design-shell--guided .design-body.guided-screen { padding: 16px; }
- body[data-app-view='play'] .setup-shell.design-shell--guided .setup-actions { border-radius: 0; padding-bottom: calc(16px + env(safe-area-inset-bottom,0px)); }
-}
-/* Keep short working screens readable without an internal scrollbar. */
-body[data-app-view='play'] .setup-shell.design-shell--guided .babbage-prompt { display: block; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .babbage-prompt .pixel-suggests-frame { display: none; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .babbage-prompt p { margin: 0; padding: 0; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .setup-actions { padding-bottom: 24px; }
-@media (min-width: 701px) {
- body[data-app-view='play'] .setup-shell.design-shell--guided .guided-reference-actions:has(> span) { display: grid; grid-template-columns: auto minmax(0,1fr); align-items: center; }
-}
-@media (min-width: 700px) and (min-height: 650px) and (max-height: 820px) {
- body[data-app-view='play'] .setup-shell.design-shell--guided .design-fields textarea { height: 120px; }
-}
-@media (max-width: 700px) {
- body[data-app-view='play'] .setup-shell.design-shell--guided .setup-actions { padding-bottom: calc(24px + env(safe-area-inset-bottom,0px)); }
-}
-/* Pixel's guidance is an optional view, outside the working form. */
-body[data-app-view='play'] .setup-shell.design-shell--guided .setup-intro:has(.guided-advice-link) { position: relative; padding-right: 140px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-advice-link { position: absolute; right: 0; top: 0; min-height: 44px; padding: 8px; background: transparent; color: #001f5b; border: 0; border-radius: 3px; font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-context { background: #edf3f9; padding: 12px 14px; border-radius: 3px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-advice h2 { font-family: Georgia,'Times New Roman',serif; font-size: 26px; font-weight: 400; margin: 0 0 16px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-advice p { font-size: 18px; line-height: 1.55; max-width: 65ch; margin: 0; }
-@media (max-width: 700px) {
- body[data-app-view='play'] .setup-shell.design-shell--guided .setup-intro:has(.guided-advice-link) { padding-right: 0; }
- body[data-app-view='play'] .setup-shell.design-shell--guided .guided-advice-link { position: static; margin-top: 8px; padding-left: 0; }
-}
-/* The editor and student preview share heading, toolbar, and document rows. */
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-revision-layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); grid-template-rows: auto auto minmax(100px,1fr); gap: 10px 20px; min-height: 0; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-editor,
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-live-preview { display: grid; grid-template-rows: subgrid; grid-row: 1 / span 3; gap: 10px; min-height: 0; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-editor { grid-column: 1; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-editor > .setup-field { display: grid; grid-template-rows: subgrid; grid-row: 1 / span 3; gap: 10px; min-height: 0; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-live-preview { grid-column: 2; }
 body[data-app-view='play'] .setup-shell.design-shell--guided :is(#revision-label,#guided-preview-title) { grid-row: 1; align-self: center; font: 600 16px/1.4 Arial,Helvetica,sans-serif; margin: 0; padding: 0; }
-body[data-app-view='play'] .setup-shell.design-shell--guided #revision-help { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; padding: 0; margin: -1px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .directions-toolbar { grid-row: 2; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; padding: 4px; margin: 0; border: 1px solid #d7dfe8; border-radius: 3px; background: #edf1f5; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .directions-toolbar button { min-height: 36px; padding: 6px 9px; font-size: 14px; font-weight: 400; background: transparent; border: 0; border-radius: 2px; color: #001f5b; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .directions-toolbar button:hover { background: #fff; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-preview-help { grid-row: 2; align-self: center; margin: 0; font-size: 14px; line-height: 1.4; color: #405674; }
 body[data-app-view='play'] .setup-shell.design-shell--guided :is(.directions-editor,.guided-live-preview .guided-document) { grid-row: 3; height: auto; min-height: 100px; max-height: none; padding: 16px; margin: 0; background: #fff; border: 1px solid #9aabbd; border-radius: 3px; font: 16px/1.55 Arial,Helvetica,sans-serif; overflow: auto; }
-body[data-app-view='play'] .setup-shell.design-shell--guided.guided-panel--revision .guided-reference-actions { margin: 0; gap: 8px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided.guided-panel--revision .guided-reference-actions button { background: transparent; border: 1px solid #aebccc; color: #001f5b; font-size: 14px; padding: 8px 12px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided.guided-panel--revision .ai-status:empty { display: none; }
-@media (max-width: 899px) {
- body[data-app-view='play'] .setup-shell.design-shell--guided .guided-revision-layout { grid-template-columns: minmax(0,1fr); grid-template-rows: auto auto minmax(220px,1fr) auto auto minmax(220px,1fr); overflow: auto; }
- body[data-app-view='play'] .setup-shell.design-shell--guided .guided-live-preview { grid-column: 1; grid-row: 4 / span 3; }
-}
-body[data-app-view='play'] .setup-shell.design-shell--guided.guided-panel--revision .setup-intro { max-width: none; padding-left: 20px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .directions-editor h4 { color: #001f5b; }
-@media (max-width: 700px) {
- body[data-app-view='play'] .setup-shell.design-shell--guided.guided-panel--revision .setup-intro { padding-left: 16px; }
-}
-/* Keep optional actions out of the writing surface. */
-body[data-app-view='play'] .setup-shell.design-shell--guided.guided-panel--revision .setup-intro { position: relative; padding-right: 100px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-tools-link { position: absolute; right: 0; top: 0; min-height: 44px; padding: 8px 16px; font-size: 15px; background: #fff; border: 1px solid #8c9fb5; color: #001f5b; border-radius: 3px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .directions-toolbar select { min-height: 36px; max-width: 130px; padding: 6px 8px; background: #fff; color: #001f5b; border: 0; border-radius: 2px; font-size: 14px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-tools h2 { font: 400 26px/1.2 Georgia,'Times New Roman',serif; margin: 0 0 12px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-tools > p { margin: 0 0 20px; font-size: 16px; line-height: 1.5; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-tools nav { display: grid; gap: 10px; max-width: 500px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-tools nav button { min-height: 48px; padding: 10px 14px; font-size: 16px; text-align: left; color: #001f5b; background: #edf3f9; border: 0; border-radius: 3px; }
-/* Two drafting choices; optional utilities live in the editor. */
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-route--choices { gap: 20px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-route--choices > button { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; min-height: 160px; margin: 0; padding: 24px; border: 1px solid #8c9fb5; border-radius: 4px; background: #fff; color: #001f5b; text-align: left; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-route--choices > button:first-child { background: #001f5b; color: #fff; border-color: #001f5b; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-route--choices > button strong { font: 400 26px/1.2 Georgia,'Times New Roman',serif; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-route--choices > button span { font-size: 16px; font-weight: 400; line-height: 1.5; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-route--choices > button:hover { border-color: #001f5b; box-shadow: inset 0 -3px #edaa00; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-route-secondary { margin-top: 16px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-route-secondary button { min-height: 44px; padding: 8px; background: transparent; border: 0; color: #001f5b; font-size: 14px; text-decoration: underline; text-underline-offset: 4px; }
-/* A single writing surface replaces the duplicate live preview. */
-body[data-app-view='play'] .setup-shell.design-shell--guided.guided-panel--revision .design-body.guided-screen,
-body[data-app-view='play'] .setup-shell.design-shell--guided.guided-panel--revision .setup-intro { max-width: 960px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-revision-layout { grid-template-columns: minmax(0,1fr); grid-template-rows: auto auto minmax(100px,1fr); }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-editor { grid-column: 1; grid-row: 1 / span 3; }
-@media (max-width: 899px) {
- body[data-app-view='play'] .setup-shell.design-shell--guided .guided-revision-layout { grid-template-rows: auto auto minmax(280px,1fr); }
-}
-/* One task and one connection message in the guided Babbage panel. */
-body[data-app-view='play'] .setup-shell.design-shell--guided .babbage-workspace { padding: 0; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .ai-status:empty { display: none; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .babbage-sharing-note { font-size: 14px; line-height: 1.5; margin: 0 0 18px; color: #405674; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .babbage-offline h3 { font: 400 26px/1.2 Georgia,'Times New Roman',serif; margin: 0 0 12px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .babbage-offline p { max-width: 60ch; margin: 0 0 20px; font-size: 16px; line-height: 1.5; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .babbage-offline button { min-height: 44px; padding: 10px 16px; font-size: 16px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .babbage-mode--dev { display: block; background: transparent; color: #405674; border: 0; padding: 0; margin: 0 0 16px; font-size: 13px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-ai-options { border: 0; padding: 0; margin-top: 20px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-ai-options button { background: transparent; border: 0; color: #001f5b; min-height: 44px; padding: 8px 0; font-size: 14px; text-decoration: underline; text-underline-offset: 4px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .ai-panel { overflow: visible; }
 /* Automatic student reading continues the classroom visual novel. */
 body[data-app-view] .maya-dialog.maya-dialog--novel { position: fixed; inset: var(--maya-header-height,80px) 0 0; margin: 0; width: 100vw; max-width: none; height: calc(100dvh - var(--maya-header-height,80px)); max-height: calc(100dvh - var(--maya-header-height,80px)); border: 0; border-radius: 0; background: #faf9f5; }
 body[data-app-view] .maya-dialog--novel::backdrop { background: transparent; }
@@ -476,7 +362,7 @@ body[data-app-view] .maya-dialog--novel .maya-dialogue { width: 56%; margin-left
 body[data-app-view] .maya-dialog--novel .maya-dialogue h3 { font: 400 26px/1.2 Georgia,'Times New Roman',serif; color: #f4bf38; margin: 0 0 16px; }
 body[data-app-view] .maya-dialog--novel .maya-dialogue p { font-size: clamp(20px,2vw,26px); line-height: 1.55; color: #fff; }
 body[data-app-view] .maya-dialog--novel[data-speaker='pixel'] .maya-actor { left: auto; right: 2%; }
-body[data-app-view] .maya-dialog--novel[data-speaker='pixel'] .maya-dialogue { width: 60%; margin-left: 0; }
+body[data-app-view] .maya-dialog--novel[data-speaker='pixel'] .maya-dialogue { width:52%; margin-left:clamp(24px,4vw,56px); }
 body[data-app-view] .maya-dialog--novel .maya-body { background: #edaa00; padding: 12px 20px; color: #001f5b; }
 body[data-app-view] .maya-dialog--novel .maya-scene-nav { margin: 0; }
 body[data-app-view] .maya-dialog--novel .maya-scene-nav button { min-height: 56px; min-width: 180px; border-radius: 3px; }
@@ -504,76 +390,15 @@ body[data-app-view] .maya-dialog--novel .maya-dialogue { align-self: center; }
  body[data-app-view] .maya-dialog--novel .maya-dialogue { grid-column: 1; grid-row: 2; align-self: start; height: auto; }
 }
 body[data-app-view] .maya-dialog--novel .maya-scene-label { display: inline-block; color: #fff; font-size: 15px; font-weight: 600; line-height: 1.4; }
-/* Keep the request disclosure centered in the gold navigation bar. */
-body[data-app-view='play'] .setup-shell.design-shell--guided .setup-actions > .guided-sharing-note { display: block; font-size: 13px; line-height: 1.45; font-weight: 400; max-width: 66ch; margin: 0 auto; text-align: center; }
-@media (max-width: 600px) {
- body[data-app-view='play'] .setup-shell.design-shell--guided .setup-actions > .guided-sharing-note { grid-column: 1 / -1; grid-row: 2; max-width: none; font-size: 12px; }
-}
-/* Suggested drafts have one reading surface and an always-visible decision row. */
-body[data-app-view='play'] .setup-shell.design-shell--guided.guided-panel--babbage .setup-intro:has(.guided-suggestion-why) { position: relative; padding-right: 150px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .guided-suggestion-why { position: absolute; right: 0; top: 0; min-height: 44px; padding: 8px; background: transparent; border: 0; border-radius: 3px; color: #001f5b; font-size: 14px; text-decoration: underline; text-underline-offset: 4px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided.guided-panel--babbage:has(.ai-suggestion--focused) .design-body { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
 body[data-app-view='play'] .setup-shell.design-shell--guided:has(.ai-suggestion--focused) :is(.ai-panel,.babbage-workspace) { display: flex; flex-direction: column; flex: 1; min-height: 0; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .ai-suggestion--focused { display: grid; flex: 1; min-height: 0; grid-template-columns: minmax(0,1fr) minmax(0,1fr); grid-template-rows: minmax(100px,1fr) auto; gap: 12px 20px; margin: 0; padding: 0; border: 0; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .suggestion-reading { display: contents; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .suggestion-reading .guided-document { grid-column: 1 / -1; grid-row: 1; min-height: 100px; max-height: none; border: 0; border-radius: 0; padding: 4px 12px 8px 0; background: transparent; overflow: auto; font-size: 16px; line-height: 1.55; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .suggestion-reading .guided-document h4 { font: 400 26px/1.25 Georgia,'Times New Roman',serif; margin: 0 0 18px; color: #001f5b; }
 body[data-app-view='play'] .setup-shell.design-shell--guided .suggestion-reading .guided-document :is(ol,ul) { padding-left: 24px; margin: 12px 0; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .suggestion-reading .guided-document li { margin: 8px 0; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .suggestion-reading .guided-document strong { font-weight: 600; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .ai-suggestion--focused .document-pages { grid-column: 1; grid-row: 2; margin: 0; font-size: 14px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .ai-suggestion--focused .document-pages button { min-height: 44px; padding: 8px 12px; font-size: 14px; background: #fff; color: #001f5b; border: 1px solid #aebccc; border-radius: 3px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .ai-suggestion--focused .ai-suggestion-actions { grid-column: 2; grid-row: 2; justify-content: flex-end; align-items: center; gap: 8px; margin: 0; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .ai-suggestion-actions button { min-height: 44px; padding: 8px 14px; font-size: 15px; border-radius: 3px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .ai-suggestion-actions [data-action='apply-ai'] { background: #001f5b; color: #fff; border: 1px solid #001f5b; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .ai-suggestion-actions [data-action='dismiss-ai'] { background: #fff; color: #001f5b; border: 1px solid #8c9fb5; }
 body[data-app-view='play'] .setup-shell.design-shell--guided:has(.ai-suggestion--focused) .ai-status:not(:empty) { flex-shrink: 0; font-size: 14px; line-height: 1.45; font-weight: 400; margin: 0 0 12px; }
-@media (max-width: 700px) {
- body[data-app-view='play'] .setup-shell.design-shell--guided.guided-panel--babbage .setup-intro:has(.guided-suggestion-why) { padding-right: 0; }
- body[data-app-view='play'] .setup-shell.design-shell--guided .guided-suggestion-why { position: static; padding-left: 0; }
- body[data-app-view='play'] .setup-shell.design-shell--guided .ai-suggestion--focused { grid-template-columns: minmax(0,1fr); grid-template-rows: minmax(180px,28dvh) auto auto; }
- body[data-app-view='play'] .setup-shell.design-shell--guided .ai-suggestion--focused .document-pages { grid-column: 1; grid-row: 2; }
- body[data-app-view='play'] .setup-shell.design-shell--guided .ai-suggestion--focused .ai-suggestion-actions { grid-column: 1; grid-row: 3; }
- body[data-app-view='play'] .setup-shell.design-shell--guided .suggestion-reading .guided-document h4 { font-size: 24px; }
-}
-/* One section selector and one quiet alternative beneath the draft. */
-body[data-app-view='play'] .setup-shell.design-shell--guided .ai-suggestion--focused .document-pages { justify-content: flex-start; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .ai-suggestion--focused [data-reading-section] { min-height: 44px; padding: 8px 12px; width: 180px; max-width: 100%; color: #001f5b; background: #fff; border: 1px solid #aebccc; border-radius: 3px; font-size: 14px; }
-body[data-app-view='play'] .setup-shell.design-shell--guided .ai-suggestion--focused .ai-suggestion-actions [data-action='dismiss-ai'] { padding: 8px 0; background: transparent; border: 0; font-size: 14px; font-weight: 400; text-decoration: underline; text-underline-offset: 4px; }
-@media (max-width: 700px) {
- body[data-app-view='play'] .setup-shell.design-shell--guided .ai-suggestion--focused { grid-template-columns: minmax(0,1fr) auto; grid-template-rows: minmax(180px,28dvh) auto; gap: 12px; }
- body[data-app-view='play'] .setup-shell.design-shell--guided .ai-suggestion--focused .ai-suggestion-actions { grid-column: 2; grid-row: 2; }
-}
-/* More writing room for the educator's explanation. */
-
-/* Quiet feedback reference beside the explanation task. */
-body[data-app-view] .design-shell--guided .setup-actions button.guided-feedback-nav {
-  background:transparent; color:#001f5b; border:0; border-radius:0;
-  min-height:44px; min-width:0; padding:8px 12px; font-size:14px;
-  text-decoration:underline; text-underline-offset:4px;
-}
-body[data-app-view] .design-shell--guided .setup-actions button.guided-feedback-nav:hover { background:rgba(255,255,255,.25); }
-body[data-app-view] .design-shell--guided .setup-actions button.guided-feedback-nav:focus-visible { outline:2px solid #001f5b; outline-offset:2px; }
 .guided-feedback { max-width:850px; margin:0 auto; }
 .guided-feedback-caption { color:#48607c; margin:0 0 24px; }
 .guided-feedback section { margin:0 0 22px; padding:0 0 0 18px; border-left:3px solid #edaa00; }
 .guided-feedback section h2 { font:700 17px Arial,sans-serif; margin:0 0 8px; }
 .guided-feedback section p { margin:0; line-height:1.6; }
-
-/* Give the explanation one writing surface, without a scrolling outer panel. */
-body[data-app-view='play'] .setup-shell.design-shell--guided.guided-panel--reason .design-body.guided-screen { overflow:visible; }
-body[data-app-view='play'] .setup-shell.design-shell--guided.guided-panel--reason .design-fields textarea { height:340px; min-height:180px; }
-@media (min-width:701px) and (min-height:650px) {
- body[data-app-view='play'] .setup-shell.design-shell--guided.guided-panel--reason .design-body.guided-screen { flex:1; display:flex; overflow:hidden; }
- body[data-app-view='play'] .setup-shell.design-shell--guided.guided-panel--reason .design-fields,
- body[data-app-view='play'] .setup-shell.design-shell--guided.guided-panel--reason .setup-field { display:flex; flex-direction:column; flex:1; min-height:0; width:100%; }
- body[data-app-view='play'] .setup-shell.design-shell--guided.guided-panel--reason .design-fields textarea { flex:1; height:auto; min-height:0; resize:none; }
-}
 .guided-feedback .guided-context { margin-bottom:20px; }
-
-@media (max-width:700px) {
- body[data-app-view='play'] .design-shell--guided .setup-actions > span:has(.guided-feedback-nav) { display:block; grid-column:1 / -1; grid-row:2; text-align:center; }
-}
 
 /* A single readable document replaces the crowded before-and-after wall. */
 body:has(.design-shell--review) #app { max-width:1240px; padding:12px 20px; }
@@ -975,25 +800,6 @@ body[data-app-view] .maya-dialog--novel .maya-reading-note {
 body[data-app-view] .maya-dialog--novel .maya-body { position: relative; }
 body[data-app-view] .maya-dialog--novel .maya-reading-note { margin: 6px auto 0; max-width: 66ch; }
 
-/* Keep the guided Babbage disclosure stable beneath navigation controls. */
-body[data-app-view='play'] .setup-shell.design-shell--guided.guided-panel--babbage .setup-actions > .guided-sharing-note {
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  max-width: 48ch;
-  padding: 0 8px;
-  font: 400 14px/1.5 Arial, Helvetica, sans-serif;
-  color: #001b45;
-}
-@media (max-width: 600px) {
-  body[data-app-view='play'] .setup-shell.design-shell--guided.guided-panel--babbage .setup-actions > .guided-sharing-note {
-    min-height: 42px;
-    max-width: 100%;
-  }
-}
-
 /* Workspace structural cleanup: match the guided scenario's compact, focused layout. */
 body[data-app-view='workspace'] .workspace-shell--focused { max-width: 1040px; }
 body[data-app-view='workspace'] .workspace-section-rail--simple {
@@ -1021,11 +827,16 @@ body[data-app-view='workspace'] .workspace-section-main .workspace-save-status {
  body[data-app-view='workspace'] .workspace-section-main .design-page-fields { padding:12px 16px 16px; }
  body[data-app-view='workspace'] .workspace-section-main .design-page-nav { padding:12px; }
 }
-/* Maya's novel controls have a reserved disclosure row, never a dynamically growing footer. */
-body[data-app-view] .maya-dialog--novel .maya-body { box-sizing:border-box; display:grid; grid-template-rows:minmax(56px,auto) 42px; align-content:end; padding:8px 18px 10px; gap:0; }
+/* Fixed scene footer: disclosure stays centered between navigation controls. */
+body[data-app-view] .maya-dialog--novel .maya-body { box-sizing:border-box; display:grid; grid-template-columns:minmax(100px,1fr) minmax(0,2.4fr) minmax(100px,1fr); grid-template-rows:48px; align-items:center; flex:0 0 72px; height:72px; min-height:72px; max-height:72px; padding:12px 18px; gap:0 16px; }
 body[data-app-view] .maya-dialog--novel .maya-scene-nav,
-body[data-app-view] .maya-dialog--novel .maya-actions { grid-row:1; align-self:center; margin:0; min-height:56px; }
-body[data-app-view] .maya-dialog--novel .maya-reading-note { grid-row:2; align-self:center; box-sizing:border-box; margin:0 auto; min-height:0; max-width:68ch; text-align:center; font:400 14px/1.4 Arial,Helvetica,sans-serif; color:#001b45; }
-@media (max-width:600px) { body[data-app-view] .maya-dialog--novel .maya-body { grid-template-rows:minmax(48px,auto) 52px; padding:8px 10px; } }
+body[data-app-view] .maya-dialog--novel .maya-actions { grid-column:1/-1; grid-row:1; align-self:center; margin:0; min-height:48px; }
+body[data-app-view] .maya-dialog--novel .maya-scene-nav { display:flex; justify-content:space-between; }
+body[data-app-view] .maya-dialog--novel .maya-scene-nav button { min-height:48px; min-width:100px; margin:0; }
+body[data-app-view] .maya-dialog--novel .maya-reading-note { grid-column:2; grid-row:1; align-self:center; box-sizing:border-box; width:100%; margin:0; min-height:0; max-width:none; text-align:center; font:400 16px/1.3 Arial,Helvetica,sans-serif; color:#111; }
+@media(max-width:600px) {
+ body[data-app-view] .maya-dialog--novel .maya-body { grid-template-columns:80px minmax(0,1fr) 80px; grid-template-rows:72px; height:96px; min-height:96px; max-height:96px; flex-basis:96px; padding:12px 10px; gap:0 8px; }
+ body[data-app-view] .maya-dialog--novel .maya-scene-nav button { min-width:72px; max-width:80px; padding:8px; }
+}
 
 body[data-app-view] .maya-dialog--novel :is(.maya-scene-nav,.maya-actions)[hidden] { display:none !important; }

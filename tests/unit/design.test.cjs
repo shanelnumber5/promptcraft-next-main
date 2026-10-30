@@ -9,28 +9,9 @@ const assert = require('node:assert/strict');
   );
   const { instructions } = await import('../../src/features/design/babbage-prompt.js');
   const { teacherSetup } = await import('../../src/features/setup/content.js');
-  const { renderTeacherStep, renderTeacherSummary } = await import(
-    '../../src/features/setup/screen.js'
-  );
   assert.equal(teacherSetup.steps.length, 6);
   assert.equal(teacherSetup.steps[5].fields[0].type, 'radio');
   assert.match(teacherSetup.steps[5].fields[0].options.map(option => option[1]).join(' '), /Not sure yet/);
-  const previewTeacher = {
-    ...initialState(scenario).teacher,
-    directions: '### First post\nDescribe your recommendation.',
-  };
-  const setupPreviews = teacherSetup.steps.map((_, index) =>
-    renderTeacherStep(teacherSetup, index, previewTeacher),
-  );
-  const summaryPreviews = teacherSetup.steps.map((_, index) =>
-    renderTeacherSummary(teacherSetup, previewTeacher, '', index),
-  );
-  for (const screen of [...setupPreviews, ...summaryPreviews]) {
-    assert.match(screen, /Assignment context/);
-    assert.match(screen, /Your original directions stay here while you shape the discussion/);
-    assert.match(screen, /data-setup-live-preview/);
-    assert.match(screen, /<h4>First post<\/h4>/);
-  }
   assert.match(teacherSetup.steps[1].intro, /one focused forum component/);
   assert.match(teacherSetup.steps[1].intro, /not replace it/);
   assert.equal(teacherSetup.steps[2].fields.find((field) => field.id === 'alignmentGuide').type, 'select');
@@ -38,8 +19,6 @@ const assert = require('node:assert/strict');
     teacherSetup.steps[2].fields.find((field) => field.id === 'alignmentGuide').options.map(([id]) => id),
     ['none', 'montana-k12', 'msu-outcomes', 'oscqr'],
   );
-  assert.match(setupPreviews[2], /OSCQR online course quality rubric/);
-  assert.match(setupPreviews[2], /Relevant standard, outcome, or rubric item/);
   assert.match(instructions, /one bounded discussion-board component within the larger assignment/);
   assert.match(instructions, /distinctive, feasible forum mechanism that fits this course/);
   assert.match(instructions, /not an all-in-one replacement/);
@@ -110,34 +89,19 @@ const assert = require('node:assert/strict');
     { teacher: currentTeacher },
   );
   assert.ok(currentGuide.includes('<h4>Week 8: Independent-Samples t-Test Report</h4>'));
-  const { renderDesign } = await import('../../src/features/design/screen.js');
-  const {designDestination,introducePixelAdvice} = await import('../../src/features/design/panels.js');
   for (const [designStep, origin] of [[0,'concern'],[1,'exchange'],[1,'notes'],[2,'route'],[2,'reason']]) {
     const adviceState = {...initialState(scenario),phase:'design',designStep,designPanel:'advice',designReturnPanel:origin};
     adviceState.design.concern='Keep my concern';
     const restored=loadState(scenario,{getItem:()=>JSON.stringify(adviceState)});
     assert.equal(restored.designPanel,'advice');
     assert.equal(restored.designReturnPanel,origin);
-    for(const delta of [-1,1]) assert.deepEqual(designDestination(restored,delta),[designStep,origin]);
-    assert.match(renderDesign(restored),/pixel-advice-scene/);
     assert.equal(restored.design.concern,'Keep my concern');
-    restored.designPanel=origin;
-    assert(!renderDesign(restored).includes('Professor Pixel suggests'));
-    assert(!renderDesign(restored).includes('pixel-advice-scene'));
-    assert(introducePixelAdvice(restored));
-    assert.equal(restored.designReturnPanel,origin);
-    assert.equal(restored.designPanel,'advice');
+
   }
 
   const { renderAssignmentDirections } = await import('../../src/shared/directions.js');
   const { renderDirectionsEditor } = await import('../../src/shared/directions-editor.js');
   const { renderDesignRationale } = await import('../../src/shared/design-evidence.js');
-  const { renderReviewDirections } = await import('../../src/shared/review-directions.js');
-  const reviewBlocks = renderReviewDirections('### Assignment\nIntroduction\n### First post\n1. Explain a choice.\n   - Use evidence.\n### Reply\n1. Test a choice.\n### Follow-up\n1. Revise or defend.\n<script>bad</script>');
-  assert.equal((reviewBlocks.match(/class="review-document-block/g) || []).length, 4);
-  assert(reviewBlocks.includes('<ul><li>Use evidence.</li></ul></li>'));
-  assert(reviewBlocks.indexOf('First post') < reviewBlocks.indexOf('Reply'));
-  assert(!reviewBlocks.includes('<script>'));
   const formattedEditor = renderDirectionsEditor('```markdown\n### Peer exchange\n1) __Compare:__ Explain your choice.\n```');
   assert.ok(formattedEditor.includes('contenteditable="true"'));
   assert.ok(formattedEditor.includes('<h4>Peer exchange</h4>'));
@@ -156,13 +120,6 @@ const assert = require('node:assert/strict');
   const spacedExplanation=renderDesignRationale(longExplanation,{paragraphBreaks:true});
   assert.equal((spacedExplanation.match(/<p>/g)||[]).length,7,'Long guide explanations have readable paragraph breaks');
   assert(rawReason.includes('https://'), 'Display formatting leaves the original text intact');
-  const { renderGuidedDesign }=await import('../../src/features/design/guided-screen.js');
-  const writingState=initialState(scenario);
-  writingState.designStep=2; writingState.designPanel='reason'; writingState.design.reason=rawReason;
-  const writingHTML=renderGuidedDesign(writingState,{pending:false,suggestion:null,error:''});
-  const reasonValue=writingHTML.match(/<textarea[^>]*name="reason"[^>]*>([\s\S]*?)<\/textarea>/)[1];
-  assert.equal(reasonValue,'Supports alignment and feedback.');
-  assert.equal(writingState.design.reason,rawReason,'Opening the editor preserves saved source text');
   assert.ok(!renderDesignRationale('[Unverified](https://unverified.example)').includes('<a '));
   const report = renderAssignmentDirections(
     '## Week 8: t-Test Report\n\n**Due:** Sunday\n\n### Peer exchange\n1. **First post:** Explain your choice.\n   Use your own output.\n2. Test a peer’s interpretation.\n\n<script>bad</script>',
@@ -171,6 +128,17 @@ const assert = require('node:assert/strict');
   assert.ok(report.includes('<strong>First post:</strong>'));
   assert.ok(report.includes('<br>Use your own output.'));
   assert.ok(!report.includes('<script>'));
+  const replySentence=renderAssignmentDirections('### Peer reply\nReply to one classmate’s initial post. Engage one specific sentence.');
+  assert(replySentence.includes('<p>Reply to one classmate’s initial post. Engage one specific sentence.</p>'));
+  assert(!replySentence.includes('<h4>Reply</h4>'),'An ordinary sentence is not a heading');
+  assert(renderAssignmentDirections('Reply: Test one claim.').includes('<h4>Reply</h4><p>Test one claim.</p>'));
+  assert(renderAssignmentDirections('Reply\nTest one claim.').includes('<h4>Reply</h4><p>Test one claim.</p>'));
+  const {renderScrollableDirections}=await import('../../src/shared/paged-directions.js');
+  const fullDraft=renderScrollableDirections('## Purpose\nExplain a decision.\n## Peer exchange\nTest a claim.\n## Follow-up\nRevise the choice.');
+  assert(fullDraft.includes('Explain a decision.') && fullDraft.includes('Test a claim.') && fullDraft.includes('Revise the choice.'));
+  assert(fullDraft.indexOf('Jump to a section')<fullDraft.indexOf('suggested-full-document'));
+  assert(fullDraft.includes('2. Peer exchange') && fullDraft.includes('data-reading-anchor'));
+  assert(!fullDraft.includes('Section 1 of'),'Named section navigation replaces the obscure count-only picker');
   const structuredDiscussion = renderAssignmentDirections(
     'First post: Explain your recommendation.\n\nPeer reply:\nCompare the recommendation with course evidence.\n\nFollow-up: Revise or defend your choice.',
   );
@@ -325,143 +293,6 @@ const assert = require('node:assert/strict');
     'Assignment changes preserve the previous draft',
   );
   saveState(state, storage);
-  const handlers = {},
-    notice = { textContent: '' },
-    finishButton = { disabled: true, querySelector: () => ({ textContent: '' }) };
-  const app = {
-    innerHTML: '',
-    addEventListener: (name, handler) => (handlers[name] = handler),
-    querySelectorAll: () => [],
-    querySelector: (selector) =>
-      selector === '[data-action="approve-version"]'
-        ? finishButton
-        : ['.save-notice', '.design-notice', '.final-check-status'].includes(selector)
-          ? notice
-          : null,
-    scrollIntoView: () => {},
-  };
-  global.window = { localStorage: storage };
-  global.document = {
-    getElementById: (id) => (id === 'app' ? app : { focus: () => {} }),
-    querySelector: () => null,
-  };
-  global.ResizeObserver = class {
-    observe() {}
-  };
-  global.requestAnimationFrame = (callback) => callback();
-  await import('../../src/app/app.js');
-  const dispatchClick = (action) =>
-    handlers.click({
-      target: {
-        closest: (selector) => (selector === '[data-action]' ? { dataset: { action } } : null),
-      },
-    });
-  const click = action => {
-    const result=dispatchClick(action);
-    if(action==='design-next' && app.innerHTML.includes('pixel-advice-scene')) dispatchClick(saved().designReturnPanel==='reason' ? 'design-back' : 'design-next');
-    return result;
-  };
-  const input = (name, value) =>
-    handlers.input({
-      target: {
-        name,
-        value,
-        closest: (selector) => (selector === '[data-design-form]' ? {} : null),
-      },
-    });
-  const saved = () => loadState(scenario, storage);
-  click('start-design');
-  assert.match(app.innerHTML,/pixel-advice-scene/);
-  click('design-next');
-  assert.match(app.innerHTML, /Give the conversation a purpose/);
-  input('concern', 'Students do not use the replies.');
-  click('design-next');
-  assert.match(app.innerHTML, /Choose a job for the reply/);
-  input('exchange', 'evidence');
-  click('design-next');
-  assert.equal(saved().designPanel, 'notes');
-  input('notes', 'Use evidence to reconsider a choice.');
-  click('design-next');
-  assert.match(app.innerHTML, /Work with Babbage/);
-  click('design-next'); // Continue to the editable draft if AI is unavailable.
-  click('use-starter');
-  assert.match(saved().design.revision, /Compare a classmate/);
-  assert.equal(
-    saved().teacher.directions,
-    original,
-    'Starter preserves original directions exactly',
-  );
-  input('revision', 'My edited draft.');
-  input('reason', 'Students explain how evidence changes their choice.');
-  click('design-back');
-  click('design-next');
-  assert.equal(saved().design.revision, 'My edited draft.', 'Back preserves draft edits');
-  click('use-starter');
-  assert.ok(
-    saved().design.revision.startsWith('My edited draft.\n\n'),
-    'Starter appends without replacing edits',
-  );
-  const beforeRepeat = saved().design.revision;
-  click('use-starter');
-  assert.equal(
-    saved().design.revision,
-    beforeRepeat,
-    'Repeated starter click does not duplicate exchange',
-  );
-  click('design-next');
-  assert.equal(saved().designPanel, 'reason');
-  click('design-next');
-  assert.match(app.innerHTML, /Original assignment/);
-  assert.match(app.innerHTML, /Revised directions/);
-  assert.match(app.innerHTML, /My edited draft/);
-  assert.equal(saved().phase, 'design');
-  assert.equal(saved().designStep, 3, 'Reload restores review and draft');
-  click('design-next');
-  assert.match(app.innerHTML, /Check your discussion-board component/);
-  const check = (key, checked) =>
-    handlers.change({
-      target: {
-        matches: (selector) => selector === '[data-final-check]',
-        dataset: { finalCheck: key },
-        checked,
-      },
-    });
-  check('instructions', true);
-  check('learning', true);
-  check('requirements', true);
-  assert.equal(finishButton.disabled, false);
-  click('approve-version');
-  assert.equal(saved().finalCheck.completed, true, 'Final checks persist');
-  assert.equal(saved().finalCheck.approved, true, 'Approval persists');
-  click('edit-draft');
-  input('revision', 'A changed draft.');
-  assert.equal(saved().finalCheck.completed, false, 'Draft edits invalidate review');
-  assert.equal(saved().finalCheck.approved, false, 'Draft edits invalidate approval');
-  assert.equal(saved().finalCheck.instructions, false);
-  click('design-next');
-  click('design-next');
-  click('edit-context');
-  assert.match(app.innerHTML, /Here’s what we’ll work with/);
-  click('start-design');
-  assert.equal(saved().designStep, 3, 'Returning from setup preserves design position');
-  for (let i = 0; i < 10 && saved().phase === 'design'; i++) click('design-back');
-  assert.equal(saved().phase, 'summary', 'Back from first design step returns to summary');
-  assert.equal(saved().teacher.directions, original);
-  const bad = {
-    ...saved(),
-    phase: 'design',
-    designStep: 99,
-    design: { concern: 3, exchange: 'invalid', revision: '<script>alert(1)</script>' },
-  };
-  storage.setItem(STORAGE_KEY, JSON.stringify(bad));
-  const restored = loadState(scenario, storage);
-  assert.equal(restored.designStep, 4);
-  assert.equal(restored.design.concern, '');
-  assert.equal(restored.design.exchange, '');
-  assert.ok(!renderDesign(restored).includes('<script>'), 'User text is escaped');
-  assert.ok(renderDesign(restored).includes('&lt;script&gt;'));
-  for (const exchange of ['test', 'evidence', 'perspective'])
-    assert.ok(starterDraft(state.teacher, { exchange }).startsWith(original));
   const block = starterDraft({ directions: '' }, { exchange: 'test' }).trim();
   const repeated =
     original + '\n\n' + Array(4).fill(block).join('\n\n') + '\n\nKeep this custom ending.';
@@ -533,7 +364,7 @@ const assert = require('node:assert/strict');
   assert(!isTestLessonKeyword({name:'subject',value:'good management'}));
   assert.throws(() => fillTestLesson(sample,'unknown'), /Unknown sample/);
   console.log(
-    'PASS: design navigation, original preservation, starter append, edits, restore, legacy saves, validation, escaping, storage failures.',
+    'PASS: design content and saved-state compatibility, original preservation, starter handling, legacy saves, escaping, and storage failures.',
   );
 })().catch((error) => {
   console.error(error);

@@ -28,7 +28,7 @@ export function readWorkspace(storage = window.localStorage) {
     metadata.ideaId = findIdea(record.workspace?.ideaId)?.id || '';
     metadata.studentNeeds = typeof record.workspace?.studentNeeds === 'string' ? record.workspace.studentNeeds.slice(0, 6000) : '';
     if (record.workspace?.selectedDirection) metadata.selectedDirection = normalizeDirection(record.workspace.selectedDirection);
-    for (const key of ['creativeCore', 'instructorPlan', 'openQuestions']) {
+    for (const key of ['creativeCore', 'studentContribution', 'peerInteraction', 'instructorPlan', 'openQuestions']) {
       if (typeof record.workspace?.[key] === 'string') metadata[key] = record.workspace[key].slice(0, 6000);
     }
     const state = loadState(discussionOpening, { getItem: () => JSON.stringify(record.state) }, metadata);

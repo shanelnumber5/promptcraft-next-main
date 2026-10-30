@@ -756,31 +756,6 @@ body:has(.setup-shell) #app {
   }
 }
 @media (min-width: 1181px) and (min-height: 821px) {
-  .summary-shell .setup-form {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding-bottom: 24px;
-  }
-  .summary-shell .setup-columns {
-    flex: 1;
-  }
-  .summary-shell .setup-main {
-    display: flex;
-    flex-direction: column;
-  }
-  .summary-shell .setup-intro,
-.summary-shell .summary-tabs {
-    margin-bottom: 0;
-  }
-  .summary-shell .summary-sections {
-    flex: 1;
-    min-height: 0;
-    overflow: auto;
-  }
-  .summary-shell .setup-actions {
-    padding-bottom: 0;
-  }
   .summary-section--limits .summary-sections > section {
     gap: 8px;
     padding: 10px 16px;
@@ -868,17 +843,6 @@ body:has(.setup-shell) #app {
     font-size: 16px;
     line-height: 1.2;
   }
-  .summary-shell .setup-intro {
-    margin-bottom: 6px;
-  }
-  .summary-shell .setup-intro h1 {
-    font-size: 32px;
-    line-height: 1.15;
-  }
-  .summary-shell .setup-intro p {
-    font-size: 16px;
-    line-height: 1.2;
-  }
   .setup-main .setup-fields {
     gap: 8px;
   }
@@ -957,18 +921,6 @@ body:has(.setup-shell) #app {
     font-size: 16px;
     line-height: 1.1;
   }
-  .summary-shell .summary-sections {
-    display: flex;
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
-  }
-  .summary-shell .summary-sections > section {
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
-    padding: 8px 10px;
-  }
   .summary-sections h2 {
     margin-bottom: 8px;
     font-size: 28px;
@@ -978,13 +930,6 @@ body:has(.setup-shell) #app {
   }
   .summary-section--class .summary-sections > section,
 .summary-section--limits .summary-sections > section {
-    gap: 8px;
-  }
-  .summary-shell.summary-section--class .summary-sections > section,
-.summary-shell.summary-section--limits .summary-sections > section {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-rows: min-content;
     gap: 8px;
   }
   .summary-section--class .summary-sections > section > .setup-field,
@@ -1018,9 +963,6 @@ body:has(.setup-shell) #app {
   .summary-sections .setup-field textarea {
     height: 64px;
     min-height: 0;
-  }
-  .summary-shell .summary-sections .setup-field + .setup-field {
-    margin-top: 0;
   }
   .summary-section--assignment .summary-sections > section {
     grid-template-rows: auto auto auto 10dvh auto;
@@ -1057,10 +999,6 @@ body:has(.setup-shell) #app {
   }
   .setup-shell .setup-actions .nav-button > span {
     font-size: 16px;
-  }
-  .summary-shell .setup-form {
-    gap: 0;
-    padding-bottom: 10px;
   }
 }
 body[data-app-view] .setup-shell .setup-header {

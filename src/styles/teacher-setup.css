@@ -78,17 +78,6 @@ body:has(.setup-shell--teacher) #app {
   border-radius: 10px;
   background: #f7fafc;
 }
-.setup-shell--teacher.summary-shell .summary-sections > section {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: none;
-  grid-auto-rows: min-content;
-  gap: 8px;
-  padding: 12px;
-  border: 0;
-  min-width: 0;
-  overflow: visible;
-}
 .setup-shell--teacher .summary-sections h2 {
   grid-column: 1 / -1;
   font-size: 28px;
@@ -461,9 +450,6 @@ body:has(.setup-shell--teacher) #app {
   .setup-shell--teacher .setup-columns {
     gap: 12px 20px;
   }
-  .setup-shell--teacher.summary-shell .summary-sections > section {
-    gap: 4px;
-  }
   .setup-shell--teacher .summary-sections h2 {
     font-size: 28px;
   }
@@ -503,7 +489,4 @@ body:has(.setup-shell--teacher) #app {
   body:has(.setup-shell--teacher) #app {
     padding: 12px;
   }
-}
-.design-shell--guided {
-  max-width: none;
 }

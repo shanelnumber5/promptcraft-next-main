@@ -7,6 +7,9 @@ export const designDefaults = () => ({
   sourceDirections: '',
   previousRevision: '',
   previousReason: '',
+  instructorPlan: '',
+  feedbackClarifications: '',
+  teachingNoteReview: '',
 });
 export function syncDraftAssignment(teacher, design) {
   if (design.sourceDirections === teacher.directions) return false;
@@ -132,6 +135,7 @@ export const finalCheckContext = (teacher, design) =>
   JSON.stringify([
     design.revision,
     design.reason,
+    ...(design.instructorPlan ? [design.instructorPlan] : []),
     teacher.directions,
     teacher.learningGoal,
     teacher.learningGoalUnsure,
@@ -164,10 +168,6 @@ export function starterDraft(teacher, design) {
     (tasks[design.exchange] || tasks.test) +
     '\n3. Respond to the contribution you received. Revise or defend your choice with reasons, and explain how the exchange informed your response.'
   );
-}
-
-export function hasStarterExchange(text) {
-  return /^Peer exchange \(draft\)\s*$/m.test(text);
 }
 
 export function removeRepeatedStarterExchanges(text) {
