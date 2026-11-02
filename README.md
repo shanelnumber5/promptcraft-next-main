@@ -31,8 +31,9 @@ The browser uses the existing backend at `https://promptcraft-discussion.netlify
 - `npm test`: offline suites plus local static-server checks.
 - `npm run test:browser`: shared Scenario and Workspace browser fixtures.
 - `npm run test:lab`: Idea Lab browser fixtures.
+- `npm run test:accessibility`: public-page layout, contrast, ARIA, skip-link and dialog keyboard checks at four viewport sizes.
 
-Browser checks require installed Chrome or `PC_CHROME_EXECUTABLE`. They use mocked AI and temporary browser profiles. Set `PC_BROWSER_DEVICE` for selected viewports, or `PC_BROWSER_OUTPUT` for a screenshot destination. These fixtures are not a claim of browser verification for this cleanup. Live AI quality must be reviewed separately.
+Browser checks require installed Chrome or `PC_CHROME_EXECUTABLE`. They use mocked AI and temporary browser profiles. Set `PC_BROWSER_DEVICE` for selected Idea Lab viewports, or `PC_BROWSER_OUTPUT` for a screenshot destination. See the [responsiveness and accessibility review](docs/responsiveness-accessibility-20261101.md) for coverage and limitations. Live AI quality must be reviewed separately.
 
 Manual live checks in `tests/manual/` require the explicit `RUN_LIVE_BABBAGE=1` or `RUN_LIVE_MAYA=1` opt-in and send fictional sample context to the backend.
 

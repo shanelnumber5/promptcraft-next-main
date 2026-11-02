@@ -1,4 +1,5 @@
 import { escapeHTML as e } from './html.js';
+import { showModal } from './modal.js';
 import { designEvidence } from './design-evidence.js';
 import { discussionOpening } from '../features/opening/content.js';
 import { teacherSetup } from '../features/setup/content.js';
@@ -66,11 +67,6 @@ export function openReferences(opener) {
       render();
     });
   });
-  dialog.addEventListener('close', () => {
-    dialog.remove();
-    if (opener?.isConnected) opener.focus({ preventScroll: true });
-  }, { once: true });
   render();
-  document.body.append(dialog);
-  dialog.showModal();
+  showModal(dialog, { opener });
 }

@@ -8,7 +8,7 @@ import { renderLoading } from '../design/loading.js';
 import { renderDesignRationale } from '../../shared/design-evidence.js';
 import { escapeHTML as e } from '../../shared/html.js';
 
-export function renderPartner(state, ai, page, preview, ui = {readingPage:0}) {
+export function renderPartner(state, ai, page, preview, ui = {}) {
   const conversation = state.babbage;
   const dev = conversation.mode === 'dev';
   const available = dev || ai.configured === true;
@@ -21,13 +21,13 @@ export function renderPartner(state, ai, page, preview, ui = {readingPage:0}) {
   if (page === 'history') {
     const index=Math.max(0,Math.min(ui.historyIndex ?? conversation.history.length-1,conversation.history.length-1));
     const turn=conversation.history[index];
-    content=`<h3>Earlier conversation</h3>${turn?`<p>${turn.role==='assistant'?'Babbage':'Your answers'}</p>${renderReading(turn.display||turn.content,ui.readingPage)}<nav class="workspace-reading-nav"><button type="button" data-history-index="${index-1}"${index===0?' disabled':''}>Earlier message</button><span>${index+1} / ${conversation.history.length}</span><button type="button" data-history-index="${index+1}"${index===conversation.history.length-1?' disabled':''}>Later message</button></nav>`:'<p>No earlier messages yet.</p>'}`;
+    content=`<h3>Earlier conversation</h3>${turn?`<p>${turn.role==='assistant'?'Babbage':'Your answers'}</p>${renderReading(turn.display||turn.content)}<nav class="workspace-reading-nav"><button type="button" data-history-index="${index-1}"${index===0?' disabled':''}>Earlier message</button><span>${index+1} / ${conversation.history.length}</span><button type="button" data-history-index="${index+1}"${index===conversation.history.length-1?' disabled':''}>Later message</button></nav>`:'<p>No earlier messages yet.</p>'}`;
     actions = '';
   } else if (page === 'options') {
     content = `<h3>Connection status</h3><p>${offline ? 'The connection is currently unavailable.' : dev ? 'Creative sketches require a live connection.' : ai.configured === true ? 'Babbage is connected.' : 'Checking the connection…'}</p>`;
     actions = `${!dev ? '<button type="button" class="primary" data-action="retry-babbage">Retry connection</button>' : ''}`;
   } else if (page === 'rationale' && ai.suggestion) {
-    content = `<h3>Why this design?</h3>${renderReading(ai.suggestion.reason,ui.readingPage,renderDesignRationale)}`;
+    content = `<h3>Why this design?</h3>${renderReading(ai.suggestion.reason,renderDesignRationale)}`;
     actions = '<button type="button" data-partner-page="work">Back to the suggestion</button>';
   } else if (page === 'ideas') {
     content = renderPossibilities(state, ai, '', false);
@@ -35,7 +35,7 @@ export function renderPartner(state, ai, page, preview, ui = {readingPage:0}) {
   } else if (ai.pending) {
     content = renderLoading(ai, dev);
   } else if (ai.suggestion) {
-    content=`${renderBabbageCameo(state, conversation.history.findLast(turn => turn.role === 'assistant')?.display)}<h3>Babbage’s suggested draft</h3><p>Compare this suggestion with your activity. Select Use this draft to put it in Build, or keep your current draft.</p><div class="partner-suggestion" data-suggestion-preview>${renderReading(ai.suggestion.revision,ui.readingPage)}</div>`;
+    content=`${renderBabbageCameo(state, conversation.history.findLast(turn => turn.role === 'assistant')?.display)}<h3>Babbage’s suggested draft</h3><p>Compare this suggestion with your activity. Select Use this draft to put it in Build, or keep your current draft.</p><div class="partner-suggestion" data-suggestion-preview>${renderReading(ai.suggestion.revision)}</div>`;
     actions = '<button type="button" class="primary" data-action="apply-ai">Use this draft</button><button type="button" data-action="dismiss-ai">Keep my draft</button><button type="button" data-partner-page="rationale">Design reasoning</button>';
   } else if (offline) {
     content = '<h3>You can keep designing.</h3><p>Babbage is unavailable right now. Continue with your idea in Build, or try the connection again.</p>';

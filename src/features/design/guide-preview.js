@@ -1,4 +1,5 @@
 import { createGuide, loadGuideLogo } from './guide.js';
+import { showModal } from '../../shared/modal.js';
 export function openGuidePreview(state, app) {
   const dialog = document.createElement('dialog');
   dialog.className = 'guide-preview';
@@ -27,11 +28,6 @@ export function openGuidePreview(state, app) {
     );
   });
   dialog.querySelector('button').addEventListener('click', () => dialog.close());
-  dialog.addEventListener('close', () => {
-    dialog.remove();
-    app.querySelector('[data-action="preview-guide"]')?.focus();
-  });
-  document.body.append(dialog);
-  dialog.showModal();
+  showModal(dialog, { fallback: () => app.querySelector('[data-action="preview-guide"]') });
   dialog.querySelector('button').focus();
 }

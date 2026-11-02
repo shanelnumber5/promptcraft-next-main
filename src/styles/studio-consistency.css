@@ -286,68 +286,6 @@ body[data-app-view] .focused-scene.focus--question .feedback.has-feedback { colo
 body[data-app-view] .focused-scene .smartboard:has(.handoff) .service-flow > li { background: #edaa00; border-color: #edaa00; color: #001f5b; }
 body[data-app-view] .focused-scene .smartboard:has(.handoff) .service-flow > li :is(strong,span:not(.flow-number)) { color: #001f5b; }
 body[data-app-view] .focused-scene .smartboard:has(.handoff) .flow-number { background: #001f5b; color: #fff; }
-/* Guided intake: the form leads; assignment context stays compact. */
-body:has(.setup-shell--teacher) #app { max-width: 1240px; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-header { background: #001f5b; color: #fff; border-radius: 4px 4px 0 0; padding: 14px 20px; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-header strong { color: #fff; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-columns { grid-template-columns: minmax(0,1.45fr) minmax(0,.85fr); gap: 20px 28px; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-main .setup-intro { margin-bottom: 20px; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-intro p { max-width: 65ch; line-height: 1.5; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-live-preview { align-self: start; height: auto; max-height: min(430px,58dvh); padding: 0; display: flex; flex-direction: column; border: 0; border-radius: 4px; background: #001f5b; overflow: hidden; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-live-preview h2 { margin: 0; padding: 20px 20px 0; font-family: Georgia,'Times New Roman',serif; font-size: 24px; font-weight: 400; color: #fff; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-live-preview > p { color: #e3ebf5; margin: 8px 0 0; padding: 0 20px 20px; font-size: 14px; line-height: 1.5; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-preview-content { flex: 0 1 auto; height: auto; min-height: 0; max-height: 300px; margin: 0; padding: 20px; border: 1px solid #c3ced9; border-top: 3px solid #edaa00; border-radius: 0 0 4px 4px; background: #fff; overflow: auto; font-size: 16px; line-height: 1.5; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-preview-empty { margin: 0; font-size: 15px; color: #405674; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-actions { grid-column: 1 / -1; background: #edaa00; padding: 12px 16px; border: 0; border-radius: 4px; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-actions button.nav-button--back { background: #fff; color: #001f5b; border: 2px solid #001f5b; border-radius: 3px; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-actions button.primary.nav-button--next { background: #001f5b; color: #fff; border: 2px solid #fff; border-radius: 3px; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-actions > span { color: #001f5b; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher .summary-tabs { padding: 4px; border-radius: 3px; background: #001f5b; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher .summary-tabs button { color: #fff; border: 0; border-radius: 3px; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher .summary-tabs button[aria-selected='true'] { color: #001f5b; background: #edaa00; border: 0; }
-@media (max-width: 1099px), (max-height: 699px) {
- body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-columns { grid-template-columns: minmax(0,1fr); }
- body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-live-preview { min-height: 0; max-height: 400px; }
- body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-actions { border-radius: 0; padding-bottom: calc(16px + env(safe-area-inset-bottom,0px)); }
-}
-@media (min-width: 1100px) and (min-height: 700px) and (max-height: 850px) {
- body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-columns { gap: 12px 20px; }
- body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-main .setup-intro { margin-bottom: 8px; }
- body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-header { padding: 10px 18px; }
- body[data-app-view='play'] .setup-shell.setup-shell--teacher .setup-actions { padding: 8px 12px; }
-}
-/* A quiet form surface and clear format choices for class context. */
-body[data-app-view='play'] .setup-shell.setup-shell--teacher.setup-step--class .setup-fields,
-body[data-app-view='play'] .setup-shell.setup-shell--teacher.summary-section--class .summary-sections > section { background: #fff; border: 1px solid #e0e5eb; border-radius: 4px; padding: 16px; gap: 20px 16px; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .setup-field .field-help { min-height: 0; font-size: 13px; line-height: 1.4; margin: 5px 0 10px; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .setup-field input[type='text'] { height: 48px; background: #f7f9fc; border: 1px solid #9aabbd; border-bottom: 2px solid #001f5b; padding: 10px 12px; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .unsure { color: #405674; gap: 8px; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .unsure input { width: 16px; height: 16px; accent-color: #001f5b; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .radio-cards { gap: 8px; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .radio-cards label { position: relative; justify-content: center; min-height: 48px; padding: 10px 8px; background: #fff; border: 1px solid #8c9fb5; border-radius: 3px; color: #001f5b; text-align: center; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .radio-cards input { position: absolute; width: 1px; height: 1px; opacity: 0; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .radio-cards label:has(input:checked) { background: #001f5b; color: #fff; border-color: #001f5b; box-shadow: inset 0 -3px #edaa00; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .radio-cards label:focus-within { outline: 2px solid #b47900; outline-offset: 3px; }
-@media (min-width: 1100px) and (min-height: 700px) and (max-height: 850px) {
- body[data-app-view='play'] .setup-shell.setup-shell--teacher.setup-step--class .setup-fields,
- body[data-app-view='play'] .setup-shell.setup-shell--teacher.summary-section--class .summary-sections > section { padding: 12px; gap: 10px 14px; }
- body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .setup-field .field-help { margin: 4px 0 6px; }
- body[data-app-view='play'] .setup-shell.setup-shell--teacher:is(.setup-step--class,.summary-section--class) .radio-cards label { min-height: 44px; padding: 8px; }
-}
-/* Give the class form a little more breathing room. */
-body[data-app-view='play'] .setup-shell.setup-shell--teacher.setup-step--class .setup-fields { padding-top: 24px; padding-bottom: 28px; row-gap: 28px; }
-@media (min-width: 1100px) and (min-height: 700px) and (max-height: 850px) {
- body[data-app-view='play'] .setup-shell.setup-shell--teacher.setup-step--class .setup-fields { padding-top: 20px; padding-bottom: 24px; row-gap: 20px; }
-}
-/* Every guided setup section shares the same white form surface. */
-body[data-app-view='play'] .setup-shell.setup-shell--teacher.setup-step .setup-fields,
-body[data-app-view='play'] .setup-shell.setup-shell--teacher.summary-shell .summary-sections > section { background: #fff; border: 1px solid #e0e5eb; border-radius: 4px; padding: 16px; }
-body[data-app-view='play'] .setup-shell.setup-shell--teacher.setup-step--class .setup-fields { padding-top: 24px; padding-bottom: 28px; }
-@media (min-width: 1100px) and (min-height: 700px) and (max-height: 850px) {
- body[data-app-view='play'] .setup-shell.setup-shell--teacher.setup-step .setup-fields,
- body[data-app-view='play'] .setup-shell.setup-shell--teacher.summary-shell .summary-sections > section { padding: 12px; }
- body[data-app-view='play'] .setup-shell.setup-shell--teacher.setup-step--class .setup-fields { padding-top: 20px; padding-bottom: 24px; }
-}
 body[data-app-view='play'] .setup-shell.design-shell--guided :is(#revision-label,#guided-preview-title) { grid-row: 1; align-self: center; font: 600 16px/1.4 Arial,Helvetica,sans-serif; margin: 0; padding: 0; }
 body[data-app-view='play'] .setup-shell.design-shell--guided :is(.directions-editor,.guided-live-preview .guided-document) { grid-row: 3; height: auto; min-height: 100px; max-height: none; padding: 16px; margin: 0; background: #fff; border: 1px solid #9aabbd; border-radius: 3px; font: 16px/1.55 Arial,Helvetica,sans-serif; overflow: auto; }
 /* Automatic student reading continues the classroom visual novel. */

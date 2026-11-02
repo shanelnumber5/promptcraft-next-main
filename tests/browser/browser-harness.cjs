@@ -154,7 +154,9 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
         errors.push(message.params.exceptionDetails.exception?.description || message.params.exceptionDetails.text);
       if (message.id) {
         const request = pending.get(message.id);
+        if (!request) return;
         pending.delete(message.id);
+        clearTimeout(request.timeout);
         message.error
           ? request.reject(Error(message.error.message))
           : request.resolve(message.result);
@@ -163,7 +165,11 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     const send = (method, params = {}, sessionId) =>
       new Promise((resolve, reject) => {
         const id = ++serial;
-        pending.set(id, { resolve, reject });
+        const timeout = setTimeout(() => {
+          pending.delete(id);
+          reject(Error('Browser command timed out: ' + method));
+        }, 30000);
+        pending.set(id, { resolve, reject, timeout });
         socket.send(JSON.stringify({ id, method, params, sessionId }));
       });
     const evaluate = async (expression) => {
@@ -172,7 +178,7 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
         returnByValue: true,
         awaitPromise: true,
       });
-      if (result.exceptionDetails) throw Error(result.exceptionDetails.text);
+      if (result.exceptionDetails) throw Error(result.exceptionDetails.exception?.description || result.exceptionDetails.text);
       return result.result.value;
     };
     const waitFor = async (expression) => {
@@ -250,7 +256,9 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     await send('Page.addScriptToEvaluateOnNewDocument', {
       source: `(()=>{const original=window.fetch.bind(window);window.fetch=(url,options)=>original(String(url).startsWith('https://promptcraft-discussion.netlify.app/.netlify/functions/babbage')?'/api/babbage':url,options);})()`,
     });
-    if (['workspace-layout','scenario-studio'].includes(process.env.PC_BROWSER_FEATURE)) {
+    if (process.env.PC_BROWSER_FEATURE === 'accessibility') {
+      await require('./accessibility-checks.cjs')({send,evaluate,waitFor,shot,key,keyboardReach,accessibleScreen});
+    } else if (['workspace-layout','scenario-studio'].includes(process.env.PC_BROWSER_FEATURE)) {
       await require('./workspace-layout-checks.cjs')({send,evaluate,waitFor,shot,key,keyboardReach,accessibleScreen,scenarioMode:process.env.PC_BROWSER_FEATURE==='scenario-studio'});
     } else if (process.env.PC_BROWSER_FEATURE === 'lab') {
       await require('./idea-lab-browser-checks.cjs')({send,evaluate,waitFor,key,keyboardReach,accessibleScreen,shot});

@@ -42,11 +42,11 @@ module.exports = async ({send,evaluate,waitFor,shot,key,keyboardReach,accessible
     assert.deepEqual(sidebar,['start','subject','ai-use','intentions','presence','draft']);
     let desktopFooter;
     const sameFooter=async label=>{
-      const bars=await evaluate('[...document.querySelectorAll("#workspace-panel .workspace-action-bar")].map(el=>el.getBoundingClientRect().toJSON())');
+      const bars=await evaluate('[...document.querySelectorAll("#workspace-panel .workspace-action-bar")].map(el=>({...el.getBoundingClientRect().toJSON(),y:el.getBoundingClientRect().y+scrollY}))');
       assert.equal(bars.length,1, `${label}: one main gold bar`);
       assert.equal(bars[0].height,72, `${label}: 72px action bar`);
       desktopFooter ??= bars[0];
-      for(const property of ['y','height']) assert(Math.abs(bars[0][property]-desktopFooter[property])<3, `${label}: stable gold bar ${property}`);
+      for(const property of ['y','height']) assert(Math.abs(bars[0][property]-desktopFooter[property])<3, `${label}: stable gold bar ${property} (${bars[0][property]} vs ${desktopFooter[property]})`);
     };
     for(const page of sidebar) {
       await choose(`[data-design-page="${page}"]`);
@@ -63,7 +63,7 @@ module.exports = async ({send,evaluate,waitFor,shot,key,keyboardReach,accessible
       assert.equal(layout.current,1);
       for(const item of layout.nav) assert(item.size>=16 && item.height>=44,`${device}/${page}: readable navigation and targets`);
       for(const field of layout.fields) assert(field.width>0,`${device}/${page}: visible field ${field.id}`);
-      assert(Math.abs(layout.footer.bottom-layout.panel.bottom)<3,`${device}/${page}: footer at panel bottom`);
+      assert(Math.abs(layout.footer.bottom-layout.panel.bottom)<3,`${device}/${page}: footer at panel bottom ${JSON.stringify({footer:layout.footer,panel:layout.panel})}`);
       await sameFooter(`${device}/build/${page}`);
       if(page==='ai-use') assert(await evaluate('(()=>{const wide=document.querySelector(".workspace-field-wide").getBoundingClientRect();const grid=document.querySelector(".workspace-combined-fields").getBoundingClientRect();return Math.abs(wide.width-grid.width)<2;})()'), `${device}: requirements span both columns`);
       if(page==='intentions'||page==='presence') {

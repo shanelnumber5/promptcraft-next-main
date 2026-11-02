@@ -441,13 +441,11 @@ export function mountWorkspace(app, params, {scenario=false} = {}) {
     const directionView=event.target.closest('[data-view-direction]');
     if(directionView&&!readError){ui={...workspaceViews(),screen:'idea',index:Number(directionView.dataset.viewDirection),saved:directionView.hasAttribute('data-saved-direction'),opener:directionView.id};render();focusTask();return;}
     const part=event.target.closest('[data-idea-part]');
-    if(part){ui.part=part.dataset.ideaPart;ui.readingPage=0;render();focusTask();return;}
-    const reading=event.target.closest('[data-reading-page]');
-    if(reading){ui.readingPage=Math.max(0,Number(reading.dataset.readingPage)||0);render();focusTask();return;}
+    if(part){ui.part=part.dataset.ideaPart;render();focusTask();return;}
     const savedPage=event.target.closest('[data-saved-page]');
     if(savedPage){ui.index=Math.max(0,Number(savedPage.dataset.savedPage)||0);render();focusTask();return;}
     const history=event.target.closest('[data-history-index]');
-    if(history){ui.historyIndex=Number(history.dataset.historyIndex);ui.readingPage=0;render();focusTask();return;}
+    if(history){ui.historyIndex=Number(history.dataset.historyIndex);render();focusTask();return;}
     const partner = event.target.closest('[data-partner-page]');
     if (partner) { ui=workspaceViews(); partnerPage = partner.dataset.partnerPage; state.designPanel = 'babbage'; saveSafely(); render(); document.getElementById('ai-title')?.focus({ preventScroll: true }); return; }
     const review = event.target.closest('[data-review-page]');

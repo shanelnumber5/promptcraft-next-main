@@ -21,7 +21,7 @@ const teacherField = (state, id) => {
   return renderField({...field,unsure:false,...compact[id],...suggestion},state.teacher);
 };
 const metaField = (id,key,label,value,rows=2) => `<div class="setup-field"><label for="${id}">${label}</label><textarea id="${id}" data-workspace-meta="${key}" rows="${rows}">${e(value || '')}</textarea></div>`;
-export function renderWorkspace(state, ai, error='', designPage='start', partnerPage='work', reviewPage='rationale', ui={screen:'work',readingPage:0}) {
+export function renderWorkspace(state, ai, error='', designPage='start', partnerPage='work', reviewPage='rationale', ui={screen:'work'}) {
   const route=designRoute(state.experience);
   if(error) return `<section class="entry-shell"><h1 id="setup-title" tabindex="-1">${e(route.heading)} needs attention</h1><p role="status">${e(error)}</p><button type="button" data-action="reset-workspace">${e(route.restartLabel)}</button><a href="?view=home">Return home</a></section>`;
   const panel=state.designPanel;
@@ -51,7 +51,7 @@ export function workspacePreview(state,designPage) {
   const starting=state.designPanel!=='reason'&&((state.designPanel==='revision'&&designPage==='start')||(!state.design.revision.trim()&&designPage!=='draft'));
   return starting?{text:state.teacher.directions,label:state.workspace.sourceKind==='idea'?'Starting idea':'Starting directions'}:{text:state.design.revision,label:'Working draft'};
 }
-export function renderWorkspacePreview(state,designPage,ui={readingPage:0}) {
+export function renderWorkspacePreview(state,designPage,ui={}) {
   const model=workspacePreview(state,designPage);
   const context = [['Course & learners',[state.teacher.subject,state.teacher.learnerLevel].filter(Boolean).join(' · ')],['Learning goal',state.teacher.learningGoal],['Time available',[state.teacher.workTime,state.teacher.daysAvailable].filter(Boolean).join(' · ')],['Required elements',state.teacher.mustStay],['Student AI use',state.teacher.aiUse],['Student contribution',state.workspace.studentContribution],['Peer interaction',state.workspace.peerInteraction],['Creative direction',state.workspace.creativeCore],['Instructor interaction',state.workspace.instructorPlan]];
   return `<div class="workspace-draft-overview"><aside class="workspace-draft-context" aria-label="Design context"><h3>Design context</h3><p>These details guide Babbage. They are separate from the student-facing directions.</p><dl>${context.filter(([,text])=>text?.trim()).map(([label,text])=>`<div><dt>${e(label)}</dt><dd>${e(text)}</dd></div>`).join('')}</dl></aside><section class="workspace-draft-document" aria-label="${e(model.label)}"><h3>Activity directions</h3><div class="workspace-reading-preview" data-live-preview>${renderDraftPreview(model.text,'No working draft yet. Your setup is saved; select Build my activity to put your choices together with Babbage.')}</div></section></div>`;

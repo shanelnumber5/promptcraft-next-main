@@ -1,19 +1,9 @@
 import { escapeHTML as e } from '../../shared/html.js';
 import { renderAssignmentDirections } from '../../shared/directions.js';
 
-export const workspaceViews = () => ({ screen: 'work', index: 0, saved: false, part: 'overview', readingPage: 0 });
+export const workspaceViews = () => ({ screen: 'work', index: 0, saved: false, part: 'overview' });
 export const buildPages = [['start','Starting point'],['subject','Course & learners'],['ai-use','Activity requirements'],['intentions','Creative direction'],['presence','Instructor interaction'],['draft','Your activity']];
-export function readingPages(text, size = typeof window !== 'undefined' && window.innerHeight < 650 ? 240 : typeof window !== 'undefined' && (window.innerWidth < 700 || window.innerHeight < 750) ? 420 : 650) {
-  const words = text.trim().match(/\S+\s*/g) || [];
-  const pages = []; let page = '';
-  for (const word of words) {
-    if (page && page.length + word.length + 1 > size) { pages.push(page); page = ''; }
-    page += word;
-  }
-  if (page) pages.push(page);
-  return pages.length ? pages : ['Nothing recorded yet.'];
-}
-export function renderReading(text, index = 0, renderer = renderAssignmentDirections) {
+export function renderReading(text, renderer = renderAssignmentDirections) {
   return `<div class="workspace-reading">${renderer(text)}</div>`;
 }
 export function renderUtility(state, ai, ui) {
@@ -56,7 +46,7 @@ export function renderUtility(state, ai, ui) {
     title = item.title;
     const parts = [['overview','The experience'],['learning','Learning & core'],['online','Online approach']];
     const text = ui.part === 'learning' ? `${item.learning}\n\nCreative core: ${item.core}` : ui.part === 'online' ? item.online : `${item.description}\n\n${item.experience}`;
-    body = `<nav class="workspace-part-nav workspace-project-actions" aria-label="Idea sections">${parts.map(([id,label])=>`<button type="button" data-idea-part="${id}"${ui.part===id?' aria-current="page"':''}>${label}</button>`).join('')}</nav>${renderReading(text,ui.readingPage)}<div class="workspace-project-actions"><button type="button" class="primary" data-develop-direction="${ui.index}"${ui.saved?' data-saved-direction':''}>Develop this idea</button>${!ui.saved?`<button type="button" data-save-direction="${ui.index}">Save for later</button>`:''}</div>`;
+    body = `<nav class="workspace-part-nav workspace-project-actions" aria-label="Idea sections">${parts.map(([id,label])=>`<button type="button" data-idea-part="${id}"${ui.part===id?' aria-current="page"':''}>${label}</button>`).join('')}</nav>${renderReading(text)}<div class="workspace-project-actions"><button type="button" class="primary" data-develop-direction="${ui.index}"${ui.saved?' data-saved-direction':''}>Develop this idea</button>${!ui.saved?`<button type="button" data-save-direction="${ui.index}">Save for later</button>`:''}</div>`;
   } else if (ui.screen === 'saved') {
     title = 'Saved ideas';
     const start = Math.max(0,Math.min(ui.index,Math.max(0,state.creative.alternatives.length-1)));
@@ -69,7 +59,7 @@ export function renderUtility(state, ai, ui) {
     body = `<label for="creative-feedback">A preference, change, or different direction</label><textarea id="creative-feedback" data-creative-field="feedback" rows="3">${e(state.creative.feedback)}</textarea><div class="workspace-project-actions"><button type="button" class="primary" data-action="explore-directions"${ai.pending || ai.configured!==true || state.babbage.mode==='dev'?' disabled':''}>Explore three possibilities</button></div>`;
   } else if (ui.screen === 'earlier') {
     title = 'Earlier draft';
-    body = `${renderReading(state.design.previousRevision,ui.readingPage)}<div class="workspace-project-actions"><button type="button" data-action="restore-earlier">Restore this draft</button></div>`;
+    body = `${renderReading(state.design.previousRevision)}<div class="workspace-project-actions"><button type="button" data-action="restore-earlier">Restore this draft</button></div>`;
   } else if (ui.screen === 'maya') {
     title = 'Student perspective';
     body = `<p>Maya offers a fictional first reading of your current draft. You can keep designing without it.</p><div class="workspace-project-actions"><button type="button" class="primary" data-action="hear-maya"${!state.design.revision.trim()||ai.pending?' disabled':''}>Hear Maya’s first read</button><button type="button" data-action="${state.creative.mayaPaused?'resume-maya':'pause-maya'}">${state.creative.mayaPaused?'Enable student perspectives':'Pause student perspectives'}</button></div>`;
