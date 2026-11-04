@@ -1,6 +1,6 @@
 import { createGuide, loadGuideLogo } from './guide.js';
 import { showModal } from '../../shared/modal.js';
-export function openGuidePreview(state, app) {
+export function openGuidePreview(state, app, { onClose = null } = {}) {
   const dialog = document.createElement('dialog');
   dialog.className = 'guide-preview';
   dialog.setAttribute('aria-label', 'Assignment guide preview');
@@ -28,6 +28,7 @@ export function openGuidePreview(state, app) {
     );
   });
   dialog.querySelector('button').addEventListener('click', () => dialog.close());
+  if (onClose) dialog.addEventListener('close', onClose, { once: true });
   showModal(dialog, { fallback: () => app.querySelector('[data-action="preview-guide"]') });
   dialog.querySelector('button').focus();
 }

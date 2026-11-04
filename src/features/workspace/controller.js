@@ -39,6 +39,11 @@ export function mountWorkspace(app, params, {scenario=false} = {}) {
   let designPage = restored.designPage || (state.design.revision.trim() ? 'draft' : 'start'), partnerPage = 'work', reviewPage = state.finalCheck.approved ? 'guide' : 'rationale';
   let showingWrapUp = scenario && restored.wrapUp;
   let closingStage = scenario ? 'board' : 'dialogue';
+  let closingPage = 0;
+  if (!scenario && params.get('build') === 'start') {
+    state.designPanel = 'revision';
+    designPage = 'start';
+  }
   let reworkForReview = false;
   let draftDestination = 'review';
   // Track offers per draft for this open session; do not alter saved or research state.
@@ -65,7 +70,7 @@ export function mountWorkspace(app, params, {scenario=false} = {}) {
     if (state.finalCheck.context !== context) state.finalCheck = { ...finalCheckDefaults(), context };
   };
   const render = ({ focus = false } = {}) => {
-    app.innerHTML = showingWrapUp ? renderClosing(state, closingStage) : renderWorkspace(state, ai, readError, designPage, partnerPage, reviewPage, ui);
+    app.innerHTML = showingWrapUp ? renderClosing(state, closingStage, closingPage) : renderWorkspace(state, ai, readError, designPage, partnerPage, reviewPage, ui);
     fitWorkspace(app);
     showBabbageCameo(state, app);
     if (focus) document.getElementById('setup-title')?.focus({ preventScroll: true });
@@ -485,12 +490,18 @@ export function mountWorkspace(app, params, {scenario=false} = {}) {
     if (action === 'reset-workspace') return reset();
     if (readError) return;
     if (action === 'finish-workspace' && state.finalCheck.approved && finalCheckReady(state)) {
-      showingWrapUp = true; closingStage = scenario ? 'board' : 'dialogue'; if(scenario) {state.phase='closing';saveSafely();} render({focus:true}); return;
+      showingWrapUp = true; closingStage = scenario ? 'board' : 'dialogue'; closingPage = 0; if(scenario) {state.phase='closing';saveSafely();} render({focus:true}); return;
     }
     if (action === 'closing-pixel' && showingWrapUp) {
-      closingStage = 'dialogue'; render({focus:true}); return;
+      closingStage = 'dialogue'; closingPage = 0; render({focus:true}); return;
     }
     if (action === 'workspace-home' && showingWrapUp) { window.location.href='?view=home'; return; }
+    if (action === 'closing-next' && showingWrapUp) { closingPage++; render({focus:true}); return; }
+    if (action === 'closing-previous' && showingWrapUp) { closingPage--; render({focus:true}); return; }
+    if (action === 'preview-guide' && showingWrapUp) {
+      openGuidePreview(state, app, { onClose: () => { window.location.href='?view=home'; } });
+      return;
+    }
     if (action === 'return-assignment' && showingWrapUp) {
       showingWrapUp = false; if(scenario) {state.phase='design';saveSafely();} ui=workspaceViews(); reviewPage='guide'; render();
       document.getElementById('review-title')?.focus({preventScroll:true}); return;

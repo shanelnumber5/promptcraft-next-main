@@ -316,12 +316,64 @@ body[data-app-view] .info-shell .info-copy p { margin: 0 0 18px; }
 body[data-app-view] .info-shell .info-copy p:last-child { margin-bottom: 0; }
 body[data-app-view] .info-shell .info-art { padding: 0; background: transparent; }
 body[data-app-view] .info-shell .info-art figcaption { font-size: 14px; color: #405674; }
+body[data-app-view='guide'] .course-guide-shell {
+  max-width: 1120px;
+}
+body[data-app-view='guide'] .course-guide-shell .info-heading {
+  height: auto;
+  margin-bottom: 20px;
+}
+body[data-app-view='guide'] .course-guide-shell .guide-library {
+  min-height: 430px;
+  padding: 34px 38px;
+  border: 1px solid #b7c9de;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 14px 36px #001f5b14;
+}
+body[data-app-view='guide'] .course-guide-shell .guide-library-intro {
+  padding: 0 0 24px;
+  border-bottom: 1px solid #dce5ef;
+}
+body[data-app-view='guide'] .course-guide-shell .guide-library-intro h2 {
+  font-size: 30px;
+  margin-bottom: 8px;
+}
+body[data-app-view='guide'] .course-guide-shell .guide-list {
+  display: grid;
+  gap: 14px;
+  padding-top: 20px;
+}
+body[data-app-view='guide'] .course-guide-shell .guide-entry {
+  grid-template-columns: minmax(0, 1fr) 170px;
+  gap: 32px;
+  padding: 22px 24px;
+  border: 1px solid #b7c9de;
+  border-left: 6px solid #edaa00;
+  border-radius: 10px;
+  background: #f6f9fc;
+}
+body[data-app-view='guide'] .course-guide-shell .guide-entry h3 {
+  font-size: 23px;
+}
+body[data-app-view='guide'] .course-guide-shell .guide-entry-actions {
+  gap: 10px;
+}
+body[data-app-view='guide'] .course-guide-shell .guide-entry-actions button {
+  min-height: 48px;
+}
+body[data-app-view='guide'] .course-guide-shell .guide-library-note {
+  padding-top: 22px;
+}
 @media (min-width: 701px) and (max-width: 1000px) {
   body[data-app-view] .info-shell .info-book { grid-template-columns: 160px minmax(0,1fr); gap: 28px; }
   body[data-app-view] .info-shell .info-art { padding: 0; }
 }
 @media (max-width: 700px) {
-  body[data-app-view] .course-guide-shell .info-heading h1 { font-size: 30px; }
+  body[data-app-view] .course-guide-shell .info-heading h1 { font-size: 30px;     body[data-app-view='guide'] .course-guide-shell .guide-library { padding: 22px 18px; }
+    body[data-app-view='guide'] .course-guide-shell .guide-entry { grid-template-columns: 1fr; gap: 16px; padding: 18px; }
+    body[data-app-view='guide'] .course-guide-shell .guide-entry-actions { flex-direction: row; }
+  }
   body[data-app-view] .course-guide-shell .guide-library { padding: 22px 0; }
   body[data-app-view] .course-guide-shell .guide-library-intro h2 { font-size: 26px; }
   body[data-app-view] .info-shell .info-heading h1 { font-size: 30px; }

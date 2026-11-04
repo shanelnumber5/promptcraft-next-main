@@ -14,7 +14,7 @@ export function mountCourseGuide(app, storage = window.localStorage) {
       if (raw.version !== 1 || raw.scenarioId !== discussionOpening.id ||
         raw.contentVersion !== discussionOpening.contentVersion ||
         !discussionOpening.scenes.some(scene => scene.id === raw.sceneId)) throw Error('Invalid save');
-      entries.push({ path: 'play', title: 'Guided scenario', state: loadState(discussionOpening, storage) });
+      entries.push({ path: 'workspace&build=start', title: 'Guided scenario', state: loadState(discussionOpening, storage) });
     }
   } catch {
     notice = 'Your scenario save could not be read. It has not been changed.';
