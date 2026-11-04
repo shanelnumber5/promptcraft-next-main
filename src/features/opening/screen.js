@@ -1,6 +1,8 @@
+import { sceneReady } from '../../app/storage.js';
 // Scenario-independent renderers. All supplied text is escaped before insertion.
 import { escapeHTML } from '../../shared/html.js';
 import { lemonadeVisual, planVisuals } from '../../shared/lemonade-visuals.js';
+import { characterArt } from '../../shared/character-art.js';
 const e = escapeHTML;
 const lemonadeIcon = `<svg viewBox="0 0 80 80" aria-hidden="true"><path d="M21 22h38l-6 47H27z" fill="#fff4d5" stroke="currentColor" stroke-width="3"/><path d="M25 42h30l-3 23H28z" fill="#e6a51d"/><path d="m45 9-7 45" stroke="currentColor" stroke-width="3"/><circle cx="60" cy="27" r="12" fill="#f4cc56" stroke="currentColor" stroke-width="2"/><path d="M60 17v20m-10-10h20" stroke="#98670d" stroke-width="2"/></svg>`;
 
@@ -25,10 +27,60 @@ export function renderCharacter(character, active) {
   return `<figure class="character character--${e(character.side)}${active ? ' is-speaking' : ''}"><img src="${e(character.src)}" alt="${e(character.alt)}" data-character="${e(character.id)}"><figcaption>${e(character.name)}</figcaption></figure>`;
 }
 
+function renderNarrativeFeedback(narrative) {
+  return `<div class="feedback feedback--narrative has-feedback" role="status" aria-live="polite" aria-atomic="true"><div class="feedback-turn feedback-turn--maya"><div><strong>Maya</strong><p>${e(narrative.maya)}</p></div></div><div class="feedback-turn feedback-turn--pixel"><div><strong>Pixel</strong><p>${e(narrative.pixel)}</p></div></div></div>`;
+}
+
+function renderSingleFeedback(feedback) {
+  return `<div class="feedback feedback--narrative feedback--single has-feedback" role="status" aria-live="polite" aria-atomic="true"><div class="feedback-turn feedback-turn--pixel"><div><strong>Pixel</strong><p>${e(feedback)}</p></div></div></div>`;
+}
+
+function smartboardExpressions(scene, answer) {
+  const defaults = { maya: characterArt.maya.thoughtful, pixel: characterArt.pixel.confident };
+  const base = {
+    'meet-plan': { maya: characterArt.maya.neutral, pixel: characterArt.pixel.explaining },
+    'peer-question': { maya: characterArt.maya.thoughtful, pixel: characterArt.pixel.explaining },
+    'revised-plan': { maya: characterArt.maya.confident, pixel: characterArt.pixel.pleasant },
+  };
+  const choices = {
+    'spot-hole': {
+      roles: { maya: characterArt.maya.pleased, pixel: characterArt.pixel.thoughtful },
+      drink: { maya: characterArt.maya.skeptical, pixel: characterArt.pixel.thoughtful },
+      length: { maya: characterArt.maya.explaining, pixel: characterArt.pixel.skeptical },
+    },
+    'peer-question': {
+      roles: { maya: characterArt.maya.skeptical, pixel: characterArt.pixel.thoughtful },
+      words: { maya: characterArt.maya.pleased, pixel: characterArt.pixel.confident },
+      agree: { maya: characterArt.maya.skeptical, pixel: characterArt.pixel.explaining },
+    },
+    'revised-plan': {
+      changed: { maya: characterArt.maya.explaining, pixel: characterArt.pixel.skeptical },
+      proven: { maya: characterArt.maya.confident, pixel: characterArt.pixel.skeptical },
+      reasoned: { maya: characterArt.maya.pleased, pixel: characterArt.pixel.confident },
+    },
+  };
+  const selected = answer && choices[scene.id]?.[answer];
+  return selected || base[scene.id] || defaults;
+}
+
+function renderSmartboardCast(scene, answer, board) {
+  const expressions = smartboardExpressions(scene, answer);
+  const characters = [
+    { id: 'maya', name: 'Maya', side: 'left', src: expressions.maya, alt: 'Maya, considering the plan.' },
+    { id: 'pixel', name: 'Professor Pixel', side: 'right', src: expressions.pixel, alt: 'Professor Pixel, considering the plan.' },
+  ];
+  return `<div class="smartboard-stage"><div class="smartboard-cast smartboard-cast--left">${renderCharacter(characters[0], false)}</div><div class="smartboard-stage-board">${board}</div><div class="smartboard-cast smartboard-cast--right">${renderCharacter(characters[1], false)}</div></div>`;
+}
+
 export function renderChoices(choice, answer) {
   if (!choice) return '';
   const option = choice.options.find((o) => o.id === answer);
-  return `<fieldset class="choices"><legend>${e(choice.question)}</legend><div class="choice-list">${choice.options.map((o) => `<label class="choice${o.id === answer ? ' is-selected' : ''}"><input type="radio" name="scene-choice" value="${e(o.id)}"${o.id === answer ? ' checked' : ''}><span>${e(o.label)}</span></label>`).join('')}</div><div id="choice-feedback" class="feedback${option ? ' has-feedback' : ''}" role="status" aria-live="polite" aria-atomic="true">${option ? e(option.feedback) : 'Choose an answer to explore the plan.'}</div></fieldset>`;
+  const feedback = option?.narrative
+    ? renderNarrativeFeedback(option.narrative)
+    : option
+      ? renderSingleFeedback(option.feedback)
+      : '<div id="choice-feedback" class="feedback" role="status" aria-live="polite" aria-atomic="true">Choose an answer to explore the plan.</div>';
+  return `<fieldset class="choices"><legend>${e(choice.question)}</legend><div class="choice-list">${choice.options.map((o) => `<label class="choice${o.id === answer ? ' is-selected' : ''}"><input type="radio" name="scene-choice" value="${e(o.id)}"${o.id === answer ? ' checked' : ''}><span>${e(o.label)}</span></label>`).join('')}</div>${feedback}</fieldset>`;
 }
 
 export function renderScene(scenario, scene, state, index, options = {}) {
@@ -36,7 +88,7 @@ export function renderScene(scenario, scene, state, index, options = {}) {
   const showingBoard = stage !== 'dialogue';
   const showingQuestion = stage === 'question' && !!scene.choice;
   const answer = state.answers[scene.id];
-  const ready = !showingQuestion || scene.choice.options.some((o) => o.id === answer && o.correct);
+  const ready = !showingQuestion || sceneReady(scene, state);
   const isLast = index === scenario.scenes.length - 1;
   const boardContent = options.boardContent ?? '';
   const nextAction = !showingBoard ? 'reveal-board' : scene.choice && !showingQuestion ? 'reveal-question' : isLast ? 'start-design-studio' : 'next';
@@ -47,14 +99,17 @@ export function renderScene(scenario, scene, state, index, options = {}) {
   }));
   const navigation =
     options.navigation ??
-    `<nav class="scene-actions" aria-label="Story navigation"><button type="button" class="nav-button nav-button--back" data-action="back"${index === 0 && !showingBoard ? ' disabled' : ''}><span>Back</span></button><span class="navigation-hint">${!showingBoard ? 'Read the dialogue, then continue to the board.' : !ready ? 'Choose a response, then use the feedback to reconsider.' : 'Continue when you are ready.'}</span><button type="button" class="primary nav-button nav-button--next" data-action="${nextAction}"${!ready ? ' disabled' : ''}><span>${nextLabel}</span></button></nav>`;
+    `<nav class="scene-actions" aria-label="Story navigation"><button type="button" class="nav-button nav-button--back" data-action="back"${index === 0 && !showingBoard ? ' disabled' : ''}><span>Back</span></button><span class="navigation-hint">${!showingBoard ? 'Read the dialogue, then continue to the board.' : !ready ? 'Choose a response, then use the feedback to reconsider.' : showingQuestion && scene.choice.allowAnyResponse ? 'Try another reply or continue.' : 'Continue when you are ready.'}</span><button type="button" class="primary nav-button nav-button--next" data-action="${nextAction}"${!ready ? ' disabled' : ''}><span>${nextLabel}</span></button></nav>`;
   const progressLabel =
     options.progressLabel ?? scene.part + ' · ' + (index + 1) + ' of ' + scenario.scenes.length;
   const speaker = cast.find((c) => c.id === scene.speaker);
-  const content = showingQuestion
+  const board = showingQuestion
     ? renderBoard({ label: 'Think it through', title: scene.board.title }, { afterContent: renderChoices(scene.choice, answer) })
+    : renderBoard(scene.board, { afterContent: boardContent + (isLast && options.showHandoff !== false ? `<div class="handoff"><strong>Explore, build, and review your activity</strong><p>${e(scenario.endNote)}</p></div>` : '') });
+  const content = showingQuestion
+    ? renderSmartboardCast(scene, answer, board)
     : showingBoard
-    ? renderBoard(scene.board, { afterContent: boardContent + (isLast && options.showHandoff !== false ? `<div class="handoff"><strong>Explore, build, and review your activity</strong><p>${e(scenario.endNote)}</p></div>` : '') })
+    ? renderSmartboardCast(scene, answer, board)
     : `<div class="speaker-panel"><div class="cast">${renderCharacter(speaker, true)}</div><section class="speech-bubble speech-bubble--${e(speaker.side)}" aria-labelledby="speaker-label"><span class="eyebrow">${e(scene.part)}</span><h2 id="speaker-label">${e(speaker.name)}</h2><p>${e(scene.dialogue)}</p></section></div>`;
   return `<section class="experience focused-scene focus--${e(stage)} camera--${e(speaker.side)}${options.className ? ' ' + e(options.className) : ''}" aria-label="${e(scenario.title)}"><div class="chapter-line"><span>${e(scenario.title)}</span><span>${e(progressLabel)} · ${showingQuestion ? 'Question' : showingBoard ? 'Smartboard' : 'Dialogue'}</span></div><h1 id="${e(options.titleId ?? 'scene-title')}" class="sr-only" tabindex="-1">${e(scene.title)}</h1><div class="classroom">${content}</div><section class="dialogue" aria-label="Story navigation">${navigation}</section>${options.designNotice ? '<p class="design-notice" role="status"></p>' : ''}<p class="save-notice" role="status">${e(state.saveNotice || '')}</p></section>`;
 }

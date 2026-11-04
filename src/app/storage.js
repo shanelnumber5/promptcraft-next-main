@@ -222,6 +222,6 @@ export function clearState(storage = window.localStorage) {
 }
 export function sceneReady(scene, state) {
   return (
-    !scene.choice || scene.choice.options.some((o) => o.id === state.answers[scene.id] && o.correct)
+    !scene.choice || scene.choice.options.some((o) => o.id === state.answers[scene.id] && (scene.choice.allowAnyResponse || o.correct))
   );
 }

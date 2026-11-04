@@ -212,6 +212,7 @@ body[data-app-view] .focused-scene .scene-actions button.nav-button--back:enable
 body[data-app-view] .focused-scene .scene-actions .navigation-hint { font-size: 14px; font-weight: 400; line-height: 1.4; }
 body[data-app-view] .focused-scene:is(.focus--board,.focus--question) .classroom { padding-bottom: 40px; }
 body[data-app-view] .focused-scene .smartboard { box-shadow: 0 0 0 1px #f6c85c, 0 0 22px #edaa0066, 0 14px 28px #08132666; }
+body[data-app-view] .focused-scene .smartboard .board-heading { padding-top: 18px; }
 body[data-app-view] .focused-scene .board-heading h2 { font-family: Georgia,'Times New Roman',serif; font-size: clamp(26px,2.6vw,36px); font-weight: 400; line-height: 1.2; letter-spacing: -.4px; margin: 8px 0 14px; color: #001f5b; }
 body[data-app-view] .focused-scene .board-heading .eyebrow { font-family: Arial,Helvetica,sans-serif; font-size: 13px; font-weight: 600; line-height: 1.4; letter-spacing: .03em; color: #405674; }
 body[data-app-view] .focused-scene :is(.board-text,.board-quote) { font-size: clamp(19px,1.8vw,22px); line-height: 1.5; }
@@ -273,12 +274,14 @@ body[data-app-view] .focused-scene:not(.closing-experience) .service-flow li > s
 /* Questions share the illustrated plans' focused content width. */
 body[data-app-view] .focused-scene.focus--question .board-screen > :is(.board-heading,.choices) { width: 100%; max-width: 900px; margin-left: auto; margin-right: auto; }
 body[data-app-view] .focused-scene.focus--question .choices { border-top: 0; }
+body[data-app-view] .focused-scene.focus--question .board-heading h2 { margin-bottom: 4px; }
+body[data-app-view] .focused-scene.focus--question .choices { margin-top: 8px; }
 body[data-app-view] .focused-scene.focus--question .choices legend { margin-bottom: 14px; }
 body[data-app-view] .focused-scene.focus--question .choice { background: #f7f9fc; border: 2px solid #b7c9de; border-radius: 4px; color: #152a47; }
 body[data-app-view] .focused-scene.focus--question .choice:hover { background: #edf3f9; border-color: #788fa9; }
 body[data-app-view] .focused-scene.focus--question .choice.is-selected { background: #e8eff8; border-color: #001f5b; }
 body[data-app-view] .focused-scene.focus--question .choice input { accent-color: #001f5b; }
-body[data-app-view] .focused-scene.focus--question .feedback.has-feedback { color: #001f5b; }
+body[data-app-view] .focused-scene.focus--question .feedback.has-feedback { color: #fff; }
 @media (min-width: 1000px) and (min-height: 650px) and (max-height: 820px) {
  body[data-app-view] .focused-scene.focus--question .choices legend { margin-bottom: 8px; }
 }
@@ -426,6 +429,178 @@ body[data-app-view='play'] .design-shell--final-reference .guide-access-actions 
 body[data-app-view='play'] .review-reference-content #final-topic-picker { display:none; }
 @media (max-width:700px) {
  body[data-app-view='play'] .review-reference-content #final-topic-picker { display:block; width:100%; min-height:44px; padding:8px; border:1px solid #aeb9c2; border-radius:3px; background:#fff; color:#001f5b; }
+}
+
+/* Keep scenario question feedback aligned and stable while answers change. */
+body[data-app-view] .focused-scene.focus--question .board-screen > .choices {
+  width: min(100%, 1000px);
+  max-width: 1000px;
+  box-sizing: border-box;
+}
+body[data-app-view] .focused-scene.focus--question .board-screen > .board-heading {
+  width: min(100%, 1000px);
+  max-width: 1000px;
+  box-sizing: border-box;
+}
+body[data-app-view] .focused-scene.focus--question .board-screen > .choices .choice-list {
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+}
+body[data-app-view] .focused-scene.focus--question .board-screen > .choices .feedback--narrative {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  justify-items: stretch;
+  gap: 12px;
+  width: 100%;
+  max-width: none;
+  min-height: 132px;
+  margin: 12px 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+body[data-app-view] .focused-scene.focus--question .board-screen > .choices .feedback--narrative.feedback--single {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+body[data-app-view] .focused-scene.focus--question .board-screen > .choices .feedback--single .feedback-turn--pixel {
+  grid-column: 2;
+  justify-self: stretch;
+}
+body[data-app-view] .focused-scene.focus--question .board-screen > .choices .feedback-turn {
+  width: 100%;
+  justify-self: stretch;
+  min-height: 132px;
+  box-sizing: border-box;
+}
+body[data-app-view] .focused-scene.focus--question .board-screen > .choices .feedback-turn strong {
+  display: block;
+  margin-top: 4px;
+  text-align: left;
+}
+@media (max-width:700px) {
+ body[data-app-view] .focused-scene.focus--question .board-screen > .choices .feedback--narrative {
+  grid-template-columns: 1fr;
+ }
+ body[data-app-view] .focused-scene.focus--question .board-screen > .choices .feedback--single .feedback-turn--pixel {
+  grid-column: auto;
+ }
+}
+
+/* Tablet and Nest Hub landscape: keep the board and side characters in one frame. */
+@media (min-width:701px) and (max-width:1099px) {
+ body[data-app-view] .focused-scene .smartboard-stage {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 100%;
+ }
+ body[data-app-view] .focused-scene .smartboard-cast {
+  display: none;
+ }
+ body[data-app-view] .focused-scene .smartboard-stage .smartboard {
+  min-height: 0;
+  width: 100%;
+  max-width: none;
+  border-width: 3px;
+ }
+ body[data-app-view] .focused-scene .smartboard-stage .board-heading {
+  padding-top: 18px;
+ }
+ body[data-app-view] .focused-scene.focus--question .board-screen {
+  padding: 10px 12px;
+ }
+ body[data-app-view] .focused-scene.focus--question .board-screen > .choices {
+  width: 100%;
+  max-width: none;
+ }
+ body[data-app-view] .focused-scene.focus--question .board-screen > .choices .choice {
+  font-size: 16px;
+  line-height: 1.35;
+  padding: 8px 10px;
+ }
+ body[data-app-view] .focused-scene.focus--question .board-screen > .choices .feedback--narrative,
+ body[data-app-view] .focused-scene.focus--question .board-screen > .choices .feedback-turn {
+  min-height: 104px;
+ }
+}
+
+@media (min-width:701px) and (max-width:1099px) and (max-height:700px) {
+ body:has(.focused-scene) {
+  overflow: auto;
+  padding-bottom: 0;
+ }
+ body[data-app-view] .focused-scene .classroom {
+  padding: 8px 10px 0;
+  overflow: visible;
+ }
+ body[data-app-view] .focused-scene .scene-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+ }
+ body[data-app-view] .focused-scene .smartboard-cast {
+  display: none;
+ }
+ body[data-app-view] .focused-scene .board-screen {
+  padding: 8px 10px;
+ }
+ body[data-app-view] .focused-scene .smartboard-stage .board-heading {
+  padding-top: 18px;
+ }
+ body[data-app-view] .focused-scene .board-heading h2 {
+  font-size: 24px;
+  margin: 3px 0 6px;
+ }
+ body[data-app-view] .focused-scene.focus--question .choices {
+  margin-top: 8px;
+ }
+ body[data-app-view] .focused-scene.focus--question .choices legend {
+  font-size: 17px;
+  margin-bottom: 7px;
+ }
+ body[data-app-view] .focused-scene.focus--question .board-screen > .choices .choice {
+  font-size: 14px;
+  padding: 6px 8px;
+ }
+ body[data-app-view] .focused-scene.focus--question .board-screen > .choices .feedback--narrative,
+ body[data-app-view] .focused-scene.focus--question .board-screen > .choices .feedback-turn {
+  min-height: 88px;
+ }
+}
+
+/* Nest Hub Max landscape: use the board as the primary surface. */
+@media (min-width:1100px) and (min-height:701px) and (max-height:820px) {
+ body[data-app-view] .focused-scene:is(.focus--board,.focus--question) .classroom {
+  padding-bottom: 20px;
+ }
+ body[data-app-view] .focused-scene .smartboard-stage {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 1120px;
+  margin-left: auto;
+  margin-right: auto;
+ }
+ body[data-app-view] .focused-scene .smartboard-cast {
+  display: none;
+ }
+ body[data-app-view] .focused-scene .smartboard-stage .smartboard {
+  width: min(100%, 940px);
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+ }
+ body[data-app-view] .focused-scene .smartboard-stage .board-screen {
+  padding: 12px 20px;
+ }
+ body[data-app-view] .focused-scene .smartboard-stage .board-heading {
+  padding-top: 18px;
+ }
+ body[data-app-view] .focused-scene.focus--question .board-screen > .choices,
+ body[data-app-view] .focused-scene.focus--question .board-screen > .board-heading {
+  width: 100%;
+  max-width: none;
+ }
 }
 
 @media (max-width:700px) {

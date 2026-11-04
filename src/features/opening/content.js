@@ -93,6 +93,7 @@ export const discussionOpening = {
         'Their first plan assigns Alex to payments and drinks, and Sam to supplies. Where might it get stuck?',
       board: firstPlan,
       choice: {
+        allowAnyResponse: true,
         question: 'Which reply best helps the group examine its reasoning before changing the plan?',
         options: [
           {
@@ -101,18 +102,30 @@ export const discussionOpening = {
             correct: true,
             feedback:
               'This tests a specific choice against the supplied facts. The group must explain whether its division of work can handle a rush. The discussion has a job: examine the reasoning behind a decision.',
+            narrative: {
+              maya: 'I would ask what happens during the rush before changing the jobs. That makes us test the plan instead of just adding detail.',
+              pixel: 'This question tests a specific choice against the supplied facts. The group has to examine its reasoning before changing the plan.',
+            },
           },
           {
             id: 'drink',
             label: 'Have Alex take payments and Sam pour drinks. That division of work will make service faster.',
             feedback:
-              'This offers a plausible solution, but assumes it will be faster without testing it. A stronger reply identifies when the original plan might struggle and asks the group to examine that concern.',
+              'Maya: “I’d move Sam to pouring like you suggested. I’m still not sure what we’d do when the cups run out.” Pixel: What question would help the group test the new roles before committing to them?',
+            narrative: {
+              maya: 'I’d move Sam to pouring like you suggested. I’m still not sure what we’d do when the cups run out.',
+              pixel: 'What question would help the group test the new roles before committing to them?',
+            },
           },
           {
             id: 'length',
             label: 'Explain the payment, pouring, and restocking steps in more detail so readers can understand the plan.',
             feedback:
-              'Clearer steps could help readers, but this reply does not identify a concern the group needs to reason through. Ask how a specific choice holds up under the customer situation.',
+              'Maya: “I’d spell out each step, but I’d still leave Alex doing both jobs. I haven’t thought about what happens if three people arrive at once.” Pixel: What could you ask that would help the group think through that rush?',
+            narrative: {
+              maya: 'I’d spell out each step, but I’d still leave Alex doing both jobs. I haven’t thought about what happens if three people arrive at once.',
+              pixel: 'What could you ask that would help the group think through that rush?',
+            },
           },
         ],
       },
@@ -139,6 +152,10 @@ export const discussionOpening = {
             label: 'Summarize the peer question and describe why feedback is useful when planning a stand.',
             feedback:
               'A summary shows students read the question, but they can still avoid examining their own plan. Require them to connect the concern to their decision and explain their response.',
+            narrative: {
+              maya: 'I could summarize the question, but I still would not have to decide what to do about the rush.',
+              pixel: 'A summary shows students noticed the question, but not whether they used it to examine the plan.',
+            },
           },
           {
             id: 'words',
@@ -146,12 +163,20 @@ export const discussionOpening = {
             correct: true,
             feedback:
               'This makes peer input part of the reasoning students must show. They connect a specific concern to their plan and explain a revision or defense. A required reply alone does not create that connection.',
+            narrative: {
+              maya: 'I would have to decide whether the second helper should serve, or explain why the original jobs still work.',
+              pixel: 'Students connect the concern to their plan and explain a revision or defense. The question becomes part of their reasoning.',
+            },
           },
           {
             id: 'agree',
             label: 'Change the helper roles to match the peer suggestion and describe the new plan.',
             feedback:
               'Following a suggestion is not enough to show learning. Students need to evaluate it and explain why they changed the plan. Keeping the original roles can also be worthwhile if their reasons address the concern.',
+            narrative: {
+              maya: 'I could copy the suggestion, but that would not show why the change helps.',
+              pixel: 'Following a suggestion is not the same as evaluating it. Students should explain the decision.',
+            },
           },
         ],
       },
@@ -173,12 +198,20 @@ export const discussionOpening = {
             label: 'We moved Sam to pouring because the other group recommended sharing service work. Our revised plan uses their suggestion.',
             feedback:
               'This names the suggestion and a change, but leaves the reasoning unstated. Why does the change address the rush, and what still needs testing?',
+            narrative: {
+              maya: 'We followed the suggestion, but I have not explained why the new jobs help during the rush.',
+              pixel: 'The change is visible, but the reasoning is missing. What still needs testing?',
+            },
           },
           {
             id: 'proven',
             label: 'We split payment and pouring after the peer raised the rush. Both helpers now serve customers, so we know the line will move faster.',
             feedback:
               'This connects the change to the concern, but treats an untested plan as proof. The group still needs to consider the order handoff and what happens when supplies run low.',
+            narrative: {
+              maya: 'We connected the change to the rush, but saying we know it will be faster feels too certain.',
+              pixel: 'This uses the concern, but treats a plan as proof. Students should name what remains uncertain.',
+            },
           },
           {
             id: 'reasoned',
@@ -186,6 +219,10 @@ export const discussionOpening = {
             correct: true,
             feedback:
               'This links the peer concern, the decision, and the reasons for it, while naming what remains uncertain. The learning is visible in how students evaluate and use the contribution, not simply in whether they change their answer.',
+            narrative: {
+              maya: 'We explained the rush concern, why we split the jobs, and what we still need to test.',
+              pixel: 'This connects the concern, decision, and reasons while keeping the plan testable.',
+            },
           },
         ],
       },

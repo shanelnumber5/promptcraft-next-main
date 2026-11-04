@@ -1,4 +1,4 @@
-import { discussionOpening } from './content.js';
+import { discussionOpening } from './content.js?v=20261104-dialogue-feedback-3';
 import { renderScene } from './screen.js';
 import { loadState, saveState, initialState, sceneReady } from '../../app/storage.js';
 import { resetScenarioStudio } from '../workspace/scenario-storage.js';
@@ -31,7 +31,8 @@ export function mountOpening(app, {storage=window.localStorage,navigate=url=>win
   function render(focus=false,choice=null) {
     const scene=discussionOpening.scenes[index()];
     document.querySelector('.skip-link')?.setAttribute('href','#scene-title');
-    app.innerHTML=renderScene(discussionOpening,scene,state,index());
+    const className=`scene-${scene.id}${scene.choice && state.answers[scene.id] ? ' answer-selected' : ''}`;
+    app.innerHTML=renderScene(discussionOpening,scene,state,index(),{className});
     app.querySelectorAll('[data-character]').forEach(image=>{
       image.addEventListener('error',()=>{image.hidden=true;image.closest('figure')?.classList.add('art-unavailable');},{once:true});
       image.addEventListener('load',positionPixelTag,{once:true});
