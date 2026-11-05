@@ -10,9 +10,11 @@ export function renderClosing(state, stage, page = 0) {
   const goal = (state.teacher.learningGoal || '').trim();
   const intention = (state.workspace?.creativeCore || '').trim();
   const brief = text => text.length > 180 ? text.slice(0,177) + '…' : text;
+  const goalText = goal ? brief(goal) : '';
+  const goalEnd = goalText && /[.!?…]$/.test(goalText) ? '' : '.';
   const completion = workspace ? 'Design complete' : 'Module complete';
   const dialogue = [
-    `You’ve brought your activity, design choices, and reasoning together.${goal ? ' Your learning goal is “' + brief(goal) + '”.' : ''}`,
+    `You’ve brought your activity, design choices, and reasoning together.${goal ? ' Your learning goal is “' + goalText + '”' + goalEnd : ''}`,
     intention
       ? `Your chosen design intention was: “${brief(intention)}”.`
       : 'Consider what sharing or feedback adds to the work students actually do.',

@@ -8,6 +8,7 @@ const assert = require('node:assert/strict');
     conversationDefaults,
     assignmentContext,
   } = await import('../../src/features/design/babbage-client.js');
+  const { assignmentGuardrails } = await import('../../src/shared/assignment-guardrails.js');
   const { initialState, loadState, saveState, STORAGE_KEY } = await import(
     '../../src/app/storage.js'
   );
@@ -89,6 +90,11 @@ const assert = require('node:assert/strict');
     { role: 'user', content: 'Use evidence', display: 'Use evidence' },
   ];
   const body = buildBabbageRequest(state, 'clarify');
+  assert.match(body.system, /explicit human ownership/);
+  assert.match(body.system, /Minimize student data collection/);
+  assert.match(body.system, /reversible and low-stakes/);
+  assert.match(body.system, /https:\/\/doi\.org\/10\.2139\/ssrn\.6428218/);
+  assert.match(assignmentGuardrails, /never describe a generated activity as compliant/);
   assert.ok(
     !Object.hasOwn(JSON.parse(body.messages[0].content).design, 'previousRevision'),
     'Archived drafts never reach the revision prompt',

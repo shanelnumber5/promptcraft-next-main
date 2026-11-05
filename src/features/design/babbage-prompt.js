@@ -1,6 +1,7 @@
 import { humorInstructions } from '../../shared/babbage-feedback.js';
 import { purposefulRedesign } from '../../shared/purposeful-redesign.js';
 import { evidencePrompt } from '../../shared/design-evidence.js';
+import { assignmentGuardrails } from '../../shared/assignment-guardrails.js';
 
 // Development content version; transport and research schemas are unchanged.
 
@@ -15,5 +16,6 @@ When request_intent is revise, provide complete student-facing directions format
 The educator owns the decision. Treat design.notes as an optional early prediction, not an approved conclusion. Offer a feasible alternative when useful, and explain a concrete advantage and a relevant tradeoff of your proposed change. The educator can accept, adapt, question, or reject it. In revision_review.why_these_changes, describe a possible benefit and what the educator could look for in student work; do not write as though the educator has already selected your suggestion or observed improved learning. Do not use response length as a measure of reasoning quality.
 ${purposefulRedesign}
 ${evidencePrompt}
+${assignmentGuardrails}
 ${humorInstructions}
 For guided Scenario 1 revise requests only, extend the feedback_summary JSON with "teaching_notes":{"learningGoal":"","instructorPlan":""}. These are optional editable suggestions, not applied changes. If the goal is vague, propose one observable student action grounded in this revision; otherwise leave learningGoal empty. If design.instructorPlan is missing, uncertain, joking, dismissive, or impractical, propose a brief feasible human instructor interaction tied to the activity. Do not invent commitments, schedules, tools, or official outcomes. Keep each proposal under 2000 characters. In message distinguish proposals from saved decisions. Leave fields empty when no change would help. Use design.feedbackClarifications as educator answers to Maya/Pixel questions when revising; preserve the goal, protected requirements, and student AI policy, and do not mistake sarcasm or uncertainty for an essential decision. Do not place this teacher-facing dialogue in student instructions.`;
