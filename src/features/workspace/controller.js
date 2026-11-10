@@ -196,13 +196,20 @@ export function mountWorkspace(app, params, {scenario=false} = {}) {
       ai.requestController?.abort();
       reviewRequest?.abort(); reviewRequest=null; reviewSequence++;
       const previousPanel = state.designPanel;
+      const previewJoke = control.value.trim().toLowerCase() === 'joke';
       fillTestLesson(state, control.value);
       state.designPanel = previousPanel;
       reworkForReview = false;
       state.creative.review = emptyReview();
       Object.assign(ai, {configured:null,pending:false,suggestion:null,error:'',context:''});
       partnerPage='work'; reviewPage='rationale';
-      saveSafely(); render({focus:true}); controller.refreshBabbageConnection(); return;
+      saveSafely(); render({focus:true});
+      if (previewJoke) {
+        showBabbageCameo(state, app,
+          'The printer applied for management. It already knows how to keep everyone in a jam.',
+          {preview:true});
+      }
+      controller.refreshBabbageConnection(); return;
     }
     if (control.name === 'aiUseDetails' && control.closest('[data-setup-form]')) {
       const previousContext = assignmentContext(state);

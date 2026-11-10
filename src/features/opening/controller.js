@@ -1,3 +1,4 @@
+import { updateDialoguePortrait } from '../../shared/dialogue-portrait.js';
 import { discussionOpening } from './content.js?v=20261104-dialogue-feedback-3';
 import { renderScene } from './screen.js';
 import { loadState, saveState, initialState, sceneReady } from '../../app/storage.js';
@@ -32,7 +33,52 @@ export function mountOpening(app, {storage=window.localStorage,navigate=url=>win
     const scene=discussionOpening.scenes[index()];
     document.querySelector('.skip-link')?.setAttribute('href','#scene-title');
     const className=`scene-${scene.id}${scene.choice && state.answers[scene.id] ? ' answer-selected' : ''}`;
-    app.innerHTML=renderScene(discussionOpening,scene,state,index(),{className});
+    const markup = renderScene(discussionOpening,scene,state,index(),{className});
+    const current = app.firstElementChild;
+    if (current?.classList.contains('focus--dialogue') && state.storyStage === 'dialogue') {
+      // Retain the classroom, cast and speech panel between consecutive lines.
+      const template = document.createElement('template');
+      template.innerHTML = markup;
+      const incoming = template.content.firstElementChild;
+      current.className = incoming.className;
+      for (const selector of ['.chapter-line', '#scene-title', '.speech-bubble', '.dialogue', '.save-notice']) {
+        current.querySelector(selector).innerHTML = incoming.querySelector(selector).innerHTML;
+      }
+      const figure = current.querySelector('.character');
+      const nextFigure = incoming.querySelector('.character');
+      figure.className = nextFigure.className;
+      figure.querySelector('figcaption').textContent = nextFigure.querySelector('figcaption').textContent;
+      const image = figure.querySelector('img');
+      const nextImage = nextFigure.querySelector('img');
+      image.alt = nextImage.alt;
+      image.dataset.character = nextImage.dataset.character;
+      updateDialoguePortrait(image, nextImage.getAttribute('src'));
+      current.querySelector('.speech-bubble').className = incoming.querySelector('.speech-bubble').className;
+    } else if (choice && current?.classList.contains('focus--question')) {
+      // Keep the board and decoded cast mounted while an answer changes.
+      const template = document.createElement('template');
+      template.innerHTML = markup;
+      const incoming = template.content.firstElementChild;
+      current.className = incoming.className;
+      const boardScreen = current.querySelector('.board-screen');
+      const scrollTop = boardScreen?.scrollTop;
+      for (const input of current.querySelectorAll('input[name="scene-choice"]')) {
+        input.checked = input.value === choice;
+        input.closest('.choice').classList.toggle('is-selected', input.checked);
+      }
+      for (const selector of ['.choices > .feedback', '.scene-actions', '.save-notice']) {
+        const existing = current.querySelector(selector);
+        const replacement = incoming.querySelector(selector);
+        if (existing && replacement) existing.replaceWith(replacement);
+      }
+      if (boardScreen) boardScreen.scrollTop = scrollTop;
+      for (const image of current.querySelectorAll('.smartboard-cast img')) {
+        const nextImage = incoming.querySelector(`img[data-character="${image.dataset.character}"]`);
+        if (nextImage) updateDialoguePortrait(image, nextImage.getAttribute('src'));
+      }
+    } else {
+      app.innerHTML = markup;
+    }
     app.querySelectorAll('[data-character]').forEach(image=>{
       image.addEventListener('error',()=>{image.hidden=true;image.closest('figure')?.classList.add('art-unavailable');},{once:true});
       image.addEventListener('load',positionPixelTag,{once:true});

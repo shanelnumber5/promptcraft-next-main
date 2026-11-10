@@ -371,7 +371,7 @@ body[data-app-view='play'] .design-shell--guided .babbage-history article,
 body[data-app-view='workspace'] .workspace-shell .babbage-history article {
   background: #F2F2F2;
   color: #1E2D59;
-  border-left: 4px solid #1E2D59;
+  
 }
 body[data-app-view='play'] .design-shell--guided .babbage-history article :is(p, h3, strong),
 body[data-app-view='workspace'] .workspace-shell .babbage-history article :is(p, h3, strong) {

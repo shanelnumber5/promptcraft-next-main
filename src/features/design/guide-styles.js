@@ -48,14 +48,14 @@ li { margin:8px 0; overflow-wrap:anywhere; }
 .assignment-directions .assignment-steps { margin:8px 0 14px; }
 .assignment-directions li { margin:5px 0; }
 .assignment-directions h4:first-child { margin-top:0; }
-.assignment-directions > h3 { padding:14px 16px; background:#F2F2F2; border-left:4px solid #1E2D59; }
+.assignment-directions > h3 { padding:14px 16px; background:#F2F2F2;  }
 .assignment-directions li > p { margin:8px 0; }
 .assignment-directions li > ul { margin:10px 0; }
 .assignment-steps { padding-left:26px; }
 .assignment-steps li { padding-left:4px; }
-.rationale { margin-top:24px; padding:20px 24px; border-left:3px solid #D98F06; background:#F2F2F2; }
+.rationale { margin-top:24px; padding:20px 24px;  background:#F2F2F2; }
 .rationale h3 { margin-top:0; }
-blockquote { padding:16px 20px; border-left:3px solid #D98F06; margin:20px 0; background:#F2F2F2; }
+blockquote { padding:16px 20px;  margin:20px 0; background:#F2F2F2; }
 .example-situation { display:grid; grid-template-columns:140px 1fr; align-items:center; gap:24px; padding:20px; background:#F2F2F2; margin:20px 0; }
 .example-situation h3 { margin-top:0; }
 .lemonade-visual { width:100%; max-width:160px; height:85px; display:block; margin:auto; }

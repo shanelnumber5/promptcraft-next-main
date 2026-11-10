@@ -77,7 +77,7 @@ body:has(dialog[open]) {
 .reference-entry blockquote {
   margin: 12px 0;
   padding: 16px;
-  border-left: 3px solid var(--gold);
+  
   background: #fff8e8;
 }
 .reference-entry a {
@@ -259,7 +259,7 @@ body[data-app-view] .reference-entry blockquote {
   line-height: 1.55;
   background: #fff;
   border: 0;
-  border-left: 3px solid var(--gold);
+  
   margin: 0 0 18px;
   padding: 14px 18px;
   white-space: pre-line;

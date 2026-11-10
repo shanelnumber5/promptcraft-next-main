@@ -339,7 +339,7 @@ body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))
   gap: 14px;
   margin: 24px 0 0;
   padding: 16px 20px;
-  border-left: 4px solid var(--blue);
+  
   border-radius: 0 14px 14px 0;
   background: #eaf2fa;
   color: #263f5e;
@@ -945,7 +945,7 @@ body[data-app-view]:not([data-app-view='play']):where(:not(:has(.focused-scene))
   gap: 2px;
   margin: 0;
   padding-left: 14px;
-  border-left: 3px solid var(--blue);
+  
   color: var(--ink);
   font-size: 16px;
   line-height: 1.45;
@@ -1222,7 +1222,7 @@ body[data-app-view='lab'] .idea-detail-body li::marker {
   color: var(--navy);
 }
 body[data-app-view='lab'] .idea-detail-aside {
-  border-left: 0;
+  
   padding-left: 28px;
 }
 body[data-app-view='lab'] .idea-detail-aside p {
@@ -1254,7 +1254,7 @@ body[data-app-view='lab'] .idea-detail-adapt p {
     gap: 28px;
   }
   body[data-app-view='lab'] .idea-detail-aside {
-    border-left: 0;
+    
     border-top: 0;
     padding: 24px 0 0;
   }

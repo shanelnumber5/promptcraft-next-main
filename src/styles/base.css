@@ -480,7 +480,7 @@ a {
   color: var(--muted);
 }
 .handoff {
-  border-left: 4px solid var(--navy);
+  
   background: var(--gold-pale);
   margin: 0 0 20px;
 }

@@ -29,7 +29,7 @@
 .babbage-prompt {
   background: #fffaed;
   border: 0;
-  border-left: 3px solid #b58324;
+  
   border-radius: 0 8px 8px 0;
 }
 .pixel-suggests-portrait {
@@ -101,13 +101,13 @@
 .babbage-history .babbage-turn {
   padding: 14px 16px;
   border: 0;
-  border-left: 2px solid #96b8ce;
+  
   border-radius: 0;
   background: #f7f9fb;
 }
 .babbage-history .babbage-turn--user {
   background: #fffaed;
-  border-left-color: #c7a765;
+  
   margin-left: 16px;
 }
 .babbage-history p {
@@ -257,7 +257,7 @@
   padding-top: 2px;
 }
 .closing-goal {
-  border-left: 3px solid #09648b;
+  
   padding-left: 12px;
 }
 .closing-experience .service-flow li {

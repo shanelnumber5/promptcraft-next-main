@@ -104,7 +104,7 @@ body:has(.setup-shell) #app {
 .setup-preview-content h4 {
   margin: 22px 0 10px;
   padding: 8px 12px;
-  border-left: 4px solid var(--navy);
+  
   border-radius: 0 6px 6px 0;
   background: #fff5df;
   color: var(--navy);

@@ -2,7 +2,7 @@ import { characterArt } from '../../shared/character-art.js';
 // Content owns the scenario; the shared engine owns interaction and navigation.
 const firstPlan = {
   label: 'The first plan',
-  title: 'One stand. Two helpers.',
+  title: 'One stand, two helpers',
   visual: 'plan',
   numbered: false,
   flowLabel: 'Customer situation and helper roles',
@@ -15,7 +15,7 @@ const firstPlan = {
 };
 const revisedPlan = {
   label: 'A revision to test',
-  title: 'Share the service work.',
+  title: 'Sharing the service work',
   visual: 'plan',
   flowLabel: 'Revised customer steps',
   nodes: [
@@ -58,7 +58,7 @@ export const discussionOpening = {
         "I posted my idea and replied to two people. Everyone said the plans looked good. I didn't really need to read their posts to finish.",
       board: {
         label: 'The old discussion',
-        title: 'Post your idea. Reply twice.',
+        title: 'The old discussion: post once, reply twice',
         text: 'Describe a successful lemonade stand. Reply to two classmates.',
         note: 'What does the conversation help students do?',
       },
@@ -73,7 +73,7 @@ export const discussionOpening = {
         "Let's try a different approach. Each student checks one piece: customer steps, supplies, or helper roles. The group brings those findings together into a plan.",
       board: {
         label: 'The supplied facts',
-        title: 'A small stand at a community event.',
+        title: 'A lemonade stand at a community event',
         visual: 'stand',
         facts: [
           'Two helpers and one table with space for two stations.',
@@ -250,7 +250,7 @@ export const discussionOpening = {
         "Their question gave the group a reason to reconsider a decision. Where could a classmate's contribution help students think something through in your course?",
       board: {
         label: 'The teaching move',
-        title: 'Give the conversation a purpose.',
+        title: 'Give the conversation a purpose',
         nodes: [
           { title: 'Propose', detail: 'Make a choice and explain it.' },
           { title: 'Question', detail: 'Test a specific part.' },

@@ -216,7 +216,7 @@
   margin: 8px 0;
 }
 .final-check-reference {
-  border-left: 3px solid var(--blue);
+  
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -379,7 +379,7 @@
   align-items: center;
   justify-content: space-between;
   margin-top: 24px;
-  border-left: 5px solid var(--border);
+  
   border-radius: 12px;
   color: var(--navy);
 }
@@ -495,7 +495,7 @@
 .babbage-history article {
   padding: 14px;
   background: #fff;
-  border-left: 3px solid var(--border);
+  
   border-radius: 6px;
 }
 .babbage-history p {
@@ -584,7 +584,7 @@
   margin-top: 0;
 }
 .babbage-ready {
-  border-left: 4px solid var(--border);
+  
   border-radius: 6px;
 }
 .ai-suggestion {
@@ -641,7 +641,7 @@
 .suggested-assignment {
   margin: 16px 0 24px;
   border: 1px solid var(--border);
-  border-left: 5px solid var(--border);
+  
   border-radius: 8px;
   overflow: hidden;
   background: #fff;
@@ -801,7 +801,7 @@ body[data-app-view='play'] .setup-shell.design-shell--guided:has(.ai-suggestion-
 .guided-feedback section {
   margin: 0 0 22px;
   padding: 0 0 0 18px;
-  border-left: 3px solid var(--gold);
+  
 }
 .guided-feedback section h2 {
   font: 700 28px Arial,sans-serif;

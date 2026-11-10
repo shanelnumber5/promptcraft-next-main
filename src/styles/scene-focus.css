@@ -51,7 +51,6 @@ body:has(.focused-scene) #app {
   background: transparent;
   box-shadow: none;
   overflow: visible;
-  animation: camera-arrive 420ms ease-out both;
 }
 .focused-scene .speaker-panel .cast {
   position: relative;
@@ -143,7 +142,6 @@ body:has(.focused-scene) #app {
   height: auto;
   max-height: none;
   margin: 0;
-  animation: board-arrive 320ms ease-out both;
 }
 .focused-scene .smartboard-stage {
   display: grid;
@@ -160,7 +158,7 @@ body:has(.focused-scene) #app {
 .focused-scene .smartboard-cast {
   position: relative;
   align-self: end;
-  height: min(94%, 560px);
+  height: clamp(280px, calc(100dvh - 300px), 560px);
   overflow: visible;
   pointer-events: none;
 }
@@ -379,7 +377,7 @@ from { opacity: 0; transform: translateY(12px); }
     grid-template-columns: minmax(0, 64%) minmax(240px, 36%);
   }
   .focused-scene .speaker-panel .cast {
-    height: min(94%, 560px);
+    height: clamp(280px, calc(100dvh - 300px), 560px);
   }
   .focused-scene .speech-bubble p {
     font-size: max(16px, clamp(20px, 2vw, 26px));
@@ -1155,7 +1153,7 @@ body[data-app-view] .focused-scene.scene-spot-hole .board-screen {
   overflow: hidden;
 }
 body[data-app-view] .focused-scene.focus--question.answer-selected .choice:not(.is-selected) {
-  opacity: 0.62;
+  opacity: 1;
 }
 body[data-app-view] .focused-scene.focus--question .feedback--narrative {
   display: grid;
@@ -1192,21 +1190,22 @@ body[data-app-view] .focused-scene.focus--question .feedback-turn {
   min-height: 124px;
   box-sizing: border-box;
   padding: 16px 18px;
-  border: 0;
+  border: 1px solid #1E2D59;
+  
   border-radius: 4px;
-  background: #001f5b;
-  box-shadow: 0 8px 24px #00112b24;
-  color: #fff;
+  background: #F2F2F2;
+  box-shadow: none;
+  color: #1E2D59;
 }
 body[data-app-view] .focused-scene.focus--question .feedback-turn--pixel {
-  background: #001f5b;
+  background: #F2F2F2;
 }
 body[data-app-view] .focused-scene.focus--question .feedback-turn strong,
 body[data-app-view] .focused-scene.focus--question .feedback-turn p {
   display: block;
 }
 body[data-app-view] .focused-scene.focus--question .feedback-turn strong {
-  color: #f4bf38;
+  color: #1E2D59;
   margin-bottom: 3px;
 }
 body[data-app-view] .focused-scene.focus--question .feedback-turn p {

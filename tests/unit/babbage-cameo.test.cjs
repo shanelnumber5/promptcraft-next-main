@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 (async () => {
-  const {babbageCameoFor,renderBabbageCameo}=await import('../../src/shared/babbage-cameo.js');
+  const {babbageCameoFor,renderBabbageCameo,showBabbageCameo}=await import('../../src/shared/babbage-cameo.js');
   const {parseBabbageFeedback,humorInstructions}=await import('../../src/shared/babbage-feedback.js');
   const {normalizeBabbageResponse}=await import('../../src/features/design/babbage-client.js');
   const {applyBabbageTurn}=await import('../../src/features/design/turn-state.js');
@@ -25,5 +25,25 @@ const assert = require('node:assert/strict');
   const restored=JSON.parse(JSON.stringify(state));
   assert.equal(babbageCameoFor(restored,turn.message),joke);
   for(const example of ['Yell at them','mandatory discussion','department chair','don\'t know','Analyze satire','exhausted']) assert(humorInstructions.includes(example));
+  const previousDocument=global.document;
+  const previews=[];
+  const fakeDialog=()=>({
+    style:{setProperty(){}},setAttribute(){},querySelectorAll:()=>[],addEventListener(){},
+    showModal(){previews.push(this.innerHTML);},
+  });
+  global.document={querySelector:()=>null,activeElement:null,createElement:fakeDialog,body:{appendChild(){}}};
+  try {
+    const root={querySelector:()=>null};
+    const dev={...state,babbage:{mode:'dev',history:[]}};
+    showBabbageCameo(dev,root,joke);
+    assert.equal(previews.length,0,'Ordinary Dev feedback cannot masquerade as a live aside');
+    showBabbageCameo(dev,root,joke,{preview:true});
+    assert.equal(previews.length,1,'Explicit joke shortcut can preview the portrait in Dev mode');
+    assert(previews[0].includes('Dev preview · scripted joke · no AI request'));
+    assert(previews[0].includes('charles-babbage-full.png'));
+    assert(previews[0].includes(joke));
+    showBabbageCameo(dev,root,joke,{preview:true});
+    assert.equal(previews.length,2,'An explicit preview can be repeated');
+  } finally {global.document=previousDocument;}
   console.log('PASS: explicit humorous asides, tone gates, plain legacy replies, saved history, no opening-sentence guessing. Mocked responses only.');
 })().catch(error=>{console.error(error);process.exitCode=1;});
