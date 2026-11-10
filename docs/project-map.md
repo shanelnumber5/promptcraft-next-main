@@ -2,26 +2,31 @@
 
 Scenario and Creative Workspace share the same studio implementation. Scenario adds Pixel’s opening story. Route-specific labels, save adapters and resets live in `src/features/workspace/routes.js`.
 
-| Change | Source |
-| --- | --- |
-| Entry and information routes | `src/app/entry.js`, `src/features/entry/` |
-| Opening story, scenes and handoff | `src/features/opening/` |
-| Shared studio lifecycle | `src/features/workspace/controller.js` |
-| Six Build pages | `src/features/workspace/screen.js` |
-| Section navigation and utility views | `src/features/workspace/section-frame.js`, `views.js` |
-| Explore and creative refinement | `src/features/workspace/creative.js`, `creative-view.js`, `partner-view.js` |
-| Review, clarification and teaching-note proposals | `src/features/workspace/review-view.js`, `review-ai.js`, `feedback-questions.js`, `teaching-notes.js` |
-| Workspace saves and portable projects | `src/features/workspace/storage.js`, `project-file.js` |
-| Scenario saves and legacy restoration | `src/features/workspace/scenario-storage.js`, `src/app/storage.js` |
-| Shared active Babbage instructions | `src/features/workspace/prompt.js`, `src/shared/purposeful-redesign.js` |
-| AI lifecycle and service adapter | `src/features/design/controller.js`, `babbage-client.js` |
-| Maya reading and dialogue | `src/features/design/maya-client.js`, `maya-dialog.js` |
-| Rich-text editor and directions rendering | `src/shared/directions-editor.js`, `directions.js` |
-| Guide export and preview | `src/features/design/guide.js`, `guide-styles.js`, `guide-preview.js` |
-| Pixel recap and spoken closing | `src/features/design/closing.js` |
-| Field definitions and approval rules | `src/features/setup/content.js`, `src/features/design/content.js` |
-| Stylesheet entry and cascade order | `src/styles/styles.css` |
-| Current browser harness | `tests/browser/browser-harness.cjs` |
+For extension recipes and state ownership, see [Expanding PromptCraft](expanding-promptcraft.md).
+
+| Change                                              | Source                                                                                                |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Entry and information routes                        | `src/app/entry.js`, `src/features/entry/`                                                             |
+| Opening story, scenes and handoff                   | `src/features/opening/`                                                                               |
+| Shared studio lifecycle                             | `src/features/workspace/controller.js`                                                                |
+| Studio stage labels, planning fields and limits     | `src/features/workspace/config.js`                                                                    |
+| Ordered Build sections and shared action bar        | `src/features/workspace/build-view.js`                                                                |
+| Studio shell and activity preview                   | `src/features/workspace/screen.js`                                                                    |
+| Section navigation and utility views                | `src/features/workspace/section-frame.js`, `views.js`                                                 |
+| Explore and creative refinement                     | `src/features/workspace/creative.js`, `creative-view.js`, `partner-view.js`                           |
+| Review, clarification and teaching-note proposals   | `src/features/workspace/review-view.js`, `review-ai.js`, `feedback-questions.js`, `teaching-notes.js` |
+| Review request lifecycle and cancellation           | `src/features/workspace/review-controller.js`                                                         |
+| Workspace saves and portable projects               | `src/features/workspace/storage.js`, `project-file.js`                                                |
+| Scenario saves and legacy restoration               | `src/features/workspace/scenario-storage.js`, `src/app/storage.js`                                    |
+| Shared active Babbage instructions                  | `src/features/workspace/prompt.js`, `src/shared/purposeful-redesign.js`                               |
+| AI lifecycle and service adapter                    | `src/features/design/controller.js`, `babbage-client.js`                                              |
+| Maya reading and dialogue                           | `src/features/design/maya-client.js`, `maya-dialog.js`                                                |
+| Rich-text editor, controls and directions rendering | `src/shared/directions-editor.js`, `directions-editor-controls.js`, `directions.js`                   |
+| Guide export and preview                            | `src/features/design/guide.js`, `guide-styles.js`, `guide-preview.js`                                 |
+| Pixel recap and spoken closing                      | `src/features/design/closing.js`                                                                      |
+| Field definitions and approval rules                | `src/features/setup/content.js`, `src/features/design/content.js`                                     |
+| Stylesheet entry and cascade order                  | `src/styles/styles.css`                                                                               |
+| Current browser harness                             | `tests/browser/browser-harness.cjs`                                                                   |
 
 ## Compatibility
 

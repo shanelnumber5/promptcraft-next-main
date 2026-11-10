@@ -1,14 +1,9 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const { filesIn, resolveSourceReference } = require('../helpers/source-files.cjs');
 
 const root = path.resolve(__dirname, '../..');
-function filesIn(folder) {
-  return fs.readdirSync(folder, { withFileTypes: true }).flatMap((entry) => {
-    const target = path.join(folder, entry.name);
-    return entry.isDirectory() ? filesIn(target) : [target];
-  });
-}
 const sources = [
   ...filesIn(path.join(root, 'src')),
   ...filesIn(path.join(root, 'server')),
@@ -20,7 +15,7 @@ for (const file of sources) {
   for (const match of text.matchAll(/(?:from\s*|import\s*)['"]([^'"]+)['"]/g)) {
     if (match[1].startsWith('.'))
       assert.ok(
-        fs.existsSync(path.resolve(path.dirname(file), match[1])),
+        fs.existsSync(resolveSourceReference(file, match[1])),
         `Missing import in ${file}: ${match[1]}`,
       );
   }

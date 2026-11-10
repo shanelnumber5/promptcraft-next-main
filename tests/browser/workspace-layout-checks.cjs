@@ -1,8 +1,18 @@
 const assert = require('node:assert/strict');
-module.exports = async ({send,evaluate,waitFor,shot,key,keyboardReach,accessibleScreen,scenarioMode=false}) => {
-  const choose = selector=>evaluate(`document.querySelector(${JSON.stringify(selector)}).click()`);
-  if(scenarioMode) {
-    await send('Page.navigate',{url:'http://127.0.0.1:8783/?view=home'});
+module.exports = async ({
+  send,
+  evaluate,
+  waitFor,
+  shot,
+  key,
+  keyboardReach,
+  accessibleScreen,
+  scenarioMode = false,
+}) => {
+  const choose = (selector) =>
+    evaluate(`document.querySelector(${JSON.stringify(selector)}).click()`);
+  if (scenarioMode) {
+    await send('Page.navigate', { url: 'http://127.0.0.1:8783/?view=home' });
     await waitFor('document.readyState==="complete"');
     await evaluate(`(async()=>{
       localStorage.clear();
@@ -13,16 +23,29 @@ module.exports = async ({send,evaluate,waitFor,shot,key,keyboardReach,accessible
       for(const scene of discussionOpening.scenes) if(scene.choice) state.answers[scene.id]=scene.choice.options.find(option=>option.correct).id;
       saveState(state);
     })()`);
-    await send('Page.navigate',{url:'http://127.0.0.1:8783/?view=play'});
+    await send('Page.navigate', { url: 'http://127.0.0.1:8783/?view=play' });
     await waitFor('!!document.querySelector("[data-action=start-design-studio]")');
     await choose('[data-action="start-design-studio"]');
     await waitFor('!!document.querySelector(".workspace-shell")');
     assert(await evaluate('new URL(location.href).searchParams.get("view")==="scenario"'));
-    assert(!await evaluate('!!document.querySelector(".summary-shell,.setup-shell--teacher")'),'Opening hands off directly without the retired intake');
+    assert(
+      !(await evaluate('!!document.querySelector(".summary-shell,.setup-shell--teacher")')),
+      'Opening hands off directly without the retired intake',
+    );
   }
-  for(const [device,width,height] of [['desktop',1280,800],['tablet',820,1024],['phone',390,844],['small-phone',320,568]]) {
-    await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<600});
-    await send('Page.navigate',{url:'http://127.0.0.1:8783/?view=home'});
+  for (const [device, width, height] of [
+    ['desktop', 1280, 800],
+    ['tablet', 820, 1024],
+    ['phone', 390, 844],
+    ['small-phone', 320, 568],
+  ]) {
+    await send('Emulation.setDeviceMetricsOverride', {
+      width,
+      height,
+      deviceScaleFactor: 1,
+      mobile: width < 600,
+    });
+    await send('Page.navigate', { url: 'http://127.0.0.1:8783/?view=home' });
     await waitFor('document.readyState==="complete"');
     await evaluate(`(async()=>{
       const {freshWorkspace,saveWorkspace}=await import('/src/features/workspace/storage.js');
@@ -36,21 +59,31 @@ module.exports = async ({send,evaluate,waitFor,shot,key,keyboardReach,accessible
       state.creative.review={fingerprint:reviewFingerprint(state),feedback:'Which evidence would help students test their decision?',status:'complete',error:'',offeredMaya:''};
       ${scenarioMode ? "state.experience='scenario';const {saveScenarioStudio}=await import('/src/features/workspace/scenario-storage.js');saveScenarioStudio(state);" : 'saveWorkspace(state);'}
     })()`);
-    await send('Page.navigate',{url:'http://127.0.0.1:8783/?view='+ (scenarioMode?'scenario':'workspace')});
+    await send('Page.navigate', {
+      url: 'http://127.0.0.1:8783/?view=' + (scenarioMode ? 'scenario' : 'workspace'),
+    });
     await waitFor('!!document.querySelector(".workspace-section-sidebar")');
-    const sidebar=await evaluate('[...document.querySelectorAll(".workspace-section-sidebar button")].map(el=>el.dataset.designPage)');
-    assert.deepEqual(sidebar,['start','subject','ai-use','intentions','presence','draft']);
+    const sidebar = await evaluate(
+      '[...document.querySelectorAll(".workspace-section-sidebar button")].map(el=>el.dataset.designPage)',
+    );
+    assert.deepEqual(sidebar, ['start', 'subject', 'ai-use', 'intentions', 'presence', 'draft']);
     let desktopFooter;
-    const sameFooter=async label=>{
-      const bars=await evaluate('[...document.querySelectorAll("#workspace-panel .workspace-action-bar")].map(el=>({...el.getBoundingClientRect().toJSON(),y:el.getBoundingClientRect().y+scrollY}))');
-      assert.equal(bars.length,1, `${label}: one main gold bar`);
-      assert.equal(bars[0].height,72, `${label}: 72px action bar`);
+    const sameFooter = async (label) => {
+      const bars = await evaluate(
+        '[...document.querySelectorAll("#workspace-panel .workspace-action-bar")].map(el=>({...el.getBoundingClientRect().toJSON(),y:el.getBoundingClientRect().y+scrollY}))',
+      );
+      assert.equal(bars.length, 1, `${label}: one main gold bar`);
+      assert.equal(bars[0].height, 72, `${label}: 72px action bar`);
       desktopFooter ??= bars[0];
-      for(const property of ['y','height']) assert(Math.abs(bars[0][property]-desktopFooter[property])<3, `${label}: stable gold bar ${property} (${bars[0][property]} vs ${desktopFooter[property]})`);
+      for (const property of ['y', 'height'])
+        assert(
+          Math.abs(bars[0][property] - desktopFooter[property]) < 3,
+          `${label}: stable gold bar ${property} (${bars[0][property]} vs ${desktopFooter[property]})`,
+        );
     };
-    for(const page of sidebar) {
+    for (const page of sidebar) {
       await choose(`[data-design-page="${page}"]`);
-      const layout=await evaluate(`(()=>{
+      const layout = await evaluate(`(()=>{
         const footer=document.querySelector('.workspace-section-main .workspace-view-actions');
         const panel=document.getElementById('workspace-panel');
         return {width:document.documentElement.scrollWidth,viewport:innerWidth,
@@ -59,39 +92,80 @@ module.exports = async ({send,evaluate,waitFor,shot,key,keyboardReach,accessible
           current:document.querySelectorAll('.workspace-section-sidebar [aria-current="page"]').length,
           fields:[...document.querySelectorAll('.build-page-fields input,.build-page-fields textarea,.build-page-fields select')].map(el=>({id:el.id||el.name,width:el.getBoundingClientRect().width}))};
       })()`);
-      assert(layout.width<=layout.viewport,`${device}/${page}: no document overflow`);
-      assert.equal(layout.current,1);
-      for(const item of layout.nav) assert(item.size>=16 && item.height>=44,`${device}/${page}: readable navigation and targets`);
-      for(const field of layout.fields) assert(field.width>0,`${device}/${page}: visible field ${field.id}`);
-      assert(Math.abs(layout.footer.bottom-layout.panel.bottom)<3,`${device}/${page}: footer at panel bottom ${JSON.stringify({footer:layout.footer,panel:layout.panel})}`);
+      assert(layout.width <= layout.viewport, `${device}/${page}: no document overflow`);
+      assert.equal(layout.current, 1);
+      for (const item of layout.nav)
+        assert(
+          item.size >= 16 && item.height >= 44,
+          `${device}/${page}: readable navigation and targets`,
+        );
+      for (const field of layout.fields)
+        assert(field.width > 0, `${device}/${page}: visible field ${field.id}`);
+      assert(
+        Math.abs(layout.footer.bottom - layout.panel.bottom) < 3,
+        `${device}/${page}: footer at panel bottom ${JSON.stringify({ footer: layout.footer, panel: layout.panel })}`,
+      );
       await sameFooter(`${device}/build/${page}`);
-      if(page==='ai-use') assert(await evaluate('(()=>{const wide=document.querySelector(".workspace-field-wide").getBoundingClientRect();const grid=document.querySelector(".workspace-combined-fields").getBoundingClientRect();return Math.abs(wide.width-grid.width)<2;})()'), `${device}: requirements span both columns`);
-      if(page==='intentions'||page==='presence') {
-        const ids=page==='intentions'?['creative-core','concern']:['instructor-plan','open-questions'];
-        assert(await evaluate(`(()=>{const first=document.getElementById(${JSON.stringify(ids[0])}).getBoundingClientRect();const second=document.getElementById(${JSON.stringify(ids[1])}).getBoundingClientRect();return second.top>first.bottom&&Math.abs(first.width-second.width)<2;})()`), `${device}/${page}: full-width answers are stacked in order`);
+      if (page === 'ai-use')
+        assert(
+          await evaluate(
+            '(()=>{const wide=document.querySelector(".workspace-field-wide").getBoundingClientRect();const grid=document.querySelector(".workspace-combined-fields").getBoundingClientRect();return Math.abs(wide.width-grid.width)<2;})()',
+          ),
+          `${device}: requirements span both columns`,
+        );
+      if (page === 'intentions' || page === 'presence') {
+        const ids =
+          page === 'intentions'
+            ? ['creative-core', 'concern']
+            : ['instructor-plan', 'open-questions'];
+        assert(
+          await evaluate(
+            `(()=>{const first=document.getElementById(${JSON.stringify(ids[0])}).getBoundingClientRect();const second=document.getElementById(${JSON.stringify(ids[1])}).getBoundingClientRect();return second.top>first.bottom&&Math.abs(first.width-second.width)<2;})()`,
+          ),
+          `${device}/${page}: full-width answers are stacked in order`,
+        );
       }
-      assert(await evaluate('getComputedStyle(document.getElementById("design-page-title")).fontFamily.startsWith("Arial")'), `${device}/${page}: bold scenario typography`);
+      assert(
+        await evaluate(
+          'getComputedStyle(document.getElementById("design-page-title")).fontFamily.startsWith("Arial")',
+        ),
+        `${device}/${page}: bold scenario typography`,
+      );
       await accessibleScreen(`${device}/${page}`);
       await shot(`layout-${device}-build-${page}`);
     }
+    if (device === 'desktop') {
+      await require('./editor-controls-checks.cjs')({ evaluate, choose, scenarioMode });
+    }
     await keyboardReach('.workspace-section-sidebar [data-design-page="subject"]');
-    const focus=await evaluate('(()=>{const style=getComputedStyle(document.activeElement);return {color:style.outlineColor,width:parseFloat(style.outlineWidth)};})()');
-    assert.equal(focus.color,'rgb(30, 45, 89)');
-    assert(focus.width>=3);
-    await key('Enter','Enter',13);
+    const focus = await evaluate(
+      '(()=>{const style=getComputedStyle(document.activeElement);return {color:style.outlineColor,width:parseFloat(style.outlineWidth)};})()',
+    );
+    assert.equal(focus.color, 'rgb(30, 45, 89)');
+    assert(focus.width >= 3);
+    await key('Enter', 'Enter', 13);
     await choose('[data-workspace-panel="reason"]');
-    for(const page of ['rationale','clarify','reasoning','checks','help']) {
+    for (const page of ['rationale', 'clarify', 'reasoning', 'checks', 'help']) {
       await choose(`[data-review-page="${page}"]`);
-      assert(await evaluate('document.documentElement.scrollWidth<=innerWidth'),`${device}/${page}: no document overflow`);
-      assert.equal(await evaluate('document.querySelectorAll(".review-actions").length'),1);
+      assert(
+        await evaluate('document.documentElement.scrollWidth<=innerWidth'),
+        `${device}/${page}: no document overflow`,
+      );
+      assert.equal(await evaluate('document.querySelectorAll(".review-actions").length'), 1);
       await sameFooter(`${device}/review/${page}`);
       await accessibleScreen(`${device}/review/${page}`);
       await shot(`layout-${device}-review-${page}`);
     }
     await choose('[data-workspace-panel="babbage"]');
     await sameFooter(`${device}/explore`);
-    if(width>=820) assert(await evaluate('document.documentElement.scrollHeight<=innerHeight+1'), `${device}: workspace fits the browser height`);
-    await evaluate('document.querySelector(".design-notice").textContent="Add your draft and design reasoning before checking the design."');
+    if (width >= 820)
+      assert(
+        await evaluate('document.documentElement.scrollHeight<=innerHeight+1'),
+        `${device}: workspace fits the browser height`,
+      );
+    await evaluate(
+      'document.querySelector(".design-notice").textContent="Add your draft and design reasoning before checking the design."',
+    );
     await sameFooter(`${device}/notice-visible`);
     await evaluate('document.querySelector(".design-notice").textContent=""');
     await accessibleScreen(`${device}/explore`);
@@ -99,6 +173,8 @@ module.exports = async ({send,evaluate,waitFor,shot,key,keyboardReach,accessible
     await choose('[data-workspace-view="options"]');
     await sameFooter(`${device}/options`);
     await shot(`layout-${device}-options`);
-    console.log(`${device} PASS: six Build pages, five Review pages, Explore, keyboard focus, footer placement, rendered contrast. Mocked service only.`);
+    console.log(
+      `${device} PASS: six Build pages, five Review pages, Explore, keyboard focus, footer placement, rendered contrast. Mocked service only.`,
+    );
   }
 };

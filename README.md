@@ -27,7 +27,7 @@ The browser uses the existing backend at `https://promptcraft-discussion.netlify
 
 ## Checks
 
-- `npm run test:unit`: 15 offline suites; unmocked global fetch is blocked.
+- `npm run test:unit`: 16 offline suites; unmocked global fetch is blocked.
 - `npm test`: offline suites plus local static-server checks.
 - `npm run test:browser`: shared Scenario and Workspace browser fixtures.
 - `npm run test:lab`: Idea Lab browser fixtures.
@@ -46,3 +46,5 @@ Type `good`, `bad`, `joke`, or `test` into the subject or starting-directions fi
 ## Maintenance
 
 See [the source map](docs/project-map.md), [cleanup record](docs/repository-cleanup-20261030.md), [artwork provenance](docs/asset-provenance.md), and [character guidance](docs/characters/guide.md). This is a complete cleaned repository. Extract it into a fresh folder rather than overlaying it on an older checkout, which would leave retired files behind. No deletion script is required. Historical development notes and retired artwork remain preserved in the original uploaded repository archive.
+
+For new scenes, Build sections, saved fields, ideas, or AI workflows, follow [Expanding PromptCraft](docs/expanding-promptcraft.md). It explains the reusable modules, extension points, save compatibility, and checks to run.
