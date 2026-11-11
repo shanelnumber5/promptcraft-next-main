@@ -94,11 +94,32 @@ module.exports = async ({
       })()`);
       assert(layout.width <= layout.viewport, `${device}/${page}: no document overflow`);
       assert.equal(layout.current, 1);
-      for (const item of layout.nav)
+      for (const item of width > 700 ? layout.nav : [])
         assert(
           item.size >= 16 && item.height >= 44,
           `${device}/${page}: readable navigation and targets`,
         );
+      if (width <= 700) {
+        assert.equal(
+          await evaluate('document.getElementById("workspace-section-picker").value'),
+          page,
+          'Mobile chooser identifies the current section',
+        );
+        assert(
+          await evaluate(
+            'document.getElementById("workspace-section-picker").getBoundingClientRect().height>=44',
+          ),
+          'Mobile chooser is a comfortable touch target',
+        );
+        await evaluate(
+          `(()=>{const picker=document.getElementById('workspace-section-picker');picker.value=${JSON.stringify(page)};picker.dispatchEvent(new Event('change',{bubbles:true}));})()`,
+        );
+        assert.equal(
+          await evaluate('document.activeElement.id'),
+          'workspace-section-picker',
+          'Choosing a section retains focus',
+        );
+      }
       for (const field of layout.fields)
         assert(field.width > 0, `${device}/${page}: visible field ${field.id}`);
       assert(
@@ -137,13 +158,24 @@ module.exports = async ({
     if (device === 'desktop') {
       await require('./editor-controls-checks.cjs')({ evaluate, choose, scenarioMode });
     }
-    await keyboardReach('.workspace-section-sidebar [data-design-page="subject"]');
+    await keyboardReach(
+      width <= 700
+        ? '#workspace-section-picker'
+        : '.workspace-section-sidebar [data-design-page="subject"]',
+    );
     const focus = await evaluate(
       '(()=>{const style=getComputedStyle(document.activeElement);return {color:style.outlineColor,width:parseFloat(style.outlineWidth)};})()',
     );
     assert.equal(focus.color, 'rgb(30, 45, 89)');
     assert(focus.width >= 3);
-    await key('Enter', 'Enter', 13);
+    if (width <= 700) {
+      await key('Home', 'Home', 36);
+      assert.equal(
+        await evaluate('document.getElementById("workspace-section-picker").value'),
+        'start',
+        'Mobile section navigation works from the keyboard',
+      );
+    } else await key('Enter', 'Enter', 13);
     await choose('[data-workspace-panel="reason"]');
     for (const page of ['rationale', 'clarify', 'reasoning', 'checks', 'help']) {
       await choose(`[data-review-page="${page}"]`);

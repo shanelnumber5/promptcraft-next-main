@@ -39,6 +39,11 @@ body:has(dialog[open]) {
 }
 .reference-header form {
   margin: 0;
+  flex: none;
+}
+.reference-header button { min-width:64px; white-space:nowrap; }
+@media (max-width:700px) {
+  body[data-app-view] .reference-header h2 { font-size:22px; min-width:0; }
 }
 .reference-tabs {
   display: flex;

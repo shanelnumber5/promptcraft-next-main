@@ -16,6 +16,7 @@ module.exports = async ({send,evaluate,waitFor,key,keyboardReach,accessibleScree
     if (height >= 650) assert(footer.bottom<=height,`${device}: footer stays in the viewport`);
     else assert(await evaluate('document.querySelector(".lab-grid").clientHeight >= 120 && document.querySelector(".lab-footer").getBoundingClientRect().bottom <= document.documentElement.scrollHeight'), `${device}: short screens retain readable cards and reachable actions ${JSON.stringify(await evaluate('({grid:document.querySelector(".lab-grid").clientHeight,footer:document.querySelector(".lab-footer").getBoundingClientRect().bottom,doc:document.documentElement.scrollHeight})'))}`);
     await accessibleScreen(device+' Idea Lab gallery');
+    await shot('lab-'+device+'-gallery');
     await evaluate(`document.querySelector('[data-lab-page="1"]').click()`);
     assert.equal(await evaluate('document.querySelectorAll(".lab-card").length'),6);
     assert.equal(await evaluate('new URL(location.href).searchParams.get("page")'),'1');
@@ -28,12 +29,14 @@ module.exports = async ({send,evaluate,waitFor,key,keyboardReach,accessibleScree
     await waitFor('!!document.querySelector(".lab-detail")');
     assert(await evaluate('document.querySelector(".lab-detail").textContent.includes("Your role as instructor")'));
     await accessibleScreen(device+' Idea Lab detail');
+    await shot('lab-'+device+'-detail');
     await follow('.lab-footer a[href*="view=lab"]');
     await waitFor('!!document.getElementById("idea-search")');
     assert.equal(await evaluate('document.getElementById("idea-search").value'),'workplace');
     assert.equal(await evaluate('document.getElementById("idea-category").value'),'Workplace');
     await input('idea-search','no-matching-idea-123');
     assert(await evaluate('!!document.querySelector(".lab-empty")'));
+    await shot('lab-'+device+'-empty');
     await evaluate('document.querySelector(".lab-empty [data-lab-clear]").click()');
     assert.equal(await evaluate('document.querySelectorAll(".lab-card").length'),6);
     await evaluate(`(async()=>{

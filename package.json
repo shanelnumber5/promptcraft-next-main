@@ -17,6 +17,7 @@
     "test:server": "node tests/unit/server.test.cjs",
     "test:accessibility": "node tests/browser/accessibility.test.cjs",
     "test:browser": "node tests/browser/shared-routes.test.cjs",
+    "test:screens": "node tests/browser/screen-review.test.cjs",
     "format": "prettier --write index.html package.json README.md docs src server tests",
     "format:check": "prettier --check index.html package.json README.md docs src server tests",
     "test:scenario-studio": "node tests/browser/scenario-studio.test.cjs",
