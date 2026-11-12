@@ -37,7 +37,7 @@ export function showBabbageCameo(state, root, feedback = '', { preview = false }
   dialog.className = 'maya-dialog maya-dialog--novel babbage-cameo-dialog';
   dialog.setAttribute('aria-label', 'Charles Babbage’s playful aside');
   dialog.style.setProperty('--maya-header-height',(document.querySelector('.app-header')?.getBoundingClientRect().height || 80)+'px');
-  dialog.innerHTML = `<div class="maya-stage"><div class="maya-actor" aria-hidden="true"><img src="assets/people/charles-babbage-full.png" alt=""></div><section class="maya-dialogue" aria-label="Babbage's dialogue"><h3>Charles Babbage</h3>${preview ? '<p class="babbage-preview-label">Dev preview · scripted joke · no AI request</p>' : ''}<p>${e(joke)}</p></section></div><div class="maya-body"><nav class="maya-scene-nav" aria-label="Dialogue navigation"><button type="button" class="primary" data-babbage-close>Continue designing</button></nav></div>`;
+  dialog.innerHTML = `<div class="maya-stage"><div class="maya-actor" aria-hidden="true"><img src="assets/people/charles-babbage-full.webp" alt=""></div><section class="maya-dialogue" aria-label="Babbage's dialogue"><h3>Charles Babbage</h3>${preview ? '<p class="babbage-preview-label">Dev preview · scripted joke · no AI request</p>' : ''}<p>${e(joke)}</p></section></div><div class="maya-body"><nav class="maya-scene-nav" aria-label="Dialogue navigation"><button type="button" class="primary" data-babbage-close>Continue designing</button></nav></div>`;
   document.body.appendChild(dialog);
   const opener = document.activeElement;
   const close = () => dialog.close();

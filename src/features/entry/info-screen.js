@@ -67,14 +67,14 @@ export function mountInfoPage(app, view) {
 }
 
 const topicVisuals = {
-  engine: { src: 'assets/people/babbage-engine-repaired.png', alt: 'Babbage, represented by a mechanical calculating engine', caption: 'Babbage', kind: 'engine' },
+  engine: { src: 'assets/people/babbage-engine-repaired.webp', alt: 'Babbage, represented by a mechanical calculating engine', caption: 'Babbage', kind: 'engine' },
   pixel: { src: characterArt.pixel.pleasant, alt: 'Professor Pixel', caption: 'Professor Pixel', kind: 'character' },
   pixelThinking: { src: characterArt.pixel.thoughtful, alt: 'Professor Pixel considering a teaching choice', caption: 'Professor Pixel', kind: 'character' },
   pixelListening: { src: characterArt.pixel.neutral, alt: 'Professor Pixel listening', caption: 'Professor Pixel', kind: 'character' },
   maya: { src: characterArt.maya.neutral, alt: 'Maya, the simulated student', caption: 'Maya', kind: 'character' },
   mayaSpeaking: { src: characterArt.maya.explaining, alt: 'Maya sharing her perspective', caption: 'Maya', kind: 'character' },
-  shanel: { src: 'assets/people/shanel-profile.png', alt: 'Shanel Lara Locke', caption: 'Shanel Lara Locke', kind: 'shanel' },
-  classroom: { src: 'assets/backgrounds/classroom.png', alt: 'PromptCraft’s classroom setting', caption: '', kind: 'classroom' },
+  shanel: { src: 'assets/people/shanel-profile.webp', alt: 'Shanel Lara Locke', caption: 'Shanel Lara Locke', kind: 'shanel' },
+  classroom: { src: 'assets/backgrounds/classroom.webp', alt: 'PromptCraft’s classroom setting', caption: '', kind: 'classroom' },
   college: { src: 'assets/brand/gfc-river-otters.png', alt: 'Great Falls College Montana State University, River Otters', caption: '', kind: 'college' },
 };
 

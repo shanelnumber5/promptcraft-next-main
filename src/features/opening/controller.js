@@ -1,4 +1,5 @@
-import { updateDialoguePortrait } from '../../shared/dialogue-portrait.js';
+import { updateDialoguePortrait, preloadDialoguePortraits } from '../../shared/dialogue-portrait.js';
+import { characterArt } from '../../shared/character-art.js';
 import { discussionOpening } from './content.js?v=20261104-dialogue-feedback-3';
 import { renderScene } from './screen.js';
 import { loadState, saveState, initialState, sceneReady } from '../../app/storage.js';
@@ -124,6 +125,16 @@ export function mountOpening(app, {storage=window.localStorage,navigate=url=>win
     },{signal:life.signal});
   }
   document.querySelector('[data-action="open-references"]')?.addEventListener('click',event=>openReferences(event.currentTarget),{signal:life.signal});
-  if(state.phase!=='opening') studio();else render();
+  if(state.phase!=='opening') studio();else {
+    render();
+    // Start with upcoming story expressions, then warm the remaining reactions.
+    const sources = [
+      ...discussionOpening.scenes.slice(index()).flatMap(scene => Object.values(scene.portraits || {})),
+      ...Object.values(characterArt).flatMap(poses => Object.values(poses)),
+    ];
+    const warm = () => { if (!life.signal.aborted) preloadDialoguePortraits(sources); };
+    if (document.readyState === 'complete') warm();
+    else if (typeof window !== 'undefined') window.addEventListener('load', warm, { once: true, signal: life.signal });
+  }
   return ()=>{life.abort();observer?.disconnect();};
 }

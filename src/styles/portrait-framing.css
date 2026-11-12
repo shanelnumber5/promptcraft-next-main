@@ -176,6 +176,11 @@
   }
 }
 @media (max-width:700px) {
+  /* Give both speakers a closer waist-up shot above the mobile dialogue. */
+  .focused-scene:is(.camera--left,.camera--right) .speaker-panel .character img {
+    height: 260%;
+    top: -12%;
+  }
   .portrait-crop {
     width: 110px;
     height: 120px;

@@ -27,7 +27,7 @@ The browser uses the existing backend at `https://promptcraft-discussion.netlify
 
 ## Checks
 
-- `npm run test:unit`: 16 offline suites; unmocked global fetch is blocked.
+- `npm run test:unit`: 17 offline suites; unmocked global fetch is blocked.
 - `npm test`: offline suites plus local static-server checks.
 - `npm run test:browser`: shared Scenario and Workspace browser fixtures.
 - `npm run test:lab`: Idea Lab browser fixtures.
@@ -44,6 +44,8 @@ Prettier is the only development dependency. `npm run format` and `npm run forma
 Type `good`, `bad`, `joke`, or `test` into the subject or starting-directions field to load a development example. This replaces the current route’s activity, retains the previous draft as the earlier version, makes no request at the moment of filling, and does not approve the activity. Subsequent AI actions use the normal connection. `?mockBabbage=1` enables labeled Dev simulation.
 
 ## Maintenance
+
+The browser uses optimized WebP artwork and `babbage-mark-small.svg`; original PNGs and the original embedded-PNG SVG remain as sources. To regenerate the optimized copies with Google's WebP tools, run `node scripts/optimize-images.cjs /path/to/cwebp`. Run `node scripts/check-image-assets.cjs /path/to/dwebp` to decode every optimized image and report download savings. These tools are only needed when changing artwork; deployment has no image-processing dependency. Character expressions preload with two low-priority downloads at a time and reuse decoded images during dialogue.
 
 See [the source map](docs/project-map.md), [cleanup record](docs/repository-cleanup-20261030.md), [artwork provenance](docs/asset-provenance.md), and [character guidance](docs/characters/guide.md). This is a complete cleaned repository. Extract it into a fresh folder rather than overlaying it on an older checkout, which would leave retired files behind. No deletion script is required. Historical development notes and retired artwork remain preserved in the original uploaded repository archive.
 

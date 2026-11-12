@@ -40,7 +40,7 @@ const assert = require('node:assert/strict');
     showBabbageCameo(dev,root,joke,{preview:true});
     assert.equal(previews.length,1,'Explicit joke shortcut can preview the portrait in Dev mode');
     assert(previews[0].includes('Dev preview · scripted joke · no AI request'));
-    assert(previews[0].includes('charles-babbage-full.png'));
+    assert(previews[0].includes('charles-babbage-full.webp'));
     assert(previews[0].includes(joke));
     showBabbageCameo(dev,root,joke,{preview:true});
     assert.equal(previews.length,2,'An explicit preview can be repeated');

@@ -33,7 +33,7 @@ function alignmentGuidance(teacher) {
 
 let logoPromise;
 export function loadGuideLogo() {
-  return (logoPromise ??= fetch(new URL('../../../assets/brand/babbage-mark.svg', import.meta.url), { signal: AbortSignal.timeout(5000) })
+  return (logoPromise ??= fetch(new URL('../../../assets/brand/babbage-mark-small.svg', import.meta.url), { signal: AbortSignal.timeout(5000) })
     .then((response) => {
       if (!response.ok) throw Error('Logo unavailable');
       return response.text();

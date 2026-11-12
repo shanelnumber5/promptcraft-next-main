@@ -1,4 +1,4 @@
-import { updateDialoguePortrait } from '../../shared/dialogue-portrait.js';
+import { updateDialoguePortrait, preloadDialoguePortraits } from '../../shared/dialogue-portrait.js';
 import { renderLoading } from './loading.js';
 import { characterArt } from '../../shared/character-art.js';
 import { buildMayaRequest, mayaContext, mayaExcerptPreview, requestMayaResponse, normalizeMayaScene, mayaSceneBeats, mayaFailureHeading } from './maya-client.js';
@@ -80,6 +80,7 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
     const scene = normalizeMayaScene(text, snapshot.design.revision);
     if (onComplete && !scene.pixel) throw Error('The reading did not include Pixel’s explanation. Please retry before continuing to the checks.');
     beats = mayaSceneBeats(scene); beatIndex = 0;
+    preloadDialoguePortraits(beats.map(beat => characterArt[beat.speaker][beat.emotion]));
     response.replaceChildren(...beats.map(beat => {
       const line = document.createElement('p');
       line.dataset.dialogueBeat = ''; line.textContent = beat.text; return line;

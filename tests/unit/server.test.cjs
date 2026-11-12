@@ -12,6 +12,8 @@ const http = require('node:http');
       '/src/app/app.js',
       '/src/styles/base.css',
       '/assets/backgrounds/classroom.png',
+      '/assets/backgrounds/classroom.webp',
+      '/assets/brand/babbage-mark-small.svg',
     ]) {
       const response = await fetch(base + file);
       assert.equal(response.status, 200, file);

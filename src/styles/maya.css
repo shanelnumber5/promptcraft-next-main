@@ -50,7 +50,7 @@
   padding: 24px;
   isolation: isolate;
   overflow: hidden;
-  background: linear-gradient(#081a3655,#081a3688),url('../../assets/backgrounds/classroom.png') center/cover;
+  background: linear-gradient(#081a3655,#081a3688),url('../../assets/backgrounds/classroom.webp') center/cover;
 }
 .maya-actor {
   position: absolute;

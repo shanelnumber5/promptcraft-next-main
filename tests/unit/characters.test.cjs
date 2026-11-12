@@ -51,7 +51,16 @@ function inspectPNG(file) {
   for (const [identity, poses] of Object.entries(characterArt)) {
     for (const [pose, file] of Object.entries(poses)) {
       assert(file.startsWith(`assets/characters/${identity}/${identity}_`), 'Character identities stay in their own catalogs');
-      bounds.push({ identity, pose, ...inspectPNG(path.resolve(__dirname, '../..', file)) });
+      const optimized = fs.readFileSync(path.resolve(__dirname, '../..', file));
+      assert(file.endsWith('.webp'), 'Browser uses optimized portraits');
+      assert.equal(optimized.toString('ascii', 0, 4), 'RIFF');
+      assert.equal(optimized.toString('ascii', 8, 16), 'WEBPVP8X');
+      assert(optimized[20] & 0x10, 'Optimized portrait keeps transparency');
+      assert.equal(optimized.readUIntLE(24, 3) + 1, 832);
+      assert.equal(optimized.readUIntLE(27, 3) + 1, 1177);
+      const original = path.resolve(__dirname, '../..', file.replace(/\.webp$/, '.png'));
+      assert(optimized.length < fs.statSync(original).size * .5, 'Portrait download is at least halved');
+      bounds.push({ identity, pose, ...inspectPNG(original) });
     }
   }
   assert.equal(bounds.length, 20, 'All twenty inspected poses are declared available');

@@ -32,8 +32,13 @@ for (const file of sources) {
     usedAssets.add(target);
   }
 }
-for (const asset of filesIn(path.join(root, 'assets')))
-  assert.ok(usedAssets.has(asset), `Unreferenced asset: ${path.relative(root, asset)}`);
+for (const asset of filesIn(path.join(root, 'assets'))) {
+  // Retained source artwork must have an optimized counterpart actually in use.
+  const optimized = asset.endsWith('.png') ? asset.replace(/\.png$/, '.webp')
+    : asset.endsWith(`${path.sep}babbage-mark.svg`) ? asset.replace('babbage-mark.svg', 'babbage-mark-small.svg') : null;
+  assert.ok(usedAssets.has(asset) || (optimized && usedAssets.has(optimized)),
+    `Unreferenced asset: ${path.relative(root, asset)}`);
+}
 const entry = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 for (const match of entry.matchAll(/(?:src|href)="([^"#]+)"/g)) {
   const pathname = match[1].split(/[?#]/)[0];

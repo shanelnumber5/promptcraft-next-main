@@ -7,6 +7,7 @@ const tests = [
   'babbage',
   'maya',
   'characters',
+  'dialogue-portrait',
   'idea-lab',
   'creative',
   'repository',

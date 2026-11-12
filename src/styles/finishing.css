@@ -275,7 +275,7 @@
 /* Wide classroom plate: preserve proportions and fill the scene edge to edge. */
 .classroom {
   background-image:
-    linear-gradient(#081a3610, #081a3633), url('../../assets/backgrounds/classroom.png');
+    linear-gradient(#081a3610, #081a3633), url('../../assets/backgrounds/classroom.webp');
   background-size: cover;
   background-position: center center;
   background-color: #c6b9a2;
