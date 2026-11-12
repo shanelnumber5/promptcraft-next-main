@@ -22,7 +22,7 @@ body[data-app-view] .babbage-cameo-dialog .maya-actor img {
   object-position: center bottom;
   bottom: -74%;
 }
-body[data-app-view] .babbage-cameo-dialog .maya-dialogue { box-sizing:border-box; width:52%; margin-left:clamp(24px,4vw,64px); }
+body[data-app-view] .babbage-cameo-dialog .maya-dialogue { box-sizing:border-box; width:52%; margin-left:16%; }
 body[data-app-view] .babbage-cameo-dialog .maya-dialogue h3,
 body[data-app-view] .babbage-cameo-dialog .maya-dialogue p { color: #fff; }
 body[data-app-view] .babbage-cameo-dialog .maya-dialogue h3 { color: #f4bf38; }

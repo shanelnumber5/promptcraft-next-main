@@ -864,8 +864,14 @@ body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .work
   background:#F2F2F2; color:#1E2D59; border-color:#1E2D59; opacity:1;
 }
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-action-bar > .workspace-save-status {
-  font: 400 16px/1.35 Arial,Helvetica,sans-serif; color: #111;
-  margin-left: auto; margin-right: auto; text-align: center;
+  font: 700 14px/1.4 Arial,Helvetica,sans-serif; color: #1E2D59;
+  margin: 0; text-align: center;
+  position:absolute; inset: auto 16px 8px;
+}
+/* Reserve a separate status row so changing actions cannot shift the message. */
+body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-action-bar:has(> .workspace-save-status) {
+  position:relative; flex-basis:100px; height:100px; min-height:100px; max-height:100px;
+  padding-bottom:40px;
 }
 @media (max-width: 720px) {
   body[data-app-view='workspace'] .workspace-shell .workspace-section-frame--sidebar { min-height: 0; }
