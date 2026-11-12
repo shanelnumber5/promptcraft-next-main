@@ -1064,3 +1064,55 @@ body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .crea
 #workspace-panel .workspace-feedback-question textarea { box-sizing:border-box; width:100%; min-height:104px; padding:12px; border:2px solid #1E2D59; border-radius:4px; background:#fff; color:#1E2D59; font:400 16px/1.5 Arial,Helvetica,sans-serif; }
 
 body[data-app-view] .info-sidebar .info-topic-label { color: #fff; }
+
+/* A native section chooser keeps the active task visible on narrow screens. */
+.workspace-section-mobile { display:none; }
+@media (max-width:700px) {
+  body[data-app-view='workspace'] .workspace-shell.workspace-shell--focused .workspace-tabs {
+    display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px;
+    padding:4px; margin-bottom:12px;
+  }
+  body[data-app-view='workspace'] .workspace-shell.workspace-shell--focused .workspace-tabs button {
+    width:100%; min-width:0; min-height:44px; padding:6px 2px;
+  }
+  body[data-app-view='workspace'] .workspace-shell.workspace-shell--focused .workspace-tabs .workspace-tabs-option { margin:0; padding:6px 2px; }
+  body[data-app-view='workspace'] .workspace-shell--focused .workspace-heading { min-height:0; margin-bottom:12px; }
+  body[data-app-view='workspace'] .workspace-shell--focused .workspace-heading h1 { font-size:24px !important; margin:0; }
+  body[data-app-view='workspace'] .workspace-messages:has(> .design-notice:empty):has(> .save-notice:empty) { display:none; }
+  body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-section-sidebar { display:none; }
+  body[data-app-view='workspace'] .workspace-section-mobile {
+    display:grid; gap:6px; padding:12px 16px; background:#f2f2f2; color:var(--navy);
+  }
+  body[data-app-view='workspace'] .workspace-section-mobile label { font-weight:700; }
+  body[data-app-view='workspace'] .workspace-section-mobile select {
+    width:100%; min-width:0; min-height:44px; padding:8px 12px;
+    border:2px solid var(--navy); border-radius:4px; background:#fff; color:var(--navy); font:inherit;
+  }
+  body[data-app-view='workspace'] .workspace-shell .workspace-section-mobile select:focus-visible { outline:3px solid var(--navy); outline-offset:3px; }
+  body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .design-page-heading h2 { font-size:24px; }
+  body[data-app-view] .focused-scene .scene-actions .navigation-hint { display:none; }
+  body[data-app-view='lab'] > header.app-header { flex-direction:row; flex-wrap:nowrap; gap:8px; padding:12px; }
+  body[data-app-view='lab'] > header.app-header .header-actions { width:auto; flex:none; margin:0; }
+}
+
+/* Loading copy lives on a dark panel even when the surrounding view is white. */
+body[data-app-view] .babbage-loading .babbage-loading-copy :is(strong,span,p) { color:#fff; }
+body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .babbage-loading .babbage-loading-copy :is(strong,span,p) { color:#fff; }
+body[data-app-view] .focused-scene .scene-actions button.primary.nav-button--next:disabled {
+  background:#f2f2f2; color:var(--navy); border:2px solid var(--navy); opacity:1;
+}
+
+/* Dialog actions remain visible while a long reading scrolls within its stage. */
+body[data-app-view] .maya-dialog header > div { min-width:0; }
+body[data-app-view] .maya-dialog header button { flex:none; min-width:64px; white-space:nowrap; }
+@media (max-width:700px), (max-height:650px) {
+  body[data-app-view] .maya-dialog--workspace:not(.maya-dialog--novel) .maya-stage { flex:1 1 0; min-height:0; overflow-y:auto; }
+  body[data-app-view] .maya-stage:has(.maya-state:not([hidden])) { align-items:center; }
+  body[data-app-view] .maya-state { box-sizing:border-box; padding:20px; flex:none; }
+}
+@media (max-width:700px) {
+  body[data-app-view] .maya-dialog header { gap:8px; padding:12px; }
+  body[data-app-view] .maya-dialog header h2 { font-size:22px; }
+  body[data-app-view] .maya-dialog .maya-scene-nav { flex-wrap:nowrap; }
+  body[data-app-view] .maya-dialog .maya-scene-nav button { flex:1 1 0; min-width:0; padding:8px; }
+}

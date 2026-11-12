@@ -277,7 +277,7 @@ from { opacity: 0; transform: translateY(12px); }
     max-width: 580px;
   }
   .focused-scene.camera--right .speaker-panel {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     align-items: end;
     gap: 0;
   }
@@ -333,6 +333,17 @@ from { opacity: 0; transform: translateY(12px); }
     font-size: 17px;
     padding: 12px;
   }
+}
+
+/* Narrow story screens give both speakers a full-width, readable dialogue. */
+@media (max-width:700px) {
+  body[data-app-view] .focused-scene .speaker-panel .cast { width:180px; height:160px; }
+  body[data-app-view] .focused-scene .speaker-panel .speech-bubble { width:100%; padding:18px; }
+  body[data-app-view] .focused-scene .speaker-panel .speech-bubble h2 { font-size:24px; margin:0 0 10px; }
+  body[data-app-view] .focused-scene .speaker-panel .speech-bubble p { font-size:18px; line-height:1.5; }
+  body[data-app-view] .focused-scene .scene-actions { padding:12px 12px calc(12px + env(safe-area-inset-bottom,0px)); }
+  body[data-app-view] .focused-scene .scene-actions .nav-button { height:56px; min-height:56px; }
+  body[data-app-view] .focused-scene .scene-actions .navigation-hint { display:none; }
 }
 @media (min-width: 1100px) and (min-height: 700px), (min-width: 1000px) and (min-height: 850px) {
   body:has(.focused-scene) {

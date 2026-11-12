@@ -193,3 +193,10 @@ body[data-info-reader] > .app-footer {
 body[data-app-view][data-info-reader] > .info-nav {
   width: 100%; margin: 0; border-radius: 0;
 }
+
+@media (max-width:700px) {
+  body[data-app-view][data-info-reader] .app-header { flex-wrap:nowrap; gap:8px; padding:12px; }
+  body[data-app-view][data-info-reader] .header-actions .campus-signature { padding:4px; align-self:center; }
+  body[data-app-view][data-info-reader] .header-actions .campus-signature img { width:100px; }
+  body[data-app-view][data-info-reader] .info-sidebar { height:auto; min-height:0; padding:12px; }
+}

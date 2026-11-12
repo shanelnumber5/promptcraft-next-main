@@ -243,13 +243,16 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
           issues.push('Background remains scrollable behind modal');
         return issues;
       })()`);
-      assert.deepEqual(layoutIssues, [], label + ' formatting audit');
+      const collectIssues = process.env.PC_BROWSER_COLLECT_ISSUES === '1';
+      if (!collectIssues) assert.deepEqual(layoutIssues, [], label + ' formatting audit');
+      let contrastIssues = [];
       if (process.env.PC_CONTRAST_AUDIT === '1') {
         const contrast = await require('./contrast-checks.cjs')(evaluate);
         fs.writeFileSync(path.join(output, label + '-contrast.json'), JSON.stringify(contrast, null, 2));
-        if (process.env.PC_CONTRAST_STRICT === '1') assert.deepEqual(contrast.failures, [], label + ' contrast audit');
+        contrastIssues = contrast.failures;
+        if (process.env.PC_CONTRAST_STRICT === '1' && !collectIssues) assert.deepEqual(contrast.failures, [], label + ' contrast audit');
       }
-      auditRecords.push({screen: label, ...await evaluate('({width: innerWidth, height: innerHeight})'), result: 'pass'});
+      auditRecords.push({screen: label, ...await evaluate('({width: innerWidth, height: innerHeight})'), result: layoutIssues.length || contrastIssues.length ? 'fail' : 'pass', layoutIssues, contrastIssues});
     };
     await send('Runtime.enable');
     await send('Page.enable');
@@ -260,11 +263,14 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       await require('./accessibility-checks.cjs')({send,evaluate,waitFor,shot,key,keyboardReach,accessibleScreen});
     } else if (['workspace-layout','scenario-studio'].includes(process.env.PC_BROWSER_FEATURE)) {
       await require('./workspace-layout-checks.cjs')({send,evaluate,waitFor,shot,key,keyboardReach,accessibleScreen,scenarioMode:process.env.PC_BROWSER_FEATURE==='scenario-studio'});
+    } else if (process.env.PC_BROWSER_FEATURE === 'screens') {
+      await require('./screen-review-checks.cjs')({send,evaluate,waitFor,shot,accessibleScreen});
     } else if (process.env.PC_BROWSER_FEATURE === 'lab') {
       await require('./idea-lab-browser-checks.cjs')({send,evaluate,waitFor,key,keyboardReach,accessibleScreen,shot});
     } else throw Error('Choose the shared-routes or idea-lab browser test entry point.');
     assert.deepEqual(errors, []);
     fs.writeFileSync(path.join(output, 'responsive-audit.json'), JSON.stringify({browser:'Chrome',screens:auditRecords},null,2));
+    if (process.env.PC_BROWSER_COLLECT_ISSUES === '1') assert.deepEqual(auditRecords.filter(record => record.result === 'fail').map(({screen,layoutIssues,contrastIssues}) => ({screen,layoutIssues,contrastIssues})), [], 'All captured screens pass layout and contrast checks');
   } finally {
     socket?.close();
     chrome.kill();
