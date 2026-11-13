@@ -6,8 +6,8 @@ const requested = params.get('view');
 const view = ['home', 'play', 'lab', 'workspace', 'scenario', 'guide', ...infoPages.map(([id]) => id)].includes(requested) ? requested : 'home';
 document.body.dataset.appView = view==='scenario' ? 'workspace' : view;
 const app = document.getElementById('app');
-if (['home', 'guide', ...infoPages.map(([id]) => id)].includes(view)) document.body.dataset.infoReader = '';
-if (['home', 'guide'].includes(view) || infoPages.some(([id]) => id === view)) {
+if (['home', 'guide', 'lab', ...infoPages.map(([id]) => id)].includes(view)) document.body.dataset.infoReader = '';
+if (['home', 'guide', 'lab'].includes(view) || infoPages.some(([id]) => id === view)) {
   document.querySelector('.header-actions a[href="?view=home"]').hidden = true;
   document.querySelector('.header-actions').insertAdjacentHTML('beforeend', campusSignature());
   app.insertAdjacentHTML('beforebegin', renderInfoNavigation(view));
