@@ -90,9 +90,11 @@ export async function requestBabbageTurn(state, intent, { fetchImpl = fetch, sig
   const data = await postJSON(BABBAGE_ENDPOINT, buildBabbageRequest(state, intent), {
     fetchImpl,
     signal,
-    httpError: (status) =>
+    httpError: (status, details) =>
       Error(
-        status === 429
+        typeof details?.error?.message === 'string' && details.error.message.startsWith('ChatMT')
+          ? details.error.message + ' Your draft is saved.'
+          : status === 429
           ? 'Babbage has reached a usage limit. Try again later or continue editing your draft.'
           : 'Babbage could not respond. Your draft is unchanged. Retry or continue editing your draft.',
       ),
