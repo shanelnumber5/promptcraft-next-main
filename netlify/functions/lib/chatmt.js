@@ -28,7 +28,6 @@ export async function handleChatmt(event, getContract, json, requestId) {
       headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.CHATMT_API_KEY.trim(), 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
         model,
-        thinking: { type: 'disabled' },
         max_tokens: Math.max(5000, Math.min(Number(incoming.max_output_tokens || incoming.max_tokens) || 5000, 8000)),
         system: `${String(incoming.system || '')}\n${guidance}\nKeep the outer analysis concise. Put requested sketches, dialogue or teaching notes inside feedback_summary exactly as the request specifies. Do not repeat the activity in ancillary fields.\nReturn only a valid JSON object matching this schema: ${JSON.stringify(schema)}`,
         messages: incoming.messages
