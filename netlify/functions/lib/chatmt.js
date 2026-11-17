@@ -24,10 +24,8 @@ export async function handleChatmt(event, getContract, json, requestId) {
       body: JSON.stringify({
         model,
         max_tokens: Math.max(1200, Math.min(Number(incoming.max_output_tokens || incoming.max_tokens) || 5000, 8000)),
-        system: `${String(incoming.system || '')}\n${guidance}\nReturn the complete analysis using the submit_analysis tool.`,
-        messages: incoming.messages,
-        tools: [{ name: 'submit_analysis', description: 'Return the structured PromptCraft analysis.', input_schema: contract.schema }],
-        tool_choice: { type: 'tool', name: 'submit_analysis' }
+        system: `${String(incoming.system || '')}\n${guidance}\nReturn only a valid JSON object matching this schema: ${JSON.stringify(contract.schema)}`,
+        messages: incoming.messages
       }),
       signal: AbortSignal.timeout(55000)
     });
@@ -40,7 +38,8 @@ export async function handleChatmt(event, getContract, json, requestId) {
       return json(response.status === 429 ? 429 : 502, { error: { message: 'ChatMT HTTP ' + response.status + '. ' + detail } });
     }
     const data = await response.json();
-    const analysis = data.content?.find(block => block.type === 'tool_use' && block.name === 'submit_analysis')?.input;
+    const text = (data.content || []).filter(block => block.type === 'text').map(block => block.text).join('\n');
+    const analysis = JSON.parse(text.trim().replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, ''));
     if (!analysis || typeof analysis !== 'object' || Array.isArray(analysis) || data.stop_reason === 'max_tokens') {
       return json(502, { error: { message: 'ChatMT returned an incomplete analysis. Retry your review.' } });
     }
