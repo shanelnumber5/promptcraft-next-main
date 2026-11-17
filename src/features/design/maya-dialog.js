@@ -75,7 +75,7 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
     speaker.textContent = beat.speaker === 'maya' ? 'Maya' : 'Professor Pixel';
     response.querySelectorAll('[data-dialogue-beat]').forEach((el, index) => { el.hidden = index !== beatIndex; });
     back.disabled = beatIndex === 0;
-    next.textContent = beatIndex === beats.length - 1 ? (novel ? 'Explain the change' : onComplete ? 'Continue to design checks' : onReturn ? 'Clarify feedback' : 'Return to your draft') : novel ? 'Continue' : 'Next';
+    next.textContent = beatIndex === beats.length - 1 ? (novel ? 'Explain the change' : onComplete ? 'Continue to design checks' : onReturn ? 'Clarify feedback' : 'Return to your draft') : beats[beatIndex + 1]?.speaker === 'pixel' && beat.speaker === 'maya' ? 'Hear Pixel’s perspective' : novel ? 'Continue' : 'Next';
   };
   const showScene = text => {
     const scene = normalizeMayaScene(text, snapshot.design.revision);
