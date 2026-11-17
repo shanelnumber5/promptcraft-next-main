@@ -6,7 +6,10 @@ function json(statusCode, data) {
 }
 
 export async function handler(event) {
-  if (process.env.CONTEXT !== 'deploy-preview') return json(404, { error: 'This test is available in Deploy Previews.' });
+  const host = String(event.headers?.host || '').toLowerCase();
+if (!/^deploy-preview-\d+--promptcraft-discussion\.netlify\.app$/.test(host)) {
+  return json(404, { error: 'Open this test using the Netlify Deploy Preview URL.' });
+}
   const names = ['CHATMT_API_KEY', 'CHATMT_BASE_URL', 'CHATMT_MODEL'];
   const missing = names.filter(name => !process.env[name]?.trim());
   if (event.httpMethod === 'GET') return json(200, { configured: !missing.length, missing, model: process.env.CHATMT_MODEL || '' });
