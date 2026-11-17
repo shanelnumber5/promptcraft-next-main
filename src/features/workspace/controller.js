@@ -90,7 +90,8 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     if (state.finalCheck.context !== context)
       state.finalCheck = { ...finalCheckDefaults(), context };
   };
-  const render = ({ focus = false } = {}) => {
+  const render = ({ focus = false, perspectivePending = false } = {}) => {
+    ai.perspectivePending = perspectivePending;
     app.innerHTML = showingWrapUp
       ? renderClosing(state, closingStage, closingPage)
       : renderWorkspace(state, ai, readError, designPage, partnerPage, reviewPage, ui);
