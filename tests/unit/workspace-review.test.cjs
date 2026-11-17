@@ -49,7 +49,7 @@ const assert = require('node:assert/strict');
   assert.equal(renderReview(state,{pending:false},'guide'),checks,'Old guide destination remains compatible');
   const reasoning=renderReview(state,{pending:false},'reasoning');
   assert(reasoning.includes('id="reason"') && !reasoning.includes('id="babbage-review-title"'));
-  assert(html.includes("Babbage’s perspective") && html.includes('Hear Maya’s perspective'));
+  assert(html.includes("Babbage’s perspective") && html.includes('Hear Maya and Pixel’s perspectives'));
   assert.equal((html.match(/Babbage[’']s perspective/g)||[]).length,1, 'One Babbage heading');
   assert(!html.includes('Check My Revision'));
   state.design.revision += ' Students discuss responses with the instructor.';
