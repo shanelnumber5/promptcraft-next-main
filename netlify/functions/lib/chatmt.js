@@ -23,7 +23,7 @@ export async function handleChatmt(event, getContract, json, requestId) {
       headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.CHATMT_API_KEY.trim(), 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
         model,
-        max_tokens: Math.max(1200, Math.min(Number(incoming.max_output_tokens || incoming.max_tokens) || 5000, 8000)),
+        max_tokens: Math.max(5000, Math.min(Number(incoming.max_output_tokens || incoming.max_tokens) || 5000, 8000)),
         system: `${String(incoming.system || '')}\n${guidance}\nReturn only a valid JSON object matching this schema: ${JSON.stringify(contract.schema)}`,
         messages: incoming.messages
       }),
