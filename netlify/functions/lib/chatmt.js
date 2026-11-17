@@ -16,6 +16,11 @@ export async function handleChatmt(event, getContract, json, requestId) {
     return json(400, { error: { message: 'Expected user and assistant text messages.' } });
   }
   const contract = getContract(incoming);
+  // Workspace callers read these four fields; avoid generating unused duplicate analysis.
+  const fields = ['feedback_summary', 'input_quality', 'revised_discussion_prompt', 'revision_review'];
+  const schema = contract.analysisType === 'scenario1'
+    ? { type: 'object', additionalProperties: false, required: fields, properties: Object.fromEntries(fields.map(key => [key, contract.schema.properties[key]])) }
+    : contract.schema;
   const started = Date.now();
   try {
     const response = await fetch(`${base}/v1/messages`, {
@@ -24,7 +29,7 @@ export async function handleChatmt(event, getContract, json, requestId) {
       body: JSON.stringify({
         model,
         max_tokens: Math.max(5000, Math.min(Number(incoming.max_output_tokens || incoming.max_tokens) || 5000, 8000)),
-        system: `${String(incoming.system || '')}\n${guidance}\nReturn only a valid JSON object matching this schema: ${JSON.stringify(contract.schema)}`,
+        system: `${String(incoming.system || '')}\n${guidance}\nKeep the outer analysis concise. Put requested sketches, dialogue or teaching notes inside feedback_summary exactly as the request specifies. Do not repeat the activity in ancillary fields.\nReturn only a valid JSON object matching this schema: ${JSON.stringify(schema)}`,
         messages: incoming.messages
       }),
       signal: AbortSignal.timeout(55000)
