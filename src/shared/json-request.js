@@ -10,7 +10,11 @@ export async function postJSON(
     body: JSON.stringify(body),
     signal,
   });
-  if (!response.ok) throw httpError(response.status);
+  if (!response.ok) {
+    let details = null;
+    try { details = await response.json(); } catch {}
+    throw httpError(response.status, details);
+  }
   try {
     return await response.json();
   } catch {
