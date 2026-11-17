@@ -39,12 +39,14 @@ export async function handleChatmt(event, getContract, json, requestId) {
     }
     const data = await response.json();
     const text = (data.content || []).filter(block => block.type === 'text').map(block => block.text).join('\n');
-    const analysis = JSON.parse(text.trim().replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, ''));
+    let analysis;
+    try { analysis = JSON.parse(text.trim().replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '')); }
+    catch { return json(502, { error: { message: 'ChatMT returned invalid JSON analysis.', stop_reason: data.stop_reason, text_length: text.length } }); }
     if (!analysis || typeof analysis !== 'object' || Array.isArray(analysis) || data.stop_reason === 'max_tokens') {
       return json(502, { error: { message: 'ChatMT returned an incomplete analysis. Retry your review.' } });
     }
     return json(200, { status: 'ok', provider: 'chatmt', model: data.model || model, analysis_schema: contract.schemaVersion, analysis_type: contract.analysisType, request_id: requestId, elapsed_ms: Date.now() - started, analysis, usage: data.usage || null });
-  } catch {
-    return json(502, { error: { message: 'ChatMT could not complete the review. Retry or continue editing.' } });
+  } catch (error) {
+    return json(502, { error: { message: error.name === 'TimeoutError' ? 'ChatMT exceeded the 55-second review limit.' : 'ChatMT could not complete the review. Retry or continue editing.' } });
   }
 }
