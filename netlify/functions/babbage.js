@@ -382,7 +382,7 @@ const S2_ACCESSIBILITY_HEADING_SCHEMA = {
   properties: { repaired_html: { type: 'string' }, explanation: { type: 'string' } }
 };
 
-function getAnalysisContract_(incoming) {
+export function getAnalysisContract_(incoming) {
   const analysisType = String(incoming?.analysis_type || 'scenario1');
   if (analysisType === 's2_accessibility_heading_repair') return { analysisType, schemaName: 'promptcraft_s2_accessibility_heading_repair', schemaVersion: 'promptcraft_s2_accessibility_heading_repair_v1', schema: S2_ACCESSIBILITY_HEADING_SCHEMA };
   if (analysisType === 's1_evidence_analysis') {

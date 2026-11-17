@@ -109,7 +109,7 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
       const turn = dev
         ? devBabbageTurn(requestState, intent)
         : await requestBabbageTurn(requestState, intent, {
-            signal: AbortSignal.any([request.signal, AbortSignal.timeout(90000)]),
+            signal: AbortSignal.any([request.signal, AbortSignal.timeout(300000)]),
           });
       if (state !== getState() || request.signal.aborted || ai.requestController !== request) return;
       ai.stage = 'received';

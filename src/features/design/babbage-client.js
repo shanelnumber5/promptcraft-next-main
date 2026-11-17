@@ -5,7 +5,7 @@ import { workspaceInstructions } from '../workspace/prompt.js';
 import { findIdea } from '../idea-lab/ideas.js';
 export const isChatmtPreview = typeof location !== 'undefined' && /^deploy-preview-\d+--promptcraft-discussion\.netlify\.app$/.test(location.hostname);
 export const BABBAGE_ENDPOINT = isChatmtPreview
-  ? '/.netlify/functions/babbage'
+  ? '/.netlify/functions/chatmt-jobs'
   : 'https://promptcraft-discussion.netlify.app/.netlify/functions/babbage';
 export const conversationDefaults = () => ({
   context: '',

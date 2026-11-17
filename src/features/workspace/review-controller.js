@@ -6,7 +6,7 @@ import {
 } from './review-ai.js';
 import { prepareMayaReading } from '../design/maya-dialog.js';
 
-const REVIEW_TIMEOUT_MS = 90000;
+const REVIEW_TIMEOUT_MS = 300000;
 const sampleReview =
   'Sample review only; no AI analysis was performed. Consider what students will produce, how you will respond to their thinking, and what changes would make the learning purpose clearer.';
 

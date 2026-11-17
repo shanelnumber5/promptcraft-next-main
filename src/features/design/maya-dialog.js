@@ -146,7 +146,7 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
     status.textContent = 'Maya is reading this draft. You can close this window to cancel.';
     try {
       const text = await requestMayaResponse(snapshot, previous, {
-        signal: AbortSignal.any([requestController.signal, AbortSignal.timeout(90000)]),
+        signal: AbortSignal.any([requestController.signal, AbortSignal.timeout(300000)]),
       });
       if (!dialog.open || requestController.signal.aborted) return;
       if (context !== mayaContext(state)) {
