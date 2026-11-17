@@ -31,7 +31,14 @@ export async function handleChatmt(event, getContract, json, requestId) {
       }),
       signal: AbortSignal.timeout(55000)
     });
-    if (!response.ok) return json(response.status === 429 ? 429 : 502, { error: { message: `ChatMT returned HTTP ${response.status}.` } });
+    if (!response.ok) {
+      let detail = '';
+      try {
+        const problem = await response.json();
+        detail = String(problem.error?.message || problem.message || '').replaceAll(process.env.CHATMT_API_KEY.trim(), '[redacted]').slice(0, 700);
+      } catch {}
+      return json(response.status === 429 ? 429 : 502, { error: { message: 'ChatMT HTTP ' + response.status + '. ' + detail } });
+    }
     const data = await response.json();
     const analysis = data.content?.find(block => block.type === 'tool_use' && block.name === 'submit_analysis')?.input;
     if (!analysis || typeof analysis !== 'object' || Array.isArray(analysis) || data.stop_reason === 'max_tokens') {
