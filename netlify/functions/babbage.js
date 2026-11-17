@@ -1,3 +1,4 @@
+import { handleChatmt } from './lib/chatmt.js';
 const DEFAULT_OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-5.6-terra';
 const OPENAI_BASE_URL = String(process.env.OPENAI_BASE_URL || 'https://api.openai.com').replace(/\/+$/, '');
 const PROMPTCRAFT_BABBAGE_PROXY_VERSION = 'V373';
@@ -523,6 +524,10 @@ function parseStructuredOutput_(data) {
 
 export const handler = async (event = {}) => {
   const requestId = requestId_(event);
+  const host = String(event.headers?.host || '').toLowerCase();
+  if (/^deploy-preview-\d+--promptcraft-discussion\.netlify\.app$/.test(host)) {
+    return handleChatmt(event, getAnalysisContract_, jsonResponse, requestId);
+  }
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: CORS_HEADERS, body: '' };
 
   if (event.httpMethod === 'GET') {
