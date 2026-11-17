@@ -3,7 +3,10 @@ import { postJSON } from '../../shared/json-request.js';
 import { instructions } from './babbage-prompt.js';
 import { workspaceInstructions } from '../workspace/prompt.js';
 import { findIdea } from '../idea-lab/ideas.js';
-export const BABBAGE_ENDPOINT = 'https://promptcraft-discussion.netlify.app/.netlify/functions/babbage';
+const isChatmtPreview = typeof location !== 'undefined' && /^deploy-preview-\d+--promptcraft-discussion\.netlify\.app$/.test(location.hostname);
+export const BABBAGE_ENDPOINT = isChatmtPreview
+  ? '/.netlify/functions/babbage'
+  : 'https://promptcraft-discussion.netlify.app/.netlify/functions/babbage';
 export const conversationDefaults = () => ({
   context: '',
   history: [],
