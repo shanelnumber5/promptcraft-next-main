@@ -62,6 +62,8 @@ export function createWorkspaceReviewController({
           : await requestReview(structuredClone(source), previous, { signal: signal() });
       if (!isCurrent()) return;
       Object.assign(review, { fingerprint, feedback, status: 'complete', error: '' });
+      save();
+      render({ perspectivePending: shouldOpenMaya(getState()) });
       if (shouldOpenMaya(getState())) {
         try {
           await prepareMaya(source, { signal: signal() });
