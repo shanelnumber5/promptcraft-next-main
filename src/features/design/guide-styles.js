@@ -180,9 +180,9 @@ body :is(h1,h2,h3,h4,h5,h6) { font-family:Georgia,'Times New Roman',serif !impor
 .guide-decision p {margin:0 0 14px;white-space:pre-line}
 .guide-decision p:last-child {margin-bottom:0}
 .guide-decision strong {color:#12355b}
-.assignment-rubric {width:100%;border-collapse:collapse;font:15px/1.5 Arial,sans-serif}
+.assignment-rubric {width:100%;border-collapse:collapse;table-layout:fixed;font:15px/1.5 Arial,sans-serif}
 .assignment-rubric caption {font:700 24px Georgia,serif;padding:12px;text-align:left}
-.assignment-rubric th,.assignment-rubric td {border:1px solid #12355b;padding:12px;vertical-align:top;text-align:left}
+.assignment-rubric th,.assignment-rubric td {width:25%;overflow-wrap:normal;word-break:normal;border:1px solid #12355b;padding:12px;vertical-align:top;text-align:left}
 .assignment-rubric thead {background:#12355b;color:#fff}
 .assignment-rubric tbody th {background:#f5f9fc}
 .rubric-table-scroll {overflow-x:auto}

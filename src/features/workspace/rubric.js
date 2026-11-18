@@ -164,7 +164,7 @@ export function rubricCSV(rubric) {
   );
 }
 export const rubricDocument = (rubric) =>
-  `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${e(rubric.title)}</title><style>body{font:16px/1.5 Arial,sans-serif;color:#12355b;padding:24px}table{border-collapse:collapse;width:100%}caption{font:bold 26px Georgia;padding:16px}th,td{border:1px solid #12355b;padding:14px;text-align:left;vertical-align:top}thead{background:#12355b;color:white}p{margin:8px 0}@media print{body{padding:0}tr{break-inside:avoid}}</style></head><body>${renderRubricTable(rubric)}</body></html>`;
+  `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${e(rubric.title)}</title><style>body{font:16px/1.5 Arial,sans-serif;color:#12355b;padding:24px}table{border-collapse:collapse;table-layout:fixed;width:100%}th,td{width:25%}caption{font:bold 26px Georgia;padding:16px}th,td{border:1px solid #12355b;padding:14px;text-align:left;vertical-align:top}thead{background:#12355b;color:white}p{margin:8px 0}@media print{body{padding:0}tr{break-inside:avoid}}</style></head><body>${renderRubricTable(rubric)}</body></html>`;
 export function downloadRubric(rubric, format) {
   const link = document.createElement('a'),
     csv = format === 'csv';
