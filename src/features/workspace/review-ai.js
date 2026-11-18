@@ -55,9 +55,9 @@ For this Workspace review only, extend that feedback_summary JSON object with "t
     messages: [base.messages[0], { role: 'user', content: JSON.stringify({ request_intent: 'clarify', workspace_review: true, current_draft: state.design.revision, current_reason: state.design.reason, previous_review: previous }) }],
   };
 }
-export async function requestWorkspaceReview(state, previous, { fetchImpl = fetch, signal } = {}) {
+export async function requestWorkspaceReview(state, previous, { fetchImpl = fetch, signal, onProgress } = {}) {
   const data = await postJSON(BABBAGE_ENDPOINT, buildReviewRequest(state, previous), {
-    fetchImpl, signal,
+    fetchImpl, signal, onProgress,
     httpError: (status, details) => Error(typeof details?.error?.message === 'string' && details.error.message.startsWith('Chat MT AI') ? details.error.message + ' Your draft is saved.' : status === 429 ? 'Babbage has reached a usage limit. Try again later.' : 'Babbage could not review this draft. Try again or keep working.'),
     unreadableMessage: 'Babbage returned an unreadable review. Please retry.',
   });

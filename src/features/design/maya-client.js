@@ -109,7 +109,7 @@ export function mayaSceneBeats(scene) {
   return beats;
 }
 
-export async function requestMayaResponse(state, previous = [], { fetchImpl = fetch, signal } = {}) {
+export async function requestMayaResponse(state, previous = [], { fetchImpl = fetch, signal, onProgress } = {}) {
   const request = buildMayaRequest(state, previous);
   const draft = state.design.revision;
   for (let attempt = 0; attempt < 2; attempt++) {
@@ -117,6 +117,7 @@ export async function requestMayaResponse(state, previous = [], { fetchImpl = fe
     const data = await postJSON(BABBAGE_ENDPOINT, request, {
       fetchImpl,
       signal,
+      onProgress,
       httpError: (status) => {
         const error = Error(
           status === 429

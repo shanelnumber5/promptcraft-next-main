@@ -40,8 +40,10 @@ const assert = require('node:assert/strict');
   }
   const jobId = 'a'.repeat(32);
   const calls = [];
+  const stages=[];
   const completed = await postJSON('/jobs', body, {
     ...options,
+    onProgress:stage=>stages.push(stage),
     fetchImpl: async (url, request = {}) => {
       calls.push({ url, method: request.method || 'GET' });
       if (request.method === 'POST') return new Response(JSON.stringify({ job_id: jobId }), { status: 202 });
@@ -50,6 +52,7 @@ const assert = require('node:assert/strict');
     },
   });
   assert.equal(completed.result, 'background feedback');
+  assert.deepEqual(stages,['sending','working','received','complete'],'Progress advances only at observed transport events');
   assert.deepEqual(calls.map(call => call.method), ['POST', 'GET', 'DELETE']);
   assert.equal(calls[1].url, '/jobs?job=' + jobId);
   const cancelledJob = new AbortController();

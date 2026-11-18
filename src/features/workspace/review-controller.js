@@ -48,6 +48,7 @@ export function createWorkspaceReviewController({
       requestSequence === sequence && source === getState() && !abort.signal.aborted;
     const signal = () => AbortSignal.any([abort.signal, AbortSignal.timeout(REVIEW_TIMEOUT_MS)]);
     review.status = 'pending';
+    review.stage='sending';
     review.error = '';
     save();
     render();
@@ -56,7 +57,7 @@ export function createWorkspaceReviewController({
         ? review.feedback
         : source.babbage.mode === 'dev'
           ? sampleReview
-          : await requestReview(structuredClone(source), previous, { signal: signal() });
+          : await requestReview(structuredClone(source), previous, { signal: signal(), onProgress:stage=>{if(isCurrent()){review.stage=stage;render();}} });
       if (!isCurrent()) return;
       Object.assign(review, { fingerprint, feedback, status: 'complete', error: '' });
     } catch (error) {

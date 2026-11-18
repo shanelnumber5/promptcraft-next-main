@@ -19,17 +19,19 @@ function waitForPoll(signal) {
 export async function postJSON(
   url,
   body,
-  { fetchImpl = fetch, signal, httpError, unreadableMessage },
+  { fetchImpl = fetch, signal, httpError, unreadableMessage, onProgress = () => {} },
 ) {
   let pollUrl = '';
   const started = Date.now();
   try {
+    onProgress('sending');
     let response = await fetchImpl(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
       signal,
     });
+    if(response.status===202) onProgress('working');
     while (response.status === 202) {
       let pending;
       try {
@@ -54,7 +56,10 @@ export async function postJSON(
       throw httpError(response.status, details);
     }
     try {
-      return await response.json();
+      onProgress('received');
+      const data=await response.json();
+      onProgress('complete');
+      return data;
     } catch {
       throw Error(unreadableMessage);
     }

@@ -53,7 +53,7 @@ const assert = require('node:assert/strict');
   }});
   assert.deepEqual(refined,improved,'Return the improvement pass rather than the initial candidates');
   assert.equal(calls.length,2,'Exactly one generation and one improvement request');
-  assert.deepEqual(stages,['refining']);
+  assert.deepEqual(stages,['sending','received','complete','refining','sending','received','complete']);
   const refinement=JSON.parse(calls[1].messages.at(-1).content);
   assert.deepEqual(refinement.candidate_possibilities,fixtures);
   assert.equal(refinement.educator_feedback,state.creative.feedback);
@@ -127,7 +127,7 @@ const assert = require('node:assert/strict');
   const presence=renderWorkspace(presenceState,{configured:true,pending:false},'', 'presence');
   assert(presence.includes('feedback, questions, or check-ins') && presence.includes('realistic for your workload'), 'Instructor presence asks about responsive and sustainable teaching');
   const {buildPages}=await import('../../src/features/workspace/views.js');
-  assert.deepEqual(buildPages.map(([id])=>id), ['start','subject','ai-use','intentions','presence','draft']);
+  assert.deepEqual(buildPages.map(([id])=>id), ['start','subject','ai-use','sharing','intentions','presence','draft']);
   for (const [page, ids] of [['subject',['subject','learningGoal','learnerLevel','student-needs','workTime','daysAvailable']],['ai-use',['mustStay','aiUseDetails']],['presence',['instructor-plan','open-questions']]]) {
     const html=renderWorkspace(presenceState,{configured:true,pending:false},'',page);
     for(const id of ids) assert(html.includes(`id="${id}"`), `${page} retains ${id}`);

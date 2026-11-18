@@ -1,7 +1,7 @@
 import { conversationBeats, feedbackQuestions, answerFor, saveFeedbackAnswer, savedFeedbackNotes, emptyFeedbackConversation } from './feedback-conversation.js';
 import { renderInlineProse } from '../../shared/directions.js';
 import { updateDialoguePortrait, preloadDialoguePortraits } from '../../shared/dialogue-portrait.js';
-import { renderLoading } from './loading.js';
+import { renderLoading, updateLoadingStage } from './loading.js';
 import { characterArt } from '../../shared/character-art.js';
 import { buildMayaRequest, mayaContext, mayaExcerptPreview, requestMayaResponse, normalizeMayaScene, mayaSceneBeats, mayaFailureHeading } from './maya-client.js';
 
@@ -204,6 +204,7 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
     try {
       const text = await requestMayaResponse(snapshot, previous, {
         signal: AbortSignal.any([requestController.signal, AbortSignal.timeout(300000)]),
+        onProgress:stage=>{if(dialog.open && !requestController.signal.aborted)updateLoadingStage(dialog,stage);},
       });
       if (!dialog.open || requestController.signal.aborted) return;
       if (context !== mayaContext(state)) {

@@ -7,8 +7,8 @@ export function buildConversationRevisionRequest(state, notes) {
     system:base.system+'\nThis is ONE requested edit of an existing draft after the educator answered Maya and Pixel. Apply only those decisions. Preserve every other requirement, deadline, policy and creative choice. Do not ask any clarification questions or introduce a new evaluation. If the educator leaves a detail open, preserve the current wording. Return the complete edited activity in revised_discussion_prompt, a short reason in revision_review.why_these_changes (80 words maximum), and feedback_summary of 60 words maximum naming what changed. Set input_quality.usable true and concerns to []. Do not invent a missing AI policy or learning goal. The educator reviews the edit next.',
     messages:[base.messages[0],{role:'user',content:JSON.stringify({request_intent:'revise',current_draft:state.design.revision,educator_decisions:notes,revision_scope:'Apply these decisions once; preserve everything else.'})}]};
 }
-export async function requestConversationRevision(state,notes,{fetchImpl=fetch,signal}={}) {
-  const data=await postJSON(BABBAGE_ENDPOINT,buildConversationRevisionRequest(state,notes),{fetchImpl,signal,
+export async function requestConversationRevision(state,notes,{fetchImpl=fetch,signal,onProgress}={}) {
+  const data=await postJSON(BABBAGE_ENDPOINT,buildConversationRevisionRequest(state,notes),{fetchImpl,signal,onProgress,
     httpError:(status,details)=>Error(details?.error?.message || 'Babbage could not finish this revision. Your draft and answers are saved.'),
     unreadableMessage:'Babbage returned an unreadable revision. Your draft and answers are saved.'});
   const turn=normalizeBabbageResponse(data,'revise');

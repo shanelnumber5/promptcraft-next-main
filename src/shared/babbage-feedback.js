@@ -33,3 +33,16 @@ export function renderBabbageMessage(text) {
   }
   return `<div class="feedback-prose">${renderAssignmentDirections(message)}</div>`;
 }
+
+// Preserve every sentence while keeping each reading page short.
+export function babbageFeedbackPages(text, limit=750) {
+ const message=parseBabbageFeedback(text).message.trim();
+ const sentences=[...new Intl.Segmenter('en',{granularity:'sentence'}).segment(message)].map(p=>p.segment);
+ const pages=[];let page='';
+ for(const sentence of sentences) {if(page && page.length+sentence.length+1>limit){pages.push(page);page='';}page+=sentence;}
+ if(page)pages.push(page);
+ return pages.length?pages:[''];
+}
+export function renderBabbagePresence() {
+ return '<figure class="babbage-presence"><img src="assets/people/charles-babbage-full.webp" width="832" height="1177" decoding="async" alt="Charles Babbage"><figcaption>Your design collaborator</figcaption></figure>';
+}

@@ -110,6 +110,7 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
         ? devBabbageTurn(requestState, intent)
         : await requestBabbageTurn(requestState, intent, {
             signal: AbortSignal.any([request.signal, AbortSignal.timeout(300000)]),
+            onProgress:stage=>{if(state===getState() && !request.signal.aborted && ai.requestController===request){ai.stage=stage;updateLoadingStage(app.ownerDocument?.querySelector('.ai-waiting-dialog') || app,stage);}},
           });
       if (state !== getState() || request.signal.aborted || ai.requestController !== request) return;
       ai.stage = 'received';

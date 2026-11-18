@@ -112,3 +112,33 @@ body[data-app-view] #app #workspace-panel .babbage-questions :is(p,textarea) { f
  body[data-app-view] :is(.ai-waiting-dialog,.maya-dialog[data-state='loading']) .babbage-loading { flex-direction:column; align-items:stretch; }
  body[data-app-view] .maya-dialog[data-excerpt='true'] .maya-dialogue { padding:22px; }
 }
+/* One current visual contract for waiting panels. */
+body[data-app-view] .ai-waiting-dialog,
+body[data-app-view] .maya-dialog[data-state='loading'] {
+ background:#12355b; color:#fff; border:6px solid #f2c14e; border-radius:6px;
+}
+body[data-app-view] :is(.ai-waiting-dialog,.maya-dialog[data-state='loading']) .babbage-loading .babbage-loading-copy :is(strong,span,p) { color:#fff; }
+body[data-app-view] :is(.ai-waiting-dialog,.maya-dialog[data-state='loading']) .babbage-loading-copy p,
+body[data-app-view] :is(.ai-waiting-dialog,.maya-dialog[data-state='loading']) .babbage-loading-note { font:400 16px/1.5 Arial,Helvetica,sans-serif; }
+body[data-app-view] :is(.ai-waiting-dialog,.maya-dialog[data-state='loading']) .babbage-progress { background:#526a83; height:12px; overflow:hidden; }
+body[data-app-view] :is(.ai-waiting-dialog,.maya-dialog[data-state='loading']) .babbage-progress > span { display:block; background:#f2c14e; animation:none; height:100%; transform:none; width:var(--stage-width,25%); transition:width .35s ease; }
+body[data-app-view] #app #workspace-panel .babbage-questions label { font:700 16px/1.5 Arial,Helvetica,sans-serif !important; }
+body[data-app-view] #app #workspace-panel .babbage-questions :is(p,textarea),
+body[data-app-view] #app #workspace-panel .babbage-feedback .feedback-prose { font-size:16px; line-height:1.6; }
+.babbage-presence { float:right; width:112px; margin:0 0 14px 20px; text-align:center; }
+.babbage-presence img { display:block; width:90px; height:126px; margin:auto; object-fit:contain; }
+.babbage-presence figcaption { font:400 12px/1.4 Arial,sans-serif; color:#405674; }
+.partner-heading:has(.babbage-presence) { display:block !important; min-height:150px; }
+.partner-heading:has(.babbage-presence) h2 { padding-top:20px; }
+.feedback-page-count { margin-bottom:18px; color:#405674; font:400 14px/1.4 Arial,sans-serif; }
+body[data-app-view] #app #workspace-panel [data-build-page='sharing'] textarea,
+body[data-app-view] #app #workspace-panel [data-build-page='intentions'] textarea { height:100px; min-height:80px; }
+body[data-app-view] .guide-preview { border:2px solid #12355b; background:#fff; padding:0; }
+body[data-app-view] .guide-preview[open] { display:flex; flex-direction:column; width:min(1100px,calc(100vw - 32px)); height:calc(100dvh - 40px); max-height:calc(100dvh - 40px); }
+body[data-app-view] .guide-preview-toolbar { flex:none; padding:12px 20px; }
+.guide-preview-sections { display:flex; flex-wrap:wrap; gap:8px; padding:12px 20px; background:#f5f9fc; }
+.guide-preview-sections button { padding:8px 12px; border:1px solid #12355b; border-radius:4px; color:#12355b; background:#fff; font:700 16px/1.4 Arial,sans-serif; }
+.guide-preview-sections button[aria-current='page'] { background:#12355b; color:#fff; }
+body[data-app-view] .guide-preview iframe { flex:1 1 0; min-height:0; height:auto; border:0; width:100%; background:#fff; }
+.guide-preview-actions { flex:none; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 20px; background:#f2c14e; color:#12355b; }
+.guide-preview-actions button { min-height:44px; padding:8px 14px; color:#12355b; background:#fff; border:2px solid #12355b; border-radius:4px; font:700 16px/1.4 Arial,sans-serif; }

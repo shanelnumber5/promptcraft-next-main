@@ -1,4 +1,4 @@
-import { renderBabbageMessage } from '../../shared/babbage-feedback.js';
+import { babbageFeedbackPages, renderBabbagePresence, renderBabbageMessage } from '../../shared/babbage-feedback.js';
 import { clarificationLimitReached, renderClarificationPause } from '../design/turn-state.js';
 import { renderWorkspaceDisclosure } from './disclosure.js';
 import { renderBabbageCameo } from '../../shared/babbage-cameo.js';
@@ -84,6 +84,16 @@ export function renderPartner(state, ai, page, preview, ui = {}) {
   const latestMessage = conversation.history.findLast(turn=>turn.role==='assistant')?.display || '';
   const feedbackMessage = !ai.pending && (ai.error === latestMessage || (!ai.error && conversation.questions.length)) ? latestMessage : '';
   const status = feedbackMessage ? '' : ai.error || (!dev && ai.configured === null ? 'Checking the Babbage connection…' : '');
-  const feedback = feedbackMessage ? `<section class="babbage-feedback" aria-label="Babbage feedback">${renderBabbageMessage(feedbackMessage)}</section>` : '';
-  return `<div class="workspace-design workspace-design--focused partner-layout partner-layout--focused${utilityPage ? ' partner-layout--utility' : ''}"><section class="workspace-context workspace-page partner-card ai-panel${welcome ? ' partner-card--welcome' : ''}" aria-labelledby="ai-title"><header class="partner-heading ai-panel-heading"><h2 class="workspace-build-title" id="ai-title" tabindex="-1">${page==='options'?'Babbage connection':ui.task==='draft'?'Develop your activity with Babbage':'Explore with Babbage'}</h2>${dev ? '<p class="partner-mode">Sample simulation · no AI call</p>' : ''}</header><div class="design-page-fields partner-content">${renderWorkspaceDisclosure(state)}${renderBabbageCameo(state,status)}<p class="ai-status" role="status" aria-live="polite">${e(status)}</p>${feedback}${content}</div>${actions ? `<footer class="workspace-action-bar partner-actions">${actions}</footer>` : ''}</section></div>`;
+  let feedback = feedbackMessage ? `<section class="babbage-feedback" aria-label="Babbage feedback">${renderBabbageMessage(feedbackMessage)}</section>` : '';
+  if(feedbackMessage && conversation.questions.length && !ai.pending) {
+    const pages=babbageFeedbackPages(feedbackMessage);
+    const index=Math.max(0,Math.min(ui.feedbackPage || 0,pages.length-1));
+    if(!ui.clarifyNow) {
+      feedback=`<section class="babbage-feedback" aria-label="Babbage feedback"><p class="feedback-page-count">Babbage’s notes · ${index+1} of ${pages.length}</p>${renderBabbageMessage(pages[index])}</section>`;
+      content='';
+      actions=`${index?`<button type="button" data-feedback-page="${index-1}">Previous notes</button>`:''}<span class="workspace-save-status">Saved in this browser.</span>${index<pages.length-1?`<button type="button" class="primary" data-feedback-page="${index+1}">Next notes</button>`:'<button type="button" class="primary" data-clarify-now>Continue to question</button>'}`;
+    } else {feedback='';actions='<button type="button" data-feedback-page="0">Read Babbage’s notes</button>'+actions;}
+    if(state.design.revision.trim()) actions+='<button type="button" data-workspace-panel="reason">Review current draft</button>';
+  }
+  return `<div class="workspace-design workspace-design--focused partner-layout partner-layout--focused${utilityPage ? ' partner-layout--utility' : ''}"><section class="workspace-context workspace-page partner-card ai-panel${welcome ? ' partner-card--welcome' : ''}" aria-labelledby="ai-title"><header class="partner-heading ai-panel-heading">${renderBabbagePresence()}<h2 class="workspace-build-title" id="ai-title" tabindex="-1">${page==='options'?'Babbage connection':ui.task==='draft'?'Develop your activity with Babbage':'Explore with Babbage'}</h2>${dev ? '<p class="partner-mode">Sample simulation · no AI call</p>' : ''}</header><div class="design-page-fields partner-content">${renderWorkspaceDisclosure(state)}${renderBabbageCameo(state,status)}<p class="ai-status" role="status" aria-live="polite">${e(status)}</p>${feedback}${content}</div>${actions ? `<footer class="workspace-action-bar partner-actions">${actions}</footer>` : ''}</section></div>`;
 }

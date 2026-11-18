@@ -127,6 +127,7 @@ export async function requestCreativeDirections(
     const data = await postJSON(BABBAGE_ENDPOINT, request, {
       fetchImpl,
       signal: requestSignal,
+      onProgress: onStage,
       httpError: () =>
         Error(
           'Babbage could not explore new directions. Your work is unchanged. Retry or keep designing.',

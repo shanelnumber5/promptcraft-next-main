@@ -83,10 +83,14 @@ export const buildSections = [
       )}</div><div data-setup-form>${renderField({ id: 'aiUseDetails', type: 'textarea', rows: 3, label: 'AI-use instructions and limits (optional)', help: '', placeholder: 'For example: name the tool, describe how it helped, verify claims, and identify the student’s own contribution.' }, { aiUseDetails: state.teacher.aiUse })}</div><div class="workspace-field-wide" data-setup-form>${teacherField(state, 'mustStay')}</div></div>`,
   },
   {
+    id: 'sharing',
+    title: 'Student work & sharing',
+    render: state => `<div class="workspace-stacked-fields">${metaField('student-contribution','studentContribution','What will students share, create, decide, or investigate?',state.workspace.studentContribution,3)}${metaField('peer-interaction','peerInteraction','How will students interact with one another’s work?',state.workspace.peerInteraction,3)}</div>`,
+  },
+  {
     id: 'intentions',
     title: 'Creative direction',
-    render: (state) =>
-      `${state.experience === 'scenario' ? '<p class="workspace-field-help">Use the board to support the activity: students might share work, compare approaches, collaborate, or give focused feedback.</p>' : ''}${state.workspace.ideaId ? '<p class="workspace-field-help"><strong>Selected inspiration: ' + e(findIdea(state.workspace.ideaId)?.title || 'Idea Lab') + '</strong>. Describe the creative core you want to keep, then develop the draft with Babbage.</p>' : ''}<div class="workspace-stacked-fields">${metaField('student-contribution', 'studentContribution', 'What will students share, create, decide, or investigate?', state.workspace.studentContribution || '', 3)}${metaField('peer-interaction', 'peerInteraction', 'How will students interact with one another’s work?', state.workspace.peerInteraction || '', 3)}${renderCreativeCore(state)}<div data-design-form>${renderField({ id: 'concern', label: 'What would you like to improve? (optional)', help: '', type: 'textarea', rows: 3 }, state.design)}</div></div>`,
+    render: state => `<div class="workspace-stacked-fields">${renderCreativeCore(state)}<div data-design-form>${renderField({id:'concern',label:'What would you like to improve? (optional)',help:'',type:'textarea',rows:3},state.design)}</div></div>`,
   },
   {
     id: 'presence',

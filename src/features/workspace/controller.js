@@ -107,8 +107,8 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       ? renderClosing(state, closingStage, closingPage)
       : renderWorkspace(state, ai, readError, designPage, partnerPage, reviewPage, ui);
     fitWorkspace(app);
-    showBabbageCameo(state, app);
-    syncWaiting({ ...ai, pending: ai.pending || state.creative.review.status === 'pending', stage: state.creative.review.status === 'pending' ? 'working' : ai.stage, intent: state.creative.review.status === 'pending' ? 'review' : ai.intent }, state.babbage.mode === 'dev');
+    if(state.designPanel !== 'reason') showBabbageCameo(state, app);
+    syncWaiting({ ...ai, pending: ai.pending || state.creative.review.status === 'pending', stage: state.creative.review.status === 'pending' ? (state.creative.review.stage || 'working') : ai.stage, intent: state.creative.review.status === 'pending' ? 'review' : ai.intent }, state.babbage.mode === 'dev');
     if (focus) document.getElementById('setup-title')?.focus({ preventScroll: true });
   };
   function focusTask() {
@@ -141,6 +141,8 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       applySuggestedDraft(state, suggestion);
       ai.suggestion = null;
       state.creative.review = emptyReview();
+      const draftNotes=state.babbage.history.findLast(turn=>turn.role==='assistant')?.display || '';
+      if(draftNotes.trim()) Object.assign(state.creative.review,{feedback:draftNotes,fingerprint:reviewFingerprint(state),status:'complete'});
       syncFinalCheck();
       controller.syncBabbage();
       if (draftDestination === 'draft') {
@@ -409,8 +411,8 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
         });
       };
       const cameo = document.querySelector('.babbage-cameo-dialog[open]');
-      if (cameo) cameo.addEventListener('close', open, { once: true });
-      else open();
+      if(cameo) cameo.close();
+      open();
     },
   });
   async function startCompilation(action) {
@@ -460,7 +462,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     Object.assign(ai,{pending:true,requestController:request,stage:'working',intent:'revise',error:''});
     render();
     try {
-      const suggestion=await requestConversationRevision(snapshot,notes,{signal:AbortSignal.any([request.signal,AbortSignal.timeout(180000)])});
+      const suggestion=await requestConversationRevision(snapshot,notes,{signal:AbortSignal.any([request.signal,AbortSignal.timeout(180000)]),onProgress:stage=>{if(source===state && !request.signal.aborted && ai.requestController===request){ai.stage=stage;render();}}});
       if(request.signal.aborted || source!==state || ai.requestController!==request) return;
       if(basis!==assignmentContext(state)) throw Error('Your draft changed while the edit was prepared. Your answers are saved; review your current activity.');
       applySuggestedDraft(state,suggestion);
@@ -667,6 +669,9 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       focusTask();
       return;
     }
+    const feedbackPage=event.target.closest('[data-feedback-page]');
+    if(feedbackPage) {ui.feedbackPage=Number(feedbackPage.dataset.feedbackPage);ui.clarifyNow=false;render();return;}
+    if(event.target.closest('[data-clarify-now]')) {ui.clarifyNow=true;render();app.querySelector('[data-clarification-answer]')?.focus();return;}
     const partner = event.target.closest('[data-partner-page]');
     if (partner) {
       ui = workspaceViews();
