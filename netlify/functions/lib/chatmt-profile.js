@@ -3,7 +3,7 @@
 export function chatmtProfile(incoming, contract, configuredModel) {
   const kind = contract.analysisType === 'scenario1' ? incoming.response_kind : '';
   const feedbackOnly = ['perspectives', 'review', 'explore'].includes(kind);
-  const interactive = feedbackOnly || kind === 'consult';
+  const interactive = feedbackOnly || kind === 'consult' || kind === 'targeted_revision';
   const model = interactive
     ? process.env.CHATMT_INTERACTIVE_MODEL?.trim() || 'anthropic.claude-sonnet-5-5'
     : configuredModel;

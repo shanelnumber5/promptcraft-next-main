@@ -1,3 +1,4 @@
+import { requestConversationRevision } from './conversation-revision.js';
 import { saveFeedbackAnswer, savedFeedbackNotes, emptyFeedbackConversation } from '../design/feedback-conversation.js';
 import { createAiWaiting } from '../design/ai-waiting.js';
 import { designRoute } from './routes.js';
@@ -435,7 +436,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
         state.babbage.ready = true;
       await controller.askBabbage(state.babbage.ready ? 'revise' : 'clarify');
   }
-  function reviseFromConversation() {
+  async function reviseFromConversation() {
     const notes=savedFeedbackNotes(state);
     if (!notes) return;
     const previous=assignmentContext(state);
@@ -453,7 +454,32 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     state.creative.conversation.appliedNotes=marker+notes;
     invalidateWorkspaceApproval(state,previous);
     syncFinalCheck(); saveSafely();
-    void startCompilation('compile-activity');
+    const source=state, request=new AbortController();
+    const basis=assignmentContext(state);
+    const snapshot=structuredClone(state);
+    Object.assign(ai,{pending:true,requestController:request,stage:'working',intent:'revise',error:''});
+    render();
+    try {
+      const suggestion=await requestConversationRevision(snapshot,notes,{signal:AbortSignal.any([request.signal,AbortSignal.timeout(180000)])});
+      if(request.signal.aborted || source!==state || ai.requestController!==request) return;
+      if(basis!==assignmentContext(state)) throw Error('Your draft changed while the edit was prepared. Your answers are saved; review your current activity.');
+      applySuggestedDraft(state,suggestion);
+      state.creative.review.manualOnly=true;
+      state.creative.review.status=state.creative.review.feedback?'complete':'idle';
+      syncFinalCheck();
+      designPage='draft';state.designPanel='revision';ui=workspaceViews();
+      saveSafely();
+    } catch(error) {
+      if(!request.signal.aborted && source===state) ai.error=error.message;
+    } finally {
+      if(ai.requestController===request) {
+        ai.pending=false;ai.requestController=null;
+        if(source===state) {
+          render();
+          app.querySelector('.design-notice').textContent=request.signal.aborted ? 'Revision cancelled. Your draft and answers are saved.' : ai.error || 'Your requested edit is ready in Build. Review it, then open Review for the guide. Another AI reading is optional.';
+        }
+      }
+    }
   }
   function returnFromMaya({completed=false} = {}) {
     if (state.designPanel !== 'reason' || showingWrapUp) return;
@@ -464,7 +490,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
   function enterReview() {
     ui = workspaceViews();
     state.designPanel = 'reason';
-    reviewPage = 'rationale';
+    reviewPage = state.creative.review.manualOnly ? (state.design.reason.trim()?'checks':'reasoning') : 'rationale';
     saveSafely();
     render();
     document.getElementById('workspace-tab-reason')?.focus();

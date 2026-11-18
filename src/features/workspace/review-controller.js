@@ -81,6 +81,7 @@ export function createWorkspaceReviewController({
 
   async function runAutomatic() {
     const state = getState();
+    if (state.creative.review.manualOnly) return;
     if (!canReview() || state.designPanel !== 'reason' || !reviewEligible(state) || activeRequest)
       return;
     const review = state.creative.review;

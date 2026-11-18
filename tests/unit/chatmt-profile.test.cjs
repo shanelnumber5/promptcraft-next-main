@@ -14,6 +14,7 @@ const assert = require('node:assert/strict');
     const quotedProfile = chatmtProfile({response_kind:'perspectives',messages:[{role:'user',content:JSON.stringify({current_draft_quote_options:['Compare two t-test outputs']})}]},contract,'draft-model');
     assert.deepEqual(quotedProfile.schema.properties.maya.properties.draft_quote.enum,['Compare two t-test outputs']);
     assert(quotedProfile.schema.properties.pixel.required.includes('draft_quote'));
+    assert.equal(chatmtProfile({response_kind:'targeted_revision'},contract,'draft-model').model,'anthropic.claude-sonnet-5-5');
     const draft = chatmtProfile({ response_kind: 'draft', max_output_tokens: 3500 }, contract, 'draft-model');
     assert.equal(draft.model, 'draft-model');
     assert(draft.schema.required.includes('revised_discussion_prompt'));

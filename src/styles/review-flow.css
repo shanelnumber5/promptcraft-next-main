@@ -81,3 +81,34 @@ body[data-app-view] .maya-dialog .maya-scene-nav button { white-space:normal; }
 @media(max-width:700px) {
  body[data-app-view] .maya-dialog .maya-stage > .maya-draft-reference { top:10px; left:12px; width:calc(100% - 24px); max-height:80px; font-size:12px; }
 }
+/* The shared waiting box follows the main navy frame and right-side actions. */
+.ai-waiting-dialog,
+body[data-app-view] .maya-dialog[data-state='loading'] {
+  border:2px solid #12355b; border-radius:6px; padding:28px 32px;
+}
+body[data-app-view] :is(.ai-waiting-dialog,.maya-dialog[data-state='loading']) .babbage-loading { min-height:220px; align-items:center; }
+body[data-app-view] :is(.ai-waiting-dialog,.maya-dialog[data-state='loading']) .babbage-loading-heading strong { font-size:30px; text-align:left; }
+body[data-app-view] :is(.ai-waiting-dialog,.maya-dialog[data-state='loading']) .babbage-loading-copy p { font-size:18px; line-height:1.55; }
+body[data-app-view] :is(.ai-waiting-dialog,.maya-dialog[data-state='loading']) .babbage-loading-note { font-size:18px; line-height:1.4; }
+.ai-waiting-dialog > button,
+body[data-app-view] .maya-dialog[data-state='loading'] > header > button { display:block; margin:20px 0 0 auto; padding:10px 18px; font-size:18px; }
+/* Display the relevant passage once as a centered quotation, before the response. */
+body[data-app-view] .maya-dialog[data-excerpt='true'] .maya-stage { justify-content:center; align-items:center; }
+body[data-app-view] .maya-dialog[data-excerpt='true'] .maya-dialogue {
+  position:relative; top:auto; left:auto; right:auto; bottom:auto; transform:none;
+  width:min(820px,calc(100% - 48px)); max-width:none; margin:auto;
+  padding:30px; background:#fff; border:2px solid #12355b; border-radius:6px;
+}
+body[data-app-view] .maya-dialog[data-excerpt='true'] .maya-dialogue p { color:#12355b; font:400 clamp(24px,2.4vw,32px)/1.45 Georgia,'Times New Roman',serif; text-align:center; }
+/* Clarifications use the same reading measure and card frame as other tasks. */
+body[data-app-view] #app #workspace-panel :is(.babbage-feedback,.babbage-latest) { max-width:78ch; font:400 18px/1.6 Arial,Helvetica,sans-serif; }
+body[data-app-view] #app #workspace-panel .babbage-feedback .feedback-prose { font-size:18px; line-height:1.6; }
+body[data-app-view] #app #workspace-panel .babbage-questions { border:2px solid #12355b; border-radius:6px; background:#f5f9fc; padding:22px; margin:24px 0 0; }
+body[data-app-view] #app #workspace-panel .babbage-questions label { display:block; margin:12px 0; color:#12355b; font:700 22px/1.35 Georgia,'Times New Roman',serif !important; }
+body[data-app-view] #app #workspace-panel .babbage-questions :is(p,textarea) { font-size:18px; line-height:1.5; }
+@media(max-width:600px) {
+ .ai-waiting-dialog,body[data-app-view] .maya-dialog[data-state='loading'] { padding:20px; }
+ body[data-app-view] :is(.ai-waiting-dialog,.maya-dialog[data-state='loading']) .babbage-loading-heading strong { font-size:26px; }
+ body[data-app-view] :is(.ai-waiting-dialog,.maya-dialog[data-state='loading']) .babbage-loading { flex-direction:column; align-items:stretch; }
+ body[data-app-view] .maya-dialog[data-excerpt='true'] .maya-dialogue { padding:22px; }
+}

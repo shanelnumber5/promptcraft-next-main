@@ -36,3 +36,14 @@ export function savedFeedbackNotes(state) {
   const answers=record.answers.filter(q=>q.answer.trim() && (!questions.length || questions.some(current=>current.speaker===q.speaker && current.text===q.question)));
   return answers.map(q=>`${q.speaker}: ${q.question}\nEducator: ${q.answer.trim()}`).concat(record.other?.trim()?[record.other.trim()]:[]).join('\n\n');
 }
+
+export function conversationBeats(scene,split,interactive) {
+  const beats=['maya','pixel'].flatMap(name=>{
+    const turn=scene[name];if(!turn)return [];
+    const questions=interactive?feedbackQuestions({[name]:turn}):[];
+    const spoken=questions.reduce((text,q)=>text.replace(q.text,''),turn.text).trim();
+    return [...(turn.draft_quote?[{speaker:name,emotion:turn.emotion,text:'“'+turn.draft_quote+'”',excerpt:true}]:[]),...(spoken?split({[name]:{...turn,text:spoken}}):[]),...questions.map(question=>({speaker:name,emotion:turn.emotion,text:question.text,question}))];
+  });
+  if(interactive) beats.push({speaker:'pixel',emotion:'thoughtful',summary:true,text:'Your decisions are saved. Request one focused edit, or keep this draft and review your guide. Another reading is optional.'});
+  return beats;
+}

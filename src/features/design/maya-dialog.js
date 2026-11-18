@@ -1,4 +1,4 @@
-import { feedbackQuestions, answerFor, saveFeedbackAnswer, savedFeedbackNotes, emptyFeedbackConversation } from './feedback-conversation.js';
+import { conversationBeats, feedbackQuestions, answerFor, saveFeedbackAnswer, savedFeedbackNotes, emptyFeedbackConversation } from './feedback-conversation.js';
 import { renderInlineProse } from '../../shared/directions.js';
 import { updateDialoguePortrait, preloadDialoguePortraits } from '../../shared/dialogue-portrait.js';
 import { renderLoading } from './loading.js';
@@ -92,30 +92,27 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
   const showBeat = () => {
     const beat = beats[beatIndex];
     dialog.dataset.speaker = beat.speaker;
-    citation.hidden = !sourceQuotes[beat.speaker];
+    citation.hidden = true;
     citation.textContent = sourceQuotes[beat.speaker] ? 'Draft excerpt · “' + sourceQuotes[beat.speaker] + '”' : '';
-    if(beat.summary) citation.hidden=true;
+    dialog.dataset.excerpt=String(Boolean(beat.excerpt));
+    actor.hidden=Boolean(beat.excerpt);
+    speaker.hidden=Boolean(beat.excerpt);
     dialog.dataset.emotion = beat.emotion;
     updateDialoguePortrait(portrait, characterArt[beat.speaker][beat.emotion]);
-    heading.textContent = beat.speaker === 'maya' ? 'Maya’s first read' : 'Pixel’s perspective';
+    heading.textContent = beat.excerpt ? 'Your activity' : beat.speaker === 'maya' ? 'Maya’s first read' : 'Pixel’s perspective';
     speaker.textContent = beat.speaker === 'maya' ? 'Maya' : 'Professor Pixel';
     response.querySelectorAll('[data-dialogue-beat]').forEach((el, index) => { el.hidden = index !== beatIndex; });
     back.disabled = beatIndex === 0;
     revise.hidden=!beat.summary; revise.disabled=!savedFeedbackNotes(state);
     keep.hidden=!beat.question;
     next.disabled=Boolean(beat.question && !answerFor(state,beat.question).trim());
-    next.textContent = interactive && beat.summary ? 'Keep draft and review guide' : beat.question ? 'Save answer and continue' : beatIndex === beats.length - 1 ? (novel ? 'Explain the change' : onComplete ? 'Continue to design checks' : onReturn ? 'Clarify feedback' : 'Return to your draft') : beats[beatIndex + 1]?.speaker === 'pixel' && beat.speaker === 'maya' ? 'Hear Pixel’s perspective' : novel ? 'Continue' : 'Next';
+    next.textContent = beat.excerpt ? (beat.speaker==='maya'?'Hear Maya’s perspective':'Hear Pixel’s perspective') : interactive && beat.summary ? 'Keep draft and review guide' : beat.question ? 'Save answer and continue' : beatIndex === beats.length - 1 ? (novel ? 'Explain the change' : onComplete ? 'Continue to design checks' : onReturn ? 'Clarify feedback' : 'Return to your draft') : beats[beatIndex + 1]?.speaker === 'pixel' && beat.speaker === 'maya' ? 'Hear Pixel’s perspective' : novel ? 'Continue' : 'Next';
   };
   const showScene = text => {
     const scene = normalizeMayaScene(text, snapshot.design.revision);
     if (onComplete && !scene.pixel) throw Error('The reading did not include Pixel’s explanation. Please retry before continuing to the checks.');
     sourceQuotes = {maya:scene.maya?.draft_quote,pixel:scene.pixel?.draft_quote};
-    beats = interactive ? ['maya','pixel'].flatMap(name=>{
-      const turn=scene[name]; if(!turn)return [];
-      const questions=feedbackQuestions({[name]:turn});
-      const spoken=questions.reduce((text,q)=>text.replace(q.text,''),turn.text).trim();
-      return [...(spoken?mayaSceneBeats({[name]:{...turn,text:spoken}}):[]),...questions.map(question=>({speaker:name,emotion:turn.emotion,text:question.text,question}))];
-    }).concat([{speaker:'pixel',emotion:'thoughtful',summary:true,text:'Your decisions are saved. You can use your answers to revise the activity or keep your current draft and review the guide.'}]) : mayaSceneBeats(scene);
+    beats = conversationBeats(scene,mayaSceneBeats,interactive);
     beatIndex = 0;
     if(interactive) {
       const record=state.creative.conversation ||= emptyFeedbackConversation();

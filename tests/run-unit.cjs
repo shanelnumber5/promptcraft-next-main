@@ -21,6 +21,7 @@ const tests = [
   'shared-controller',
   'ai-waiting',
   'feedback-conversation',
+  'conversation-revision',
   'architecture',
   'scenario-studio',
   'opening-route',
