@@ -191,3 +191,19 @@ body[data-app-view] #app .babbage-presence img {width:180px;height:150px;margin:
 @media(max-width:700px) {.rubric-parameters{grid-template-columns:1fr}.assignment-rubric{min-width:720px}}
 
 body[data-app-view] #app .babbage-presence img {object-view-box:inset(20% 5% 18% 5%)}
+
+/* The assignment title must not consume the starting page's flexible editor space. */
+body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .build-page-fields[data-build-page='start'] > .assignment-title-field {flex:0 0 auto;min-height:0;margin:0 0 20px}
+.assessment-point-total {display:flex;align-items:center;gap:16px;margin:24px 0}
+.assessment-point-total label {font-weight:700}
+.assessment-point-total input {width:120px;padding:10px;font-size:16px}
+.assessment-criteria-list {margin:24px 0;padding:20px;background:#f5f9fc;border:1px solid #c3ced9;border-radius:5px}
+.assessment-criterion {display:grid;grid-template-columns:100px minmax(0,1fr) auto;gap:12px;align-items:center;margin:16px 0}
+.assessment-criterion label {font-weight:700}
+.assessment-criterion input {width:100%;min-width:0;box-sizing:border-box;padding:12px;font-size:16px}
+.assessment-level-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin:20px 0}
+.assessment-level-grid article {border:2px solid #12355b;border-radius:5px;overflow:hidden;background:#fff}
+.assessment-level-grid h4 {margin:0;padding:14px;background:#12355b;color:#fff;font:700 20px/1.4 Georgia,serif;border-bottom:4px solid #f2c14e}
+.assessment-level-grid article>strong {display:block;padding:14px 14px 0}
+.assessment-level-grid article>p {padding:14px;margin:0;font:400 16px/1.5 Arial,sans-serif}
+@media(max-width:750px){.assessment-level-grid{grid-template-columns:1fr}.assessment-criterion{grid-template-columns:minmax(0,1fr) auto}.assessment-criterion label{grid-column:1/-1}}

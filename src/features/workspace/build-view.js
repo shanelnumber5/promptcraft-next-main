@@ -39,7 +39,7 @@ export const buildSections = [
     id: 'start',
     title: 'Starting point',
     render: (state) =>
-      `<div class="setup-field"><label for="assignment-title">Assignment title</label><input id="assignment-title" data-workspace-meta="assignmentTitle" maxlength="200" value="${e(assignmentName(state)==='Your activity'?'':assignmentName(state))}" placeholder="Name your assignment"></div><fieldset><legend>What are you bringing?</legend>${[
+      `<div class="setup-field assignment-title-field"><label for="assignment-title">Assignment title</label><input id="assignment-title" data-workspace-meta="assignmentTitle" maxlength="200" value="${e(assignmentName(state)==='Your activity'?'':assignmentName(state))}" placeholder="Name your assignment"></div><fieldset><legend>What are you bringing?</legend>${[
         ['existing', 'Existing directions'],
         ['idea', 'A rough idea'],
       ]

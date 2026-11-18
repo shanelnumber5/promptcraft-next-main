@@ -266,6 +266,11 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
   // Form edits keep saved context, AI suggestions, and approval in sync.
   function input(control) {
     if (readError) return;
+    if(control.dataset?.rubricCriterion !== undefined) {
+      state.creative.rubric ||= emptyRubric();
+      const names=state.creative.rubric.criteria.split('\n');names[Number(control.dataset.rubricCriterion)]=control.value.slice(0,200);
+      state.creative.rubric.criteria=names.join('\n');state.creative.rubric.confirmed=false;saveSafely();return;
+    }
     if(control.dataset?.rubricParam) {
       state.creative.rubric ||= emptyRubric();
       const key=control.dataset.rubricParam;
@@ -882,16 +887,24 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       document.getElementById('review-title')?.focus({ preventScroll: true });
       return;
     }
-    if(action==='generate-rubric') {
+    if(action==='add-rubric-criterion' || event.target.closest('[data-remove-rubric-criterion]')) {
+      const names=state.creative.rubric.criteria.split('\n');
+      const remove=event.target.closest('[data-remove-rubric-criterion]');
+      if(remove)names.splice(Number(remove.dataset.removeRubricCriterion),1);
+      else if(names.length<8)names.push('');
+      state.creative.rubric.criteria=names.join('\n');state.creative.rubric.confirmed=false;saveSafely();render();return;
+    }
+    if(action==='generate-rubric' || action==='draft-rubric-criteria') {
       if(ai.pending || reviews.pending)return;
       const source=state,basis=state.design.revision,request=new AbortController();
       const snapshot=structuredClone(state);
+      if(action==='draft-rubric-criteria')snapshot.creative.rubric.criteria='';
       Object.assign(ai,{pending:true,requestController:request,intent:'review',stage:'sending',error:''});render();
       try {
         const rows=await generateRubric(snapshot,{signal:AbortSignal.any([request.signal,AbortSignal.timeout(180000)]),onProgress:stage=>{if(source===state && ai.requestController===request && !request.signal.aborted){ai.stage=stage;render();}}});
         if(source!==state || request.signal.aborted || ai.requestController!==request)return;
         if(basis!==state.design.revision)throw Error('Your assignment changed. Create the rubric again for the current draft.');
-        Object.assign(state.creative.rubric,{title:rubricForState(snapshot).title,submission:rubricForState(snapshot).submission});state.creative.rubric.rows=rows;state.creative.rubric.basis=basis;state.creative.rubric.confirmed=true;saveSafely();
+        Object.assign(state.creative.rubric,{title:rubricForState(snapshot).title,submission:rubricForState(snapshot).submission});state.creative.rubric.rows=rows;if(!snapshot.creative.rubric.criteria.trim())state.creative.rubric.criteria=rows.map(row=>row.name).join('\n');state.creative.rubric.basis=basis;state.creative.rubric.confirmed=true;saveSafely();
       } catch(error) {if(source===state && !request.signal.aborted)ai.error=error.message;}
       finally {if(ai.requestController===request){ai.pending=false;ai.requestController=null;render();const notice=app.querySelector('[data-rubric-notice]');if(notice)notice.textContent=ai.error || (request.signal.aborted?'Rubric cancelled. Your work is saved.':'Rubric created. Edit the descriptors, then continue.');}}
       return;

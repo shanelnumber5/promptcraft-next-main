@@ -55,18 +55,63 @@ const assert = require('node:assert/strict');
   state.creative.rubric.rows = rows;
   state.creative.rubric.basis = state.design.revision;
   state.creative.rubric.confirmed = true;
-  const {rubricForState}=await import('../../src/features/workspace/rubric.js');
-  const {renderBuildPage}=await import('../../src/features/workspace/build-view.js');
-  state.workspace.assignmentTitle='Staffing choices';
-  state.workspace.studentContribution='A recommendation and a peer response';
-  assert.equal(rubricForState(state).title,'Staffing choices rubric');
-  assert.equal(rubricForState(state).submission,state.workspace.studentContribution);
-  assert(!renderBuildPage(state,{pending:false},'rubric').includes('What will students submit?'));
-  assert(renderBuildPage(state,{pending:false},'assessment').includes('Assessment criteria, one per line'));
-  const guideWithRubric=createGuide(state.design,{teacher:state.teacher,workspace:state.workspace,rubric:rubricForState(state),conversationNotes:'Maya: Private NPC question\nEducator: Internal answer'});
+  const { rubricForState } = await import('../../src/features/workspace/rubric.js');
+  const { renderBuildPage } = await import('../../src/features/workspace/build-view.js');
+  state.workspace.assignmentTitle = 'Staffing choices';
+  state.workspace.studentContribution = 'A recommendation and a peer response';
+  assert.equal(rubricForState(state).title, 'Staffing choices rubric');
+  assert.equal(rubricForState(state).submission, state.workspace.studentContribution);
+  assert(
+    !renderBuildPage(state, { pending: false }, 'rubric').includes('What will students submit?'),
+  );
+  assert(renderBuildPage(state, { pending: false }, 'assessment').includes('Add a criterion'));
+  const guideWithRubric = createGuide(state.design, {
+    teacher: state.teacher,
+    workspace: state.workspace,
+    rubric: rubricForState(state),
+    conversationNotes: 'Maya: Private NPC question\nEducator: Internal answer',
+  });
   assert(guideWithRubric.includes('Staffing choices rubric'));
   assert(guideWithRubric.includes('<title>Staffing choices</title>'));
-  assert(!guideWithRubric.includes('Private NPC question') && !guideWithRubric.includes('Design decisions'));
+  assert(
+    !guideWithRubric.includes('Private NPC question') &&
+      !guideWithRubric.includes('Design decisions'),
+  );
+  const uncertain = structuredClone(state);
+  uncertain.creative.rubric.criteria = '';
+  assert.equal(rubricIssue(rubricForState(uncertain)), '', 'Empty criteria invite AI drafting');
+  const drafted = await generateRubric(uncertain, {
+    fetchImpl: async (_, options) => {
+      const request = JSON.parse(options.body);
+      assert.deepEqual(JSON.parse(request.messages[0].content).criteria, []);
+      return {
+        ok: true,
+        json: async () => ({
+          analysis: {
+            feedback_summary: JSON.stringify({
+              rows: ['Evidence', 'Explanation'].map((name) => ({
+                name,
+                description: 'Observable ' + name,
+                ratings: ['Clear evidence.', 'Partial evidence.', 'No evidence.'],
+              })),
+            }),
+          },
+        }),
+      };
+    },
+  });
+  assert.deepEqual(
+    drafted.map((row) => row.name),
+    ['Evidence', 'Explanation'],
+  );
+  assert.equal(
+    drafted.reduce((n, row) => n + row.points, 0),
+    10,
+  );
+  const setup = renderBuildPage(uncertain, { pending: false }, 'assessment');
+  assert(setup.includes('Not sure? Draft criteria with Babbage'));
+  assert.equal((setup.match(/<article>/g) || []).length, 3, 'Levels are three separate cards');
+  assert(setup.includes('data-rubric-criterion="0"'));
   const csv = rubricCSV(state.creative.rubric);
   assert(
     csv.startsWith(
