@@ -1,3 +1,4 @@
+import {emptyRubric,restoreRubric} from './rubric.js';
 import { emptyFeedbackConversation, restoreFeedbackConversation } from '../design/feedback-conversation.js';
 import { emptyReview, restoreReview } from './review-ai.js';
 import { postJSON } from '../../shared/json-request.js';
@@ -17,6 +18,7 @@ export const creativeDefaults = () => ({
   mayaPaused: false,
   review: emptyReview(),
   conversation: emptyFeedbackConversation(),
+  rubric: emptyRubric(),
 });
 export function normalizeDirection(value) {
   if (
@@ -45,6 +47,7 @@ export function restoreCreative(value) {
     typeof value.feedback === 'string' ? value.feedback.slice(0, MAX_WORKSPACE_TEXT) : '';
   result.basis = typeof value.basis === 'string' ? value.basis : '';
   result.mayaPaused = value.mayaPaused === true;
+  result.rubric = restoreRubric(value.rubric);
   result.review = restoreReview(value.review);
   result.conversation = restoreFeedbackConversation(value.conversation);
   return result;

@@ -15,6 +15,7 @@ const tests = [
   'exploration-controller',
   'repository',
   'workspace-review',
+  'rubric',
   'workspace-project',
   'workspace-workflow',
   'babbage-cameo',

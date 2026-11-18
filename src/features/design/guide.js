@@ -1,3 +1,4 @@
+import {renderRubricTable} from '../workspace/rubric.js';
 import { renderGuideHelp } from '../../shared/guide-help.js';
 import { guideStyles } from './guide-styles.js';
 import { renderAssignmentDirections } from '../../shared/directions.js';
@@ -49,7 +50,7 @@ export function loadGuideLogo() {
     .catch(() => null));
 }
 
-export function createGuide(design, { approved = true, logo = null, teacher = null, workspace = null, conversationNotes = '' } = {}) {
+export function createGuide(design, { approved = true, logo = null, teacher = null, workspace = null, conversationNotes = '', rubric = null } = {}) {
   const example = teacherSetup.steps[1].example.directions;
   const stale =
     teacher &&
@@ -62,7 +63,7 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
     approved = false;
   }
   const chosenTitle = workspace ? 'Activity directions' : 'Your revised discussion board';
-  const milestoneTitle = workspace ? 'Teaching notes' : 'Your assignment design summary';
+  const milestoneTitle = workspace ? 'Design decisions' : 'Your assignment design summary';
   const sections = workspace ? [] : [
     { id: 'lemonade-example', title: 'The lemonade example', body: lemonadeExample() },
   ];
@@ -94,7 +95,8 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
     body: `<section class="guide-sources"><h2>${workspace ? 'Design references' : 'Sources'}</h2><p>${workspace ? 'References supporting the teaching and design choices.' : 'References behind the teaching moves. The lemonade example is a fictional illustration.'}</p><ul>`+designEvidence.map(source=>'<li><a href="'+e(source.url)+'" target="_blank" rel="noopener noreferrer">'+e(source.short)+'</a><span>'+e(source.citation)+'</span></li>').join('')+'</ul></section>',
   });
   if (!workspace) sections.push({ id:'using-guide',title:'Using your downloaded guide',body:'<section class="guide-help-section">'+renderGuideHelp({standalone:true})+'</section>' });
-  const order = ['lemonade-example','your-assignment','assignment-pending','decision-milestone','assignment-guidance','design-sources','using-guide'];
+  if(rubric?.rows?.length) sections.push({id:'assignment-rubric',title:'Assessment rubric',body:'<section><h2>Assessment rubric</h2>'+ (rubric.basis!==design.revision?'<p>Assignment changed after rubric creation. Review this rubric before use.</p>':'')+renderRubricTable(rubric)+'</section>'});
+  const order = ['lemonade-example','your-assignment','assignment-rubric','assignment-pending','decision-milestone','assignment-guidance','design-sources','using-guide'];
   sections.sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id));
   const contents = sections.map(section => '<li><a href="#'+section.id+'">'+e(section.title)+'</a></li>').join('');
   return `<!doctype html>

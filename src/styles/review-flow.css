@@ -172,3 +172,22 @@ body[data-app-view] #app #workspace-panel .workspace-ai-disclosure p {margin:0;f
 .babbage-loading-note {display:block;margin-top:10px;margin-bottom:16px}
 .guide-download-actions {display:flex;flex-wrap:wrap;gap:12px;margin:0 0 28px}
 .guide-download-actions button {padding:12px 18px;min-height:46px}
+
+/* Show the entire computer, including its base and lower corner. */
+body[data-app-view] #app .babbage-presence {width:180px;height:150px;overflow:visible}
+body[data-app-view] #app .babbage-presence img {width:180px;height:150px;margin:0;object-fit:contain;object-position:center}
+.rubric-parameters {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;margin:20px 0}
+.rubric-parameters label {display:flex;flex-direction:column;gap:8px;font:700 16px/1.5 Arial,sans-serif}
+.rubric-parameters :is(input,textarea) {font:400 16px/1.5 Arial,sans-serif;padding:10px;min-width:0}
+.rubric-table-scroll {max-width:100%;overflow-x:auto;margin:24px 0}
+.assignment-rubric {width:100%;border-collapse:collapse;table-layout:fixed;font:400 15px/1.5 Arial,sans-serif;color:#12355b}
+.assignment-rubric caption {font:700 24px/1.4 Georgia,serif;text-align:left;padding:12px 0}
+.assignment-rubric :is(th,td) {border:1px solid #12355b;padding:12px;text-align:left;vertical-align:top}
+.assignment-rubric thead {background:#12355b;color:#fff}
+.assignment-rubric tbody th {background:#f5f9fc;width:23%}
+.assignment-rubric textarea {width:100%;box-sizing:border-box;min-height:100px;font:inherit;padding:8px;border:1px solid #c3ced9;background:#fff;color:#12355b}
+.assignment-rubric p {font-size:14px;margin:10px 0 0}
+.rubric-stale {padding:12px;background:#fff4cf;border:1px solid #b38310}
+@media(max-width:700px) {.rubric-parameters{grid-template-columns:1fr}.assignment-rubric{min-width:720px}}
+
+body[data-app-view] #app .babbage-presence img {object-view-box:inset(20% 5% 18% 5%)}

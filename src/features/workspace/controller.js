@@ -1,3 +1,4 @@
+import {emptyRubric,generateRubric,downloadRubric} from './rubric.js';
 import { requestConversationRevision } from './conversation-revision.js';
 import { saveFeedbackAnswer, savedFeedbackNotes, emptyFeedbackConversation } from '../design/feedback-conversation.js';
 import { createAiWaiting } from '../design/ai-waiting.js';
@@ -265,6 +266,20 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
   // Form edits keep saved context, AI suggestions, and approval in sync.
   function input(control) {
     if (readError) return;
+    if(control.dataset?.rubricParam) {
+      state.creative.rubric ||= emptyRubric();
+      const key=control.dataset.rubricParam;
+      if(['title','submission','total','criteria'].includes(key)) {state.creative.rubric[key]=control.value.slice(0,2000);state.creative.rubric.confirmed=false;saveSafely();}
+      return;
+    }
+    if(control.dataset?.rubricRow) {
+      const row=state.creative.rubric?.rows[Number(control.dataset.rubricRow)];
+      if(!row)return;
+      const field=control.dataset.rubricField;
+      if(field==='ratings') row.ratings[Number(control.dataset.rubricRating)]=control.value.slice(0,2000);
+      else if(['name','description'].includes(field))row[field]=control.value.slice(0,2000);
+      saveSafely();return;
+    }
     if (control.closest('[data-setup-form]') && isTestLessonKeyword(control)) {
       ai.requestController?.abort();
       reviews.cancel();
@@ -492,6 +507,8 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
   }
   function requirePerspectives(destination='reasoning') {
     const review=state.creative.review;
+    if(destination==='rubric') return false;
+    if(!state.creative.rubric?.confirmed && !state.finalCheck.approved && !review.manualOnly) {reviewPage='rubric';render();document.getElementById('review-title')?.focus();return true;}
     if(destination==='rationale' || state.finalCheck.approved || review.manualOnly || review.perspectivesComplete || !state.design.revision.trim()) return false;
     if(reviews.pending || ai.pending) return true;
     if(review.feedback) {
@@ -864,6 +881,27 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       document.getElementById('review-title')?.focus({ preventScroll: true });
       return;
     }
+    if(action==='generate-rubric') {
+      if(ai.pending || reviews.pending)return;
+      const source=state,basis=state.design.revision,request=new AbortController();
+      const snapshot=structuredClone(state);
+      Object.assign(ai,{pending:true,requestController:request,intent:'review',stage:'sending',error:''});render();
+      try {
+        const rows=await generateRubric(snapshot,{signal:AbortSignal.any([request.signal,AbortSignal.timeout(180000)]),onProgress:stage=>{if(source===state && ai.requestController===request && !request.signal.aborted){ai.stage=stage;render();}}});
+        if(source!==state || request.signal.aborted || ai.requestController!==request)return;
+        if(basis!==state.design.revision)throw Error('Your assignment changed. Create the rubric again for the current draft.');
+        state.creative.rubric.rows=rows;state.creative.rubric.basis=basis;state.creative.rubric.confirmed=true;saveSafely();
+      } catch(error) {if(source===state && !request.signal.aborted)ai.error=error.message;}
+      finally {if(ai.requestController===request){ai.pending=false;ai.requestController=null;render();const notice=app.querySelector('[data-rubric-notice]');if(notice)notice.textContent=ai.error || (request.signal.aborted?'Rubric cancelled. Your work is saved.':'Rubric created. Edit the descriptors, then continue.');}}
+      return;
+    }
+    if(action==='rubric-continue') {
+      if(!state.creative.rubric?.rows.length)return;
+      state.creative.rubric.confirmed=true;saveSafely();enterReview();return;
+    }
+    if(action==='download-rubric-csv' || action==='download-rubric-html') {
+      if(state.creative.rubric?.rows.length)downloadRubric(state.creative.rubric,action.endsWith('csv')?'csv':'html');return;
+    }
     if (action === 'check-workspace-revision') {
       await reviews.check();
       return;
@@ -1028,6 +1066,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
           teacher: state.teacher,
           workspace: state.workspace,
           conversationNotes: savedFeedbackNotes(state),
+          rubric:state.creative.rubric,
         });
         app.querySelector('.design-notice').textContent = 'Your Course Guide download has started.';
       } catch (error) {
