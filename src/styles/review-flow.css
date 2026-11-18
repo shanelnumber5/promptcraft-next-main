@@ -53,3 +53,5 @@ body[data-app-view] .maya-dialog[data-state='loading'] .maya-stage {
 }
 body[data-app-view] .maya-dialog[data-state='loading'] :is(.maya-state,.babbage-loading,.babbage-loading-copy,.babbage-loading p,.babbage-loading-note) { color:#12355b; }
 body[data-app-view] .maya-dialog[data-state='loading'] > header { border:0; }
+body[data-app-view] .ai-waiting-dialog .babbage-loading .babbage-loading-copy :is(strong,span,p),
+body[data-app-view] .maya-dialog[data-state='loading'] .babbage-loading .babbage-loading-copy :is(strong,span,p) { color:#12355b; }
