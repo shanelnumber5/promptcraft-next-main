@@ -1117,3 +1117,8 @@ body[data-app-view] .maya-dialog header button { flex:none; min-width:64px; whit
   body[data-app-view] .maya-dialog .maya-scene-nav { flex-wrap:nowrap; }
   body[data-app-view] .maya-dialog .maya-scene-nav button { flex:1 1 0; min-width:0; padding:8px; }
 }
+
+/* Keep conversational feedback readable beside the clarification form. */
+#workspace-panel .babbage-feedback p { margin:0 0 16px; line-height:1.6; }
+#workspace-panel .babbage-feedback .assignment-steps { margin:12px 0 20px; padding-left:26px; }
+#workspace-panel .babbage-feedback li { margin:0 0 12px; line-height:1.6; }

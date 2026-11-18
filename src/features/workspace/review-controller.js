@@ -4,7 +4,6 @@ import {
   requestWorkspaceReview,
   shouldOpenMaya,
 } from './review-ai.js';
-import { prepareMayaReading } from '../design/maya-dialog.js';
 
 const REVIEW_TIMEOUT_MS = 300000;
 const sampleReview =
@@ -21,7 +20,6 @@ export function createWorkspaceReviewController({
   render,
   onMayaReady,
   requestReview = requestWorkspaceReview,
-  prepareMaya = prepareMayaReading,
 }) {
   let activeRequest = null;
   let sequence = 0;
@@ -49,7 +47,6 @@ export function createWorkspaceReviewController({
     const isCurrent = () =>
       requestSequence === sequence && source === getState() && !abort.signal.aborted;
     const signal = () => AbortSignal.any([abort.signal, AbortSignal.timeout(REVIEW_TIMEOUT_MS)]);
-    let mayaError = null;
     review.status = 'pending';
     review.error = '';
     save();
@@ -62,15 +59,6 @@ export function createWorkspaceReviewController({
           : await requestReview(structuredClone(source), previous, { signal: signal() });
       if (!isCurrent()) return;
       Object.assign(review, { fingerprint, feedback, status: 'complete', error: '' });
-      save();
-      render({ perspectivePending: shouldOpenMaya(getState()) });
-      if (shouldOpenMaya(getState())) {
-        try {
-          await prepareMaya(source, { signal: signal() });
-        } catch (error) {
-          mayaError = error;
-        }
-      }
     } catch (error) {
       if (!isCurrent()) return;
       review.status = 'error';
@@ -84,7 +72,7 @@ export function createWorkspaceReviewController({
           if (source.designPanel === 'reason') {
             render();
             if (shouldOpenMaya(source))
-              onMayaReady({ source, review, error: mayaError, isCurrent });
+              onMayaReady({ source, review, isCurrent });
           }
         }
       }

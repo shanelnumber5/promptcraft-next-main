@@ -90,8 +90,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     if (state.finalCheck.context !== context)
       state.finalCheck = { ...finalCheckDefaults(), context };
   };
-  const render = ({ focus = false, perspectivePending = false } = {}) => {
-    ai.perspectivePending = perspectivePending;
+  const render = ({ focus = false } = {}) => {
     app.innerHTML = showingWrapUp
       ? renderClosing(state, closingStage, closingPage)
       : renderWorkspace(state, ai, readError, designPage, partnerPage, reviewPage, ui);
@@ -411,13 +410,13 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     canReview: () => !readError && !showingWrapUp && !ai.pending,
     save: saveSafely,
     render,
-    onMayaReady({ source, review, error, isCurrent }) {
+    onMayaReady({ source, review, isCurrent }) {
       const open = () => {
-        if (!isCurrent() || !shouldOpenMaya(source)) return;
+        if (!isCurrent() || showingWrapUp || !shouldOpenMaya(source)) return;
         review.offeredMaya = review.fingerprint;
         saveSafely();
         openMayaDialog(source, document.getElementById('review-title'), {
-          initialError: error,
+          autoStart: true,
           onReturn: returnFromMaya,
         });
       };
@@ -694,6 +693,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     if (action === 'reset-workspace') return reset();
     if (readError) return;
     if (action === 'finish-workspace' && state.finalCheck.approved && finalCheckReady(state)) {
+      reviews.cancel();
       showingWrapUp = true;
       closingStage = scenario ? 'board' : 'dialogue';
       closingPage = 0;
