@@ -35,7 +35,7 @@ export function renderBabbageMessage(text) {
 }
 
 // Preserve every sentence while keeping each reading page short.
-export function babbageFeedbackPages(text, limit=750) {
+export function babbageFeedbackPages(text, limit=420) {
  const message=parseBabbageFeedback(text).message.trim();
  const sentences=[...new Intl.Segmenter('en',{granularity:'sentence'}).segment(message)].map(p=>p.segment);
  const pages=[];let page='';
@@ -44,5 +44,5 @@ export function babbageFeedbackPages(text, limit=750) {
  return pages.length?pages:[''];
 }
 export function renderBabbagePresence() {
- return '<figure class="babbage-presence"><img src="assets/people/charles-babbage-full.webp" width="832" height="1177" decoding="async" alt="Charles Babbage"><figcaption>Your design collaborator</figcaption></figure>';
+ return '<figure class="babbage-presence"><img src="assets/people/babbage-engine-repaired.webp" width="160" height="110" decoding="async" alt="Babbage computer"></figure>';
 }

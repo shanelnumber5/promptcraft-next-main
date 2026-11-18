@@ -142,3 +142,24 @@ body[data-app-view] .guide-preview-toolbar { flex:none; padding:12px 20px; }
 body[data-app-view] .guide-preview iframe { flex:1 1 0; min-height:0; height:auto; border:0; width:100%; background:#fff; }
 .guide-preview-actions { flex:none; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 20px; background:#f2c14e; color:#12355b; }
 .guide-preview-actions button { min-height:44px; padding:8px 14px; color:#12355b; background:#fff; border:2px solid #12355b; border-radius:4px; font:700 16px/1.4 Arial,sans-serif; }
+
+/* Compact collaborator header and readable, bounded feedback pages. */
+body[data-app-view] #app .partner-heading:has(.babbage-presence) {min-height:0;display:flow-root !important;padding-bottom:12px}
+body[data-app-view] #app .partner-heading:has(.babbage-presence) h2 {padding-top:0;font-size:28px;line-height:1.25;margin:0}
+body[data-app-view] #app .babbage-presence {width:96px;margin:0 0 0 16px}
+body[data-app-view] #app .babbage-presence img {width:96px;height:64px;object-fit:contain}
+body[data-app-view] #app #workspace-panel .workspace-ai-disclosure {font:400 14px/1.45 Arial,sans-serif;margin:0 0 16px;max-width:72ch}
+.workspace-ai-disclosure summary {cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+body[data-app-view] #app #workspace-panel .babbage-feedback {max-width:68ch;margin:0 auto}
+body[data-app-view] #app #workspace-panel .babbage-feedback .feedback-prose {font:400 18px/1.65 Arial,sans-serif}
+body[data-app-view] #app #workspace-panel .babbage-questions {margin:0;padding:16px;border:0;background:transparent}
+body[data-app-view] #app #workspace-panel .babbage-question {min-width:0;margin:16px 0;padding:16px;border:1px solid #12355b;border-radius:5px;background:#f5f9fc}
+body[data-app-view] #app #workspace-panel .babbage-question legend {max-width:100%;padding:0 4px;color:#12355b;font:700 16px/1.5 Arial,sans-serif}
+body[data-app-view] #app #workspace-panel .babbage-question label.clarification-choice {display:flex;align-items:flex-start;gap:12px;margin:10px 0;padding:12px;border:1px solid #b6c4d2;border-radius:4px;background:#fff;font:400 16px/1.5 Arial,sans-serif !important;cursor:pointer}
+.clarification-choice input[type='radio'] {flex:0 0 20px;width:20px;height:20px;margin:2px 0 0;accent-color:#12355b}
+body[data-app-view] #app #workspace-panel [data-clarification-custom][hidden] {display:none}
+/* A single navigation strip owns the closing scene footer. */
+body[data-app-view]:has(.closing-experience) .app-footer {display:none !important}
+body[data-app-view] .closing-experience .dialogue {background:transparent;min-height:0;height:auto;flex:0 0 auto;padding:0;margin:0;border:0}
+body[data-app-view] .closing-experience .design-notice:empty,
+body[data-app-view] .closing-experience .save-notice:empty {display:none}

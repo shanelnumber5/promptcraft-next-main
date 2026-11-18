@@ -318,7 +318,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       saveSafely();
       return;
     }
-    if (control.dataset?.clarificationAnswer) return controller.updateClarificationAnswer(control);
+    if (control.dataset?.clarificationAnswer || control.dataset?.clarificationChoice) return controller.updateClarificationAnswer(control);
     const previousContext = assignmentContext(state);
     let movedDraft = false;
     if (control.dataset?.workspaceMeta) {

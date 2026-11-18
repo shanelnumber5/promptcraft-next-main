@@ -7,6 +7,13 @@ import { discussionOpening } from '../opening/content.js';
 import { lemonadeVisual, planVisuals } from '../../shared/lemonade-visuals.js';
 import { designEvidence, renderDesignRationale } from '../../shared/design-evidence.js';
 
+export function renderConversationNotes(notes) {
+  return '<div class="guide-conversation-notes">'+notes.trim().split(/\n\s*\n/).map(block=>{
+    const match=block.match(/^(Maya|Pixel):\s*([\s\S]*?)\nEducator:\s*([\s\S]*)$/);
+    return match ? `<section class="guide-decision"><p class="guide-question"><strong>${e(match[1])} asked</strong><br>${e(match[2])}</p><p><strong>Your decision</strong><br>${e(match[3])}</p></section>` : `<section class="guide-decision"><p>${e(block)}</p></section>`;
+  }).join('')+'</div>';
+}
+
 function lemonadeExample() {
   const scene = (id) => discussionOpening.scenes.find((item) => item.id === id);
   const flow = (board) =>
@@ -65,7 +72,7 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
     sections.push({
       id: 'decision-milestone',
       title: milestoneTitle,
-      body: `<section><h2>${e(milestoneTitle)}</h2>${teacher.learningGoal?.trim() ? `<h3>Learning goal</h3><p>${e(teacher.learningGoal)}</p>` : ''}${design.reason?.trim() ? `<h3>Why this design?</h3>${renderDesignRationale(design.reason, { showSources: false, paragraphBreaks: true })}` : ''}${conversationNotes.trim() ? `<h3>Conversation decisions</h3>${renderAssignmentDirections(conversationNotes)}` : ''}${workspace.instructorPlan?.trim() && !/^(?:i am not sure(?: yet)?|not sure(?: yet)?|not recorded(?: yet)?)\.?$/i.test(workspace.instructorPlan.trim()) ? `<h3>Instructor interaction</h3><p>${e(workspace.instructorPlan)}</p>` : ''}</section>`,
+      body: `<section><h2>${e(milestoneTitle)}</h2>${teacher.learningGoal?.trim() ? `<h3>Learning goal</h3><p>${e(teacher.learningGoal)}</p>` : ''}${design.reason?.trim() ? `<h3>Why this design?</h3>${renderDesignRationale(design.reason, { showSources: false, paragraphBreaks: true })}` : ''}${conversationNotes.trim() ? `<h3>Conversation decisions</h3>${renderConversationNotes(conversationNotes)}` : ''}${workspace.instructorPlan?.trim() && !/^(?:i am not sure(?: yet)?|not sure(?: yet)?|not recorded(?: yet)?)\.?$/i.test(workspace.instructorPlan.trim()) ? `<h3>Instructor interaction</h3><p>${e(workspace.instructorPlan)}</p>` : ''}</section>`,
     });
   if (teacher && !design.revision.trim())
     sections.push({

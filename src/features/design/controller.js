@@ -23,7 +23,12 @@ export function createDesignController({ app, getState, ai, render, saveSafely, 
 
   function updateClarificationAnswer(control) {
     const state = getState();
-    const id = control.dataset.clarificationAnswer;
+    const id = control.dataset.clarificationAnswer || control.dataset.clarificationChoice;
+    if(control.dataset.clarificationChoice) {
+      const custom=app.querySelector('[data-clarification-custom="'+id+'"]');
+      if(custom) custom.hidden=control.value!=='__clarify__';
+      if(control.value==='__clarify__') {control=custom.querySelector('textarea');control.focus();}
+    }
     if (!state.babbage.questions.some((q) => q.id === id)) return;
     state.babbage.answers[id] = control.value.slice(0, 24000);
     const support = document.getElementById(id + '-support');

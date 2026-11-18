@@ -174,4 +174,10 @@ body :is(h1,h2,h3,h4,h5,h6) { font-family:Georgia,'Times New Roman',serif !impor
  body { padding:0; background:#fff; }
  .guide-section > section,.assignment-content,.guide-section > .guide-sources { padding:16px 0; }
 }
+
+.guide-conversation-notes {display:grid;gap:16px}
+.guide-decision {border:1px solid #12355b;border-radius:5px;padding:16px 20px;break-inside:avoid;background:#f5f9fc}
+.guide-decision p {margin:0 0 14px;white-space:pre-line}
+.guide-decision p:last-child {margin-bottom:0}
+.guide-decision strong {color:#12355b}
 `;

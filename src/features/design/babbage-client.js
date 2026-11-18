@@ -26,7 +26,7 @@ export function buildBabbageRequest(state, intent) {
     analysis_type: 'scenario1',
     response_kind: intent === 'revise' ? 'draft' : 'consult',
     max_output_tokens: intent === 'revise' ? 3500 : 1600,
-    system: (state.workspace ? workspaceInstructions : instructions) + '\nKeep the educator-facing feedback under 100 words. Put complete activity directions only in revised_discussion_prompt; do not repeat them in feedback. Keep the design rationale under 120 words. For an existing draft, preserve unresolved preferences and apply the supplied decisions instead of asking new optional questions.',
+    system: (state.workspace ? workspaceInstructions : instructions) + '\nFor every clarification concern, write a short question followed by two or three concrete answer choices labeled (a), (b), and optionally (c). Keep choices separate from the question and do not include an other choice; the interface adds a written clarification option. Keep the educator-facing feedback under 100 words. Put complete activity directions only in revised_discussion_prompt; do not repeat them in feedback. Keep the design rationale under 120 words. For an existing draft, preserve unresolved preferences and apply the supplied decisions instead of asking new optional questions.',
     messages: [
       {
         role: 'user',

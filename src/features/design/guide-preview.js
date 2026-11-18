@@ -14,11 +14,11 @@ export function openGuidePreview(state, app, { onClose = null } = {}) {
     [...tabs.children].forEach((button,index)=>button.setAttribute('aria-current',index===page?'page':'false'));
     dialog.querySelector('iframe').srcdoc='<!doctype html><html lang="en"><head><base href="about:srcdoc"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'+parsed.head.querySelector('style').outerHTML+'<style>body{padding:20px;background:#fff}main{max-width:80ch;margin:auto}.guide-section{margin:0}.guide-section>section,.assignment-content{padding:20px}.guide-section>section.assignment{padding:0}</style></head><body class="workspace-guide"><main>'+sections[page].outerHTML+'</main></body></html>';
     dialog.querySelector('[data-guide-back]').disabled=page===0;
-    dialog.querySelector('[data-guide-next]').disabled=page===sections.length-1;
+    dialog.querySelector('[data-guide-next]').textContent=page===sections.length-1?'Close':'Next section';
     dialog.querySelector('[data-guide-page]').textContent='Section '+(page+1)+' of '+sections.length;
   }
   dialog.querySelector('[data-guide-back]').addEventListener('click',()=>{if(page>0){page--;render();}});
-  dialog.querySelector('[data-guide-next]').addEventListener('click',()=>{if(page<sections.length-1){page++;render();}});
+  dialog.querySelector('[data-guide-next]').addEventListener('click',()=>{if(page<sections.length-1){page++;render();}else dialog.close();});
   dialog.querySelector('[data-guide-close]').addEventListener('click',()=>dialog.close());
   if(onClose)dialog.addEventListener('close',onClose,{once:true});
   render();showModal(dialog,{fallback:()=>app.querySelector('[data-action="preview-guide"]')});dialog.querySelector('[data-guide-close]').focus();
