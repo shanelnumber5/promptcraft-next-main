@@ -73,7 +73,7 @@ export function renderPartner(state, ai, page, preview, ui = {}) {
   }
   const hasPreviewAction = welcome && (hasDirections || state.design.revision.trim());
   if(hasPreviewAction) actions += '<button type="button" id="workspace-show-preview" data-workspace-view="preview">View starting point</button><span class="workspace-save-status">Saved in this browser.</span>';
-  if(!utilityPage && !ai.pending && !ai.suggestion && page !== 'ideas' && !welcome && !hasIdeas && (hasDirections || state.design.revision.trim()) && !conversation.questions.length) actions += '<button type="button" id="workspace-show-preview" data-workspace-view="preview">View activity</button><span class="workspace-save-status">Saved in this browser.</span>';
+  if(!utilityPage && !ai.pending && !ai.suggestion && page !== 'ideas' && !welcome && !hasIdeas && (hasDirections || state.design.revision.trim()) && !conversation.questions.length && !actions.includes('data-workspace-view="preview"')) actions += '<button type="button" id="workspace-show-preview" data-workspace-view="preview">View activity</button><span class="workspace-save-status">Saved in this browser.</span>';
   if (utilityPage) actions += '<button type="button" data-partner-page="work">Back to exploration</button>';
   if (!actions) actions = `<span class="workspace-save-status" role="status">${ai.pending ? '' : 'Saved in this browser.'}</span>`;
   if (welcome) {

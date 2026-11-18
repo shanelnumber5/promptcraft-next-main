@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 (async () => {
   const { chatmtProfile } = await import('../../netlify/functions/lib/chatmt-profile.js');
   const { getAnalysisContract_ } = await import('../../netlify/functions/lib/analysis-contracts.js');
-  const { handleChatmt } = await import('../../netlify/functions/lib/chatmt.js');
+  const { handleChatmt, parseChatmtAnalysis } = await import('../../netlify/functions/lib/chatmt.js');
   const contract = getAnalysisContract_({ analysis_type: 'scenario1' });
   const env = { ...process.env };
   try {
@@ -35,6 +35,14 @@ const assert = require('node:assert/strict');
     assert.equal(result.body.analysis.feedback_summary, 'Grounded character feedback');
     assert.deepEqual(result.body.analysis.input_quality, { usable: true, concerns: [] });
     assert.equal(result.body.analysis.revised_discussion_prompt, '');
+    assert.deepEqual(parseChatmtAnalysis('Here is the result: {"feedback_summary":"Line one\nLine two"} done.'), {feedback_summary:'Line one\nLine two'});
+    assert.throws(() => parseChatmtAnalysis('{"feedback_summary":"unfinished'), SyntaxError);
+    let attempts = 0;
+    const recovered = await handleChatmt({httpMethod:'POST', body:JSON.stringify(incoming)}, getAnalysisContract_, (status,body)=>({status,body}), 'retry-test', {
+      fetchImpl: async () => new Response(JSON.stringify({content:[{type:'text',text:++attempts === 1 ? '{"feedback_summary":"truncated' : '{"feedback_summary":"Complete feedback"}'}],stop_reason:'end_turn'}))
+    });
+    assert.equal(attempts,2);
+    assert.equal(recovered.status,200);
     console.log('PASS: interactive model routing, bounded token budgets, minimal feedback output and compatible response envelopes. Mocked provider.');
   } finally {
     for (const key of ['CHATMT_INTERACTIVE_MODEL','CHATMT_API_KEY','CHATMT_BASE_URL','CHATMT_MODEL']) {

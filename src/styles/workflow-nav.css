@@ -845,15 +845,15 @@ body[data-app-view='workspace'] .workspace-shell .workspace-section-frame--sideb
   flex:1 1 0; min-height:0; overflow:auto;
 }
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-action-bar {
-  flex:0 0 72px; height:72px; min-height:72px; max-height:72px;
+  flex:0 0 auto; height:auto; min-height:72px; max-height:none;
   box-sizing:border-box; width:100%; margin:0; padding:12px 16px;
   background:#D98F06; color:#111; border:0; border-radius:0;
-  display:flex; align-items:center; flex-wrap:nowrap; gap:10px;
-  overflow-x:auto; overflow-y:hidden;
+  display:flex; align-items:center; flex-wrap:wrap; gap:10px;
+  overflow:visible;
 }
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-action-bar > :is(button,a,.workspace-save-status) { flex:0 0 auto; }
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-action-bar button {
-  box-sizing:border-box; height:48px; min-height:48px; max-width:none; white-space:nowrap; margin-block:0; padding:8px 14px;
+  box-sizing:border-box; height:auto; min-height:48px; max-width:100%; white-space:normal; margin-block:0; padding:8px 14px;
   background:#fff; color:#1E2D59; border:2px solid #1E2D59; border-radius:5px;
   font:700 16px/1.35 Arial,Helvetica,sans-serif;
 }
@@ -865,7 +865,7 @@ body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .work
 }
 body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel .workspace-action-bar > .workspace-save-status {
   font: 700 14px/1.4 Arial,Helvetica,sans-serif; color: #1E2D59;
-  flex:1 0 auto; margin:0; text-align:center; white-space:nowrap;
+  flex:1 1 160px; min-width:0; margin:0; text-align:center; white-space:normal;
   position:static;
 }
 @media (max-width: 720px) {
