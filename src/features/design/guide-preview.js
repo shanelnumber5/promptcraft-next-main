@@ -1,3 +1,4 @@
+import { savedFeedbackNotes } from './feedback-conversation.js';
 import { createGuide, loadGuideLogo } from './guide.js';
 import { showModal } from '../../shared/modal.js';
 export function openGuidePreview(state, app, { onClose = null } = {}) {
@@ -10,6 +11,7 @@ export function openGuidePreview(state, app, { onClose = null } = {}) {
   const design = { ...state.design };
   const options = {
     approved: state.finalCheck.approved,
+    conversationNotes: savedFeedbackNotes(state),
     teacher: { ...state.teacher },
     workspace: state.workspace ? { ...state.workspace } : null,
   };

@@ -1,3 +1,4 @@
+import { feedbackQuestions, answerFor, saveFeedbackAnswer, savedFeedbackNotes, emptyFeedbackConversation } from './feedback-conversation.js';
 import { renderInlineProse } from '../../shared/directions.js';
 import { updateDialoguePortrait, preloadDialoguePortraits } from '../../shared/dialogue-portrait.js';
 import { renderLoading } from './loading.js';
@@ -9,7 +10,13 @@ const readings = new WeakMap();
 const reviewContext = state => JSON.stringify([state.teacher,state.design.revision,state.workspace || null]);
 export function mayaFeedbackReference(state) {
   const reading = readings.get(state)?.findLast(entry => entry.reviewContext === reviewContext(state));
-  if (!reading) return null;
+  if (!reading) {
+    const saved=state.creative?.conversation;
+    if(saved?.draft === state.design.revision && saved.response) {
+      try { return normalizeMayaScene(saved.response,state.design.revision); } catch {}
+    }
+    return null;
+  }
   try { return normalizeMayaScene(reading.response, state.design.revision); } catch { return null; }
 }
 // Prepare without opening a second loading scene. Reuse the normal session cache.
@@ -24,13 +31,16 @@ export async function prepareMayaReading(state, {signal, fetchImpl} = {}) {
     assignment:buildMayaRequest(snapshot).messages[0].content}].slice(-2));
 }
 
-export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,novel=false,initialError=null,onReturn=null} = {}) {
-  let completed = false;
+export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,novel=false,initialError=null,onReturn=null,onSave=null,onRevise=null} = {}) {
+  let completed = false, requestedRevision = false;
+  const interactive=Boolean(state.creative && onSave);
+  const persist=()=>{const saved=onSave?.();status.textContent=saved===false?'Your answers could not be saved in this browser. Keep this window open.':'Your answers are saved as you type.';return saved!==false;};
   const reviewedContext = reviewContext(state);
   const context = mayaContext(state);
   const snapshot = structuredClone(state);
   const previous = readings.get(state) || [];
-  const cached = previous.findLast((reading) => reading.context === context);
+  const savedConversation=state.creative?.conversation;
+  const cached = previous.findLast((reading) => reading.context === context) || (savedConversation?.context===context && savedConversation.response ? {response:savedConversation.response} : null);
   const dev = state.babbage.mode === 'dev';
   const dialog = document.createElement('dialog');
   dialog.className = 'maya-dialog' + (novel ? ' maya-dialog--novel' : '') + (state.workspace ? ' maya-dialog--workspace' : '');
@@ -49,6 +59,7 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
   const heading = dialog.querySelector('#maya-title');
   const showState = (kind, title, message) => {
     dialog.dataset.state = kind;
+    citation.hidden=true;
     actor.hidden=true; dialogue.hidden=true; stateCard.hidden=false; navigation.hidden=true;
     heading.textContent=kind==='loading' ? 'Preparing your feedback' : 'Maya’s first read';
     const close = dialog.querySelector('[data-maya-close]');
@@ -69,29 +80,67 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
   const back = dialog.querySelector('[data-maya-back]');
   const next = dialog.querySelector('[data-maya-next]');
   let beats = [], beatIndex = 0, sourceQuotes = {};
-  const citation=document.createElement('p'); citation.className='maya-draft-reference'; citation.hidden=true; dialogue.append(citation);
+  const citation=document.createElement('aside'); citation.className='maya-draft-reference'; citation.hidden=true; dialog.querySelector('.maya-stage').append(citation);
+  const revise=document.createElement('button');revise.type='button';revise.textContent='Use my answers to revise';revise.hidden=true;navigation.append(revise);
+  revise.addEventListener('click',()=>{if(!savedFeedbackNotes(state)||!persist())return;requestedRevision=true;completed=true;dialog.close();});
+  const keep=document.createElement('button');keep.type='button';keep.textContent='Keep the current design';keep.hidden=true;navigation.insertBefore(keep,next);
+  keep.addEventListener('click',()=>{
+    const field=response.querySelector('[data-dialogue-beat]:not([hidden]) textarea');
+    if(!field)return;field.value='Keep the current design; no change requested.';field.dispatchEvent(new Event('input',{bubbles:true}));
+    if(!persist())return;beatIndex++;showBeat();
+  });
   const showBeat = () => {
     const beat = beats[beatIndex];
     dialog.dataset.speaker = beat.speaker;
     citation.hidden = !sourceQuotes[beat.speaker];
-    citation.textContent = sourceQuotes[beat.speaker] ? 'From your draft: “' + sourceQuotes[beat.speaker] + '”' : '';
+    citation.textContent = sourceQuotes[beat.speaker] ? 'Draft excerpt · “' + sourceQuotes[beat.speaker] + '”' : '';
+    if(beat.summary) citation.hidden=true;
     dialog.dataset.emotion = beat.emotion;
     updateDialoguePortrait(portrait, characterArt[beat.speaker][beat.emotion]);
     heading.textContent = beat.speaker === 'maya' ? 'Maya’s first read' : 'Pixel’s perspective';
     speaker.textContent = beat.speaker === 'maya' ? 'Maya' : 'Professor Pixel';
     response.querySelectorAll('[data-dialogue-beat]').forEach((el, index) => { el.hidden = index !== beatIndex; });
     back.disabled = beatIndex === 0;
-    next.textContent = beatIndex === beats.length - 1 ? (novel ? 'Explain the change' : onComplete ? 'Continue to design checks' : onReturn ? 'Clarify feedback' : 'Return to your draft') : beats[beatIndex + 1]?.speaker === 'pixel' && beat.speaker === 'maya' ? 'Hear Pixel’s perspective' : novel ? 'Continue' : 'Next';
+    revise.hidden=!beat.summary; revise.disabled=!savedFeedbackNotes(state);
+    keep.hidden=!beat.question;
+    next.disabled=Boolean(beat.question && !answerFor(state,beat.question).trim());
+    next.textContent = interactive && beat.summary ? 'Keep draft and review guide' : beat.question ? 'Save answer and continue' : beatIndex === beats.length - 1 ? (novel ? 'Explain the change' : onComplete ? 'Continue to design checks' : onReturn ? 'Clarify feedback' : 'Return to your draft') : beats[beatIndex + 1]?.speaker === 'pixel' && beat.speaker === 'maya' ? 'Hear Pixel’s perspective' : novel ? 'Continue' : 'Next';
   };
   const showScene = text => {
     const scene = normalizeMayaScene(text, snapshot.design.revision);
     if (onComplete && !scene.pixel) throw Error('The reading did not include Pixel’s explanation. Please retry before continuing to the checks.');
     sourceQuotes = {maya:scene.maya?.draft_quote,pixel:scene.pixel?.draft_quote};
-    beats = mayaSceneBeats(scene); beatIndex = 0;
+    beats = interactive ? ['maya','pixel'].flatMap(name=>{
+      const turn=scene[name]; if(!turn)return [];
+      const questions=feedbackQuestions({[name]:turn});
+      const spoken=questions.reduce((text,q)=>text.replace(q.text,''),turn.text).trim();
+      return [...(spoken?mayaSceneBeats({[name]:{...turn,text:spoken}}):[]),...questions.map(question=>({speaker:name,emotion:turn.emotion,text:question.text,question}))];
+    }).concat([{speaker:'pixel',emotion:'thoughtful',summary:true,text:'Your decisions are saved. You can use your answers to revise the activity or keep your current draft and review the guide.'}]) : mayaSceneBeats(scene);
+    beatIndex = 0;
+    if(interactive) {
+      const record=state.creative.conversation ||= emptyFeedbackConversation();
+      Object.assign(record,{draft:state.design.revision,context,response:text});
+      persist();
+    }
     preloadDialoguePortraits(beats.map(beat => characterArt[beat.speaker][beat.emotion]));
     response.replaceChildren(...beats.map(beat => {
-      const line = document.createElement('p');
-      line.dataset.dialogueBeat = ''; line.innerHTML = renderInlineProse(beat.text); return line;
+      const line = document.createElement('div');
+      line.dataset.dialogueBeat = '';
+      const speech=document.createElement('p');speech.innerHTML=renderInlineProse(beat.text);line.append(speech);
+      if(beat.question || beat.summary) {
+        const label=document.createElement('label');
+        label.textContent=beat.question?'Your answer to '+beat.question.speaker:'Anything else to change? (optional)';
+        const field=document.createElement('textarea');field.rows=3;field.maxLength=1000;
+        field.id='dialogue-answer-'+beats.indexOf(beat);label.htmlFor=field.id;
+        field.value=beat.question?answerFor(state,beat.question):(state.creative.conversation?.other || '');
+        field.addEventListener('input',()=>{
+          if(beat.question) saveFeedbackAnswer(state,beat.question,field.value);
+          else state.creative.conversation.other=field.value;
+          persist(); next.disabled=Boolean(beat.question&&!field.value.trim());revise.disabled=!savedFeedbackNotes(state);
+        });
+        line.append(label,field);
+      }
+      return line;
     }));
     stateCard.hidden=true; actor.hidden=false; dialogue.hidden=false; navigation.hidden=false;
     dialog.dataset.state='dialogue';
@@ -105,6 +154,7 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
   };
   back.addEventListener('click', () => { if (beatIndex > 0) { beatIndex--; showBeat(); } });
   next.addEventListener('click', () => {
+    if(interactive && !persist()) return;
     if (beatIndex === beats.length - 1) {
       if (context !== mayaContext(state)) { showState('error','Your draft has changed','Return to your draft and check the latest version again.'); return; }
       completed=true; dialog.close();
@@ -114,7 +164,7 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
   let controller;
   dialog.addEventListener('keydown', (event) => {
     if (event.key !== 'Tab') return;
-    const stops = [...dialog.querySelectorAll('button:not(:disabled), summary, [tabindex="0"]')].filter(el => el.getClientRects().length);
+    const stops = [...dialog.querySelectorAll('button:not(:disabled), textarea, summary, [tabindex="0"]')].filter(el => el.getClientRects().length);
     const first = stops[0], last = stops.at(-1);
     if (event.shiftKey && document.activeElement === first) {
       event.preventDefault();
@@ -186,10 +236,11 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
   dialog.addEventListener('close', () => {
     controller?.abort();
     dialog.remove();
-    if (completed && onComplete) onComplete();
+    if(requestedRevision) onRevise?.();
+    else if (completed && onComplete) onComplete();
     else if (opener?.isConnected) opener.focus();
     else if (novel) document.getElementById('setup-title')?.focus({preventScroll:true});
-    onReturn?.();
+    onReturn?.({completed,requestedRevision});
   }, { once: true });
   document.body.append(dialog);
   dialog.showModal();

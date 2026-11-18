@@ -1,3 +1,4 @@
+import { emptyFeedbackConversation, restoreFeedbackConversation } from '../design/feedback-conversation.js';
 import { emptyReview, restoreReview } from './review-ai.js';
 import { postJSON } from '../../shared/json-request.js';
 import {
@@ -15,6 +16,7 @@ export const creativeDefaults = () => ({
   basis: '',
   mayaPaused: false,
   review: emptyReview(),
+  conversation: emptyFeedbackConversation(),
 });
 export function normalizeDirection(value) {
   if (
@@ -44,6 +46,7 @@ export function restoreCreative(value) {
   result.basis = typeof value.basis === 'string' ? value.basis : '';
   result.mayaPaused = value.mayaPaused === true;
   result.review = restoreReview(value.review);
+  result.conversation = restoreFeedbackConversation(value.conversation);
   return result;
 }
 export function normalizeCreativeResponse(data) {

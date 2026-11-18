@@ -65,3 +65,19 @@ body[data-app-view] :is(.ai-waiting-dialog,.maya-dialog[data-state='loading']) .
 body[data-app-view] :is(.ai-waiting-dialog,.maya-dialog[data-state='loading']) .babbage-loading-note { display:block; margin-top:12px; font-size:14px; }
 body[data-app-view] :is(.ai-waiting-dialog,.maya-dialog[data-state='loading']) .babbage-progress { height:8px; border-radius:6px; }
 .maya-draft-reference { color:#405674; padding:12px 16px; border-left:3px solid #f2c14e; font-size:14px; }
+/* Draft evidence is a quiet scene reference, separate from the spoken bubble. */
+body[data-app-view] .maya-dialog .maya-stage > .maya-draft-reference {
+  position:absolute; z-index:3; top:16px; left:24px; width:min(600px,55%);
+  max-height:105px; overflow:auto; margin:0; padding:10px 14px;
+  border:0; border-left:3px solid #f2c14e; border-radius:4px;
+  background:rgb(255 255 255 / .94); color:#405674;
+  font:400 14px/1.45 Arial,Helvetica,sans-serif;
+}
+body[data-app-view] .maya-dialog .maya-dialogue:has(textarea) { max-height:calc(100% - 150px); overflow:auto; }
+body[data-app-view] .maya-dialog .maya-dialogue label { display:block; margin:14px 0 6px; font:700 16px/1.4 Arial,Helvetica,sans-serif; }
+body[data-app-view] .maya-dialog .maya-dialogue textarea { box-sizing:border-box; width:100%; min-height:90px; max-height:160px; padding:10px; resize:vertical; border:2px solid #12355b; border-radius:5px; background:#fff; color:#12355b; font:400 16px/1.5 Arial,Helvetica,sans-serif; }
+body[data-app-view] .maya-dialog .maya-scene-nav { display:flex; flex-wrap:wrap; gap:10px; }
+body[data-app-view] .maya-dialog .maya-scene-nav button { white-space:normal; }
+@media(max-width:700px) {
+ body[data-app-view] .maya-dialog .maya-stage > .maya-draft-reference { top:10px; left:12px; width:calc(100% - 24px); max-height:80px; font-size:12px; }
+}

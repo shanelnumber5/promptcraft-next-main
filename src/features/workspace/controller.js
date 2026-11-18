@@ -1,3 +1,4 @@
+import { saveFeedbackAnswer, savedFeedbackNotes, emptyFeedbackConversation } from '../design/feedback-conversation.js';
 import { createAiWaiting } from '../design/ai-waiting.js';
 import { designRoute } from './routes.js';
 import { currentFeedbackQuestions, clarificationNotes } from './feedback-questions.js';
@@ -307,6 +308,13 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       saveSafely();
       return;
     }
+    if (control.dataset?.feedbackAnswer !== undefined) {
+      const record = state.creative.conversation ||= emptyFeedbackConversation();
+      if (control.dataset.feedbackAnswer === 'other') record.other = control.value.slice(0,1000);
+      else { const question=currentFeedbackQuestions(state)[Number(control.dataset.feedbackAnswer)]; if(question) saveFeedbackAnswer(state,question,control.value); }
+      saveSafely();
+      return;
+    }
     if (control.dataset?.clarificationAnswer) return controller.updateClarificationAnswer(control);
     const previousContext = assignmentContext(state);
     let movedDraft = false;
@@ -395,6 +403,8 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
         openMayaDialog(source, document.getElementById('review-title'), {
           autoStart: true,
           onReturn: returnFromMaya,
+          onSave: saveSafely,
+          onRevise: reviseFromConversation,
         });
       };
       const cameo = document.querySelector('.babbage-cameo-dialog[open]');
@@ -402,9 +412,52 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       else open();
     },
   });
-  function returnFromMaya() {
+  async function startCompilation(action) {
+      if (ai.pending || reviews.pending || !state.teacher.directions.trim()) return;
+      reworkForReview = action !== 'consult-babbage';
+      draftDestination = action === 'compile-activity' ? 'draft' : 'review';
+      ui = { ...workspaceViews(), task: reworkForReview ? 'draft' : 'explore' };
+      partnerPage = 'work';
+      state.designPanel = 'babbage';
+      controller.syncBabbage();
+      if (clarificationLimitReached(state.babbage)) {
+        render();
+        return;
+      }
+      if (
+        reworkForReview &&
+        state.teacher.learningGoal.trim() &&
+        !state.teacher.learningGoalUnsure &&
+        !isUncertainAnswer(state.teacher.learningGoal) &&
+        state.teacher.aiUse.trim() &&
+        !isUncertainAnswer(state.teacher.aiUse)
+      )
+        state.babbage.ready = true;
+      await controller.askBabbage(state.babbage.ready ? 'revise' : 'clarify');
+  }
+  function reviseFromConversation() {
+    const notes=savedFeedbackNotes(state);
+    if (!notes) return;
+    const previous=assignmentContext(state);
+    const existing=state.workspace.openQuestions || '';
+    const marker='Educator conversation with Maya and Pixel:\n';
+    const applied=state.creative.conversation.appliedNotes;
+    const preserved=applied ? existing.replace(applied,'').trim() : existing;
+    const combined=[preserved,marker+notes].filter(Boolean).join('\n\n');
+    if(combined.length>MAX_WORKSPACE_TEXT) {
+      render();
+      app.querySelector('.design-notice').textContent='Your answers are saved. Shorten the project notes in Build before using them for a revision.';
+      return;
+    }
+    state.workspace.openQuestions=combined;
+    state.creative.conversation.appliedNotes=marker+notes;
+    invalidateWorkspaceApproval(state,previous);
+    syncFinalCheck(); saveSafely();
+    void startCompilation('compile-activity');
+  }
+  function returnFromMaya({completed=false} = {}) {
     if (state.designPanel !== 'reason' || showingWrapUp) return;
-    if (currentFeedbackQuestions(state).length) reviewPage = 'clarify';
+    reviewPage = completed ? (state.design.reason.trim() ? 'checks' : 'reasoning') : 'rationale';
     render();
     document.getElementById('review-title')?.focus({ preventScroll: true });
   }
@@ -771,6 +824,8 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
         openMayaDialog(state, event.target.closest('[data-action]'), {
           autoStart: true,
           onReturn: returnFromMaya,
+          onSave: saveSafely,
+          onRevise: reviseFromConversation,
         });
       else {
         app.querySelector('.design-notice').textContent =
@@ -804,34 +859,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
         return;
       }
     }
-    if (
-      action === 'compile-activity' ||
-      action === 'review-my-design' ||
-      action === 'consult-babbage'
-    ) {
-      if (ai.pending || reviews.pending || !state.teacher.directions.trim()) return;
-      reworkForReview = action !== 'consult-babbage';
-      draftDestination = action === 'compile-activity' ? 'draft' : 'review';
-      ui = { ...workspaceViews(), task: reworkForReview ? 'draft' : 'explore' };
-      partnerPage = 'work';
-      state.designPanel = 'babbage';
-      controller.syncBabbage();
-      if (clarificationLimitReached(state.babbage)) {
-        render();
-        return;
-      }
-      if (
-        reworkForReview &&
-        state.teacher.learningGoal.trim() &&
-        !state.teacher.learningGoalUnsure &&
-        !isUncertainAnswer(state.teacher.learningGoal) &&
-        state.teacher.aiUse.trim() &&
-        !isUncertainAnswer(state.teacher.aiUse)
-      )
-        state.babbage.ready = true;
-      await controller.askBabbage(state.babbage.ready ? 'revise' : 'clarify');
-      return;
-    }
+    if (['compile-activity','review-my-design','consult-babbage'].includes(action)) { await startCompilation(action); return; }
     if (action === 'explore-directions') {
       await exploreDirections();
       return;
@@ -917,6 +945,8 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       openMayaDialog(state, event.target.closest('[data-action]'), {
         autoStart: true,
         onReturn: returnFromMaya,
+        onSave: saveSafely,
+        onRevise: reviseFromConversation,
       });
     else if (action === 'restore-earlier') {
       ui = workspaceViews();
@@ -944,6 +974,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
           approved: state.finalCheck.approved && finalCheckReady(state),
           teacher: state.teacher,
           workspace: state.workspace,
+          conversationNotes: savedFeedbackNotes(state),
         });
         app.querySelector('.design-notice').textContent = 'Your Course Guide download has started.';
       } catch (error) {

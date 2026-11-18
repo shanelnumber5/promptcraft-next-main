@@ -20,6 +20,7 @@ const tests = [
   'babbage-cameo',
   'shared-controller',
   'ai-waiting',
+  'feedback-conversation',
   'architecture',
   'scenario-studio',
   'opening-route',

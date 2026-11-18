@@ -42,7 +42,7 @@ export function loadGuideLogo() {
     .catch(() => null));
 }
 
-export function createGuide(design, { approved = true, logo = null, teacher = null, workspace = null } = {}) {
+export function createGuide(design, { approved = true, logo = null, teacher = null, workspace = null, conversationNotes = '' } = {}) {
   const example = teacherSetup.steps[1].example.directions;
   const stale =
     teacher &&
@@ -65,7 +65,7 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
     sections.push({
       id: 'decision-milestone',
       title: milestoneTitle,
-      body: `<section><h2>${e(milestoneTitle)}</h2>${teacher.learningGoal?.trim() ? `<h3>Learning goal</h3><p>${e(teacher.learningGoal)}</p>` : ''}${design.reason?.trim() ? `<h3>Why this design?</h3>${renderDesignRationale(design.reason, { showSources: false, paragraphBreaks: true })}` : ''}${workspace.instructorPlan?.trim() && !/^(?:i am not sure(?: yet)?|not sure(?: yet)?|not recorded(?: yet)?)\.?$/i.test(workspace.instructorPlan.trim()) ? `<h3>Instructor interaction</h3><p>${e(workspace.instructorPlan)}</p>` : ''}</section>`,
+      body: `<section><h2>${e(milestoneTitle)}</h2>${teacher.learningGoal?.trim() ? `<h3>Learning goal</h3><p>${e(teacher.learningGoal)}</p>` : ''}${design.reason?.trim() ? `<h3>Why this design?</h3>${renderDesignRationale(design.reason, { showSources: false, paragraphBreaks: true })}` : ''}${conversationNotes.trim() ? `<h3>Conversation decisions</h3>${renderAssignmentDirections(conversationNotes)}` : ''}${workspace.instructorPlan?.trim() && !/^(?:i am not sure(?: yet)?|not sure(?: yet)?|not recorded(?: yet)?)\.?$/i.test(workspace.instructorPlan.trim()) ? `<h3>Instructor interaction</h3><p>${e(workspace.instructorPlan)}</p>` : ''}</section>`,
     });
   if (teacher && !design.revision.trim())
     sections.push({
