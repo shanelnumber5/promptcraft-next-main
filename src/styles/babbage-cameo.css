@@ -1,18 +1,18 @@
 /* Babbage's visual-novel Easter egg. Scope framing to this cameo only. */
 body[data-app-view] .babbage-cameo-dialog .maya-actor {
   left: auto;
-  right: 2%;
+  right: max(2%, calc((100vw - 1120px) / 2));
   top: auto;
   bottom: 0;
-  width: 36%;
-  height: 100%;
+  width: min(36%, 403px);
+  height: clamp(280px, calc(100dvh - 300px), 560px);
   overflow: visible;
 }
 body[data-app-view] .babbage-cameo-dialog .maya-actor img {
   position: absolute;
   left: 50%;
-  top: auto;
-  bottom: 0;
+  top: 0;
+  bottom: auto;
   transform: translateX(-50%);
   display: block;
   width: auto;
@@ -20,10 +20,8 @@ body[data-app-view] .babbage-cameo-dialog .maya-actor img {
   max-width: none;
   object-fit: contain;
   object-position: center bottom;
-  top: -4%;
-  bottom: auto;
 }
-body[data-app-view] .babbage-cameo-dialog .maya-dialogue { box-sizing:border-box; width:52%; margin-left:clamp(24px,4vw,56px); }
+body[data-app-view] .babbage-cameo-dialog .maya-dialogue { box-sizing:border-box; width:min(620px, calc(64% - 24px)); margin-left:max(18px, calc((100vw - 1120px) / 2)); }
 body[data-app-view] .babbage-cameo-dialog .maya-dialogue h3,
 body[data-app-view] .babbage-cameo-dialog .maya-dialogue p { color: #fff; }
 body[data-app-view] .babbage-cameo-dialog .maya-dialogue h3 { color: #f4bf38; }
