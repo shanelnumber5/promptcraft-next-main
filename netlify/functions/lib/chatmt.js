@@ -6,9 +6,9 @@ export async function handleChatmt(event, getContract, json, requestId, { timeou
   const model = process.env.CHATMT_MODEL?.trim() || '';
   if (event.httpMethod === 'GET') return json(200, { configured: missing.length === 0, provider: 'chatmt', model, missing });
   if (event.httpMethod !== 'POST') return json(405, { error: { message: 'Use GET or POST.' } });
-  if (missing.length) return json(503, { error: { message: `Missing ChatMT settings: ${missing.join(', ')}` } });
+  if (missing.length) return json(503, { error: { message: `Missing Chat MT AI settings: ${missing.join(', ')}` } });
   const base = process.env.CHATMT_BASE_URL.trim().replace(/\/+$/, '');
-  if (base !== 'https://my.chatmt.ai/bedrock') return json(503, { error: { message: 'Invalid ChatMT base URL.' } });
+  if (base !== 'https://my.chatmt.ai/bedrock') return json(503, { error: { message: 'Invalid Chat MT AI base URL.' } });
   let incoming;
   try { incoming = JSON.parse(event.body || '{}'); }
   catch { return json(400, { error: { message: 'Expected a JSON request.' } }); }
@@ -40,18 +40,18 @@ export async function handleChatmt(event, getContract, json, requestId, { timeou
         const problem = await response.json();
         detail = String(problem.error?.message || problem.message || '').replaceAll(process.env.CHATMT_API_KEY.trim(), '[redacted]').slice(0, 700);
       } catch {}
-      return json(response.status === 429 ? 429 : 502, { error: { message: 'ChatMT HTTP ' + response.status + '. ' + detail } });
+      return json(response.status === 429 ? 429 : 502, { error: { message: 'Chat MT AI HTTP ' + response.status + '. ' + detail } });
     }
     const data = await response.json();
     const text = (data.content || []).filter(block => block.type === 'text').map(block => block.text).join('\n');
     let analysis;
     try { analysis = JSON.parse(text.trim().replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '')); }
-    catch { return json(502, { error: { message: 'ChatMT returned invalid JSON analysis.', stop_reason: data.stop_reason, text_length: text.length } }); }
+    catch { return json(502, { error: { message: 'Chat MT AI returned invalid JSON analysis.', stop_reason: data.stop_reason, text_length: text.length } }); }
     if (!analysis || typeof analysis !== 'object' || Array.isArray(analysis) || data.stop_reason === 'max_tokens') {
-      return json(502, { error: { message: 'ChatMT returned an incomplete analysis. Retry your review.' } });
+      return json(502, { error: { message: 'Chat MT AI returned an incomplete analysis. Retry your review.' } });
     }
     return json(200, { status: 'ok', provider: 'chatmt', model: data.model || model, analysis_schema: contract.schemaVersion, analysis_type: contract.analysisType, request_id: requestId, elapsed_ms: Date.now() - started, analysis, usage: data.usage || null });
   } catch (error) {
-    return json(502, { error: { message: error.name === 'TimeoutError' ? 'ChatMT took too long to complete this request. Retry or continue editing.' : 'ChatMT could not complete the review. Retry or continue editing.' } });
+    return json(502, { error: { message: error.name === 'TimeoutError' ? 'Chat MT AI took too long to complete this request. Retry or continue editing.' : 'Chat MT AI could not complete the review. Retry or continue editing.' } });
   }
 }

@@ -92,7 +92,7 @@ export async function requestBabbageTurn(state, intent, { fetchImpl = fetch, sig
     signal,
     httpError: (status, details) =>
       Error(
-        typeof details?.error?.message === 'string' && details.error.message.startsWith('ChatMT')
+        typeof details?.error?.message === 'string' && details.error.message.startsWith('Chat MT AI')
           ? details.error.message + ' Your draft is saved.'
           : status === 429
           ? 'Babbage has reached a usage limit. Try again later or continue editing your draft.'

@@ -25,12 +25,12 @@ if (!/^deploy-preview-\d+--promptcraft-discussion\.netlify\.app$/.test(host)) {
       body: JSON.stringify({ model: process.env.CHATMT_MODEL.trim(), max_tokens: 1200, system: SYSTEM, messages: [{ role: 'user', content: DRAFT }] }),
       signal: AbortSignal.timeout(45000)
     });
-    if (!response.ok) return json(502, { error: `ChatMT returned HTTP ${response.status}. Check the API key and model ID in preview settings.`, upstream_status: response.status });
+    if (!response.ok) return json(502, { error: `Chat MT AI returned HTTP ${response.status}. Check the API key and model ID in preview settings.`, upstream_status: response.status });
     const data = await response.json();
     const feedback = (data.content || []).filter(block => block.type === 'text').map(block => block.text).join('\n\n');
-    if (!feedback.trim()) return json(502, { error: 'ChatMT responded without text feedback.' });
+    if (!feedback.trim()) return json(502, { error: 'Chat MT AI responded without text feedback.' });
     return json(200, { model: data.model || process.env.CHATMT_MODEL, feedback, elapsed_ms: Date.now() - started, stop_reason: data.stop_reason });
   } catch {
-    return json(502, { error: 'The ChatMT request failed or exceeded 45 seconds. Try again.' });
+    return json(502, { error: 'The Chat MT AI request failed or exceeded 45 seconds. Try again.' });
   }
 }

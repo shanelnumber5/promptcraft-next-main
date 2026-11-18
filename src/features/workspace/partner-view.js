@@ -1,3 +1,4 @@
+import { renderBabbageMessage } from '../../shared/babbage-feedback.js';
 import { clarificationLimitReached, renderClarificationPause } from '../design/turn-state.js';
 import { renderWorkspaceDisclosure } from './disclosure.js';
 import { renderBabbageCameo } from '../../shared/babbage-cameo.js';
@@ -21,7 +22,7 @@ export function renderPartner(state, ai, page, preview, ui = {}) {
   if (page === 'history') {
     const index=Math.max(0,Math.min(ui.historyIndex ?? conversation.history.length-1,conversation.history.length-1));
     const turn=conversation.history[index];
-    content=`<h3>Earlier conversation</h3>${turn?`<p>${turn.role==='assistant'?'Babbage':'Your answers'}</p>${renderReading(turn.display||turn.content)}<nav class="workspace-reading-nav"><button type="button" data-history-index="${index-1}"${index===0?' disabled':''}>Earlier message</button><span>${index+1} / ${conversation.history.length}</span><button type="button" data-history-index="${index+1}"${index===conversation.history.length-1?' disabled':''}>Later message</button></nav>`:'<p>No earlier messages yet.</p>'}`;
+    content=`<h3>Earlier conversation</h3>${turn?`<p>${turn.role==='assistant'?'Babbage':'Your answers'}</p>${renderBabbageMessage(turn.display||turn.content)}<nav class="workspace-reading-nav"><button type="button" data-history-index="${index-1}"${index===0?' disabled':''}>Earlier message</button><span>${index+1} / ${conversation.history.length}</span><button type="button" data-history-index="${index+1}"${index===conversation.history.length-1?' disabled':''}>Later message</button></nav>`:'<p>No earlier messages yet.</p>'}`;
     actions = '';
   } else if (page === 'options') {
     content = `<h3>Connection status</h3><p>${offline ? 'The connection is currently unavailable.' : dev ? 'Creative sketches require a live connection.' : ai.configured === true ? 'Babbage is connected.' : 'Checking the connection…'}</p>`;
@@ -83,8 +84,6 @@ export function renderPartner(state, ai, page, preview, ui = {}) {
   const latestMessage = conversation.history.findLast(turn=>turn.role==='assistant')?.display || '';
   const feedbackMessage = !ai.pending && (ai.error === latestMessage || (!ai.error && conversation.questions.length)) ? latestMessage : '';
   const status = feedbackMessage ? '' : ai.error || (!dev && ai.configured === null ? 'Checking the Babbage connection…' : '');
-  // Preserve saved messages while rendering their escaped Markdown as readable feedback.
-  const formattedFeedback = feedbackMessage.replace(/\s+(\d+[.)])\s+(?=\*\*)/g, '\n$1 ');
-  const feedback = feedbackMessage ? `<section class="babbage-feedback" aria-label="Babbage feedback">${renderReading(formattedFeedback)}</section>` : '';
+  const feedback = feedbackMessage ? `<section class="babbage-feedback" aria-label="Babbage feedback">${renderBabbageMessage(feedbackMessage)}</section>` : '';
   return `<div class="workspace-design workspace-design--focused partner-layout partner-layout--focused${utilityPage ? ' partner-layout--utility' : ''}"><section class="workspace-context workspace-page partner-card ai-panel${welcome ? ' partner-card--welcome' : ''}" aria-labelledby="ai-title"><header class="partner-heading ai-panel-heading"><h2 class="workspace-build-title" id="ai-title" tabindex="-1">${page==='options'?'Babbage connection':ui.task==='draft'?'Develop your activity with Babbage':'Explore with Babbage'}</h2>${dev ? '<p class="partner-mode">Sample simulation · no AI call</p>' : ''}</header><div class="design-page-fields partner-content">${renderWorkspaceDisclosure(state)}${renderBabbageCameo(state,status)}<p class="ai-status" role="status" aria-live="polite">${e(status)}</p>${feedback}${content}</div>${actions ? `<footer class="workspace-action-bar partner-actions">${actions}</footer>` : ''}</section></div>`;
 }

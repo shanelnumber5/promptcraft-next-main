@@ -16,7 +16,7 @@ export default async function handler(request) {
       (statusCode, body) => ({ statusCode, body: JSON.stringify(body) }), id, { timeoutMs: 240000 });
     await store.setJSON(id, { createdAt: record.data.createdAt, result });
   } catch {
-    await store.setJSON(id, { createdAt: record.data.createdAt, result: { statusCode: 502, body: JSON.stringify({ error: { message: 'ChatMT could not complete this consultation. Please retry.' } }) } });
+    await store.setJSON(id, { createdAt: record.data.createdAt, result: { statusCode: 502, body: JSON.stringify({ error: { message: 'Chat MT AI could not complete this consultation. Please retry.' } }) } });
   }
   // Remove abandoned output as well as results acknowledged by the browser.
   // The request content itself is never written to the store.

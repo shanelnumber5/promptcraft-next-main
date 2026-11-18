@@ -16,7 +16,7 @@ export async function postJSON(
     let pending;
     try { pending = await response.json(); } catch { throw Error(unreadableMessage); }
     if (!/^[a-f0-9]{32}$/.test(pending?.job_id || '')) throw Error(unreadableMessage);
-    if (Date.now() - started > 300000) throw Error('ChatMT took too long. Your draft is saved. Please retry.');
+    if (Date.now() - started > 300000) throw Error('Chat MT AI took too long. Your draft is saved. Please retry.');
     pollUrl = `${url}${url.includes('?') ? '&' : '?'}job=${pending.job_id}`;
     await new Promise((resolve, reject) => {
       const abort = () => {

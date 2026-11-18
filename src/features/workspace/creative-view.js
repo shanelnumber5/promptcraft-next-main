@@ -1,7 +1,8 @@
+import { renderInlineProse } from '../../shared/directions.js';
 import { escapeHTML as e } from '../../shared/html.js';
 export function renderPossibilities(state, ai, extraActions='', includeActions=true) {
   const items=state.creative.directions;
-  return `<section class="creative-possibilities" aria-labelledby="possibilities-title" tabindex="-1"><h3 id="possibilities-title">${items.length?'Choose an idea to explore.':'Where could this go?'}</h3>${items.length?`<div class="workspace-short-list">${items.map((item,index)=>`<article class="creative-sketch"><h4>${e(item.title)}</h4><p>${e(item.description)}</p><button type="button" id="workspace-idea-${index}" data-view-direction="${index}">View idea</button></article>`).join('')}</div>`:'<p>Try three approaches to your idea or activity. A learning purpose can take shape as you explore.</p>'}${includeActions?`<div class="workspace-view-actions">${renderPossibilityActions(state,ai,extraActions)}</div>`:''}</section>`;
+  return `<section class="creative-possibilities" aria-labelledby="possibilities-title" tabindex="-1"><h3 id="possibilities-title">${items.length?'Choose an idea to explore.':'Where could this go?'}</h3>${items.length?`<div class="workspace-short-list">${items.map((item,index)=>`<article class="creative-sketch"><h4>${e(item.title)}</h4><p>${renderInlineProse(item.description)}</p><button type="button" id="workspace-idea-${index}" data-view-direction="${index}">View idea</button></article>`).join('')}</div>`:'<p>Try three approaches to your idea or activity. A learning purpose can take shape as you explore.</p>'}${includeActions?`<div class="workspace-view-actions">${renderPossibilityActions(state,ai,extraActions)}</div>`:''}</section>`;
 }
 export function renderPossibilityActions(state, ai, extraActions='') {
   const disabled=ai.pending||state.babbage.mode==='dev'||ai.configured!==true||!state.teacher.directions.trim();

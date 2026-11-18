@@ -209,7 +209,7 @@ const pages = {
       },
       {
         "title": "When you ask for AI help",
-        "body": "<p>Sending a Babbage message shares assignment context and your answers with the existing Babbage service and OpenAI.</p><p>Requesting Maya’s reading shares your original and revised directions, design context, and earlier readings with the same service. Use fictional examples and remove identifying information before requesting help.</p>",
+        "body": "<p>Sending a Babbage message shares assignment context and your answers with the existing Babbage service and Chat MT AI.</p><p>Requesting Maya’s reading shares your original and revised directions, design context, and earlier readings with the same service. Use fictional examples and remove identifying information before requesting help.</p>",
         "visual": "engine"
       },
       {
@@ -219,7 +219,7 @@ const pages = {
       },
       {
         "title": "External service privacy",
-        "body": "<p>AI requests use the existing Babbage service and OpenAI. Information sent with a request leaves the browser to receive a response.</p><p>This prototype does not establish those services’ retention or deletion practices. Resetting a local workspace clears that path’s browser save; it does not request deletion from an external service. Keep confidential information out of requests.</p>",
+        "body": "<p>AI requests use the existing Babbage service and Chat MT AI. Information sent with a request leaves the browser to receive a response.</p><p>This prototype does not establish those services’ retention or deletion practices. Resetting a local workspace clears that path’s browser save; it does not request deletion from an external service. Keep confidential information out of requests.</p>",
         "visual": "engine"
       },
       {

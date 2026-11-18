@@ -21,7 +21,7 @@ Review starts the first Babbage check automatically; subsequent checks are educa
 
 ## AI and privacy
 
-AI requests send assignment details and design notes to the configured Babbage service and OpenAI. Babbage is a collaborator; the educator decides what to accept. Maya is a fictional student perspective, not evidence of actual student experience. The prototype does not collect formal participant research data.
+AI requests send assignment details and design notes to the configured Babbage service and Chat MT AI. Babbage is a collaborator; the educator decides what to accept. Maya is a fictional student perspective, not evidence of actual student experience. The prototype does not collect formal participant research data.
 
 The browser uses the existing backend at `https://promptcraft-discussion.netlify.app/.netlify/functions/babbage`. Its API key stays on the backend. The `scenario1` request envelope and legacy response field names remain unchanged. The local server serves static files and needs no AI key. Errors preserve your work; Dev simulation is labeled and never silently substitutes for a failed live request.
 

@@ -1,7 +1,7 @@
 import { renderLoading } from '../design/loading.js';
 import { renderFeedbackClarifications } from './feedback-questions.js';
 import { teachingNoteSuggestions } from './teaching-notes.js';
-import { parseBabbageFeedback } from '../../shared/babbage-feedback.js';
+import { renderBabbageMessage } from '../../shared/babbage-feedback.js';
 import { renderAssignmentDirections } from '../../shared/directions.js';
 import { renderWorkspaceDisclosure } from './disclosure.js';
 import { renderBabbageCameo } from '../../shared/babbage-cameo.js';
@@ -19,12 +19,7 @@ export function renderReview(state, ai, page, preview) {
   const pending = ai.pending || review.status === 'pending';
   const current = review.fingerprint === reviewFingerprint(state);
   const hasDraft = reviewEligible(state);
-  // Older saved reviews may be a single paragraph. Break at sentence boundaries,
-  // preserving the exact wording while keeping feedback readable.
-  const reviewMessage = parseBabbageFeedback(review.feedback).message;
-  const sentences = [...new Intl.Segmenter('en', {granularity:'sentence'}).segment(reviewMessage)].map(part=>part.segment);
-  const feedbackText = reviewMessage.includes('\n') ? reviewMessage : sentences.reduce((text, sentence, index)=>text+(index && index%2===0?'\n\n':'')+sentence,'');
-  const feedback = review.feedback ? `${renderBabbageCameo(state, review.feedback)}<div class="workspace-review-feedback">${current ? '' : '<p class="workspace-review-version">Earlier draft</p>'}${renderAssignmentDirections(feedbackText)}</div>` : '';
+  const feedback = review.feedback ? `${renderBabbageCameo(state, review.feedback)}<div class="workspace-review-feedback">${current ? '' : '<p class="workspace-review-version">Earlier draft</p>'}${renderBabbageMessage(review.feedback)}</div>` : '';
   let supportsTeachingNotes=false;
   try { supportsTeachingNotes=Boolean(JSON.parse(review.feedback)?.teaching_notes); } catch { /* Legacy prose review. */ }
   const proposals = teachingNoteSuggestions(state);

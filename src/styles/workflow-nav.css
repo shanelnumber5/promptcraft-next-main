@@ -1016,11 +1016,11 @@ body[data-app-view] .maya-dialog--workspace:not(.maya-dialog--novel)[data-speake
 #workspace-panel .workspace-ai-review { border:0; }
 
 /* Assignment prose has its own scale, independent of application headings. */
-body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel :is(.workspace-reading-preview,.partner-suggestion,.workspace-writing .directions-editor) h4 { font:700 20px/1.35 Arial,Helvetica,sans-serif !important; margin:20px 0 8px; }
-#workspace-panel :is(.workspace-reading-preview,.partner-suggestion,.workspace-writing .directions-editor) h4:first-child { margin-top:0; }
-#workspace-panel :is(.workspace-reading-preview,.partner-suggestion,.workspace-writing .directions-editor) p { margin:0 0 12px; line-height:1.55; white-space:normal; }
-#workspace-panel :is(.workspace-reading-preview,.partner-suggestion,.workspace-writing .directions-editor) .assignment-steps { margin:8px 0 14px; padding-left:24px; }
-#workspace-panel :is(.workspace-reading-preview,.partner-suggestion,.workspace-writing .directions-editor) li { margin:5px 0; line-height:1.55; }
+body[data-app-view='workspace'] .workspace-shell--focused #workspace-panel :is(.workspace-reading-preview,.partner-suggestion,.workspace-writing .directions-editor,.workspace-reading,.feedback-prose,.workspace-review-feedback,.workspace-check-reference) h4 { font:700 20px/1.35 Arial,Helvetica,sans-serif !important; margin:20px 0 8px; }
+#workspace-panel :is(.workspace-reading-preview,.partner-suggestion,.workspace-writing .directions-editor,.workspace-reading,.feedback-prose,.workspace-review-feedback,.workspace-check-reference) h4:first-child { margin-top:0; }
+#workspace-panel :is(.workspace-reading-preview,.partner-suggestion,.workspace-writing .directions-editor,.workspace-reading,.feedback-prose,.workspace-review-feedback,.workspace-check-reference) p { margin:0 0 12px; line-height:1.55; white-space:normal; }
+#workspace-panel :is(.workspace-reading-preview,.partner-suggestion,.workspace-writing .directions-editor,.workspace-reading,.feedback-prose,.workspace-review-feedback,.workspace-check-reference) .assignment-steps { margin:8px 0 14px; padding-left:24px; }
+#workspace-panel :is(.workspace-reading-preview,.partner-suggestion,.workspace-writing .directions-editor,.workspace-reading,.feedback-prose,.workspace-review-feedback,.workspace-check-reference) li { margin:5px 0; line-height:1.55; }
 #workspace-panel .workspace-ai-columns > [data-setup-form] > .setup-field { margin:0; }
 #workspace-panel .workspace-ai-columns .radio-cards { flex:1; margin:0; grid-auto-rows:1fr; }
 #workspace-panel .workspace-ai-columns .radio-cards label { margin:0; }
@@ -1118,7 +1118,11 @@ body[data-app-view] .maya-dialog header button { flex:none; min-width:64px; whit
   body[data-app-view] .maya-dialog .maya-scene-nav button { flex:1 1 0; min-width:0; padding:8px; }
 }
 
-/* Keep conversational feedback readable beside the clarification form. */
-#workspace-panel .babbage-feedback p { margin:0 0 16px; line-height:1.6; }
-#workspace-panel .babbage-feedback .assignment-steps { margin:12px 0 20px; padding-left:26px; }
-#workspace-panel .babbage-feedback li { margin:0 0 12px; line-height:1.6; }
+/* Feedback, conversation history and activity previews use the same prose rhythm. */
+body[data-app-view] .feedback-prose { font-family:var(--font-body); font-size:16px; line-height:1.55; overflow-wrap:anywhere; }
+body[data-app-view] .feedback-prose p { margin:0 0 12px; line-height:1.55; }
+body[data-app-view] .feedback-prose .assignment-steps { margin:8px 0 14px; padding-left:24px; }
+body[data-app-view] .feedback-prose li { margin:5px 0; line-height:1.55; }
+body[data-app-view] .feedback-prose h4 { margin:20px 0 8px; font:700 20px/1.35 var(--font-body); }
+body[data-app-view] .feedback-prose h4:first-child { margin-top:0; }
+body[data-app-view] .feedback-prose > :last-child { margin-bottom:0; }

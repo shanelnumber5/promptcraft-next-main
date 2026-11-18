@@ -15,6 +15,20 @@ const assert = require('node:assert/strict');
   assert(!clarificationView.includes('**Evidence sort.**'));
   assert(!clarificationView.includes('<script>'));
   assert(clarificationView.includes('&lt;script&gt;'));
+  const {renderBabbageMessage} = await import('../../src/shared/babbage-feedback.js');
+  const {renderInlineProse} = await import('../../src/shared/directions.js');
+  const message = 'Keep **the decision**. Ask a useful question. Consider the tradeoff.';
+  const formatted = renderBabbageMessage(message);
+  assert(formatted.includes('<strong>the decision</strong>'));
+  assert(formatted.includes('</p><p>'));
+  assert.equal(renderBabbageMessage(JSON.stringify({version:1,tone:'serious',message,aside:''})),formatted,'Saved structured feedback uses the same formatting');
+  assert.equal(renderInlineProse('**Decision** <img src=x onerror=alert(1)>'),'<strong>Decision</strong> &lt;img src=x onerror=alert(1)&gt;','Dialogue emphasis is escaped safely');
+  const fs = require('node:fs');
+  for (const file of ['index.html','src/features/entry/info-screen.js','src/features/workspace/disclosure.js','src/features/design/conversation-view.js','src/features/design/maya-dialog.js']) {
+    const source = fs.readFileSync(require('node:path').join(__dirname,'../..',file),'utf8');
+    assert(!/Open\s?AI/.test(source),file+' must use Chat MT AI in visible copy');
+    assert(source.includes('Chat MT AI'),file+' includes the requested provider name');
+  }
   const state = freshWorkspace();
   state.design.revision = 'Students compare evidence and revise a recommendation.';
   state.design.reason = 'Support reasoning.';

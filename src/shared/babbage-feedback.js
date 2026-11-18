@@ -1,3 +1,5 @@
+import { renderAssignmentDirections } from './directions.js';
+
 // Keep the service envelope unchanged: structured dialogue travels in its string field.
 export const humorInstructions = `Interpret educator tone in context, including previous answers. Sarcasm is not necessarily agreement or a literal instruction. Distinguish playful, sarcastic, frustrated, uncertain, and serious responses. If uncertain about tone, choose serious or uncertain and respond constructively without a joke. Recognizing humor does not require answering with humor.
 Examples of interpretation, not fixed replies:
@@ -18,4 +20,16 @@ export function parseBabbageFeedback(text) {
     return {message:value.message.trim(), tone:value.tone, structured:true,
       aside:['playful','sarcastic'].includes(value.tone) && value.aside.trim().length<=240 ? value.aside.trim() : ''};
   } catch { return fallback; }
+}
+
+// Current feedback, clarification and saved conversations share the same prose layout.
+export function renderBabbageMessage(text) {
+  let message = parseBabbageFeedback(text).message.trim();
+  if (!message) return '';
+  message = message.replace(/\s+(\d+[.)])\s+(?=\*\*)/g, '\n$1 ');
+  if (!message.includes('\n')) {
+    const sentences = [...new Intl.Segmenter('en', { granularity: 'sentence' }).segment(message)];
+    message = sentences.map(({ segment }, index) => (index && index % 2 === 0 ? '\n\n' : '') + segment).join('');
+  }
+  return `<div class="feedback-prose">${renderAssignmentDirections(message)}</div>`;
 }
