@@ -11,6 +11,21 @@ export const emptyRubric = () => ({
   basis: '',
   rows: [],
 });
+export function assignmentName(state) {
+  const explicit=state.workspace?.assignmentTitle?.trim();
+  if(explicit)return explicit;
+  const legacy=state.creative?.rubric?.title?.trim();
+  return legacy && legacy!=='Assignment rubric' ? legacy.replace(/\s+rubric$/i,'') : 'Your activity';
+}
+export function rubricForState(state) {
+  const rubric=state.creative?.rubric || emptyRubric();
+  const name=assignmentName(state);
+  return {...rubric,title:name==='Your activity' ? rubric.title : name+' rubric',submission:state.workspace?.studentContribution?.trim() || rubric.submission || state.design.revision || state.teacher.directions};
+}
+export function renderAssessmentSetup(state) {
+  const rubric=rubricForState(state);
+  return `<p>Use the learning goal and directions already entered in Build. Add only the assessment choices that are not clear there.</p><p><strong>Learning goal:</strong> ${e(state.teacher.learningGoal || 'Add a learning goal in Course & learners.')}</p><div class="rubric-parameters"><label>Total points<input type="number" min="1" max="10000" step="1" data-rubric-param="total" value="${e(rubric.total)}"></label><label>Assessment criteria, one per line<textarea data-rubric-param="criteria" rows="4" maxlength="2000" placeholder="Name the work you want to assess">${e(rubric.criteria)}</textarea></label></div><p>The rubric uses three performance levels: strong, developing, and not yet demonstrated. Criteria share the total points evenly; ratings receive full, half, or zero points.</p>`;
+}
 export function restoreRubric(value) {
   const result = emptyRubric();
   if (!value || typeof value !== 'object') return result;
@@ -63,7 +78,7 @@ export function rubricIssue(rubric) {
   return '';
 }
 export async function generateRubric(state, { signal, onProgress, fetchImpl = fetch } = {}) {
-  const rubric = state.creative.rubric;
+  const rubric = rubricForState(state);
   const issue = rubricIssue(rubric);
   if (issue) throw Error(issue);
   const names = rubricCriteria(rubric),
@@ -132,9 +147,10 @@ export function renderRubricTable(rubric, { editable = false } = {}) {
   return `<div class="rubric-table-scroll"><table class="assignment-rubric"><caption>${e(rubric.title)} · ${rubric.rows.reduce((n, r) => n + r.points, 0)} points</caption><thead><tr><th scope="col">Criterion</th>${ratingNames.map((name) => `<th scope="col">${name}</th>`).join('')}</tr></thead><tbody>${rubric.rows.map((row, i) => `<tr><th scope="row">${cell(row.name, i, 'name')}<p>${cell(row.description, i, 'description')}</p><strong>${row.points} points</strong></th>${row.ratings.map((text, j) => `<td>${cell(text, i, 'ratings', j)}<p>${j === 0 ? row.points : j === 1 ? row.points / 2 : 0} points</p></td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
 export function renderRubric(state, pending = false) {
-  const rubric = state.creative.rubric || emptyRubric();
-  return `<section class="rubric-builder"><p>Create a rubric students can use alongside the assignment. Confirm the assignment parameters, then review and edit every descriptor.</p><div class="rubric-parameters"><label>Rubric title<input data-rubric-param="title" value="${e(rubric.title)}" maxlength="200"></label><label>What will students submit?<textarea data-rubric-param="submission" rows="2" maxlength="2000" placeholder="For example: a recommendation, one evidence-based reply, and a revised decision">${e(rubric.submission)}</textarea></label><label>Total points<input type="number" min="1" max="10000" step="1" data-rubric-param="total" value="${e(rubric.total)}"></label><label>What should the rubric assess? One criterion per line, up to eight.<textarea data-rubric-param="criteria" rows="3" maxlength="2000" placeholder="Use of case evidence&#10;Reasoning about tradeoffs&#10;Response to feedback">${e(rubric.criteria)}</textarea></label></div><p>Points are split evenly across your criteria. The three ratings receive full, half, or zero points. Edit the CSV after downloading if you want different weights or rating levels.</p><button type="button" data-action="generate-rubric"${pending || !state.design.revision.trim() ? ' disabled' : ''}>${rubric.rows.length ? 'Regenerate rubric' : 'Create rubric'}</button><p data-rubric-notice role="status"></p>${rubric.rows.length ? `${rubric.basis !== state.design.revision ? '<p class="rubric-stale">The assignment has changed since this rubric was created. Check the criteria and descriptors before using it.</p>' : ''}${renderRubricTable(rubric, { editable: true })}<div class="guide-download-actions"><button type="button" data-action="download-rubric-csv">Download Canvas rubric CSV</button><button type="button" data-action="download-rubric-html">Download visual rubric</button></div>` : ''}</section>`;
+  const rubric = rubricForState(state);
+  return `<section class="rubric-builder"><p>Rubric for <strong>${e(assignmentName(state))}</strong>. The directions, learning goal, student work, and assessment criteria come from your Build pages.</p><p>Review each descriptor before using this rubric with students.</p><div class="guide-download-actions"><button type="button" data-design-page="assessment">Edit assessment criteria</button><button type="button" data-action="generate-rubric"${pending || !state.design.revision.trim() ? ' disabled' : ''}>${rubric.rows.length ? 'Regenerate rubric' : 'Create rubric'}</button></div>${!state.design.revision.trim()?'<p>Build your activity draft first, then create its rubric.</p>':''}<p data-rubric-notice role="status"></p>${rubric.rows.length ? `${rubric.basis !== state.design.revision ? '<p class="rubric-stale">The assignment has changed since this rubric was created. Check the criteria and descriptors before using it.</p>' : ''}${renderRubricTable(rubric, { editable: true })}<div class="guide-download-actions"><button type="button" data-action="download-rubric-csv">Download Canvas rubric CSV</button><button type="button" data-action="download-rubric-html">Download visual rubric</button></div>` : ''}</section>`;
 }
+
 const csvCell = (value) => '"' + String(value).replaceAll('"', '""') + '"';
 export function rubricCSV(rubric) {
   const header = [

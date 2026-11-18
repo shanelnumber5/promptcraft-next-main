@@ -127,7 +127,7 @@ const assert = require('node:assert/strict');
   const presence=renderWorkspace(presenceState,{configured:true,pending:false},'', 'presence');
   assert(presence.includes('feedback, questions, or check-ins') && presence.includes('realistic for your workload'), 'Instructor presence asks about responsive and sustainable teaching');
   const {buildPages}=await import('../../src/features/workspace/views.js');
-  assert.deepEqual(buildPages.map(([id])=>id), ['start','subject','ai-use','sharing','intentions','presence','draft']);
+  assert.deepEqual(buildPages.map(([id])=>id), ['start','subject','ai-use','sharing','intentions','presence','assessment','draft','rubric']);
   for (const [page, ids] of [['subject',['subject','learningGoal','learnerLevel','student-needs','workTime','daysAvailable']],['ai-use',['mustStay','aiUseDetails']],['presence',['instructor-plan','open-questions']]]) {
     const html=renderWorkspace(presenceState,{configured:true,pending:false},'',page);
     for(const id of ids) assert(html.includes(`id="${id}"`), `${page} retains ${id}`);
@@ -147,7 +147,8 @@ const assert = require('node:assert/strict');
   state.creative.mayaPaused = false;
   assert(renderUtility(state,{},{screen:'maya'}).includes('data-action="hear-maya"'));
   const guide = createGuide(state.design, { teacher: state.teacher, workspace: state.workspace });
-  for (const text of [state.workspace.instructorPlan]) assert(guide.includes(text));
+  assert(!guide.includes('Design decisions'));
+  assert.equal(state.workspace.instructorPlan,'Respond to initial reasoning and give final feedback.');
   const guidedRequest = buildBabbageRequest(initialState(discussionOpening), 'clarify');
   assert(!guidedRequest.system.includes('workspace.selectedDirection'));
   assert(buildCreativeRequest(state).system.includes('ONLY JSON'));

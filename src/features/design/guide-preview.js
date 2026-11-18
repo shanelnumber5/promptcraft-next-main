@@ -1,10 +1,11 @@
+import {rubricForState} from '../workspace/rubric.js';
 import { savedFeedbackNotes } from './feedback-conversation.js';
 import { createGuide } from './guide.js';
 import { showModal } from '../../shared/modal.js';
 export function openGuidePreview(state, app, { onClose = null } = {}) {
   const dialog=document.createElement('dialog');dialog.className='guide-preview';dialog.setAttribute('aria-label','Course Guide preview');
   dialog.innerHTML='<header class="guide-preview-toolbar"><strong>Course Guide preview</strong><button type="button" data-guide-close aria-label="Close assignment guide preview">Close</button></header><nav class="guide-preview-sections" aria-label="Guide sections"></nav><iframe title="Your assignment guide" sandbox="allow-popups allow-popups-to-escape-sandbox"></iframe><footer class="guide-preview-actions"><button type="button" data-guide-back>Previous section</button><span data-guide-page></span><button type="button" data-guide-next>Next section</button></footer>';
-  const html=createGuide({...state.design},{approved:state.finalCheck.approved,teacher:{...state.teacher},workspace:state.workspace?{...state.workspace}:null,conversationNotes:savedFeedbackNotes(state),rubric:state.creative?.rubric});
+  const html=createGuide({...state.design},{approved:state.finalCheck.approved,teacher:{...state.teacher},workspace:state.workspace?{...state.workspace}:null,conversationNotes:savedFeedbackNotes(state),rubric:rubricForState(state)});
   const parsed=new DOMParser().parseFromString(html,'text/html');
   const sections=[...parsed.querySelectorAll('.guide-section')];
   let page=0;

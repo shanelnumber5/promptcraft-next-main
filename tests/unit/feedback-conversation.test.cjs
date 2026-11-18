@@ -22,7 +22,7 @@ const assert=require('node:assert/strict');
  assert(savedFeedbackNotes(imported).includes('Pixel: What will you look for?'));
  assert.equal(imported.design.revision,before,'Conversation answers never silently rewrite the draft');
  const html=createGuide(imported.design,{workspace:imported.workspace,teacher:imported.teacher,conversationNotes:savedFeedbackNotes(imported),approved:false});
- assert(html.includes('Conversation decisions')&&html.includes('Use the supplied staffing case.'));
+ assert(!html.includes('Conversation decisions') && !html.includes('Educator:'));
  saveFeedbackAnswer(imported,questions[0],'<script>bad()</script>');
  assert(!renderFeedbackClarifications(imported,false).includes('<script>'));
  console.log('PASS: conversation question ownership, immediate save/reload, backup/import, legacy form restoration, draft preservation and guide notes. Offline only.');

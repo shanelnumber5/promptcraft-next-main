@@ -55,6 +55,18 @@ const assert = require('node:assert/strict');
   state.creative.rubric.rows = rows;
   state.creative.rubric.basis = state.design.revision;
   state.creative.rubric.confirmed = true;
+  const {rubricForState}=await import('../../src/features/workspace/rubric.js');
+  const {renderBuildPage}=await import('../../src/features/workspace/build-view.js');
+  state.workspace.assignmentTitle='Staffing choices';
+  state.workspace.studentContribution='A recommendation and a peer response';
+  assert.equal(rubricForState(state).title,'Staffing choices rubric');
+  assert.equal(rubricForState(state).submission,state.workspace.studentContribution);
+  assert(!renderBuildPage(state,{pending:false},'rubric').includes('What will students submit?'));
+  assert(renderBuildPage(state,{pending:false},'assessment').includes('Assessment criteria, one per line'));
+  const guideWithRubric=createGuide(state.design,{teacher:state.teacher,workspace:state.workspace,rubric:rubricForState(state),conversationNotes:'Maya: Private NPC question\nEducator: Internal answer'});
+  assert(guideWithRubric.includes('Staffing choices rubric'));
+  assert(guideWithRubric.includes('<title>Staffing choices</title>'));
+  assert(!guideWithRubric.includes('Private NPC question') && !guideWithRubric.includes('Design decisions'));
   const csv = rubricCSV(state.creative.rubric);
   assert(
     csv.startsWith(

@@ -1,3 +1,4 @@
+import {assignmentName,renderAssessmentSetup,renderRubric} from './rubric.js';
 import { isUncertainAnswer } from '../design/input-quality.js';
 import { findIdea } from '../idea-lab/ideas.js';
 import { teacherSetup } from '../setup/content.js';
@@ -38,7 +39,7 @@ export const buildSections = [
     id: 'start',
     title: 'Starting point',
     render: (state) =>
-      `<fieldset><legend>What are you bringing?</legend>${[
+      `<div class="setup-field"><label for="assignment-title">Assignment title</label><input id="assignment-title" data-workspace-meta="assignmentTitle" maxlength="200" value="${e(assignmentName(state)==='Your activity'?'':assignmentName(state))}" placeholder="Name your assignment"></div><fieldset><legend>What are you bringing?</legend>${[
         ['existing', 'Existing directions'],
         ['idea', 'A rough idea'],
       ]
@@ -95,10 +96,10 @@ export const buildSections = [
   {
     id: 'presence',
     title: 'Instructor interaction',
-    compile: true,
     render: (state) =>
       `<p class="workspace-field-help">Where could your feedback, questions, or check-ins help students learn? Consider an approach that is realistic for your workload.</p><div class="workspace-stacked-fields"><div>${metaField('instructor-plan', 'instructorPlan', 'How will you interact with students?', state.workspace.instructorPlan)}</div><div>${metaField('open-questions', 'openQuestions', 'Questions to revisit (optional)', state.workspace.openQuestions)}</div></div>`,
   },
+  {id:'assessment',title:'Assessment criteria',render:renderAssessmentSetup},
   {
     id: 'draft',
     title: 'Your activity',
@@ -108,6 +109,7 @@ export const buildSections = [
         ? `<div class="workspace-writing" data-design-form>${renderDirectionsEditor(state.design.revision, { label: 'Activity directions' })}</div>`
         : '<div class="workspace-compile-summary"><h3>Put your activity together</h3><p>Babbage will combine your starting idea, course and learner details, requirements, creative direction, and instructor interaction plan into complete directions.</p><p>Select Build my activity. You can edit the finished draft here before reviewing it.</p></div>',
   },
+  {id:'rubric',title:'Assignment rubric',render:(state)=>renderRubric(state)},
 ];
 export const buildPages = buildSections.map(({ id, title }) => [id, title]);
 
@@ -124,14 +126,16 @@ export function renderBuildPage(state, ai, pageId = 'start') {
       Math.min(buildPages.findIndex(([id]) => id === designPage) + 1, buildPages.length - 1)
     ][0];
   const hasDraft = designPage === 'draft' && state.design.revision.trim();
-  const primaryAction = hasDraft
+  const primaryAction = designPage==='rubric'
     ? '<button type="button" class="primary" data-workspace-panel="reason">Review my activity</button>'
+    : hasDraft
+    ? '<button type="button" class="primary" data-design-page="rubric">Next: assignment rubric</button>'
     : section.compile
       ? `<button type="button" class="primary" data-action="compile-activity"${ai.pending ? ' disabled' : ''}>Build my activity</button>`
       : `<button type="button" class="primary" data-design-page="${nextPage}">Next section</button>`;
   const rebuildAction = hasDraft
     ? `<button type="button" data-action="compile-activity"${ai.pending ? ' disabled' : ''}>Rebuild with Babbage</button>`
     : '';
-  const body = `<section class="workspace-view workspace-page"><header class="design-page-heading"><h2 class="workspace-build-title" id="design-page-title" tabindex="-1">${title}</h2></header><div class="design-page-fields build-page-fields" data-build-page="${designPage}">${fields}</div><nav class="workspace-action-bar workspace-view-actions${designPage === 'ai-use' ? ' workspace-view-actions--gold' : ''}" aria-label="Design actions">${primaryAction}<button type="button" id="workspace-show-preview" data-workspace-view="preview">Preview activity</button><span class="workspace-save-status">Saved in this browser.</span>${rebuildAction}</nav></section>`;
+  const body = `<section class="workspace-view workspace-page"><header class="design-page-heading"><h2 class="workspace-build-title" id="design-page-title" tabindex="-1">${designPage==='rubric'?e(assignmentName(state))+' rubric':title}</h2></header><div class="design-page-fields build-page-fields" data-build-page="${designPage}">${fields}</div><nav class="workspace-action-bar workspace-view-actions${designPage === 'ai-use' ? ' workspace-view-actions--gold' : ''}" aria-label="Design actions">${primaryAction}<button type="button" id="workspace-show-preview" data-workspace-view="preview">Preview activity</button><span class="workspace-save-status">Saved in this browser.</span>${rebuildAction}</nav></section>`;
   return renderSectionFrame(buildPages, designPage, 'data-design-page', body, 'Build sections');
 }

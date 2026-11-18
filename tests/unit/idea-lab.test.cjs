@@ -73,7 +73,7 @@ const assert = require('node:assert/strict');
   assert.notEqual(mayaContext(state), beforeNeeds, 'Changed learner needs invalidate a cached student reading');
   const guide = createGuide(state.design, { teacher: state.teacher, workspace: state.workspace });
   assert(!guide.includes('id="original-assignment"'));
-  assert(guide.includes('Activity directions') && guide.includes('Design decisions'));
+  assert(guide.includes('Activity directions') && !guide.includes('Design decisions'));
   assert(!guide.includes('Idea Lab inspiration') && !guide.includes('Shift-Change Challenge'), 'Inspiration history stays out of the teaching guide');
   assert(!guide.includes('id="lemonade-example"'));
   assert(!guide.includes('Scenario 1 ·'));

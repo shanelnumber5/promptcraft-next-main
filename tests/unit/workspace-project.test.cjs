@@ -128,8 +128,7 @@ const assert = require('node:assert/strict');
     for (const text of [
       'Course Guide · Your activity',
       'Activity directions',
-      result.workspace.instructorPlan,
-      result.design.reason,
+      result.teacher.learningGoal,
     ])
       assert(guide.includes(text));
     assert(renderClosing(result).includes('data-action="return-assignment"'));

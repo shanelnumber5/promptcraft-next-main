@@ -62,19 +62,13 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
     design = { ...design, revision: '', reason: '' };
     approved = false;
   }
-  const chosenTitle = workspace ? 'Activity directions' : 'Your revised discussion board';
-  const milestoneTitle = workspace ? 'Design decisions' : 'Your assignment design summary';
+  const assignmentTitle=workspace?.assignmentTitle?.trim() || (rubric?.title && rubric.title!=='Assignment rubric' ? rubric.title.replace(/\s+rubric$/i,'') : '');
+  const chosenTitle = workspace ? (assignmentTitle || 'Activity directions') : 'Your revised discussion board';
   const sections = workspace ? [] : [
     { id: 'lemonade-example', title: 'The lemonade example', body: lemonadeExample() },
   ];
   const alignmentSection = teacher && alignmentGuidance(teacher);
   if (alignmentSection) sections.push({ id: 'assignment-guidance', title: 'Optional assignment guidance', body: alignmentSection });
-  if (workspace && teacher && design.revision.trim())
-    sections.push({
-      id: 'decision-milestone',
-      title: milestoneTitle,
-      body: `<section><h2>${e(milestoneTitle)}</h2>${teacher.learningGoal?.trim() ? `<h3>Learning goal</h3><p>${e(teacher.learningGoal)}</p>` : ''}${design.reason?.trim() ? `<h3>Why this design?</h3>${renderDesignRationale(design.reason, { showSources: false, paragraphBreaks: true })}` : ''}${conversationNotes.trim() ? `<h3>Conversation decisions</h3>${renderConversationNotes(conversationNotes)}` : ''}${workspace.instructorPlan?.trim() && !/^(?:i am not sure(?: yet)?|not sure(?: yet)?|not recorded(?: yet)?)\.?$/i.test(workspace.instructorPlan.trim()) ? `<h3>Instructor interaction</h3><p>${e(workspace.instructorPlan)}</p>` : ''}</section>`,
-    });
   if (teacher && !design.revision.trim())
     sections.push({
       id: 'assignment-pending',
@@ -87,7 +81,7 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
     sections.push({
       id: 'your-assignment',
       title: chosenTitle,
-      body: `<section class="assignment"><div class="assignment-banner"><h2>${e(chosenTitle)} · ${approved ? 'Approved version' : 'Draft'}</h2></div><div class="assignment-content">${!workspace && teacher?.learningGoal ? `<p><strong>Learning goal:</strong> ${e(teacher.learningGoal)}</p>` : ''}${design.revision.trim() ? `${workspace ? '' : '<h3 id="revised-directions">Discussion-board directions</h3>'}<div class="assignment-directions"${workspace ? ' id="revised-directions"' : ''}>${renderAssignmentDirections(design.revision, { approved })}</div>` : ''}${!workspace && design.instructorPlan?.trim() ? `<aside class="rationale"><h3>Instructor interaction</h3><p>${e(design.instructorPlan)}</p></aside>` : ''}${design.reason.trim() && !workspace ? `<aside class="rationale"><h3 id="change-reason">Why I made this change</h3><div class="design-rationale">${renderDesignRationale(design.reason, { showSources: false, paragraphBreaks: true })}</div></aside>` : ''}</div></section>`,
+      body: `<section class="assignment"><div class="assignment-banner"><h2>${e(chosenTitle)} · ${approved ? 'Approved version' : 'Draft'}</h2></div><div class="assignment-content">${teacher?.learningGoal ? `<p><strong>Learning goal:</strong> ${e(teacher.learningGoal)}</p>` : ''}${design.revision.trim() ? `${workspace ? '' : '<h3 id="revised-directions">Discussion-board directions</h3>'}<div class="assignment-directions"${workspace ? ' id="revised-directions"' : ''}>${renderAssignmentDirections(design.revision, { approved })}</div>` : ''}${!workspace && design.instructorPlan?.trim() ? `<aside class="rationale"><h3>Instructor interaction</h3><p>${e(design.instructorPlan)}</p></aside>` : ''}${design.reason.trim() && !workspace ? `<aside class="rationale"><h3 id="change-reason">Why I made this change</h3><div class="design-rationale">${renderDesignRationale(design.reason, { showSources: false, paragraphBreaks: true })}</div></aside>` : ''}</div></section>`,
     });
   sections.push({
     id: 'design-sources',
@@ -100,11 +94,11 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
   sections.sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id));
   const contents = sections.map(section => '<li><a href="#'+section.id+'">'+e(section.title)+'</a></li>').join('');
   return `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PromptCraft assignment guide</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${e(assignmentTitle || 'PromptCraft assignment guide')}</title>
 <style>${guideStyles}</style></head>
 
 
-<body${workspace ? ' class="workspace-guide"' : ''}><main><header><div class="guide-brand">${logo ? `<img src="${e(logo)}" alt="PromptCraft Babbage emblem">` : ''}<div><div class="wordmark">Prompt<span>Craft</span></div><small>The Prompt Lab · Great Falls College MSU</small></div></div><div class="guide-heading"><h1>${workspace ? 'Course Guide · Your activity' : 'Discussion guide'}</h1><p>${approved ? 'Your approved version' : 'Draft preview · Not yet approved'}</p><p>${workspace ? 'Your activity directions and teaching notes.' : 'Your discussion directions, teaching decisions, and a worked example to revisit.'}</p></div></header>${workspace ? '' : `<nav class="toc" aria-labelledby="contents-title"><h2 id="contents-title">In this guide</h2><ol>${contents}</ol></nav>`}${sections.map((section) => `<div class="guide-section" id="${section.id}">${section.body}</div>`).join('')}</main></body></html>`;
+<body${workspace ? ' class="workspace-guide"' : ''}><main><header><div class="guide-brand">${logo ? `<img src="${e(logo)}" alt="PromptCraft Babbage emblem">` : ''}<div><div class="wordmark">Prompt<span>Craft</span></div><small>The Prompt Lab · Great Falls College MSU</small></div></div><div class="guide-heading"><h1>${workspace ? e(assignmentTitle || 'Course Guide · Your activity') : 'Discussion guide'}</h1><p>${approved ? 'Your approved version' : 'Draft preview · Not yet approved'}</p><p>${workspace ? 'Your activity directions and assessment rubric.' : 'Your discussion directions, teaching decisions, and a worked example to revisit.'}</p></div></header>${workspace ? '' : `<nav class="toc" aria-labelledby="contents-title"><h2 id="contents-title">In this guide</h2><ol>${contents}</ol></nav>`}${sections.map((section) => `<div class="guide-section" id="${section.id}">${section.body}</div>`).join('')}</main></body></html>`;
 }
 
 export function downloadGuide(design, options) {

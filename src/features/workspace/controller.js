@@ -1,4 +1,4 @@
-import {emptyRubric,generateRubric,downloadRubric} from './rubric.js';
+import {emptyRubric,generateRubric,downloadRubric,rubricForState} from './rubric.js';
 import { requestConversationRevision } from './conversation-revision.js';
 import { saveFeedbackAnswer, savedFeedbackNotes, emptyFeedbackConversation } from '../design/feedback-conversation.js';
 import { createAiWaiting } from '../design/ai-waiting.js';
@@ -338,6 +338,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     let movedDraft = false;
     if (control.dataset?.workspaceMeta) {
       state.workspace[control.dataset.workspaceMeta] = control.value.slice(0, MAX_WORKSPACE_TEXT);
+      if(control.dataset.workspaceMeta==='assignmentTitle')state.creative.rubric.title=rubricForState(state).title;
       if (workspacePlanningFields.includes(control.dataset.workspaceMeta)) {
         state.babbage.context = assignmentContext(state);
         ai.suggestion = null;
@@ -508,7 +509,6 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
   function requirePerspectives(destination='reasoning') {
     const review=state.creative.review;
     if(destination==='rubric') return false;
-    if(!state.creative.rubric?.confirmed && !state.finalCheck.approved && !review.manualOnly) {reviewPage='rubric';render();document.getElementById('review-title')?.focus();return true;}
     if(destination==='rationale' || state.finalCheck.approved || review.manualOnly || review.perspectivesComplete || !state.design.revision.trim()) return false;
     if(reviews.pending || ai.pending) return true;
     if(review.feedback) {
@@ -716,6 +716,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     const review = event.target.closest('[data-review-page]');
     if (review) {
       const destination = review.dataset.reviewPage;
+      if(destination==='rubric') {state.designPanel='revision';designPage='rubric';render();return;}
       if(requirePerspectives(destination)) return;
       if(['checks','guide','help'].includes(destination) && !state.design.reason.trim()) {reviewPage='reasoning';render();document.getElementById('reason')?.focus();return;}
       const show = () => {
@@ -890,7 +891,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
         const rows=await generateRubric(snapshot,{signal:AbortSignal.any([request.signal,AbortSignal.timeout(180000)]),onProgress:stage=>{if(source===state && ai.requestController===request && !request.signal.aborted){ai.stage=stage;render();}}});
         if(source!==state || request.signal.aborted || ai.requestController!==request)return;
         if(basis!==state.design.revision)throw Error('Your assignment changed. Create the rubric again for the current draft.');
-        state.creative.rubric.rows=rows;state.creative.rubric.basis=basis;state.creative.rubric.confirmed=true;saveSafely();
+        Object.assign(state.creative.rubric,{title:rubricForState(snapshot).title,submission:rubricForState(snapshot).submission});state.creative.rubric.rows=rows;state.creative.rubric.basis=basis;state.creative.rubric.confirmed=true;saveSafely();
       } catch(error) {if(source===state && !request.signal.aborted)ai.error=error.message;}
       finally {if(ai.requestController===request){ai.pending=false;ai.requestController=null;render();const notice=app.querySelector('[data-rubric-notice]');if(notice)notice.textContent=ai.error || (request.signal.aborted?'Rubric cancelled. Your work is saved.':'Rubric created. Edit the descriptors, then continue.');}}
       return;
@@ -900,7 +901,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       state.creative.rubric.confirmed=true;saveSafely();enterReview();return;
     }
     if(action==='download-rubric-csv' || action==='download-rubric-html') {
-      if(state.creative.rubric?.rows.length)downloadRubric(state.creative.rubric,action.endsWith('csv')?'csv':'html');return;
+      if(state.creative.rubric?.rows.length)downloadRubric(rubricForState(state),action.endsWith('csv')?'csv':'html');return;
     }
     if (action === 'check-workspace-revision') {
       await reviews.check();
@@ -1066,7 +1067,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
           teacher: state.teacher,
           workspace: state.workspace,
           conversationNotes: savedFeedbackNotes(state),
-          rubric:state.creative.rubric,
+          rubric:rubricForState(state),
         });
         app.querySelector('.design-notice').textContent = 'Your Course Guide download has started.';
       } catch (error) {
