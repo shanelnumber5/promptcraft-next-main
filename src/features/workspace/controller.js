@@ -786,11 +786,17 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       return;
     }
     if (action === 'preview-guide' && showingWrapUp) {
-      openGuidePreview(state, app, {
-        onClose: () => {
-          window.location.href = '?view=home';
-        },
-      });
+      // Put the saved guide behind its preview before opening it. Closing the
+      // dialog should never reveal the final character frame or navigate away.
+      showingWrapUp = false;
+      if (scenario) {
+        state.phase = 'design';
+        saveSafely();
+      }
+      ui = workspaceViews();
+      reviewPage = 'guide';
+      render();
+      openGuidePreview(state, app);
       return;
     }
     if (action === 'return-assignment' && showingWrapUp) {

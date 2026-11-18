@@ -146,8 +146,8 @@ body[data-app-view] .guide-preview iframe { flex:1 1 0; min-height:0; height:aut
 /* Compact collaborator header and readable, bounded feedback pages. */
 body[data-app-view] #app .partner-heading:has(.babbage-presence) {min-height:0;display:flow-root !important;padding-bottom:12px}
 body[data-app-view] #app .partner-heading:has(.babbage-presence) h2 {padding-top:0;font-size:28px;line-height:1.25;margin:0}
-body[data-app-view] #app .babbage-presence {width:96px;margin:0 0 0 16px}
-body[data-app-view] #app .babbage-presence img {width:96px;height:64px;object-fit:contain}
+body[data-app-view] #app .babbage-presence {width:180px;height:120px;margin:0 0 0 20px;overflow:hidden}
+body[data-app-view] #app .babbage-presence img {width:180px;height:170px;object-fit:cover;object-position:center;margin-top:-25px}
 body[data-app-view] #app #workspace-panel .workspace-ai-disclosure {font:400 14px/1.45 Arial,sans-serif;margin:0 0 16px;max-width:72ch}
 .workspace-ai-disclosure summary {cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 body[data-app-view] #app #workspace-panel .babbage-feedback {max-width:68ch;margin:0 auto}
@@ -163,3 +163,5 @@ body[data-app-view]:has(.closing-experience) .app-footer {display:none !importan
 body[data-app-view] .closing-experience .dialogue {background:transparent;min-height:0;height:auto;flex:0 0 auto;padding:0;margin:0;border:0}
 body[data-app-view] .closing-experience .design-notice:empty,
 body[data-app-view] .closing-experience .save-notice:empty {display:none}
+
+@media(max-width:600px) {body[data-app-view] #app .babbage-presence {width:132px;height:96px;margin-left:12px}body[data-app-view] #app .babbage-presence img {width:132px;height:132px;margin-top:-18px}}
