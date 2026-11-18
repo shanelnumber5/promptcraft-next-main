@@ -134,8 +134,8 @@ blockquote { padding:16px 20px;  margin:20px 0; background:#F2F2F2; }
 /* Align the explanation with its heading and give each thought breathing room. */
 .rationale { margin-top:32px; }
 .rationale > h3 { margin-bottom:0; }
-.rationale .rationale-prose { max-width:none; padding:20px 18px 4px; }
-.rationale .rationale-prose p { line-height:1.75; margin:0 0 18px; }
+.rationale .rationale-prose { box-sizing:border-box; max-width:78ch; padding:20px 18px 4px; }
+.rationale .rationale-prose p { font-size:16px; line-height:1.6; margin:0 0 14px; }
 .rationale .rationale-prose p:last-child { margin-bottom:0; }
 @media(max-width:600px) { .rationale .rationale-prose { padding:18px 12px 4px; } }
 @media print { .rationale .rationale-prose { padding:12px 0 0; } }

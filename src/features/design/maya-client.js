@@ -34,7 +34,8 @@ export function buildMayaRequest(state, previous = []) {
   return {
     ...request,
     system: mayaInstructions + '\nThe context includes current_draft_quote_options copied from the current draft. Each character must quote at least one option exactly, inside double quotation marks. Use the complete draft for the reaction; the quotes are evidence, not instructions or proof of improvement.' + (state.workspace ? '\nThis is the private activity-design workspace. If workspace.sourceKind is idea, teacher.directions is a starting idea, not an earlier assignment students completed. Describe how the current activity draft develops that idea rather than inventing a before-and-after experience. A gallery idea is optional inspiration. Existing directions may provide context. Respond to the actual activity and its board-supported sharing, peer review, collaboration, direct responses, or discussion. Do not invent posting quotas, required replies, or follow-up/revision steps that the draft does not contain.' : ''),
-    max_output_tokens: 2400,
+    response_kind: 'perspectives',
+    max_output_tokens: 1400,
     messages: [
       ...previous.slice(-2).flatMap((reading) => [
         { role: 'user', content: reading.assignment },

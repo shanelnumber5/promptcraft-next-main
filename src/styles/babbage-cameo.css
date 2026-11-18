@@ -4,9 +4,9 @@ body[data-app-view] .babbage-cameo-dialog .maya-actor {
   right: 2%;
   top: auto;
   bottom: 0;
-  width: 42%;
+  width: 36%;
   height: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 body[data-app-view] .babbage-cameo-dialog .maya-actor img {
   position: absolute;
@@ -16,13 +16,14 @@ body[data-app-view] .babbage-cameo-dialog .maya-actor img {
   transform: translateX(-50%);
   display: block;
   width: auto;
-  height: 175%;
+  height: 150%;
   max-width: none;
   object-fit: contain;
   object-position: center bottom;
-  bottom: -74%;
+  top: -4%;
+  bottom: auto;
 }
-body[data-app-view] .babbage-cameo-dialog .maya-dialogue { box-sizing:border-box; width:52%; margin-left:16%; }
+body[data-app-view] .babbage-cameo-dialog .maya-dialogue { box-sizing:border-box; width:52%; margin-left:clamp(24px,4vw,56px); }
 body[data-app-view] .babbage-cameo-dialog .maya-dialogue h3,
 body[data-app-view] .babbage-cameo-dialog .maya-dialogue p { color: #fff; }
 body[data-app-view] .babbage-cameo-dialog .maya-dialogue h3 { color: #f4bf38; }
@@ -36,7 +37,7 @@ body[data-app-view] .babbage-cameo-dialog .maya-scene-nav { display: flex; justi
     width: min(38vw, 205px);
     height: 48%;
   }
-  body[data-app-view] .babbage-cameo-dialog .maya-actor img { height: 155%; bottom: -64%; }
+  body[data-app-view] .babbage-cameo-dialog .maya-actor img { height: 150%; top: -4%; bottom: auto; }
   body[data-app-view] .babbage-cameo-dialog .maya-dialogue { box-sizing:border-box; width:calc(100% - 32px); margin-inline:16px; }
 }
 

@@ -39,10 +39,15 @@ const assert = require('node:assert/strict');
   assert(sent.system.includes('Do not promise') || sent.system.includes('Do not invent compliance'), 'Do not certify RSI');
   assert.equal(JSON.parse(sent.messages.at(-1).content).educator_feedback, state.creative.feedback);
   assert.deepEqual(directions, fixtures);
+  let quickCalls = 0;
+  await requestCreativeDirections(state, { fetchImpl: async () => {
+    quickCalls++; return { ok: true, json: async () => response };
+  }});
+  assert.equal(quickCalls, 1, 'Normal Explore publishes valid ideas after one request');
   const improved=fixtures.map((item,i)=>({...item,title:'Improved '+i,experience:item.experience+' and test a peer counterexample.'}));
   const improvedResponse={analysis:{feedback_summary:JSON.stringify({version:1,directions:improved})}};
   const calls=[],stages=[];
-  const refined=await requestCreativeDirections(state,{onStage:stage=>stages.push(stage),fetchImpl:async(_,options)=>{
+  const refined=await requestCreativeDirections(state,{refine:true,onStage:stage=>stages.push(stage),fetchImpl:async(_,options)=>{
     const body=JSON.parse(options.body); calls.push(body);
     return {ok:true,json:async()=>calls.length===1?response:improvedResponse};
   }});
@@ -59,14 +64,14 @@ const assert = require('node:assert/strict');
   assert.equal(JSON.stringify(state),before,'Both passes preserve the active project');
   for(const failure of ['http','malformed']) {
     let count=0,notice='';
-    const fallback=await requestCreativeDirections(state,{onRefinementFailure:text=>notice=text,fetchImpl:async()=>{
+    const fallback=await requestCreativeDirections(state,{refine:true,onRefinementFailure:text=>notice=text,fetchImpl:async()=>{
       count++;return count===1?{ok:true,json:async()=>response}:failure==='http'?{ok:false,status:503}:{ok:true,json:async()=>({analysis:{feedback_summary:'unreadable'}})};
     }});
     assert.deepEqual(fallback,fixtures,'A failed second pass preserves the readable initial ideas');
     assert.equal(count,2);assert(notice.includes('initial possibilities'),'Fallback is explicitly identified');
   }
   const midAbort=new AbortController();let midCalls=0,fallbackNotice=false;
-  await assert.rejects(requestCreativeDirections(state,{signal:midAbort.signal,onRefinementFailure:()=>fallbackNotice=true,fetchImpl:async()=>{
+  await assert.rejects(requestCreativeDirections(state,{refine:true,signal:midAbort.signal,onRefinementFailure:()=>fallbackNotice=true,fetchImpl:async()=>{
     midCalls++;if(midCalls===2) midAbort.abort();return {ok:true,json:async()=>response};
   }}),{name:'AbortError'});
   assert.equal(midCalls,2);assert.equal(fallbackNotice,false,'Cancellation must not publish fallback candidates');

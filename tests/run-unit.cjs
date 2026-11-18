@@ -4,6 +4,7 @@ const root = path.resolve(__dirname, '..');
 const tests = [
   'json-request',
   'chatmt-worker',
+  'chatmt-profile',
   'design',
   'babbage',
   'maya',

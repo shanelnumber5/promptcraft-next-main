@@ -69,6 +69,7 @@ export function buildCreativeRequest(state) {
   const request = buildBabbageRequest(state, 'clarify');
   return {
     ...request,
+    response_kind: 'explore',
     max_output_tokens: 5000,
     system:
       request.system +
@@ -96,6 +97,7 @@ export function buildCreativeRefinementRequest(state, candidates) {
   const last = JSON.parse(request.messages.at(-1).content);
   return {
     ...request,
+    response_kind: 'explore',
     system: request.system + '\n' + creativeChallenge,
     messages: [
       ...request.messages.slice(0, -1),
@@ -113,7 +115,7 @@ export function buildCreativeRefinementRequest(state, candidates) {
 
 export async function requestCreativeDirections(
   state,
-  { fetchImpl = fetch, signal, onStage = () => {}, onRefinementFailure = () => {} } = {},
+  { fetchImpl = fetch, signal, refine = false, onStage = () => {}, onRefinementFailure = () => {} } = {},
 ) {
   // Freeze the supplied context across both calls; neither pass edits the project.
   const snapshot = structuredClone(state);
@@ -133,6 +135,7 @@ export async function requestCreativeDirections(
   };
   const candidates = await ask(buildCreativeRequest(snapshot));
   signal?.throwIfAborted();
+  if (!refine) return candidates;
   onStage('refining');
   let improved;
   try {

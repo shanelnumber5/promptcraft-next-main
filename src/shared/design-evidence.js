@@ -47,11 +47,18 @@ export function separateRationaleReferences(text) {
 
 export function renderDesignRationale(text, { showSources = true, paragraphBreaks = false } = {}) {
   let { prose, sources }=separateRationaleReferences(text);
-  if(paragraphBreaks) prose=prose.split(/\n\s*\n/).map(paragraph=>{
-    // Keep authored lists and existing formatting; only space dense plain prose.
-    if(paragraph.length<450 || /\n|^\s*[#*\-]|^\d+[.)]/.test(paragraph)) return paragraph;
-    const sentences=[...new Intl.Segmenter('en',{granularity:'sentence'}).segment(paragraph)].map(part=>part.segment.trim());
-    return sentences.length>1 ? sentences.join('\n\n') : paragraph;
+  if (paragraphBreaks) prose = prose.split(/\n\s*\n/).map(paragraph => {
+    if (paragraph.length < 450 || /\n|^\s*[#*\-]|^\d+[.)]/.test(paragraph)) return paragraph;
+    const sentences = [...new Intl.Segmenter('en', { granularity: 'sentence' }).segment(paragraph)];
+    const groups = [];
+    let group = '';
+    for (const { segment } of sentences) {
+      const sentence = segment.trim();
+      if (group && group.length + sentence.length > 420) { groups.push(group); group = ''; }
+      group += (group ? ' ' : '') + sentence;
+    }
+    if (group) groups.push(group);
+    return groups.join('\n\n');
   }).join('\n\n');
   const references=showSources && sources.length ? '<aside class="rationale-references" aria-label="References for this explanation"><strong>References</strong><ul>'+sources.map(source=>'<li><a href="'+e(source.url)+'" target="_blank" rel="noopener noreferrer">'+e(source.short)+'</a></li>').join('')+'</ul></aside>' : '';
   return '<div class="rationale-prose">'+renderAssignmentDirections(prose)+'</div>'+references;
