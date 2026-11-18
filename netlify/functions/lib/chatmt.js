@@ -26,7 +26,7 @@ export async function handleChatmt(event, getContract, json, requestId, { timeou
       body: JSON.stringify({
         model: profile.model,
         max_tokens: profile.maxTokens,
-        system: `${String(incoming.system || '')}\n${guidance}\nKeep the outer analysis concise. Put requested sketches, dialogue or teaching notes inside feedback_summary exactly as the request specifies. Do not repeat the activity in ancillary fields.\nReturn only a valid JSON object matching this schema: ${JSON.stringify(profile.schema)}\n${profile.instruction}`,
+        system: `${String(incoming.system || '')}\n${profile.scene ? guidance.replace("You are Babbage, PromptCraft's instructional-design collaborator.", 'You are writing the separate Maya and Pixel dialogue turns specified below.') : guidance}\nKeep the outer analysis concise. Put requested sketches, dialogue or teaching notes inside feedback_summary exactly as the request specifies. Do not repeat the activity in ancillary fields.\nReturn only a valid JSON object matching this schema: ${JSON.stringify(profile.schema)}\n${profile.instruction}`,
         messages: incoming.messages
       }),
       signal: AbortSignal.timeout(timeoutMs)

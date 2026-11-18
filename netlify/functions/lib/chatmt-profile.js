@@ -19,12 +19,18 @@ export function chatmtProfile(incoming, contract, configuredModel) {
       properties: Object.fromEntries(fields.map(key => [key, contract.schema.properties[key]])) };
     if (feedbackOnly) instruction = 'Generate only feedback_summary. The server supplies the empty draft and input-quality fields. Do not generate a revised activity or a rationale.';
   }
-  return { model, maxTokens, schema, instruction, feedbackOnly };
+  const scene = kind === 'perspectives';
+  if (scene) {
+    const turn = emotions => ({type:'object',additionalProperties:false,required:['emotion','text'],properties:{emotion:{type:'string',enum:emotions},text:{type:'string'}}});
+    schema = {type:'object',additionalProperties:false,required:['version','maya','pixel'],properties:{version:{type:'integer',const:1},maya:turn(['neutral','confident','pleased','skeptical','frustrated','thoughtful','surprised','amused']),pixel:turn(['thoughtful','explaining','confident','pleasant','skeptical'])}};
+    instruction = 'Return the version-1 scene object directly with version, maya and pixel. Do not wrap it in feedback_summary or encode the scene as a JSON string. The server supplies the response envelope. Each character must quote a short exact phrase from current_draft_quote_options, using escaped double quotation marks inside their text. Follow the separate Maya and Pixel voices in the supplied instructions.';
+  }
+  return { model, maxTokens, schema, instruction, feedbackOnly, scene };
 }
 
 export function completeChatmtEnvelope(analysis, profile) {
   return profile.feedbackOnly ? {
-    ...analysis,
+    ...(profile.scene ? {feedback_summary:JSON.stringify(analysis)} : analysis),
     input_quality: { usable: true, concerns: [] },
     revised_discussion_prompt: '',
     revision_review: { why_these_changes: '' },
