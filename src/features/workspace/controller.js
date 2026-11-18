@@ -106,7 +106,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       : renderWorkspace(state, ai, readError, designPage, partnerPage, reviewPage, ui);
     fitWorkspace(app);
     showBabbageCameo(state, app);
-    syncWaiting({ ...ai, pending: ai.pending || state.creative.review.status === 'pending', intent: state.creative.review.status === 'pending' ? 'review' : ai.intent }, state.babbage.mode === 'dev');
+    syncWaiting({ ...ai, pending: ai.pending || state.creative.review.status === 'pending', stage: state.creative.review.status === 'pending' ? 'working' : ai.stage, intent: state.creative.review.status === 'pending' ? 'review' : ai.intent }, state.babbage.mode === 'dev');
     if (focus) document.getElementById('setup-title')?.focus({ preventScroll: true });
   };
   function focusTask() {

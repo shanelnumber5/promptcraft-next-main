@@ -55,3 +55,13 @@ body[data-app-view] .maya-dialog[data-state='loading'] :is(.maya-state,.babbage-
 body[data-app-view] .maya-dialog[data-state='loading'] > header { border:0; }
 body[data-app-view] .ai-waiting-dialog .babbage-loading .babbage-loading-copy :is(strong,span,p),
 body[data-app-view] .maya-dialog[data-state='loading'] .babbage-loading .babbage-loading-copy :is(strong,span,p) { color:#12355b; }
+
+/* Only the modal owns the waiting illustration; no duplicate behind the backdrop. */
+body:has(.ai-waiting-dialog[open]) #app .babbage-loading { visibility:hidden; }
+.ai-waiting-dialog,body[data-app-view] .maya-dialog[data-state='loading'] { border:1px solid #c9d6e2; border-top:6px solid #f2c14e; border-bottom:1px solid #c9d6e2; border-radius:12px; box-shadow:0 18px 60px rgb(0 20 50 / .24); padding:28px 32px; }
+body[data-app-view] :is(.ai-waiting-dialog,.maya-dialog[data-state='loading']) .babbage-loading-heading { display:block; margin-bottom:20px; }
+body[data-app-view] :is(.ai-waiting-dialog,.maya-dialog[data-state='loading']) .babbage-loading-heading strong { display:block; font:700 26px/1.25 Georgia,serif; }
+body[data-app-view] :is(.ai-waiting-dialog,.maya-dialog[data-state='loading']) .babbage-loading-heading > span { display:none; }
+body[data-app-view] :is(.ai-waiting-dialog,.maya-dialog[data-state='loading']) .babbage-loading-note { display:block; margin-top:12px; font-size:14px; }
+body[data-app-view] :is(.ai-waiting-dialog,.maya-dialog[data-state='loading']) .babbage-progress { height:8px; border-radius:6px; }
+.maya-draft-reference { color:#405674; padding:12px 16px; border-left:3px solid #f2c14e; font-size:14px; }

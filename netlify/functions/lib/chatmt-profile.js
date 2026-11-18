@@ -21,9 +21,14 @@ export function chatmtProfile(incoming, contract, configuredModel) {
   }
   const scene = kind === 'perspectives';
   if (scene) {
-    const turn = emotions => ({type:'object',additionalProperties:false,required:['emotion','text'],properties:{emotion:{type:'string',enum:emotions},text:{type:'string'}}});
+    let excerpts=[];
+    for (const message of incoming.messages || []) {
+      if (message.role !== 'user') continue;
+      try { const context=JSON.parse(message.content); if(Array.isArray(context.current_draft_quote_options)) excerpts=context.current_draft_quote_options.filter(q=>typeof q==='string' && q.length>=8 && q.length<=180); } catch {}
+    }
+    const turn = emotions => ({type:'object',additionalProperties:false,required:['emotion','text',...(excerpts.length?['draft_quote']:[])],properties:{...(excerpts.length?{draft_quote:{type:'string',enum:excerpts}}:{}),emotion:{type:'string',enum:emotions},text:{type:'string'}}});
     schema = {type:'object',additionalProperties:false,required:['version','maya','pixel'],properties:{version:{type:'integer',const:1},maya:turn(['neutral','confident','pleased','skeptical','frustrated','thoughtful','surprised','amused']),pixel:turn(['thoughtful','explaining','confident','pleasant','skeptical'])}};
-    instruction = 'Return the version-1 scene object directly with version, maya and pixel. Do not wrap it in feedback_summary or encode the scene as a JSON string. The server supplies the response envelope. Each character must quote a short exact phrase from current_draft_quote_options, using escaped double quotation marks inside their text. Follow the separate Maya and Pixel voices in the supplied instructions.';
+    instruction = 'Return the version-1 scene object directly with version, maya and pixel. Do not wrap it in feedback_summary or encode the scene as a JSON string. The server supplies the response envelope. Each character must choose draft_quote exactly from the schema enum and respond to that excerpt in their own text. The app shows draft_quote as a separate source citation; do not force quotation marks into the dialogue. If the schema has no draft_quote, quote a short exact phrase from current_draft_quote_options in the dialogue. Follow the separate Maya and Pixel voices in the supplied instructions.';
   }
   return { model, maxTokens, schema, instruction, feedbackOnly, scene };
 }

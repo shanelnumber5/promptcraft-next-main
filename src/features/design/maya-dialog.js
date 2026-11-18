@@ -68,10 +68,13 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
   const navigation = dialog.querySelector('.maya-scene-nav');
   const back = dialog.querySelector('[data-maya-back]');
   const next = dialog.querySelector('[data-maya-next]');
-  let beats = [], beatIndex = 0;
+  let beats = [], beatIndex = 0, sourceQuotes = {};
+  const citation=document.createElement('p'); citation.className='maya-draft-reference'; citation.hidden=true; dialogue.append(citation);
   const showBeat = () => {
     const beat = beats[beatIndex];
     dialog.dataset.speaker = beat.speaker;
+    citation.hidden = !sourceQuotes[beat.speaker];
+    citation.textContent = sourceQuotes[beat.speaker] ? 'From your draft: “' + sourceQuotes[beat.speaker] + '”' : '';
     dialog.dataset.emotion = beat.emotion;
     updateDialoguePortrait(portrait, characterArt[beat.speaker][beat.emotion]);
     heading.textContent = beat.speaker === 'maya' ? 'Maya’s first read' : 'Pixel’s perspective';
@@ -83,6 +86,7 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
   const showScene = text => {
     const scene = normalizeMayaScene(text, snapshot.design.revision);
     if (onComplete && !scene.pixel) throw Error('The reading did not include Pixel’s explanation. Please retry before continuing to the checks.');
+    sourceQuotes = {maya:scene.maya?.draft_quote,pixel:scene.pixel?.draft_quote};
     beats = mayaSceneBeats(scene); beatIndex = 0;
     preloadDialoguePortraits(beats.map(beat => characterArt[beat.speaker][beat.emotion]));
     response.replaceChildren(...beats.map(beat => {

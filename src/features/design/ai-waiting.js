@@ -8,6 +8,7 @@ export function createAiWaiting({ onCancel }) {
       if (dialog) { const current = dialog; dialog = null; current.close(); current.remove(); }
       return;
     }
+    ai = { ...ai, stage: ai.stage === 'complete' ? 'received' : ai.stage };
     if (!dialog) {
       dialog = document.createElement('dialog');
       dialog.className = 'ai-waiting-dialog';

@@ -20,6 +20,8 @@ const assert = require('node:assert/strict');
   sync({pending:true,intent:'review'});
   assert.equal(created,1,'The same waiting surface is reused across stages');
   assert(dialogs[0].content.innerHTML.includes('Reviewing your activity'));
+  sync({pending:true,intent:'review',stage:'complete'});
+  assert(!dialogs[0].content.innerHTML.includes('Response ready'), 'Previous completion is not displayed as the current request');
   dialogs[0].button.click();
   assert.equal(cancelled,1);assert.equal(dialogs[0].removed,true);
   sync({pending:true,intent:'revise'});
