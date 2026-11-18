@@ -60,7 +60,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     readError = restored.error;
   let designPage = restored.designPage || (state.design.revision.trim() ? 'draft' : 'start'),
     partnerPage = 'work',
-    reviewPage = state.finalCheck.approved ? 'guide' : 'rationale';
+    reviewPage = state.finalCheck.approved || state.creative.review.manualOnly ? 'guide' : 'rationale';
   let showingWrapUp = scenario && restored.wrapUp;
   let closingStage = scenario ? 'board' : 'dialogue';
   let closingPage = 0;
@@ -589,7 +589,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     showingWrapUp = false;
     designPage = state.design.revision.trim() ? 'draft' : 'start';
     partnerPage = 'work';
-    reviewPage = state.finalCheck.approved ? 'guide' : 'rationale';
+    reviewPage = state.finalCheck.approved || state.creative.review.manualOnly ? 'guide' : 'rationale';
     ui = workspaceViews();
     Object.assign(ai, { pending: false, suggestion: null, error: '', context: '' });
     render({ focus: true });
