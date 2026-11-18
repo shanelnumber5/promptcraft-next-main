@@ -130,7 +130,7 @@ const assert = require('node:assert/strict');
   assert.match(note.textContent, /Response received/);
   updateLoadingStage(root, 'complete');
   assert.equal(attributes.get('aria-valuenow'), '4');
-  assert.equal(note.textContent, 'Step 4 of 4 · Ready');
+  assert.equal(note.textContent, 'Ready');
   const state = initialState(scenario);
   state.teacher.directions = 'Choose a recommendation; keep the rubric.';
   state.teacher.learningGoal = 'Compare evidence.';

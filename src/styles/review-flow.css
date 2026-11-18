@@ -165,3 +165,10 @@ body[data-app-view] .closing-experience .design-notice:empty,
 body[data-app-view] .closing-experience .save-notice:empty {display:none}
 
 @media(max-width:600px) {body[data-app-view] #app .babbage-presence {width:132px;height:96px;margin-left:12px}body[data-app-view] #app .babbage-presence img {width:132px;height:132px;margin-top:-18px}}
+
+/* Plain disclosure and named request progress, without collapsible sections. */
+body[data-app-view] #app #workspace-panel .workspace-ai-disclosure {max-width:78ch;margin:0 0 20px;padding:12px 16px;border:1px solid #c3ced9;border-radius:4px;background:#f5f9fc;color:#405674;font:400 14px/1.5 Arial,sans-serif}
+body[data-app-view] #app #workspace-panel .workspace-ai-disclosure p {margin:0;font:inherit}
+.babbage-loading-note {display:block;margin-top:10px;margin-bottom:16px}
+.guide-download-actions {display:flex;flex-wrap:wrap;gap:12px;margin:0 0 28px}
+.guide-download-actions button {padding:12px 18px;min-height:46px}

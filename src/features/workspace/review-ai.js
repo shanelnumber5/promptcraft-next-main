@@ -3,7 +3,7 @@ import { postJSON } from '../../shared/json-request.js';
 import { BABBAGE_ENDPOINT, buildBabbageRequest } from '../design/babbage-client.js';
 import { assignmentGuardrails } from '../../shared/assignment-guardrails.js';
 
-export const emptyReview = () => ({ fingerprint: '', feedback: '', status: 'idle', error: '', offeredMaya: '', manualOnly: false });
+export const emptyReview = () => ({ fingerprint: '', feedback: '', status: 'idle', error: '', offeredMaya: '', manualOnly: false, perspectivesComplete: false });
 export function restoreReview(value) {
   const result = emptyReview();
   if (!value || typeof value !== 'object' || Array.isArray(value)) return result;
@@ -14,6 +14,7 @@ export function restoreReview(value) {
       ? value[key] : value[key].slice(0, key === 'feedback' ? 6000 : 1000);
   }
   result.manualOnly = value.manualOnly === true;
+  result.perspectivesComplete = value.perspectivesComplete === true;
   // Pending requests cannot survive a reload or a portable project import.
   result.status = result.feedback && result.fingerprint ? 'complete' : 'idle';
   return result;
@@ -33,7 +34,7 @@ export function reviewFingerprint(state) {
 // Automatic student perspective follows a successful current live review once.
 export function shouldOpenMaya(state) {
   const review = state.creative.review;
-  return !review.manualOnly && state.designPanel === 'reason' && state.babbage.mode !== 'dev' && !state.creative.mayaPaused &&
+  return !review.manualOnly && !review.perspectivesComplete && state.designPanel === 'reason' && state.babbage.mode !== 'dev' && !state.creative.mayaPaused &&
     review.status === 'complete' && Boolean(review.feedback) &&
     review.fingerprint === reviewFingerprint(state) && review.offeredMaya !== review.fingerprint;
 }

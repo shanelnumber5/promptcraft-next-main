@@ -485,9 +485,23 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
   }
   function returnFromMaya({completed=false} = {}) {
     if (state.designPanel !== 'reason' || showingWrapUp) return;
-    reviewPage = completed ? (state.design.reason.trim() ? 'checks' : 'reasoning') : 'rationale';
+    if(completed) {state.creative.review.perspectivesComplete=true;saveSafely();}
+    reviewPage = completed ? 'reasoning' : 'rationale';
     render();
     document.getElementById('review-title')?.focus({ preventScroll: true });
+  }
+  function requirePerspectives(destination='reasoning') {
+    const review=state.creative.review;
+    if(destination==='rationale' || state.finalCheck.approved || review.manualOnly || review.perspectivesComplete || !state.design.revision.trim()) return false;
+    if(reviews.pending || ai.pending) return true;
+    if(review.feedback) {
+      review.offeredMaya=reviewFingerprint(state);
+      saveSafely();
+      openMayaDialog(state,app.querySelector('#workspace-tab-reason'),{
+        autoStart:true,onReturn:returnFromMaya,onSave:saveSafely,onRevise:reviseFromConversation,
+      });
+    } else void reviews.runAutomatic();
+    return true;
   }
   function enterReview() {
     ui = workspaceViews();
@@ -496,7 +510,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     saveSafely();
     render();
     document.getElementById('workspace-tab-reason')?.focus();
-    void reviews.runAutomatic();
+    if(!requirePerspectives()) void reviews.runAutomatic();
   }
   const setPanel = (panel) => {
     reworkForReview = false;
@@ -597,7 +611,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     render({ focus: true });
     app.querySelector('.design-notice').textContent =
       'Project opened. Your editable work has been restored.';
-    if (state.designPanel === 'reason') void reviews.runAutomatic();
+    if (state.designPanel === 'reason' && !requirePerspectives()) void reviews.runAutomatic();
   });
   // Delegated navigation and actions remain bound while render replaces page contents.
   app.addEventListener('click', async (event) => {
@@ -685,6 +699,8 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     const review = event.target.closest('[data-review-page]');
     if (review) {
       const destination = review.dataset.reviewPage;
+      if(requirePerspectives(destination)) return;
+      if(['checks','guide','help'].includes(destination) && !state.design.reason.trim()) {reviewPage='reasoning';render();document.getElementById('reason')?.focus();return;}
       const show = () => {
         ui = workspaceViews();
         state.designPanel = 'reason';
@@ -1047,6 +1063,6 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     reviews.cancel();
   });
   render();
-  if (state.designPanel === 'reason') void reviews.runAutomatic();
+  if (state.designPanel === 'reason' && !requirePerspectives()) void reviews.runAutomatic();
   if (!readError && state.babbage.mode !== 'dev') controller.refreshBabbageConnection();
 }
