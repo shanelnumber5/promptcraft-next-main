@@ -25,7 +25,7 @@ export function renderWorkspace(
   if (ui.screen === 'preview')
     body = `<section class="workspace-view workspace-page"><header class="design-page-heading"><h2 id="workspace-view-title" tabindex="-1">${workspacePreview(state, designPage).label}</h2></header><div class="workspace-view-body">${renderWorkspacePreview(state, designPage, ui)}</div><footer class="workspace-action-bar workspace-view-back"><button type="button" data-workspace-view="work">Back to my work</button></footer></section>`;
   if (!body && panel === 'babbage') body = renderPartner(state, ai, partnerPage, '', ui);
-  else if (!body && panel === 'reason') body = renderReview(state, ai, reviewPage, '');
+  else if (!body && panel === 'reason') body = renderReview(state, ai, reviewPage, '', ui);
   else if (!body) body = renderBuildPage(state, ai, designPage);
   if (state.saveNotice)
     body = body.replaceAll('Saved in this browser.</span>', 'Not saved in this browser.</span>');

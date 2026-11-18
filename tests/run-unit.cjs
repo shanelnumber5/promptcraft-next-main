@@ -19,6 +19,7 @@ const tests = [
   'workspace-workflow',
   'babbage-cameo',
   'shared-controller',
+  'ai-waiting',
   'architecture',
   'scenario-studio',
   'opening-route',

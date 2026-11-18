@@ -101,7 +101,7 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
 export function downloadGuide(design, options) {
   if (
     options?.teacher &&
-    (!design.revision.trim() || design.sourceDirections !== options.teacher.directions)
+    (!design.revision.trim() || (design.sourceDirections && design.sourceDirections !== options.teacher.directions))
   )
     throw Error('Review a revision for the current assignment before downloading.');
   const url = URL.createObjectURL(

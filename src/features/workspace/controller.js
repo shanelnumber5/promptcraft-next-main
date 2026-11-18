@@ -1,3 +1,4 @@
+import { createAiWaiting } from '../design/ai-waiting.js';
 import { designRoute } from './routes.js';
 import { currentFeedbackQuestions, clarificationNotes } from './feedback-questions.js';
 import { applyTeachingNoteSuggestion } from './teaching-notes.js';
@@ -37,7 +38,7 @@ import { bindDirectionsEditorControls } from '../../shared/directions-editor-con
 import { showBabbageCameo } from '../../shared/babbage-cameo.js';
 import { openMayaDialog } from '../design/maya-dialog.js';
 import { openGuidePreview } from '../design/guide-preview.js';
-import { downloadGuide, loadGuideLogo } from '../design/guide.js';
+import { downloadGuide } from '../design/guide.js';
 import { confirmRestart } from '../../shared/restart-dialog.js';
 import { openReferences } from '../../shared/reference-dialog.js';
 
@@ -91,12 +92,21 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     if (state.finalCheck.context !== context)
       state.finalCheck = { ...finalCheckDefaults(), context };
   };
+  const syncWaiting = createAiWaiting({ onCancel() {
+    ai.requestController?.abort();
+    reviews.cancel();
+    ai.pending = false;
+    ai.error = '';
+    render();
+    document.getElementById('setup-title')?.focus({ preventScroll: true });
+  } });
   const render = ({ focus = false } = {}) => {
     app.innerHTML = showingWrapUp
       ? renderClosing(state, closingStage, closingPage)
       : renderWorkspace(state, ai, readError, designPage, partnerPage, reviewPage, ui);
     fitWorkspace(app);
     showBabbageCameo(state, app);
+    syncWaiting({ ...ai, pending: ai.pending || state.creative.review.status === 'pending', intent: state.creative.review.status === 'pending' ? 'review' : ai.intent }, state.babbage.mode === 'dev');
     if (focus) document.getElementById('setup-title')?.focus({ preventScroll: true });
   };
   function focusTask() {
@@ -229,10 +239,10 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       approve.disabled = !finalCheckReady(state) || state.finalCheck.approved;
       approve.textContent = state.finalCheck.approved
         ? 'Saved to your Course Guide'
-        : 'Save final design to Course Guide';
+        : 'Save final design';
     }
     const download = app.querySelector('[data-action="download-guide"]');
-    if (download) download.disabled = !state.finalCheck.approved || !finalCheckReady(state);
+    if (download) download.disabled = !state.design.revision.trim();
     app.querySelectorAll('.workspace-save-status').forEach((status) => {
       status.textContent = state.saveNotice
         ? 'Not saved in this browser.'
@@ -243,7 +253,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       status.textContent = state.finalCheck.approved
         ? 'This design is approved for your Course Guide.'
         : finalCheckReady(state)
-          ? 'Ready to save. Select Save final design to Course Guide.'
+          ? 'Ready to save. Select Save final design.'
           : 'Include your rationale and review all three checks before saving.';
     const notice = app.querySelector('.save-notice');
     if (notice) notice.textContent = state.saveNotice;
@@ -711,6 +721,11 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       document.getElementById('review-title')?.focus({ preventScroll: true });
       return;
     }
+    if (action === 'toggle-teaching-notes') {
+      ui.showTeachingNotes = !ui.showTeachingNotes;
+      render();
+      return;
+    }
     if (action === 'apply-teaching-note') {
       if (reviews.pending || ai.pending) return;
       const button = event.target.closest('[data-teaching-note]');
@@ -923,16 +938,17 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       saveSafely();
       render();
       document.getElementById('review-title')?.focus({ preventScroll: true });
-    } else if (action === 'download-guide' && finalCheckReady(state) && state.finalCheck.approved) {
-      const context = assignmentContext(state);
-      const logo = await loadGuideLogo();
-      if (context !== assignmentContext(state) || !state.finalCheck.approved) return;
-      downloadGuide(state.design, {
-        teacher: state.teacher,
-        workspace: scenario ? null : state.workspace,
-        logo,
-      });
-      app.querySelector('.design-notice').textContent = 'Your Course Guide download has started.';
+    } else if (action === 'download-guide' && state.design.revision.trim()) {
+      try {
+        downloadGuide(state.design, {
+          approved: state.finalCheck.approved && finalCheckReady(state),
+          teacher: state.teacher,
+          workspace: state.workspace,
+        });
+        app.querySelector('.design-notice').textContent = 'Your Course Guide download has started.';
+      } catch (error) {
+        app.querySelector('.design-notice').textContent = error.message || 'The guide could not be downloaded. Your work is saved.';
+      }
     } else if (action === 'read-final-directions' || action === 'return-final-checks') {
       const target = app.querySelector(
         action === 'read-final-directions' ? '.comparison-card h2' : '.final-check-list h2',

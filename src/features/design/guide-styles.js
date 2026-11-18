@@ -152,4 +152,26 @@ blockquote { padding:16px 20px;  margin:20px 0; background:#F2F2F2; }
 
 .guide-help-section ul { padding-left:22px; margin:0; }
 .guide-help-section li { font-size: 16px; line-height:1.6; margin:12px 0; }
+
+/* Consistent document typography and section padding in preview, download and print. */
+body :is(h1,h2,h3,h4,h5,h6) { font-family:Georgia,'Times New Roman',serif !important; line-height:1.25; }
+.guide-section > section > h2,
+.guide-section > .guide-sources > h2 { margin:0 0 20px; padding:0 0 12px; background:transparent; color:#12355b; border-bottom:3px solid #f2c14e; border-radius:0; }
+.workspace-guide #decision-milestone h2 { padding:0 0 12px; border-bottom:3px solid #f2c14e; }
+.guide-section > .guide-sources { padding:28px 32px; }
+.assignment-content,.guide-section > section { overflow-wrap:anywhere; }
+.assignment-content :is(p,li),.rationale-prose { max-width:78ch; }
+.rationale .rationale-prose { max-width:none; padding:16px 0 0; }
+.guide-sources li { margin:0 0 18px; }
+.guide-sources li span { display:block; margin-top:4px; }
+@media(max-width:600px) {
+ body { padding:12px; }
+ .guide-heading,.workspace-guide .guide-heading,.guide-section > section,.assignment-content,.guide-section > .guide-sources { padding:20px; }
+ .guide-section > section.assignment { padding:0; }
+ .assignment-banner { padding:20px; }
+}
+@media print {
+ body { padding:0; background:#fff; }
+ .guide-section > section,.assignment-content,.guide-section > .guide-sources { padding:16px 0; }
+}
 `;

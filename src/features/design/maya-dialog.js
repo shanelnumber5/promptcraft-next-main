@@ -50,10 +50,13 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
   const showState = (kind, title, message) => {
     dialog.dataset.state = kind;
     actor.hidden=true; dialogue.hidden=true; stateCard.hidden=false; navigation.hidden=true;
-    heading.textContent=novel && kind==='loading' ? 'Preparing your feedback' : 'Maya’s first read';
+    heading.textContent=kind==='loading' ? 'Preparing your feedback' : 'Maya’s first read';
+    const close = dialog.querySelector('[data-maya-close]');
+    close.textContent = kind === 'loading' ? 'Cancel and return to my work' : novel ? 'Skip reading' : onComplete ? 'Back to draft' : 'Close';
+    close.setAttribute('aria-label', close.textContent);
     const engine=dialog.querySelector('[data-maya-loading]');
-    engine.hidden=!(novel && kind==='loading');
-    engine.innerHTML=engine.hidden ? '' : renderLoading({pending:true,stage:'working',intent:'review'},dev);
+    engine.hidden=kind!=='loading';
+    engine.innerHTML=engine.hidden ? '' : renderLoading({pending:true,stage:'working',intent:'perspectives'},dev);
     dialog.querySelector('[data-maya-state-title]').hidden=!engine.hidden;
     dialog.querySelector('[data-maya-state-copy]').hidden=!engine.hidden;
     dialog.querySelector('[data-maya-state-title]').textContent=title;
@@ -87,7 +90,10 @@ export function openMayaDialog(state, opener, {autoStart=false,onComplete=null,n
       line.dataset.dialogueBeat = ''; line.innerHTML = renderInlineProse(beat.text); return line;
     }));
     stateCard.hidden=true; actor.hidden=false; dialogue.hidden=false; navigation.hidden=false;
-    dialog.dataset.state='dialogue'; ask.hidden=Boolean(onComplete) || novel;
+    dialog.dataset.state='dialogue';
+    dialog.querySelector('[data-maya-close]').textContent = novel ? 'Skip reading' : onComplete ? 'Back to draft' : 'Close';
+    dialog.querySelector('[data-maya-close]').setAttribute('aria-label', novel ? 'Skip reading' : 'Close feedback');
+    ask.hidden=Boolean(onComplete) || novel;
     ask.textContent = 'Read this draft again';
     ask.classList.remove('primary');
     response.tabIndex = 0;
