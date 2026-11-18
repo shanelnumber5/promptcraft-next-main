@@ -25,7 +25,7 @@ export function renderBoard(board, { afterContent = '' } = {}) {
 }
 
 export function renderCharacter(character, active) {
-  return `<figure class="character character--${e(character.side)}${active ? ' is-speaking' : ''}"><img src="${e(character.src)}" alt="${e(character.alt)}" data-character="${e(character.id)}"><figcaption>${e(character.name)}</figcaption></figure>`;
+  return `<figure class="character character--${e(character.side)}${active ? ' is-speaking' : ''}"><img src="${e(character.src)}" alt="${e(character.alt)}" data-character="${e(character.id)}" width="832" height="1177" decoding="async"><figcaption>${e(character.name)}</figcaption></figure>`;
 }
 
 function renderNarrativeFeedback(narrative) {

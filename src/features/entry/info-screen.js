@@ -17,7 +17,7 @@ export function renderInfoPage(view, index = 0) {
   const section = page.sections[current];
   const shortTitle = title => ({ "Good company, different perspectives": "Maya’s view", "Institutional context": "College context", "Independent project": "Independence", "Academic context": "Graduate work", "Browsing and testing": "Browsing", "Resume and reset": "Resume &amp; reset", "About this prototype": "This prototype", "Meet the developer": "The developer", "External service privacy": "Service privacy", "Choose where to begin": "Where to begin", "Keep student information out": "Student privacy", "When you ask for AI help": "AI requests", "You make the decisions": "Your decisions", "Professor Pixel": "Professor Pixel", "A student’s first read": "Maya’s first read" }[title] || title);
   const visual = topicVisuals[section.visual];
-  const portrait = `<img src="${visual.src}" alt="${visual.alt}" class="info-portrait">`;
+  const portrait = `<img src="${visual.src}" alt="${visual.alt}" class="info-portrait" decoding="async">`;
   const artwork = ['character', 'shanel'].includes(visual.kind)
     ? `<div class="portrait-crop">${portrait}</div>` : visual.kind === 'engine' ? `<div class="engine-crop">${portrait}</div>` : portrait;
   return `<section class="entry-shell info-shell menu-shell" aria-labelledby="entry-title">

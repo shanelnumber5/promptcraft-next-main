@@ -17,7 +17,8 @@ import {
 } from './config.js';
 import { workspaceViews } from './views.js';
 import { downloadProjectFile, parseProjectFile, MAX_PROJECT_BYTES } from './project-file.js';
-import { requestCreativeDirections, creativeBasis, combineDirections } from './creative.js';
+import { combineDirections } from './creative.js';
+import { exploreWorkspace } from './exploration-controller.js';
 import { renderClosing } from '../design/closing.js';
 import { isTestLessonKeyword, fillTestLesson } from '../../shared/test-lesson.js';
 import { renderWorkspace } from './screen.js';
@@ -195,64 +196,30 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     if (initialExploration && state.babbage.questions.length) {
       state.babbage = { ...conversationDefaults(), mode: state.babbage.mode };
     }
-    const source = state;
-    const basis = creativeBasis(state);
-    const snapshot = structuredClone(state);
-    const request = new AbortController();
-    Object.assign(ai, {
-      pending: true,
-      requestController: request,
-      error: '',
-      stage: 'working',
-      intent: 'explore',
-    });
-    partnerPage = 'work';
-    state.designPanel = 'babbage';
-    ui = workspaceViews();
-    render();
-    try {
-      const directions = await requestCreativeDirections(snapshot, {
-        signal: AbortSignal.any([request.signal, AbortSignal.timeout(90000)]),
-        onStage: (stage) => {
-          if (source !== state || request.signal.aborted || ai.requestController !== request)
-            return;
-          ai.stage = stage;
-          if (state.designPanel === 'babbage') render();
-        },
-        onRefinementFailure: (message) => {
-          if (source === state && !request.signal.aborted) ai.error = message;
-        },
-      });
-      if (request.signal.aborted || source !== state) return;
-      if (basis !== creativeBasis(state)) {
-        ai.error =
-          'Your context changed while Babbage was exploring. Ask again for possibilities based on your latest work.';
-        return;
-      }
-      state.creative.directions = directions;
-      partnerPage = 'ideas';
-      state.creative.basis = basis;
-    } catch (error) {
-      if (source === state && !request.signal.aborted)
-        ai.error =
-          error.name === 'TimeoutError'
-            ? 'Babbage took too long. Your ideas and draft are unchanged. Try again.'
-            : error.message;
-    } finally {
-      if (source === state) {
-        Object.assign(ai, { pending: false, requestController: null });
+    await exploreWorkspace({
+      getState: () => state,
+      ai,
+      onStart: () => {
+        partnerPage = 'work';
+        state.designPanel = 'babbage';
+        ui = workspaceViews();
+        render();
+      },
+      onStage: () => { if (state.designPanel === 'babbage') render(); },
+      onComplete: () => { partnerPage = 'ideas'; },
+      onFinish: () => {
         saveSafely();
         if (state.designPanel !== 'revision') {
           render();
           if (state.designPanel === 'babbage') {
-            const heading = document.getElementById('possibilities-title');
-            heading?.focus({ preventScroll: true });
+            document.getElementById('possibilities-title')?.focus({ preventScroll: true });
             window.scrollTo({ top: 0, behavior: 'instant' });
           }
         }
-      }
-    }
+      },
+    });
   }
+
   function updateApproval() {
     app.querySelectorAll('[data-final-check]').forEach((control) => {
       control.checked = state.finalCheck[control.dataset.finalCheck];

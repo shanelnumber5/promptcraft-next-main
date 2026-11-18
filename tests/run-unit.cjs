@@ -3,6 +3,7 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const tests = [
   'json-request',
+  'chatmt-worker',
   'design',
   'babbage',
   'maya',
@@ -10,6 +11,7 @@ const tests = [
   'dialogue-portrait',
   'idea-lab',
   'creative',
+  'exploration-controller',
   'repository',
   'workspace-review',
   'workspace-project',
