@@ -6,10 +6,6 @@ export const infoPages = [
   ['privacy', 'Privacy & Progress'],
 ];
 
-export function renderInfoNavigation(view) {
-  return `<nav class="info-nav" aria-label="About and help"><a href="?view=home"${view === 'home' ? ' aria-current="page"' : ''}>Home</a>${infoPages.map(([id, label]) => `<a href="?view=${id}"${view === id ? ' aria-current="page"' : ''}>${label}</a>`).join('')}<select class="info-nav-select" aria-label="About and help page"><option value="home">Home</option>${view === 'guide' ? '<option value="guide" selected>Course Guide</option>' : ''}${infoPages.map(([id, label]) => `<option value="${id}"${view === id ? ' selected' : ''}>${label}</option>`).join('')}</select></nav>`;
-}
-
 export function renderInfoPage(view, index = 0) {
   const page = pages[view];
   if (!page) return '';
@@ -154,7 +150,7 @@ const pages = {
       },
       {
         "title": "Open the published prototype",
-        "body": "<p>To open the published PromptCraft site on another device, scan this code. This link opens the published site; preview changes and browser saves stay on this device.</p><p><a href=\"https://promptcraft-discussion.netlify.app/?view=home\" target=\"_blank\" rel=\"noopener noreferrer\"><img src=\"assets/brand/promptcraft-qr.png\" width=\"128\" height=\"128\" alt=\"QR code: open the published PromptCraft site in a new tab\"></a></p>",
+        "body": "<p>To open the published PromptCraft site on another device, scan this code. Preview changes and browser saves stay on this device.</p><p><img src=\"assets/brand/promptcraft-qr.png\" width=\"128\" height=\"128\" alt=\"QR code for the published PromptCraft site\"></p>",
         "visual": "classroom"
       }
     ]

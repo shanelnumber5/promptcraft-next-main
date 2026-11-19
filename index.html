@@ -10,26 +10,64 @@
   <body>
     <a class="skip-link" href="#scene-title">Skip to the activity</a>
     <header class="app-header">
-      <a class="brand" href="?view=home" aria-label="PromptCraft home"
-        ><img src="assets/brand/babbage-mark-small.svg" alt="" /><span
+      <div class="brand">
+        <img src="assets/brand/babbage-mark-small.svg" alt="" /><span
           ><strong>Prompt<span>Craft</span></strong
           ><small>The Prompt Lab · Great Falls College MSU</small></span
-        ></a
-      >
+        >
+      </div>
       <div class="header-actions">
-      <a class="action-link" href="?view=home">Home</a>
-      <button type="button" class="restart-module" data-action="open-references" aria-label="Sources and samples">
-        <span class="reference-label-wide">Sources &amp; samples</span><span class="reference-label-small">Resources</span>
-      </button>
-      <button type="button" class="restart-module" data-action="restart-module">
-        Restart module
-      </button>
+        <div class="dropdown site-menu" data-dropdown>
+          <button
+            type="button"
+            id="site-menu-toggle"
+            data-dropdown-toggle
+            aria-expanded="false"
+            aria-controls="site-menu-panel"
+          >
+            Menu
+          </button>
+          <nav
+            id="site-menu-panel"
+            class="dropdown-panel info-nav"
+            popover="manual"
+            aria-label="PromptCraft menu"
+            hidden
+          >
+            <a class="action-link" href="?view=home">Home</a>
+            <a href="?view=play&amp;story=1">Guided Scenario</a>
+            <a href="?view=workspace">Creative Workspace</a>
+            <a href="?view=lab">Babbage’s Idea Lab</a>
+            <a href="?view=guide">Course Guide</a>
+            <a href="?view=scenario" class="site-return-activity" hidden
+              >Return to saved activity</a
+            >
+            <button
+              type="button"
+              class="restart-module"
+              data-action="open-references"
+              aria-label="Sources and samples"
+            >
+              <span class="reference-label-wide">Sources &amp; samples</span
+              ><span class="reference-label-small">Resources</span>
+            </button>
+            <button type="button" class="restart-module" data-action="restart-module">
+              Restart module
+            </button>
+            <a href="?view=how-to-play">How to Play</a>
+            <a href="?view=about">About PromptCraft</a>
+            <a href="?view=babbage">Meet the Characters</a>
+            <a href="?view=privacy">Privacy &amp; Progress</a>
+          </nav>
+        </div>
       </div>
     </header>
     <main id="app"></main>
     <footer class="app-footer">
-      <a href="?view=privacy">Privacy &amp; Progress</a>
-      <span class="app-footer-disclosure">Asking Babbage sends assignment details to Chat MT AI</span>
+      <span>Great Falls College MSU</span>
+      <span class="app-footer-disclosure"
+        >Asking Babbage sends assignment details to Chat MT AI</span
+      >
     </footer>
     <noscript
       >This prototype needs JavaScript. Your existing PromptCraft project is unchanged.</noscript

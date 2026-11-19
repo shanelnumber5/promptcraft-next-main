@@ -4,6 +4,7 @@ import { discussionOpening } from '../opening/content.js';
 import { readWorkspace } from '../workspace/storage.js';
 import { openGuidePreview } from '../design/guide-preview.js';
 import { escapeHTML as e } from '../../shared/html.js';
+import { renderDropdown } from '../../shared/dropdown.js';
 
 // Read existing snapshots only. Visiting the guide never changes progress or the resume path.
 export function mountCourseGuide(app, storage = window.localStorage) {
@@ -47,12 +48,13 @@ export function mountCourseGuide(app, storage = window.localStorage) {
               (entry.path === 'workspace'
                 ? 'Your discussion design and the reasoning behind it.'
                 : 'Your work from Scenario 1 · Give the discussion a job.');
-            return `<article class="guide-entry" aria-labelledby="guide-entry-${index}"><div class="guide-entry-copy"><div class="guide-entry-meta"><span>${entry.title}</span><span class="guide-entry-status${approved ? ' is-approved' : ''}">${approved ? 'Approved version' : 'In progress'}</span></div><h3 id="guide-entry-${index}">${e(title)}</h3><p>${e(summary.slice(0, 180))}${summary.length > 180 ? '…' : ''}</p></div><div class="guide-entry-actions"><button type="button" class="action-link${approved ? ' primary' : ''}" data-guide-index="${index}" aria-label="${approved ? 'Open' : 'Preview'} ${e(entry.title)} guide">${approved ? 'Open guide' : 'Preview draft'}</button><a href="?view=${entry.path}" aria-label="Continue designing in ${e(entry.title)}">Continue designing</a></div></article>`;
+            const options = `<button type="button" data-guide-index="${index}" aria-label="${approved ? 'Open' : 'Preview'} ${e(entry.title)} guide">${approved ? 'Open guide' : 'Preview draft'}</button><a href="?view=${entry.path}" aria-label="Continue designing in ${e(entry.title)}">Continue designing</a>`;
+            return `<article class="guide-entry" aria-labelledby="guide-entry-${index}"><div class="guide-entry-copy"><h3 id="guide-entry-${index}">${e(title)}</h3><p class="guide-entry-status${approved ? ' is-approved' : ''}">${e(entry.title)} · ${approved ? 'Approved version' : 'In progress'}</p><p>${e(summary.slice(0, 180))}${summary.length > 180 ? '…' : ''}</p></div><div class="guide-entry-actions">${renderDropdown({ id: `guide-options-${index}`, label: 'Guide options', content: options })}</div></article>`;
           })
           .join(
             '',
           )}</div><footer class="guide-library-note"><p>Saved in this browser. Download a finished HTML guide from your workspace to keep a separate copy.</p></footer>`
-      : `<div class="guide-empty"><h3>A place for your next idea</h3><p>Start a design or try the guided scenario. Your saved work will appear here.</p><div class="guide-empty-actions"><a class="action-link primary" href="?view=workspace">Open Creative Workspace</a><a href="?view=play">Try Scenario 1</a></div></div>`
+      : `<div class="guide-empty"><h3>A place for your next idea</h3><p>Choose Guided Scenario or Creative Workspace from Menu. Your saved work will appear here.</p></div>`
   }<p role="status" data-guide-notice></p></div></section>`;
   app.querySelector('[data-guide-notice]').textContent = [notice, workspace.error]
     .filter(Boolean)

@@ -56,7 +56,12 @@ module.exports = async ({
       })()`);
       await go('home');
       const before = await evaluate(saves);
-      assert.equal(await evaluate('document.querySelectorAll(".home-paths a").length'), 2);
+      assert.equal(
+        await evaluate(
+          'document.querySelectorAll(".home-path--story,.home-path--workspace").length',
+        ),
+        2,
+      );
       assert(
         await evaluate(
           '!!document.querySelector(".home-classroom img[src*=maya]") && !!document.querySelector(".home-classroom img[src*=pixel]")',
@@ -90,6 +95,12 @@ module.exports = async ({
         await evaluate(
           'window.__spoken.at(-1).text.includes(document.querySelector(".speech-bubble p").textContent)',
         ),
+      );
+      assert(
+        await evaluate(
+          `getComputedStyle(document.querySelector('[data-action=toggle-narration]')).backgroundColor==='rgba(0, 0, 0, 0)'`,
+        ),
+        'Active narration remains a plain text control',
       );
       const firstRead = await evaluate('window.__spoken.length');
       await evaluate('document.querySelector("[data-action=repeat-narration]").click()');
@@ -139,7 +150,9 @@ module.exports = async ({
           );
         }
       } else {
-        await keyboardReach('.story-identity a');
+        await keyboardReach('.site-menu > [data-dropdown-toggle]');
+        await key('Enter', 'Enter', 13);
+        await keyboardReach('.site-return-activity');
         await key('Enter', 'Enter', 13);
       }
       await waitFor('!!document.querySelector(".workspace-shell,.closing-experience")');

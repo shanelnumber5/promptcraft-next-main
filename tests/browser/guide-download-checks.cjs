@@ -30,7 +30,7 @@ module.exports = async ({ send, evaluate, waitFor, shot, key, keyboardReach, sce
   await send('Page.navigate', { url: 'http://127.0.0.1:8783/?view=' + route });
   await waitFor('!!document.querySelector(".workspace-tabs")');
   const click = (selector) =>
-    evaluate(`document.querySelector(${JSON.stringify(selector)}).click()`);
+    evaluate(`(()=>{const el=document.querySelector(${JSON.stringify(selector)});const dropdown=el.closest('[data-dropdown]');if(dropdown?.querySelector('.dropdown-panel').hidden)dropdown.querySelector('[data-dropdown-toggle]').click();el.click();})()`);
   const fill = (selector, value) =>
     evaluate(
       `(()=>{const el=document.querySelector(${JSON.stringify(selector)});el.value=${JSON.stringify(value)};el.dispatchEvent(new Event('input',{bubbles:true}));})()`,
@@ -187,7 +187,7 @@ module.exports = async ({ send, evaluate, waitFor, shot, key, keyboardReach, sce
   );
   await click('[data-guide-close]');
   await waitFor('!document.querySelector("dialog[open]")');
-  await evaluate(`document.querySelectorAll('.guide-entry')[${index}].querySelector('a').click()`);
+  await evaluate(`(()=>{const entry=document.querySelectorAll('.guide-entry')[${index}];if(entry.querySelector('.dropdown-panel').hidden)entry.querySelector('[data-dropdown-toggle]').click();entry.querySelector('a').click();})()`);
   await waitFor(
     `new URLSearchParams(location.search).get('view')===${JSON.stringify(route)} && !!document.querySelector('.workspace-tabs')`,
   );

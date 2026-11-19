@@ -896,7 +896,11 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       render();
       const target = returning && opener ? document.getElementById(opener) : null;
       if (target) {
-        target.focus({ preventScroll: true });
+        const focusTarget =
+          target
+            .closest('.dropdown-panel[hidden]')
+            ?.parentElement.querySelector('[data-dropdown-toggle]') || target;
+        focusTarget.focus({ preventScroll: true });
         if (selection && target.setSelectionRange) target.setSelectionRange(...selection);
       } else focusTask();
       return;

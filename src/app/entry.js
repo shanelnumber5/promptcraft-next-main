@@ -1,6 +1,8 @@
 import { campusSignature } from '../shared/lab-visuals.js';
 import { rememberPath } from '../features/workspace/storage.js';
-import { infoPages, renderInfoNavigation } from '../features/entry/info-screen.js';
+import { infoPages } from '../features/entry/info-screen.js';
+import { mountDropdowns } from '../shared/dropdown.js';
+mountDropdowns();
 const params = new URLSearchParams(window.location.search);
 const requested = params.get('view');
 const view = [
@@ -19,24 +21,12 @@ const app = document.getElementById('app');
 if (['home', 'guide', 'lab', ...infoPages.map(([id]) => id)].includes(view))
   document.body.dataset.infoReader = '';
 if (['home', 'guide', 'lab'].includes(view) || infoPages.some(([id]) => id === view)) {
-  document.querySelector('.header-actions a[href="?view=home"]').hidden = true;
   document.querySelector('.header-actions').insertAdjacentHTML('beforeend', campusSignature());
-  app.insertAdjacentHTML('beforebegin', renderInfoNavigation(view));
-  // Switch information tabs in place instead of loading a second page/menu.
-  // Keep normal navigation for other experiences and modified clicks.
-  document.querySelector('.info-nav-select')?.addEventListener('change', (event) => {
-    const destination = new URL(window.location.href);
-    destination.searchParams.set('view', event.target.value);
-    const matchingLink = document.querySelector(`.info-nav a[href="?view=${event.target.value}"]`);
-    if (
-      matchingLink &&
-      infoPages.some(([id]) => id === event.target.value) &&
-      infoPages.some(([id]) => id === document.body.dataset.appView)
-    )
-      matchingLink.click();
-    else window.location.href = destination.href;
-  });
 }
+document.querySelectorAll('#site-menu-panel a[href^="?"]').forEach((link) => {
+  if (new URL(link.href).searchParams.get('view') === view)
+    link.setAttribute('aria-current', 'page');
+});
 const restart = document.querySelector('[data-action="restart-module"]');
 if (params.get('mockBabbage') === '1')
   document.addEventListener('click', (event) => {

@@ -17,7 +17,9 @@ Both routes use **Explore → Build → Review**. Explore offers three possibili
 
 Review starts the first Babbage check automatically; subsequent checks are educator controlled. Maya and Pixel offer perspectives and questions to clarify. Teaching-note proposals change your saved wording only when you accept them. Complete the final checks to save the approved version, preview or download the guide, and finish with Pixel.
 
-**Project** in the quiet global header includes editable JSON project backup/import, resources and reset. Explore → Build → Review is the main navigation; section links are secondary. Each task shows its current step, with Back and Continue in the same bottom row. AI-use choices and the optional rubric preference stay inside Build. Rubric review and editing share the Review screen, without opening automatically over Final checks. Scenario and Workspace saves are independent. Use project backup to move work between browsers or addresses. Existing saved-project keys and validation remain compatible. Scenario uses `promptcraft_next_opening_v1` plus `promptcraft_scenario_studio_v1`; Workspace uses `promptcraft_assignment_workspace_v1`. Browser addresses have separate local storage.
+**Menu** contains site navigation and **Project**, with editable JSON backup/import, resources and reset. **Activity tools** groups previews and secondary task actions; the guide library uses **Guide options**. Explore → Build → Review remains the main task navigation, with quieter section links and predictable Back/Continue controls. AI-use choices and the optional rubric preference stay inside Build. Rubric review and editing share the Review screen, without opening automatically over Final checks. Scenario and Workspace saves are independent. Use project backup to move work between browsers or addresses. Existing saved-project keys and validation remain compatible. Scenario uses `promptcraft_next_opening_v1` plus `promptcraft_scenario_studio_v1`; Workspace uses `promptcraft_assignment_workspace_v1`. Browser addresses have separate local storage.
+
+The [editorial visual system](docs/editorial-design-20261119.md) uses full-bleed color and imagery, oversized Georgia headings, Arial body text, and plain numbered navigation. Cards, outer frames, rounded panels, shadows, eyebrow labels, and decorative menu arrows are removed.
 
 ## AI and privacy
 
@@ -29,6 +31,7 @@ The browser uses the existing backend at `https://promptcraft-discussion.netlify
 
 - `npm run test:unit`: 25 offline suites; unmocked global fetch is blocked.
 - `node tests/browser/story-audio.test.cjs`: keyboard story entry, replay preservation, and narration controls; speech output is mocked.
+- `node tests/browser/menu-navigation.test.cjs`: keyboard dropdowns, full-bleed home layout, saved-work entry, and no-scroll checks at six sizes.
 - `npm test`: offline suites plus local static-server checks.
 - `npm run test:browser`: shared Scenario and Workspace browser fixtures.
 - `npm run test:lab`: Idea Lab browser fixtures.

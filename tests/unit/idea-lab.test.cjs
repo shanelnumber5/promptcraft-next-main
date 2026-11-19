@@ -85,7 +85,7 @@ const assert = require('node:assert/strict');
   const home = renderHome('workspace');
   assert(home.includes('Continue your saved work'));
   assert(home.includes('Creative Workspace'));
-  assert(home.includes('?view=guide'));
+  assert(!home.includes('home-tools') && !home.includes('home-eyebrow') && !home.includes('→'));
   assert(!home.includes('home-scope'));
   assert(home.includes('class="home-board menu-board home-studio"'));
   assert(!home.includes('Private work · Progress saves in this browser'));

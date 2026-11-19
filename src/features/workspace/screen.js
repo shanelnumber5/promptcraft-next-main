@@ -19,7 +19,7 @@ export function renderWorkspace(
 ) {
   const route = designRoute(state.experience);
   if (error)
-    return `<section class="entry-shell"><h1 id="setup-title" tabindex="-1">${e(route.heading)} needs attention</h1><p role="status">${e(error)}</p><button type="button" data-action="reset-workspace">${e(route.restartLabel)}</button><a href="?view=home">Return home</a></section>`;
+    return `<section class="entry-shell"><h1 id="setup-title" tabindex="-1">${e(route.heading)} needs attention</h1><p role="status">${e(error)}</p><button type="button" data-action="reset-workspace">${e(route.restartLabel)}</button></section>`;
   const panel = state.designPanel;
   const tabs = workspaceStages;
   let body = renderUtility(state, ai, ui);

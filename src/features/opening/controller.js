@@ -27,6 +27,8 @@ export function mountOpening(
   const replay =
     new URL(location.href).searchParams.get('story') === '1' && state.phase !== 'opening';
   if (replay) state = initialState(discussionOpening);
+  const returnLink = document.querySelector('.site-return-activity');
+  if (returnLink) returnLink.hidden = !replay;
   const life = new AbortController();
   const narrator = createNarrator({
     speech: globalThis.window?.speechSynthesis,

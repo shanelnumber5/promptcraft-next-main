@@ -180,7 +180,7 @@ const assert = require('node:assert/strict');
   );
 
   const checks = renderReview(state, { pending: false }, 'checks');
-  assert(checks.includes(state.design.revision) && checks.includes('href="#check-activity"'));
+  assert(checks.includes(state.design.revision) && checks.includes('id="check-activity"') && !checks.includes('href="#check-activity"'));
   assert(
     checks.includes('data-action="preview-guide"') &&
       checks.includes('data-action="download-guide"'),

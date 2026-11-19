@@ -36,7 +36,7 @@ module.exports = async function auditContrast(evaluate) {
     while (walker.nextNode()) {
       const node = walker.currentNode, parent = node.parentElement;
       if (node.textContent.trim() && !parent.closest('script,style,option') && visible(parent)) {
-        check(parent, node.textContent.trim(), getComputedStyle(parent).color, 7);
+        check(parent, node.textContent.trim(), getComputedStyle(parent).webkitTextFillColor || getComputedStyle(parent).color, 7);
         const size = parseFloat(getComputedStyle(parent).fontSize);
         if (size < 16 && !parent.closest('svg')) failures.push({kind:'text-size',text:node.textContent.trim().slice(0,100),size,minimum:16});
       }

@@ -1,251 +1,242 @@
-/* The main menu owns its layout; optional tools stay beneath the two journeys. */
+/* The entry is a full-bleed editorial spread, with an illustrated field and a numbered index. */
 body[data-app-view][data-app-view='home'] {
-  background: #d8edfc;
+  background: #f3bf4b;
+  min-height: 100svh;
+  height: 100svh;
 }
 body[data-app-view][data-app-view='home'] #app {
-  max-width: 1440px;
-  padding: 24px 40px 32px;
+  width: 100%;
+  max-width: none;
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+body[data-app-view='home'] .home-shell {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: 0;
 }
 body[data-app-view='home'] .home-shell .info-heading {
   height: auto;
-  margin: 0 0 20px;
+  margin: 0;
+  padding: clamp(16px, 2.5vw, 40px) clamp(24px, 5vw, 80px);
+  flex: none;
 }
 body[data-app-view='home'] .home-shell .info-heading h1 {
-  font-size: 30px;
+  font:
+    700 clamp(48px, 8.4vw, 144px) / 0.95 Georgia,
+    'Times New Roman',
+    serif;
+  letter-spacing: -0.055em;
+  margin: 0;
   color: #1e2d59;
 }
 body[data-app-view='home'] .home-studio {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
   grid-template-rows: auto;
+  flex: 1;
   height: auto;
+  min-height: 0;
   gap: 0;
   padding: 0;
-  min-height: 0;
+  border: 0;
   overflow: hidden;
-  border-radius: 16px;
-  background: #1e2d59;
-  box-shadow: 0 12px 30px #1e2d5926;
+  border-radius: 0;
+  background: #f3bf4b;
+  box-shadow: none;
 }
 body[data-app-view='home'] .home-studio-intro {
-  grid-row: auto;
-  padding: 32px 32px 0;
-  border: 0;
-  border-radius: 0;
-  background: #1e2d59;
-  color: white;
-}
-body[data-app-view='home'] .home-studio-intro h2 {
-  border: 0;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
   padding: 0;
-  margin: 0 0 16px;
-  font-size: clamp(28px, 3vw, 42px);
-  line-height: 1.18;
-  color: white;
-}
-body[data-app-view='home'] .home-studio-intro > p {
-  color: white;
-  font-size: 18px;
-  line-height: 1.5;
-  max-width: 42ch;
-  margin: 0 0 20px;
-}
-body[data-app-view='home'] .home-studio-intro > .home-eyebrow {
-  color: #ffcf61;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-bottom: 12px;
+  background: #f3bf4b;
 }
 .home-classroom {
   position: relative;
   isolation: isolate;
   display: flex;
+  flex: 1;
   align-items: flex-end;
   justify-content: center;
-  height: 240px;
-  margin: 24px -32px 0;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
   overflow: hidden;
-  background: #345d80 url('../../assets/backgrounds/classroom.webp') center 55% / cover;
-  border-top: 4px solid #d98f06;
-}
-.home-classroom::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: #1e2d5938;
-  z-index: -1;
+  background: #f3bf4b url('../../assets/backgrounds/classroom.webp') center/cover;
 }
 .home-classroom img {
-  height: 300px;
-  width: auto;
-  object-fit: contain;
-  flex: none;
-  margin-bottom: -58px;
-  filter: drop-shadow(0 4px 6px #1e2d5940);
+  height: 100%;
+  max-height: none;
+  width: 55%;
+  max-width: none;
+  object-fit: cover;
+  object-position: center 24%;
+  flex: 0 0 55%;
+  margin: 0;
+  filter: none;
 }
 .home-classroom .home-pixel {
-  margin-left: -35px;
+  margin-left: -12%;
 }
 .home-classroom figcaption {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 8px 12px;
-  background: #1e2d59;
-  color: white;
-  text-align: center;
-  font-size: 16px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
 }
 body[data-app-view='home'] .home-studio .home-choices {
-  grid-row: auto;
   display: flex;
+  min-height: 0;
   flex-direction: column;
-  padding: 32px;
-  gap: 20px;
-  background: #1e2d59;
-}
-body[data-app-view='home'] .home-studio .home-menu-label {
-  padding: 0;
-  margin: 0;
-  border: 0;
-  color: white;
-  font-size: 28px;
+  justify-content: center;
+  padding: 24px clamp(24px, 5vw, 80px);
+  gap: 0;
+  background: #f3bf4b;
 }
 body[data-app-view='home'] .home-studio .home-paths {
   display: grid;
-  grid-template-rows: auto auto;
-  gap: 16px;
+  grid-template-rows: auto;
+  gap: clamp(24px, 4vh, 48px);
+  min-height: 0;
+  counter-reset: journey;
 }
 body[data-app-view='home'] .home-studio .home-path {
-  display: block;
-  padding: 20px 24px;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  align-items: baseline;
+  gap: 12px;
+  padding: 0;
   margin: 0;
-  background: #ffd579;
+  background: transparent;
   color: #1e2d59;
-  border: 2px solid #ffd579;
-  border-radius: 8px;
+  border: 0;
+  border-radius: 0;
+  text-decoration: none;
+  counter-increment: journey;
 }
-body[data-app-view='home'] .home-studio .home-path--workspace {
-  background: #b9e3ff;
-  border-color: #b9e3ff;
+body[data-app-view='home'] .home-studio .home-path::before {
+  content: counter(journey, decimal-leading-zero);
+  font:
+    400 18px/1.4 Arial,
+    Helvetica,
+    sans-serif;
+}
+body[data-app-view='home'] .home-studio .home-path--resume {
+  display: block;
+  counter-increment: none;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  text-align: left;
+  font:
+    400 16px/1.4 Arial,
+    Helvetica,
+    sans-serif;
+}
+body[data-app-view='home'] .home-studio .home-path--resume::before {
+  content: none;
 }
 body[data-app-view='home'] .home-studio .home-path:hover {
-  background: white;
-  border-color: white;
-  transform: translateY(-2px);
+  background: transparent;
+  color: #1e2d59;
+}
+body[data-app-view='home'] .home-studio .home-path:hover strong,
+body[data-app-view='home'] .home-studio .home-path--resume:hover {
+  text-decoration: underline;
+  text-underline-offset: 6px;
 }
 body[data-app-view='home'] .home-studio .home-path strong {
+  display: block;
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 26px;
+  font-size: clamp(28px, 3vw, 48px);
   font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
   color: #1e2d59;
 }
 body[data-app-view='home'] .home-studio .home-path span span {
+  display: block;
+  margin-top: 12px;
   font-size: 16px;
   color: #1e2d59;
-  line-height: 1.5;
+  line-height: 1.45;
 }
-body[data-app-view='home'] .home-studio .home-path .home-path-action {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 14px;
-  font-weight: 700;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-body[data-app-view='home'] .home-studio .home-path-action > span {
-  margin: 0;
-}
-body[data-app-view='home'] .home-studio .home-resume {
-  margin: 0;
-  display: block;
-}
-body[data-app-view='home'] .home-studio .home-resume a {
-  background: transparent;
-  color: white;
-  border: 0;
-  padding: 4px 0;
-  font-size: 16px;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-.home-resume p {
-  margin: 0;
-  font-size: 16px;
-  color: white;
-}
-.home-tools {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 24px;
-}
-.home-tools a {
-  color: white;
-  font-size: 16px;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  text-underline-offset: 4px;
-}
-body[data-app-view='home'] .home-studio :is(a, button):focus-visible {
-  outline: 3px solid white !important;
-  outline-offset: 4px;
-}
-body[data-app-view='home'] .home-studio .home-path:focus-visible {
-  outline-color: white !important;
+body[data-app-view='home'] .home-studio a:focus-visible {
+  outline: 3px solid #1e2d59 !important;
+  outline-offset: 6px;
 }
 @media (max-width: 700px) {
-  body[data-app-view][data-app-view='home'] #app {
-    padding: 20px 16px;
+  body[data-app-view='home'] .home-shell .info-heading {
+    padding: 16px 24px;
+  }
+  body[data-app-view='home'] .home-shell .info-heading h1 {
+    font-size: clamp(40px, 11vw, 64px);
   }
   body[data-app-view='home'] .home-studio {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto auto;
-    gap: 0;
+    grid-template-rows: minmax(76px, 1fr) auto;
   }
   body[data-app-view='home'] .home-studio-intro {
-    padding: 24px 24px 0;
-  }
-  body[data-app-view='home'] .home-studio-intro h2 {
-    font-size: 30px;
-  }
-  body[data-app-view='home'] .home-studio-intro > p {
-    font-size: 16px;
-  }
-  .home-classroom {
-    margin: 20px -24px 0;
-    height: 180px;
-  }
-  .home-classroom img {
-    height: 244px;
-    margin-bottom: -55px;
-  }
-  body[data-app-view='home'] .home-studio .home-choices {
-    padding: 24px;
     grid-row: 1;
   }
+  body[data-app-view='home'] .home-studio .home-choices {
+    grid-row: 2;
+    padding: 20px 24px;
+  }
+  body[data-app-view='home'] .home-studio .home-paths {
+    gap: 20px;
+  }
   body[data-app-view='home'] .home-studio .home-path {
-    padding: 18px;
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 8px;
   }
   body[data-app-view='home'] .home-studio .home-path strong {
-    font-size: 24px;
+    font-size: clamp(26px, 7vw, 36px);
   }
-  body[data-app-view='home'] .home-studio-intro {
-    grid-row: 2;
-    padding-top: 8px;
+  body[data-app-view='home'] .home-studio .home-path span span {
+    margin-top: 6px;
+  }
+  .home-classroom img {
+    object-position: center 14%;
+  }
+}
+@media (max-height: 499px) and (min-width: 701px) {
+  body[data-app-view='home'] .home-shell .info-heading {
+    padding: 8px 24px;
   }
   body[data-app-view='home'] .home-shell .info-heading h1 {
+    font-size: 64px;
+  }
+  body[data-app-view='home'] .home-studio {
+    grid-template-columns: 180px minmax(0, 1fr);
+  }
+  body[data-app-view='home'] .home-studio .home-choices {
+    padding: 12px 24px;
+  }
+  body[data-app-view='home'] .home-studio .home-paths {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  body[data-app-view='home'] .home-studio .home-path--resume {
+    grid-column: 1 / -1;
+  }
+  body[data-app-view='home'] .home-studio .home-path strong {
     font-size: 26px;
   }
-  body[data-app-view='home'] .home-studio .home-menu-label {
-    font-size: 26px;
+}
+@media (max-width: 700px) and (max-height: 499px) {
+  body[data-app-view][data-app-view='home'] {
+    height: auto;
   }
-  body[data-app-view='home'] .home-studio .home-resume a {
-    width: 100%;
-    justify-content: space-between;
-    text-align: left;
+  body[data-app-view='home'] .home-studio {
+    flex: none;
+    grid-template-rows: 100px auto;
   }
 }

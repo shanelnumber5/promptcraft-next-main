@@ -125,7 +125,7 @@ export function renderPartner(state, ai, page, preview, ui = {}) {
   if (utilityPage)
     actions += '<button type="button" data-partner-page="work">Back to exploration</button>';
   if (welcome) {
-    content = `<div class="workspace-welcome-board"><div class="workspace-welcome-intro">${content.replace(/<h3>[\s\S]*?<\/h3>/, '')}${renderWorkspaceDisclosure(state)}</div><a class="studio-optional-link" href="?view=lab">${state.experience === 'scenario' ? 'Browse Idea Lab in Creative Workspace' : 'Browse Babbage’s Idea Lab'}</a></div>`;
+    content = `<div class="workspace-welcome-board"><div class="workspace-welcome-intro">${content.replace(/<h3>[\s\S]*?<\/h3>/, '')}${renderWorkspaceDisclosure(state)}</div></div>`;
   }
   const latestMessage =
     conversation.history.findLast((turn) => turn.role === 'assistant')?.display || '';
