@@ -510,7 +510,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     Object.assign(ai, {
       pending: true,
       requestController: request,
-      intent: 'review',
+      intent: 'rubric',
       stage: 'sending',
       error: '',
     });
@@ -555,7 +555,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
             ai.error ||
             (request.signal.aborted
               ? 'Rubric cancelled. Your work is saved.'
-              : 'Rubric created. Edit the descriptors, then continue.');
+              : 'Rubric ready. Editing is optional.');
       }
     }
     return;
