@@ -9,7 +9,7 @@ body[data-app-view]:is([data-app-view='workspace'], [data-app-view='play']) > he
   height: auto;
   min-height: 64px;
   padding: 8px 24px;
-  background: #fff !important;
+  background: #d8edfc !important;
   border-bottom: 1px solid #1e2d59;
   box-shadow: none;
 }
@@ -35,7 +35,7 @@ body[data-app-view]:is([data-app-view='workspace'], [data-app-view='play'])
   > header.app-header
   .brand
   small {
-  font-size: 14px;
+  font-size: 16px;
 }
 body[data-app-view]:is([data-app-view='workspace'], [data-app-view='play'])
   > header.app-header
@@ -46,7 +46,7 @@ body[data-app-view]:is([data-app-view='workspace'], [data-app-view='play'])
   box-shadow: none;
   min-height: 44px;
   padding: 8px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   text-decoration: underline;
   text-underline-offset: 4px;
@@ -56,7 +56,7 @@ body[data-app-view='workspace'] #app .workspace-shell .workspace-tabs {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   padding: 0;
   gap: 0;
-  background: #fff;
+  background: #d8edfc;
   border-bottom: 2px solid #1e2d59;
 }
 body[data-app-view='workspace'] #app .workspace-shell .workspace-tabs button {
@@ -82,7 +82,7 @@ body[data-app-view='workspace'] #app .workspace-tabs button:focus-visible {
   outline-offset: -4px;
 }
 .studio-stage-number {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
 }
 body[data-app-view='workspace'] #app .workspace-heading {
@@ -149,7 +149,7 @@ body[data-app-view='workspace']
   color: #1e2d59;
 }
 .studio-section-number {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   min-width: 12px;
 }
@@ -160,7 +160,7 @@ body[data-app-view='workspace']
 body[data-app-view='workspace'] #app .studio-step {
   margin: 0 0 6px;
   font:
-    400 14px/1.4 Arial,
+    400 16px/1.4 Arial,
     Helvetica,
     sans-serif;
 }
@@ -206,7 +206,7 @@ body[data-app-view='workspace']
   background: transparent;
   padding: 0;
   margin: 20px 0;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.5;
 }
 .studio-optional-link {
@@ -325,7 +325,7 @@ body[data-app-view='workspace']
   color: #1e2d59;
   text-align: right;
   font:
-    400 14px/1.4 Arial,
+    400 16px/1.4 Arial,
     Helvetica,
     sans-serif;
   white-space: normal;
@@ -370,7 +370,7 @@ body[data-app-view='workspace'] #app .rubric-rating header {
     border-bottom: 1px solid #b9c2d2;
   }
   body[data-app-view='workspace'] #app .workspace-section-mobile label {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 400;
   }
   body[data-app-view='workspace'] #app .workspace-section-main .studio-step {
@@ -425,7 +425,7 @@ body[data-app-view='workspace'] #app #workspace-panel .workspace-check-item {
     padding: 0;
     width: auto;
     text-align: center;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.4;
   }
   body:is([data-app-view='play'], [data-app-view='workspace'])
@@ -534,7 +534,7 @@ body[data-app-view='workspace'] #app #workspace-panel .workspace-requirements .r
     background: #fff;
   }
   body[data-app-view='workspace'] #app .workspace-section-mobile label {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 400;
     flex: none;
     margin: 0;
@@ -617,4 +617,16 @@ body[data-app-view]:is([data-app-view='workspace'], [data-app-view='play'])
   :is(.brand, .header-actions a, .header-actions button):focus-visible {
   outline: 3px solid #1e2d59 !important;
   outline-offset: 2px;
+}
+
+/* Sky surrounds a readable task surface; gold marks the current stage and next action. */
+body[data-app-view][data-app-view='workspace'] {
+  background: #d8edfc;
+}
+body[data-app-view='workspace'] #app .workspace-section-sidebar {
+  background: #e4f3ff;
+}
+body[data-app-view='workspace'] #app #workspace-panel .design-page-heading {
+  background: #e4f3ff;
+  border-bottom: 3px solid #d98f06;
 }

@@ -10,6 +10,12 @@ module.exports = async ({ send, evaluate, waitFor, shot, accessibleScreen }) => 
   const capture = async (label) => {
     await evaluate('window.scrollTo(0,0)');
     await evaluate('Promise.all([...document.images].map(image=>image.decode().catch(()=>{})))');
+    if(label.includes('-public-home-')) {
+      assert(await evaluate(`(()=>{const frame=document.querySelector('.home-studio').getBoundingClientRect();return [...document.querySelectorAll('.home-choices a')].every(link=>{const r=link.getBoundingClientRect();return r.top>=frame.top && r.bottom<=frame.bottom && r.left>=frame.left && r.right<=frame.right;});})()`),'Main menu links remain inside the unclipped menu surface');
+    }
+    if(label.startsWith('landscape-') && (label.includes('-story-') || label.includes('-closing-'))) {
+      assert(await evaluate(`(()=>{const nav=document.querySelector('.scene-actions').getBoundingClientRect(),audio=document.querySelector('.story-toolbar').getBoundingClientRect();return audio.height>0 && audio.top>=0 && nav.top>=0 && nav.bottom<=innerHeight+1;})()`),'Landscape keeps story audio and Back/Continue in view');
+    }
     if (label.endsWith('-dialog-maya-reading') || label.endsWith('-dialog-pixel')) {
       const navVisible = await evaluate(
         `(()=>{const dialog=document.querySelector('.maya-dialog[open]');const bounds=dialog.getBoundingClientRect();return [...dialog.querySelectorAll('.maya-scene-nav button:not([hidden])')].every(button=>{const r=button.getBoundingClientRect();return r.top>=bounds.top && r.bottom<=bounds.bottom && r.left>=bounds.left && r.right<=bounds.right;});})()`,

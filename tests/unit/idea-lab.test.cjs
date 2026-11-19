@@ -83,7 +83,7 @@ const assert = require('node:assert/strict');
   assert(pendingGuide.includes('Use Build'));
   assert(!pendingGuide.includes('Return to Design one focused discussion-board activity'));
   const home = renderHome('workspace');
-  assert(home.includes('Continue Where You Left Off'));
+  assert(home.includes('Continue your saved work'));
   assert(home.includes('Creative Workspace'));
   assert(home.includes('?view=guide'));
   assert(!home.includes('home-scope'));

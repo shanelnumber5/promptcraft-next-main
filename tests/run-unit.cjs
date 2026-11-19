@@ -26,6 +26,7 @@ const tests = [
   'architecture',
   'scenario-studio',
   'opening-route',
+  'narration',
 ];
 for (const name of tests) {
   const result = spawnSync(

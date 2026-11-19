@@ -245,7 +245,7 @@ body[data-app-view]
   .babbage-loading-note {
   display: block;
   margin-top: 12px;
-  font-size: 14px;
+  font-size: 16px;
 }
 body[data-app-view] :is(.ai-waiting-dialog, .maya-dialog[data-state='loading']) .babbage-progress {
   height: 8px;
@@ -255,7 +255,7 @@ body[data-app-view] :is(.ai-waiting-dialog, .maya-dialog[data-state='loading']) 
   color: #405674;
   padding: 12px 16px;
   border-left: 3px solid #f2c14e;
-  font-size: 14px;
+  font-size: 16px;
 }
 /* Draft evidence is a quiet scene reference, separate from the spoken bubble. */
 body[data-app-view] .maya-dialog .maya-stage > .maya-draft-reference {
@@ -274,7 +274,7 @@ body[data-app-view] .maya-dialog .maya-stage > .maya-draft-reference {
   background: rgb(255 255 255 / 0.94);
   color: #405674;
   font:
-    400 14px/1.45 Arial,
+    400 16px/1.45 Arial,
     Helvetica,
     sans-serif;
 }
@@ -320,7 +320,7 @@ body[data-app-view] .maya-dialog .maya-scene-nav button {
     left: 12px;
     width: calc(100% - 24px);
     max-height: 80px;
-    font-size: 12px;
+    font-size: 16px;
   }
 }
 /* The shared waiting box follows the main navy frame and right-side actions. */
@@ -510,7 +510,7 @@ body[data-app-view] #app #workspace-panel .babbage-feedback .feedback-prose {
 }
 .babbage-presence figcaption {
   font:
-    400 12px/1.4 Arial,
+    400 16px/1.4 Arial,
     sans-serif;
   color: #405674;
 }
@@ -525,7 +525,7 @@ body[data-app-view] #app #workspace-panel .babbage-feedback .feedback-prose {
   margin-bottom: 18px;
   color: #405674;
   font:
-    400 14px/1.4 Arial,
+    400 16px/1.4 Arial,
     sans-serif;
 }
 body[data-app-view] #app #workspace-panel [data-build-page='sharing'] textarea,
@@ -631,7 +631,7 @@ body[data-app-view] #app .babbage-presence img {
 }
 body[data-app-view] #app #workspace-panel .workspace-ai-disclosure {
   font:
-    400 14px/1.45 Arial,
+    400 16px/1.45 Arial,
     sans-serif;
   margin: 0 0 16px;
   max-width: 72ch;
@@ -737,7 +737,7 @@ body[data-app-view] #app #workspace-panel .workspace-ai-disclosure {
   background: #f5f9fc;
   color: #405674;
   font:
-    400 14px/1.5 Arial,
+    400 16px/1.5 Arial,
     sans-serif;
 }
 body[data-app-view] #app #workspace-panel .workspace-ai-disclosure p {
@@ -804,7 +804,7 @@ body[data-app-view] #app .babbage-presence img {
   border-collapse: collapse;
   table-layout: fixed;
   font:
-    400 15px/1.5 Arial,
+    400 16px/1.5 Arial,
     sans-serif;
   color: #12355b;
 }
@@ -840,7 +840,7 @@ body[data-app-view] #app .babbage-presence img {
   color: #12355b;
 }
 .assignment-rubric p {
-  font-size: 14px;
+  font-size: 16px;
   margin: 10px 0 0;
 }
 .rubric-stale {
@@ -961,7 +961,7 @@ body[data-app-view='workspace']
   background: #eef4f9;
   border: 1px solid #12355b;
   border-radius: 4px;
-  font: bold 15px Arial;
+  font: bold 16px Arial;
   color: #12355b;
 }
 .rubric-descriptor {
@@ -1286,14 +1286,14 @@ body[data-app-view] #app .closing-experience .scene-actions {
     height: calc(100dvh - 12px);
   }
   .workspace-popup-footer button {
-    font-size: 14px;
+    font-size: 16px;
   }
   .guide-preview-toolbar {
     gap: 10px;
     padding: 12px;
   }
   .guide-preview-toolbar button {
-    font-size: 14px;
+    font-size: 16px;
   }
   .guide-preview-actions {
     padding: 12px !important;
@@ -1350,7 +1350,7 @@ body[data-app-view] .guide-preview .guide-preview-actions button {
   white-space: normal;
 }
 body[data-app-view] .guide-preview .guide-preview-actions [data-guide-page] {
-  font-size: 14px;
+  font-size: 16px;
 }
 .workspace-popup--rubric :is(input, textarea) {
   border: 2px solid #1e2d59;

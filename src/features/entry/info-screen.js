@@ -114,7 +114,7 @@ const pages = {
       },
       {
         "title": "Choose where to begin",
-        "body": "<p>Guided Scenario begins with Pixel’s example, then opens the shared Explore, Build, and Review screens. Creative Workspace opens those design tools directly. Babbage’s Idea Lab offers 12 illustrative discussion starters.</p><p>The current prototype uses discussion boards as spaces for sharing work, peer review, collaboration, direct responses, or discussion. Scenario and workspace saves are separate. Course Guide previews either saved design; Continue Where You Left Off resumes your recent path.</p>",
+        "body": "<p>Guided Scenario begins with Pixel’s example, then opens the shared Explore, Build, and Review screens. Creative Workspace opens those design tools directly. Babbage’s Idea Lab offers 12 illustrative discussion starters.</p><p>The current prototype uses discussion boards as spaces for sharing work, peer review, collaboration, direct responses, or discussion. Scenario and workspace saves are separate. Course Guide previews either saved design; Continue your saved work resumes your recent path.</p>",
         "visual": "pixel"
       }
     ]
@@ -151,6 +151,11 @@ const pages = {
         "title": "Independent project",
         "body": "<p>PromptCraft is an educational and scholarly project developed by Shanel. Its examples and character perspectives are designed to support exploration and discussion.</p><p>The content, interpretations, and design choices do not necessarily represent official policy or positions of Great Falls College MSU, Montana State University, or the Montana University System. Consult your institution’s guidance when applying ideas in practice.</p>",
         "visual": "shanel"
+      },
+      {
+        "title": "Open the published prototype",
+        "body": "<p>To open the published PromptCraft site on another device, scan this code. This link opens the published site; preview changes and browser saves stay on this device.</p><p><a href=\"https://promptcraft-discussion.netlify.app/?view=home\" target=\"_blank\" rel=\"noopener noreferrer\"><img src=\"assets/brand/promptcraft-qr.png\" width=\"128\" height=\"128\" alt=\"QR code: open the published PromptCraft site in a new tab\"></a></p>",
+        "visual": "classroom"
       }
     ]
   },

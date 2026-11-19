@@ -34,6 +34,7 @@ export function renderUtility(state, ai, ui) {
           <h3 id="workspace-tools-title">Additional tools</h3>
           <p>${connectionDescription}</p>
           <nav class="workspace-project-actions" aria-label="Additional tools">
+            ${state.experience === 'scenario' ? '<a class="action-link" href="?view=play&amp;story=1">Revisit Pixel &amp; Maya’s story</a>' : ''}
             <button type="button" data-partner-page="history">Earlier conversation</button>
             ${state.creative.alternatives.length ? '<button type="button" data-workspace-view="saved">Saved ideas</button>' : ''}
             <button type="button" data-partner-page="options">AI connection</button>

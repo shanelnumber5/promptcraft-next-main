@@ -8,7 +8,7 @@ On Windows, double-click **start-local.cmd** and open **http://127.0.0.1:3080** 
 
 ## Design an activity
 
-- **Guided Scenario** starts with Pixel’s lemonade example, then opens the shared studio.
+- **Guided Scenario** starts with Pixel and Maya’s classroom example, with on-screen dialogue and optional device-voice narration, then opens the shared studio. Returning learners can replay the story without changing their saved design.
 - **Creative Workspace** opens that studio directly.
 - **Idea Lab** offers 12 illustrative starting points to adapt.
 - **Course Guide** previews your saved design and approved teaching decisions.
@@ -27,7 +27,8 @@ The browser uses the existing backend at `https://promptcraft-discussion.netlify
 
 ## Checks
 
-- `npm run test:unit`: 24 offline suites; unmocked global fetch is blocked.
+- `npm run test:unit`: 25 offline suites; unmocked global fetch is blocked.
+- `node tests/browser/story-audio.test.cjs`: keyboard story entry, replay preservation, and narration controls; speech output is mocked.
 - `npm test`: offline suites plus local static-server checks.
 - `npm run test:browser`: shared Scenario and Workspace browser fixtures.
 - `npm run test:lab`: Idea Lab browser fixtures.

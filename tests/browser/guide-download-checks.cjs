@@ -132,6 +132,16 @@ module.exports = async ({ send, evaluate, waitFor, shot, key, keyboardReach, sce
     ),
   );
   assert(await evaluate('document.documentElement.scrollWidth<=innerWidth'));
+  assert.deepEqual(await evaluate(`(()=>{
+    const issues=[];
+    const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+    while(walker.nextNode()) {
+      const node=walker.currentNode,el=node.parentElement;
+      if(!node.textContent.trim() || el.closest('style,script,svg') || !el.getBoundingClientRect().height)continue;
+      if(parseFloat(getComputedStyle(el).fontSize)<16)issues.push(node.textContent.trim());
+    }
+    return issues;
+  })()`),[],'Downloaded guide text is at least 12 points');
   await shot(route + '-download-offline');
   const csv = await evaluate(
     'decodeURIComponent(document.querySelector(".rubric-download a").href.split(",").slice(1).join(","))',

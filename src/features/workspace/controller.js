@@ -29,6 +29,8 @@ import { downloadProjectFile, parseProjectFile, MAX_PROJECT_BYTES } from './proj
 import { combineDirections } from './creative.js';
 import { exploreWorkspace } from './exploration-controller.js';
 import { renderClosing } from '../design/closing.js';
+import { createNarrator } from '../../shared/narration.js';
+import { updateNarrationControls } from '../../shared/narration-controls.js';
 import { isTestLessonKeyword, fillTestLesson } from '../../shared/test-lesson.js';
 import { renderWorkspace } from './screen.js';
 import { freshWorkspace } from './storage.js';
@@ -69,6 +71,19 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     reviewPage =
       state.finalCheck.approved || state.creative.review.manualOnly ? 'guide' : 'rationale';
   let showingWrapUp = scenario && restored.wrapUp;
+  const narrator = createNarrator({
+    speech: window.speechSynthesis,
+    Utterance: window.SpeechSynthesisUtterance,
+    onChange: (audio) => updateNarrationControls(app, audio),
+  });
+  const closingNarration = () => [
+    {
+      speaker: 'pixel',
+      text:
+        (app.querySelector('.speech-bubble') || app.querySelector('.board-screen'))?.innerText ||
+        '',
+    },
+  ];
   let closingStage = scenario ? 'board' : 'dialogue';
   let closingPage = 0;
   if (['start', 'draft'].includes(params.get('build'))) {
@@ -119,6 +134,10 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
         ? renderClosing(state, closingStage, closingPage)
         : renderWorkspace(state, ai, readError, designPage, partnerPage, reviewPage, ui);
     fitWorkspace(app);
+    if (showingWrapUp && ui.screen === 'work') {
+      updateNarrationControls(app, narrator.status());
+      narrator.read(closingNarration());
+    } else narrator.dispose();
     if (ui.popup && !ai.pending)
       mountWorkspacePopup(app, state, ui, () => {
         ui.popup = '';
@@ -839,6 +858,15 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
   });
   // Delegated navigation and actions remain bound while render replaces page contents.
   app.addEventListener('click', async (event) => {
+    const narrationAction = event.target.closest('[data-action]')?.dataset.action;
+    if (narrationAction === 'toggle-narration') {
+      narrator.toggle(closingNarration());
+      return;
+    }
+    if (narrationAction === 'repeat-narration') {
+      narrator.read(closingNarration());
+      return;
+    }
     const route = event.target.closest('[data-workspace-view]');
     if (route && !readError) {
       const screen = route.dataset.workspaceView;
@@ -1401,6 +1429,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
   window.addEventListener('resize', () => fitWorkspace(app));
   document.fonts?.ready.then(() => fitWorkspace(app));
   window.addEventListener('pagehide', () => {
+    narrator.dispose();
     ai.requestController?.abort();
     reviews.cancel();
   });
