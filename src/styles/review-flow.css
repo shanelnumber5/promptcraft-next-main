@@ -1304,3 +1304,26 @@ body[data-app-view] #app .closing-experience .scene-actions {
     height: 76px !important;
   }
 }
+/* Crop only the asset's transparent padding; keep the complete computer visible. */
+body[data-app-view] #app .partner-heading .babbage-presence {
+  height: 110px !important;
+  overflow: hidden !important;
+}
+body[data-app-view] #app .partner-heading .babbage-presence img {
+  width: 132px !important;
+  height: 188px !important;
+  max-height: none !important;
+  object-view-box: none !important;
+  object-fit: contain !important;
+  margin-top: -40px !important;
+}
+@media (max-width: 760px) {
+  body[data-app-view] #app .partner-heading .babbage-presence {
+    height: 82px !important;
+  }
+  body[data-app-view] #app .partner-heading .babbage-presence img {
+    width: 96px !important;
+    height: 137px !important;
+    margin-top: -29px !important;
+  }
+}

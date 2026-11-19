@@ -719,7 +719,10 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     saveSafely();
     render();
     document.getElementById('workspace-tab-reason')?.focus();
-    if (!requirePerspectives()) void reviews.runAutomatic();
+    if (!requirePerspectives()) {
+      if (reviewPage === 'checks') showRubricAutomatically();
+      else void reviews.runAutomatic();
+    }
   }
   const setPanel = (panel) => {
     reworkForReview = false;
