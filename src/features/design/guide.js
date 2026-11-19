@@ -1,4 +1,4 @@
-import {renderRubricTable} from '../workspace/rubric.js';
+import { renderRubricTable, rubricCSV } from '../workspace/rubric.js';
 import { renderGuideHelp } from '../../shared/guide-help.js';
 import { guideStyles } from './guide-styles.js';
 import { renderAssignmentDirections } from '../../shared/directions.js';
@@ -9,10 +9,20 @@ import { lemonadeVisual, planVisuals } from '../../shared/lemonade-visuals.js';
 import { designEvidence, renderDesignRationale } from '../../shared/design-evidence.js';
 
 export function renderConversationNotes(notes) {
-  return '<div class="guide-conversation-notes">'+notes.trim().split(/\n\s*\n/).map(block=>{
-    const match=block.match(/^(Maya|Pixel):\s*([\s\S]*?)\nEducator:\s*([\s\S]*)$/);
-    return match ? `<section class="guide-decision"><p class="guide-question"><strong>${e(match[1])} asked</strong><br>${e(match[2])}</p><p><strong>Your decision</strong><br>${e(match[3])}</p></section>` : `<section class="guide-decision"><p>${e(block)}</p></section>`;
-  }).join('')+'</div>';
+  return (
+    '<div class="guide-conversation-notes">' +
+    notes
+      .trim()
+      .split(/\n\s*\n/)
+      .map((block) => {
+        const match = block.match(/^(Maya|Pixel):\s*([\s\S]*?)\nEducator:\s*([\s\S]*)$/);
+        return match
+          ? `<section class="guide-decision"><p class="guide-question"><strong>${e(match[1])} asked</strong><br>${e(match[2])}</p><p><strong>Your decision</strong><br>${e(match[3])}</p></section>`
+          : `<section class="guide-decision"><p>${e(block)}</p></section>`;
+      })
+      .join('') +
+    '</div>'
+  );
 }
 
 function lemonadeExample() {
@@ -41,7 +51,10 @@ function alignmentGuidance(teacher) {
 
 let logoPromise;
 export function loadGuideLogo() {
-  return (logoPromise ??= fetch(new URL('../../../assets/brand/babbage-mark-small.svg', import.meta.url), { signal: AbortSignal.timeout(5000) })
+  return (logoPromise ??= fetch(
+    new URL('../../../assets/brand/babbage-mark-small.svg', import.meta.url),
+    { signal: AbortSignal.timeout(5000) },
+  )
     .then((response) => {
       if (!response.ok) throw Error('Logo unavailable');
       return response.text();
@@ -50,7 +63,17 @@ export function loadGuideLogo() {
     .catch(() => null));
 }
 
-export function createGuide(design, { approved = true, logo = null, teacher = null, workspace = null, conversationNotes = '', rubric = null } = {}) {
+export function createGuide(
+  design,
+  {
+    approved = true,
+    logo = null,
+    teacher = null,
+    workspace = null,
+    conversationNotes = '',
+    rubric = null,
+  } = {},
+) {
   const example = teacherSetup.steps[1].example.directions;
   const stale =
     teacher &&
@@ -62,17 +85,30 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
     design = { ...design, revision: '', reason: '' };
     approved = false;
   }
-  const assignmentTitle=workspace?.assignmentTitle?.trim() || (rubric?.title && rubric.title!=='Assignment rubric' ? rubric.title.replace(/\s+rubric$/i,'') : '');
-  const chosenTitle = workspace ? (assignmentTitle || 'Activity directions') : 'Your revised discussion board';
-  const sections = workspace ? [] : [
-    { id: 'lemonade-example', title: 'The lemonade example', body: lemonadeExample() },
-  ];
+  const assignmentTitle =
+    workspace?.assignmentTitle?.trim() ||
+    (rubric?.title && rubric.title !== 'Assignment rubric'
+      ? rubric.title.replace(/\s+rubric$/i, '')
+      : '');
+  const chosenTitle = workspace
+    ? assignmentTitle || 'Activity directions'
+    : 'Your revised discussion board';
+  const sections = workspace
+    ? []
+    : [{ id: 'lemonade-example', title: 'The lemonade example', body: lemonadeExample() }];
   const alignmentSection = teacher && alignmentGuidance(teacher);
-  if (alignmentSection) sections.push({ id: 'assignment-guidance', title: 'Optional assignment guidance', body: alignmentSection });
+  if (alignmentSection)
+    sections.push({
+      id: 'assignment-guidance',
+      title: 'Optional assignment guidance',
+      body: alignmentSection,
+    });
   if (teacher && !design.revision.trim())
     sections.push({
       id: 'assignment-pending',
-      title: workspace ? 'Your assignment · design in progress' : 'Discussion-board component · design in progress',
+      title: workspace
+        ? 'Your assignment · design in progress'
+        : 'Discussion-board component · design in progress',
       body: workspace
         ? '<section class="assignment"><div class="assignment-banner"><h2>Your assignment design is still in progress</h2></div><div class="assignment-content"><p>Use Build to write directions, or collaborate with Babbage and choose a suggestion to edit. Return to Review &amp; Course Guide to explain and approve your design before downloading.</p></div></section>'
         : '<section class="assignment"><div class="assignment-banner"><h2>Your discussion-board component is still in progress</h2></div><div class="assignment-content"><p>Return to Design one focused discussion-board activity. Write a bounded forum exchange that supports the larger assignment, or generate a suggestion to adapt. This component is not an all-in-one replacement. Review and approve your directions before downloading the guide.</p></div></section>',
@@ -86,13 +122,60 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
   sections.push({
     id: 'design-sources',
     title: workspace ? 'Design references' : 'Sources',
-    body: `<section class="guide-sources"><h2>${workspace ? 'Design references' : 'Sources'}</h2><p>${workspace ? 'References supporting the teaching and design choices.' : 'References behind the teaching moves. The lemonade example is a fictional illustration.'}</p><ul>`+designEvidence.map(source=>'<li><a href="'+e(source.url)+'" target="_blank" rel="noopener noreferrer">'+e(source.short)+'</a><span>'+e(source.citation)+'</span></li>').join('')+'</ul></section>',
+    body:
+      `<section class="guide-sources"><h2>${workspace ? 'Design references' : 'Sources'}</h2><p>${workspace ? 'References supporting the teaching and design choices.' : 'References behind the teaching moves. The lemonade example is a fictional illustration.'}</p><ul>` +
+      designEvidence
+        .map(
+          (source) =>
+            '<li><a href="' +
+            e(source.url) +
+            '" target="_blank" rel="noopener noreferrer">' +
+            e(source.short) +
+            '</a><span>' +
+            e(source.citation) +
+            '</span></li>',
+        )
+        .join('') +
+      '</ul></section>',
   });
-  if (!workspace) sections.push({ id:'using-guide',title:'Using your downloaded guide',body:'<section class="guide-help-section">'+renderGuideHelp({standalone:true})+'</section>' });
-  if(rubric?.rows?.length) sections.push({id:'assignment-rubric',title:'Assessment rubric',body:'<section><h2>Assessment rubric</h2>'+ (rubric.basis!==design.revision?'<p>Assignment changed after rubric creation. Review this rubric before use.</p>':'')+renderRubricTable(rubric)+'</section>'});
-  const order = ['lemonade-example','your-assignment','assignment-rubric','assignment-pending','decision-milestone','assignment-guidance','design-sources','using-guide'];
-  sections.sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id));
-  const contents = sections.map(section => '<li><a href="#'+section.id+'">'+e(section.title)+'</a></li>').join('');
+  if (!workspace)
+    sections.push({
+      id: 'using-guide',
+      title: 'Using your downloaded guide',
+      body:
+        '<section class="guide-help-section">' +
+        renderGuideHelp({ standalone: true }) +
+        '</section>',
+    });
+  if (rubric?.rows?.length)
+    sections.push({
+      id: 'assignment-rubric',
+      title: 'Assessment rubric',
+      body:
+        '<section><h2>Assessment rubric</h2>' +
+        (rubric.basis !== design.revision
+          ? '<p>Assignment changed after rubric creation. Review this rubric before use.</p>'
+          : '') +
+        '<p class="rubric-download"><a download="assignment-rubric-canvas.csv" href="data:text/csv;charset=utf-8,' +
+        encodeURIComponent(rubricCSV(rubric)) +
+        '">Download Canvas rubric template (.csv)</a></p>' +
+        renderRubricTable(rubric) +
+        '</section>',
+    });
+  const order = [
+    'lemonade-example',
+    'your-assignment',
+    'assignment-rubric',
+    'assignment-pending',
+    'decision-milestone',
+    'assignment-guidance',
+    'design-sources',
+    'using-guide',
+  ];
+  sections.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+  const contents = sections
+    .map((section) => '<li><a href="#' + section.id + '">' + e(section.title) + '</a></li>')
+    .join('');
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${e(assignmentTitle || 'PromptCraft assignment guide')}</title>
 <style>${guideStyles}</style></head>
@@ -104,7 +187,8 @@ export function createGuide(design, { approved = true, logo = null, teacher = nu
 export function downloadGuide(design, options) {
   if (
     options?.teacher &&
-    (!design.revision.trim() || (design.sourceDirections && design.sourceDirections !== options.teacher.directions))
+    (!design.revision.trim() ||
+      (design.sourceDirections && design.sourceDirections !== options.teacher.directions))
   )
     throw Error('Review a revision for the current assignment before downloading.');
   const url = URL.createObjectURL(

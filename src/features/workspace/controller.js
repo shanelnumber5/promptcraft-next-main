@@ -1,6 +1,11 @@
-import {emptyRubric,generateRubric,downloadRubric,rubricForState} from './rubric.js';
+import { mountWorkspacePopup } from './popups.js';
+import { emptyRubric, generateRubric, downloadRubric, rubricForState } from './rubric.js';
 import { requestConversationRevision } from './conversation-revision.js';
-import { saveFeedbackAnswer, savedFeedbackNotes, emptyFeedbackConversation } from '../design/feedback-conversation.js';
+import {
+  saveFeedbackAnswer,
+  savedFeedbackNotes,
+  emptyFeedbackConversation,
+} from '../design/feedback-conversation.js';
 import { createAiWaiting } from '../design/ai-waiting.js';
 import { designRoute } from './routes.js';
 import { currentFeedbackQuestions, clarificationNotes } from './feedback-questions.js';
@@ -61,7 +66,8 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     readError = restored.error;
   let designPage = restored.designPage || (state.design.revision.trim() ? 'draft' : 'start'),
     partnerPage = 'work',
-    reviewPage = state.finalCheck.approved || state.creative.review.manualOnly ? 'guide' : 'rationale';
+    reviewPage =
+      state.finalCheck.approved || state.creative.review.manualOnly ? 'guide' : 'rationale';
   let showingWrapUp = scenario && restored.wrapUp;
   let closingStage = scenario ? 'board' : 'dialogue';
   let closingPage = 0;
@@ -95,21 +101,39 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     if (state.finalCheck.context !== context)
       state.finalCheck = { ...finalCheckDefaults(), context };
   };
-  const syncWaiting = createAiWaiting({ onCancel() {
-    ai.requestController?.abort();
-    reviews.cancel();
-    ai.pending = false;
-    ai.error = '';
-    render();
-    document.getElementById('setup-title')?.focus({ preventScroll: true });
-  } });
+  const syncWaiting = createAiWaiting({
+    onCancel() {
+      ai.requestController?.abort();
+      reviews.cancel();
+      ai.pending = false;
+      ai.error = '';
+      render();
+      document.getElementById('setup-title')?.focus({ preventScroll: true });
+    },
+  });
   const render = ({ focus = false } = {}) => {
     app.innerHTML = showingWrapUp
       ? renderClosing(state, closingStage, closingPage)
       : renderWorkspace(state, ai, readError, designPage, partnerPage, reviewPage, ui);
     fitWorkspace(app);
-    if(state.designPanel !== 'reason') showBabbageCameo(state, app);
-    syncWaiting({ ...ai, pending: ai.pending || state.creative.review.status === 'pending', stage: state.creative.review.status === 'pending' ? (state.creative.review.stage || 'working') : ai.stage, intent: state.creative.review.status === 'pending' ? 'review' : ai.intent }, state.babbage.mode === 'dev');
+    if (ui.popup && !ai.pending)
+      mountWorkspacePopup(app, state, ui, () => {
+        ui.popup = '';
+        render();
+      });
+    if (state.designPanel !== 'reason') showBabbageCameo(state, app);
+    syncWaiting(
+      {
+        ...ai,
+        pending: ai.pending || state.creative.review.status === 'pending',
+        stage:
+          state.creative.review.status === 'pending'
+            ? state.creative.review.stage || 'working'
+            : ai.stage,
+        intent: state.creative.review.status === 'pending' ? 'review' : ai.intent,
+      },
+      state.babbage.mode === 'dev',
+    );
     if (focus) document.getElementById('setup-title')?.focus({ preventScroll: true });
   };
   function focusTask() {
@@ -142,8 +166,14 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       applySuggestedDraft(state, suggestion);
       ai.suggestion = null;
       state.creative.review = emptyReview();
-      const draftNotes=state.babbage.history.findLast(turn=>turn.role==='assistant')?.display || '';
-      if(draftNotes.trim()) Object.assign(state.creative.review,{feedback:draftNotes,fingerprint:reviewFingerprint(state),status:'complete'});
+      const draftNotes =
+        state.babbage.history.findLast((turn) => turn.role === 'assistant')?.display || '';
+      if (draftNotes.trim())
+        Object.assign(state.creative.review, {
+          feedback: draftNotes,
+          fingerprint: reviewFingerprint(state),
+          status: 'complete',
+        });
       syncFinalCheck();
       controller.syncBabbage();
       if (draftDestination === 'draft') {
@@ -220,8 +250,12 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
         ui = workspaceViews();
         render();
       },
-      onStage: () => { if (state.designPanel === 'babbage') render(); },
-      onComplete: () => { partnerPage = 'ideas'; },
+      onStage: () => {
+        if (state.designPanel === 'babbage') render();
+      },
+      onComplete: () => {
+        partnerPage = 'ideas';
+      },
       onFinish: () => {
         saveSafely();
         if (state.designPanel !== 'revision') {
@@ -266,24 +300,34 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
   // Form edits keep saved context, AI suggestions, and approval in sync.
   function input(control) {
     if (readError) return;
-    if(control.dataset?.rubricCriterion !== undefined) {
+    if (control.dataset?.rubricCriterion !== undefined) {
       state.creative.rubric ||= emptyRubric();
-      const names=state.creative.rubric.criteria.split('\n');names[Number(control.dataset.rubricCriterion)]=control.value.slice(0,200);
-      state.creative.rubric.criteria=names.join('\n');state.creative.rubric.confirmed=false;saveSafely();return;
-    }
-    if(control.dataset?.rubricParam) {
-      state.creative.rubric ||= emptyRubric();
-      const key=control.dataset.rubricParam;
-      if(['title','submission','total','criteria'].includes(key)) {state.creative.rubric[key]=control.value.slice(0,2000);state.creative.rubric.confirmed=false;saveSafely();}
+      const names = state.creative.rubric.criteria.split('\n');
+      names[Number(control.dataset.rubricCriterion)] = control.value.slice(0, 200);
+      state.creative.rubric.criteria = names.join('\n');
+      state.creative.rubric.confirmed = false;
+      saveSafely();
       return;
     }
-    if(control.dataset?.rubricRow) {
-      const row=state.creative.rubric?.rows[Number(control.dataset.rubricRow)];
-      if(!row)return;
-      const field=control.dataset.rubricField;
-      if(field==='ratings') row.ratings[Number(control.dataset.rubricRating)]=control.value.slice(0,2000);
-      else if(['name','description'].includes(field))row[field]=control.value.slice(0,2000);
-      saveSafely();return;
+    if (control.dataset?.rubricParam) {
+      state.creative.rubric ||= emptyRubric();
+      const key = control.dataset.rubricParam;
+      if (['title', 'submission', 'total', 'criteria'].includes(key)) {
+        state.creative.rubric[key] = control.value.slice(0, 2000);
+        state.creative.rubric.confirmed = false;
+        saveSafely();
+      }
+      return;
+    }
+    if (control.dataset?.rubricRow) {
+      const row = state.creative.rubric?.rows[Number(control.dataset.rubricRow)];
+      if (!row) return;
+      const field = control.dataset.rubricField;
+      if (field === 'ratings')
+        row.ratings[Number(control.dataset.rubricRating)] = control.value.slice(0, 2000);
+      else if (['name', 'description'].includes(field)) row[field] = control.value.slice(0, 2000);
+      saveSafely();
+      return;
     }
     if (control.closest('[data-setup-form]') && isTestLessonKeyword(control)) {
       ai.requestController?.abort();
@@ -332,18 +376,23 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       return;
     }
     if (control.dataset?.feedbackAnswer !== undefined) {
-      const record = state.creative.conversation ||= emptyFeedbackConversation();
-      if (control.dataset.feedbackAnswer === 'other') record.other = control.value.slice(0,1000);
-      else { const question=currentFeedbackQuestions(state)[Number(control.dataset.feedbackAnswer)]; if(question) saveFeedbackAnswer(state,question,control.value); }
+      const record = (state.creative.conversation ||= emptyFeedbackConversation());
+      if (control.dataset.feedbackAnswer === 'other') record.other = control.value.slice(0, 1000);
+      else {
+        const question = currentFeedbackQuestions(state)[Number(control.dataset.feedbackAnswer)];
+        if (question) saveFeedbackAnswer(state, question, control.value);
+      }
       saveSafely();
       return;
     }
-    if (control.dataset?.clarificationAnswer || control.dataset?.clarificationChoice) return controller.updateClarificationAnswer(control);
+    if (control.dataset?.clarificationAnswer || control.dataset?.clarificationChoice)
+      return controller.updateClarificationAnswer(control);
     const previousContext = assignmentContext(state);
     let movedDraft = false;
     if (control.dataset?.workspaceMeta) {
       state.workspace[control.dataset.workspaceMeta] = control.value.slice(0, MAX_WORKSPACE_TEXT);
-      if(control.dataset.workspaceMeta==='assignmentTitle')state.creative.rubric.title=rubricForState(state).title;
+      if (control.dataset.workspaceMeta === 'assignmentTitle')
+        state.creative.rubric.title = rubricForState(state).title;
       if (workspacePlanningFields.includes(control.dataset.workspaceMeta)) {
         state.babbage.context = assignmentContext(state);
         ai.suggestion = null;
@@ -357,6 +406,11 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     else if (control.closest('[data-setup-form]') && Object.hasOwn(state.teacher, control.name)) {
       state.teacher[control.name] = control.type === 'checkbox' ? control.checked : control.value;
       if (control.name === 'aiUse') {
+        state.workspace.aiUseChoice = control.value;
+        if (ui.popup === 'ai-use') {
+          ui.popup = '';
+          queueMicrotask(() => render());
+        }
         const details = app.querySelector('#aiUseDetails');
         if (details) details.value = state.teacher.aiUse;
       }
@@ -432,95 +486,134 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
         });
       };
       const cameo = document.querySelector('.babbage-cameo-dialog[open]');
-      if(cameo) cameo.close();
+      if (cameo) cameo.close();
       open();
     },
   });
   async function startCompilation(action) {
-      if (ai.pending || reviews.pending || !state.teacher.directions.trim()) return;
-      reworkForReview = action !== 'consult-babbage';
-      draftDestination = action === 'compile-activity' ? 'draft' : 'review';
-      ui = { ...workspaceViews(), task: reworkForReview ? 'draft' : 'explore' };
-      partnerPage = 'work';
-      state.designPanel = 'babbage';
-      controller.syncBabbage();
-      if (clarificationLimitReached(state.babbage)) {
-        render();
-        return;
-      }
-      if (
-        reworkForReview &&
-        state.teacher.learningGoal.trim() &&
-        !state.teacher.learningGoalUnsure &&
-        !isUncertainAnswer(state.teacher.learningGoal) &&
-        state.teacher.aiUse.trim() &&
-        !isUncertainAnswer(state.teacher.aiUse)
-      )
-        state.babbage.ready = true;
-      await controller.askBabbage(state.babbage.ready ? 'revise' : 'clarify');
-  }
-  async function reviseFromConversation() {
-    const notes=savedFeedbackNotes(state);
-    if (!notes) return;
-    const previous=assignmentContext(state);
-    const existing=state.workspace.openQuestions || '';
-    const marker='Educator conversation with Maya and Pixel:\n';
-    const applied=state.creative.conversation.appliedNotes;
-    const preserved=applied ? existing.replace(applied,'').trim() : existing;
-    const combined=[preserved,marker+notes].filter(Boolean).join('\n\n');
-    if(combined.length>MAX_WORKSPACE_TEXT) {
+    if (ai.pending || reviews.pending || !state.teacher.directions.trim()) return;
+    reworkForReview = action !== 'consult-babbage';
+    draftDestination = action === 'compile-activity' ? 'draft' : 'review';
+    ui = { ...workspaceViews(), task: reworkForReview ? 'draft' : 'explore' };
+    partnerPage = 'work';
+    state.designPanel = 'babbage';
+    controller.syncBabbage();
+    if (clarificationLimitReached(state.babbage)) {
       render();
-      app.querySelector('.design-notice').textContent='Your answers are saved. Shorten the project notes in Build before using them for a revision.';
       return;
     }
-    state.workspace.openQuestions=combined;
-    state.creative.conversation.appliedNotes=marker+notes;
-    invalidateWorkspaceApproval(state,previous);
-    syncFinalCheck(); saveSafely();
-    const source=state, request=new AbortController();
-    const basis=assignmentContext(state);
-    const snapshot=structuredClone(state);
-    Object.assign(ai,{pending:true,requestController:request,stage:'working',intent:'revise',error:''});
+    if (
+      reworkForReview &&
+      state.teacher.learningGoal.trim() &&
+      !state.teacher.learningGoalUnsure &&
+      !isUncertainAnswer(state.teacher.learningGoal) &&
+      state.teacher.aiUse.trim() &&
+      !isUncertainAnswer(state.teacher.aiUse)
+    )
+      state.babbage.ready = true;
+    await controller.askBabbage(state.babbage.ready ? 'revise' : 'clarify');
+  }
+  async function reviseFromConversation() {
+    const notes = savedFeedbackNotes(state);
+    if (!notes) return;
+    const previous = assignmentContext(state);
+    const existing = state.workspace.openQuestions || '';
+    const marker = 'Educator conversation with Maya and Pixel:\n';
+    const applied = state.creative.conversation.appliedNotes;
+    const preserved = applied ? existing.replace(applied, '').trim() : existing;
+    const combined = [preserved, marker + notes].filter(Boolean).join('\n\n');
+    if (combined.length > MAX_WORKSPACE_TEXT) {
+      render();
+      app.querySelector('.design-notice').textContent =
+        'Your answers are saved. Shorten the project notes in Build before using them for a revision.';
+      return;
+    }
+    state.workspace.openQuestions = combined;
+    state.creative.conversation.appliedNotes = marker + notes;
+    invalidateWorkspaceApproval(state, previous);
+    syncFinalCheck();
+    saveSafely();
+    const source = state,
+      request = new AbortController();
+    const basis = assignmentContext(state);
+    const snapshot = structuredClone(state);
+    Object.assign(ai, {
+      pending: true,
+      requestController: request,
+      stage: 'working',
+      intent: 'revise',
+      error: '',
+    });
     render();
     try {
-      const suggestion=await requestConversationRevision(snapshot,notes,{signal:AbortSignal.any([request.signal,AbortSignal.timeout(180000)]),onProgress:stage=>{if(source===state && !request.signal.aborted && ai.requestController===request){ai.stage=stage;render();}}});
-      if(request.signal.aborted || source!==state || ai.requestController!==request) return;
-      if(basis!==assignmentContext(state)) throw Error('Your draft changed while the edit was prepared. Your answers are saved; review your current activity.');
-      applySuggestedDraft(state,suggestion);
-      state.creative.review.manualOnly=true;
-      state.creative.review.status=state.creative.review.feedback?'complete':'idle';
+      const suggestion = await requestConversationRevision(snapshot, notes, {
+        signal: AbortSignal.any([request.signal, AbortSignal.timeout(180000)]),
+        onProgress: (stage) => {
+          if (source === state && !request.signal.aborted && ai.requestController === request) {
+            ai.stage = stage;
+            render();
+          }
+        },
+      });
+      if (request.signal.aborted || source !== state || ai.requestController !== request) return;
+      if (basis !== assignmentContext(state))
+        throw Error(
+          'Your draft changed while the edit was prepared. Your answers are saved; review your current activity.',
+        );
+      applySuggestedDraft(state, suggestion);
+      state.creative.review.manualOnly = true;
+      state.creative.review.status = state.creative.review.feedback ? 'complete' : 'idle';
       syncFinalCheck();
-      designPage='draft';state.designPanel='revision';ui=workspaceViews();
+      designPage = 'draft';
+      state.designPanel = 'revision';
+      ui = workspaceViews();
       saveSafely();
-    } catch(error) {
-      if(!request.signal.aborted && source===state) ai.error=error.message;
+    } catch (error) {
+      if (!request.signal.aborted && source === state) ai.error = error.message;
     } finally {
-      if(ai.requestController===request) {
-        ai.pending=false;ai.requestController=null;
-        if(source===state) {
+      if (ai.requestController === request) {
+        ai.pending = false;
+        ai.requestController = null;
+        if (source === state) {
           render();
-          app.querySelector('.design-notice').textContent=request.signal.aborted ? 'Revision cancelled. Your draft and answers are saved.' : ai.error || 'Your requested edit is ready in Build. Review it, then open Review for the guide. Another AI reading is optional.';
+          app.querySelector('.design-notice').textContent = request.signal.aborted
+            ? 'Revision cancelled. Your draft and answers are saved.'
+            : ai.error ||
+              'Your requested edit is ready in Build. Review it, then open Review for the guide. Another AI reading is optional.';
         }
       }
     }
   }
-  function returnFromMaya({completed=false} = {}) {
+  function returnFromMaya({ completed = false } = {}) {
     if (state.designPanel !== 'reason' || showingWrapUp) return;
-    if(completed) {state.creative.review.perspectivesComplete=true;saveSafely();}
+    if (completed) {
+      state.creative.review.perspectivesComplete = true;
+      saveSafely();
+    }
     reviewPage = completed ? 'reasoning' : 'rationale';
     render();
     document.getElementById('review-title')?.focus({ preventScroll: true });
   }
-  function requirePerspectives(destination='reasoning') {
-    const review=state.creative.review;
-    if(destination==='rubric') return false;
-    if(destination==='rationale' || state.finalCheck.approved || review.manualOnly || review.perspectivesComplete || !state.design.revision.trim()) return false;
-    if(reviews.pending || ai.pending) return true;
-    if(review.feedback) {
-      review.offeredMaya=reviewFingerprint(state);
+  function requirePerspectives(destination = 'reasoning') {
+    const review = state.creative.review;
+    if (destination === 'rubric') return false;
+    if (
+      destination === 'rationale' ||
+      state.finalCheck.approved ||
+      review.manualOnly ||
+      review.perspectivesComplete ||
+      !state.design.revision.trim()
+    )
+      return false;
+    if (reviews.pending || ai.pending) return true;
+    if (review.feedback) {
+      review.offeredMaya = reviewFingerprint(state);
       saveSafely();
-      openMayaDialog(state,app.querySelector('#workspace-tab-reason'),{
-        autoStart:true,onReturn:returnFromMaya,onSave:saveSafely,onRevise:reviseFromConversation,
+      openMayaDialog(state, app.querySelector('#workspace-tab-reason'), {
+        autoStart: true,
+        onReturn: returnFromMaya,
+        onSave: saveSafely,
+        onRevise: reviseFromConversation,
       });
     } else void reviews.runAutomatic();
     return true;
@@ -528,11 +621,15 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
   function enterReview() {
     ui = workspaceViews();
     state.designPanel = 'reason';
-    reviewPage = state.creative.review.manualOnly ? (state.design.reason.trim()?'checks':'reasoning') : 'rationale';
+    reviewPage = state.creative.review.manualOnly
+      ? state.design.reason.trim()
+        ? 'checks'
+        : 'reasoning'
+      : 'rationale';
     saveSafely();
     render();
     document.getElementById('workspace-tab-reason')?.focus();
-    if(!requirePerspectives()) void reviews.runAutomatic();
+    if (!requirePerspectives()) void reviews.runAutomatic();
   }
   const setPanel = (panel) => {
     reworkForReview = false;
@@ -627,7 +724,8 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     showingWrapUp = false;
     designPage = state.design.revision.trim() ? 'draft' : 'start';
     partnerPage = 'work';
-    reviewPage = state.finalCheck.approved || state.creative.review.manualOnly ? 'guide' : 'rationale';
+    reviewPage =
+      state.finalCheck.approved || state.creative.review.manualOnly ? 'guide' : 'rationale';
     ui = workspaceViews();
     Object.assign(ai, { pending: false, suggestion: null, error: '', context: '' });
     render({ focus: true });
@@ -705,9 +803,19 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       focusTask();
       return;
     }
-    const feedbackPage=event.target.closest('[data-feedback-page]');
-    if(feedbackPage) {ui.feedbackPage=Number(feedbackPage.dataset.feedbackPage);ui.clarifyNow=false;render();return;}
-    if(event.target.closest('[data-clarify-now]')) {ui.clarifyNow=true;render();app.querySelector('[data-clarification-answer]')?.focus();return;}
+    const feedbackPage = event.target.closest('[data-feedback-page]');
+    if (feedbackPage) {
+      ui.feedbackPage = Number(feedbackPage.dataset.feedbackPage);
+      ui.clarifyNow = false;
+      render();
+      return;
+    }
+    if (event.target.closest('[data-clarify-now]')) {
+      ui.clarifyNow = true;
+      render();
+      app.querySelector('[data-clarification-answer]')?.focus();
+      return;
+    }
     const partner = event.target.closest('[data-partner-page]');
     if (partner) {
       ui = workspaceViews();
@@ -721,9 +829,18 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     const review = event.target.closest('[data-review-page]');
     if (review) {
       const destination = review.dataset.reviewPage;
-      if(destination==='rubric') {state.designPanel='revision';designPage='rubric';render();return;}
-      if(requirePerspectives(destination)) return;
-      if(['checks','guide','help'].includes(destination) && !state.design.reason.trim()) {reviewPage='reasoning';render();document.getElementById('reason')?.focus();return;}
+      if (destination === 'rubric') {
+        ui.popup = 'rubric';
+        render();
+        return;
+      }
+      if (requirePerspectives(destination)) return;
+      if (['checks', 'guide', 'help'].includes(destination) && !state.design.reason.trim()) {
+        reviewPage = 'reasoning';
+        render();
+        document.getElementById('reason')?.focus();
+        return;
+      }
       const show = () => {
         ui = workspaceViews();
         state.designPanel = 'reason';
@@ -780,6 +897,28 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       return;
     }
     let action = event.target.closest('[data-action]')?.dataset.action;
+    if (action === 'open-ai-use-popup' || action === 'open-rubric-popup') {
+      ui.popup = action === 'open-ai-use-popup' ? 'ai-use' : 'rubric';
+      render();
+      return;
+    }
+    if (action === 'rubric-edit-criteria') {
+      ui.rubricPart = 'criteria';
+      render();
+      return;
+    }
+    if (action === 'close-workspace-popup') {
+      ui.popup = '';
+      render();
+      return;
+    }
+    const criterionPage = event.target.closest('[data-rubric-criterion-page]');
+    if (criterionPage) {
+      ui.rubricCriterion = Number(criterionPage.dataset.rubricCriterionPage);
+      render();
+      return;
+    }
+
     if (action === 'save-project-file' && !readError) {
       downloadProjectFile(state);
       app.querySelector('.design-notice').textContent =
@@ -834,6 +973,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       }
       ui = workspaceViews();
       reviewPage = 'guide';
+      if (!state.creative.rubric?.rows.length) ui.popup = 'rubric';
       render();
       openGuidePreview(state, app);
       return;
@@ -846,6 +986,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       }
       ui = workspaceViews();
       reviewPage = 'guide';
+      if (!state.creative.rubric?.rows.length) ui.popup = 'rubric';
       render();
       document.getElementById('review-title')?.focus({ preventScroll: true });
       return;
@@ -887,34 +1028,91 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       document.getElementById('review-title')?.focus({ preventScroll: true });
       return;
     }
-    if(action==='add-rubric-criterion' || event.target.closest('[data-remove-rubric-criterion]')) {
-      const names=state.creative.rubric.criteria.split('\n');
-      const remove=event.target.closest('[data-remove-rubric-criterion]');
-      if(remove)names.splice(Number(remove.dataset.removeRubricCriterion),1);
-      else if(names.length<8)names.push('');
-      state.creative.rubric.criteria=names.join('\n');state.creative.rubric.confirmed=false;saveSafely();render();return;
-    }
-    if(action==='generate-rubric' || action==='draft-rubric-criteria') {
-      if(ai.pending || reviews.pending)return;
-      const source=state,basis=state.design.revision,request=new AbortController();
-      const snapshot=structuredClone(state);
-      if(action==='draft-rubric-criteria')snapshot.creative.rubric.criteria='';
-      Object.assign(ai,{pending:true,requestController:request,intent:'review',stage:'sending',error:''});render();
-      try {
-        const rows=await generateRubric(snapshot,{signal:AbortSignal.any([request.signal,AbortSignal.timeout(180000)]),onProgress:stage=>{if(source===state && ai.requestController===request && !request.signal.aborted){ai.stage=stage;render();}}});
-        if(source!==state || request.signal.aborted || ai.requestController!==request)return;
-        if(basis!==state.design.revision)throw Error('Your assignment changed. Create the rubric again for the current draft.');
-        Object.assign(state.creative.rubric,{title:rubricForState(snapshot).title,submission:rubricForState(snapshot).submission});state.creative.rubric.rows=rows;if(!snapshot.creative.rubric.criteria.trim())state.creative.rubric.criteria=rows.map(row=>row.name).join('\n');state.creative.rubric.basis=basis;state.creative.rubric.confirmed=true;saveSafely();
-      } catch(error) {if(source===state && !request.signal.aborted)ai.error=error.message;}
-      finally {if(ai.requestController===request){ai.pending=false;ai.requestController=null;render();const notice=app.querySelector('[data-rubric-notice]');if(notice)notice.textContent=ai.error || (request.signal.aborted?'Rubric cancelled. Your work is saved.':'Rubric created. Edit the descriptors, then continue.');}}
+    if (
+      action === 'add-rubric-criterion' ||
+      event.target.closest('[data-remove-rubric-criterion]')
+    ) {
+      const names = state.creative.rubric.criteria.split('\n');
+      const remove = event.target.closest('[data-remove-rubric-criterion]');
+      if (remove) names.splice(Number(remove.dataset.removeRubricCriterion), 1);
+      else if (names.length < 8) names.push('');
+      state.creative.rubric.criteria = names.join('\n');
+      state.creative.rubric.confirmed = false;
+      saveSafely();
+      render();
       return;
     }
-    if(action==='rubric-continue') {
-      if(!state.creative.rubric?.rows.length)return;
-      state.creative.rubric.confirmed=true;saveSafely();enterReview();return;
+    if (action === 'generate-rubric' || action === 'draft-rubric-criteria') {
+      if (ai.pending || reviews.pending) return;
+      const source = state,
+        basis = state.design.revision,
+        request = new AbortController();
+      const snapshot = structuredClone(state);
+      if (action === 'draft-rubric-criteria') snapshot.creative.rubric.criteria = '';
+      Object.assign(ai, {
+        pending: true,
+        requestController: request,
+        intent: 'review',
+        stage: 'sending',
+        error: '',
+      });
+      render();
+      try {
+        const rows = await generateRubric(snapshot, {
+          signal: AbortSignal.any([request.signal, AbortSignal.timeout(180000)]),
+          onProgress: (stage) => {
+            if (source === state && ai.requestController === request && !request.signal.aborted) {
+              ai.stage = stage;
+              render();
+            }
+          },
+        });
+        if (source !== state || request.signal.aborted || ai.requestController !== request) return;
+        if (basis !== state.design.revision)
+          throw Error('Your assignment changed. Create the rubric again for the current draft.');
+        Object.assign(state.creative.rubric, {
+          title: rubricForState(snapshot).title,
+          submission: rubricForState(snapshot).submission,
+        });
+        ui.rubricPart = 'rubric';
+        state.creative.rubric.rows = rows;
+        if (!snapshot.creative.rubric.criteria.trim())
+          state.creative.rubric.criteria = rows.map((row) => row.name).join('\n');
+        state.creative.rubric.basis = basis;
+        state.creative.rubric.confirmed = true;
+        if (!state.workspace.assignmentTitle?.trim() && rows.assignmentTitle)
+          state.workspace.assignmentTitle = rows.assignmentTitle;
+        state.creative.rubric.title = rubricForState(state).title;
+        saveSafely();
+      } catch (error) {
+        if (source === state && !request.signal.aborted) ai.error = error.message;
+      } finally {
+        if (ai.requestController === request) {
+          ai.pending = false;
+          ai.requestController = null;
+          render();
+          const notice = app.querySelector('[data-rubric-notice]');
+          if (notice)
+            notice.textContent =
+              ai.error ||
+              (request.signal.aborted
+                ? 'Rubric cancelled. Your work is saved.'
+                : 'Rubric created. Edit the descriptors, then continue.');
+        }
+      }
+      return;
     }
-    if(action==='download-rubric-csv' || action==='download-rubric-html') {
-      if(state.creative.rubric?.rows.length)downloadRubric(rubricForState(state),action.endsWith('csv')?'csv':'html');return;
+    if (action === 'rubric-continue') {
+      if (!state.creative.rubric?.rows.length) return;
+      state.creative.rubric.confirmed = true;
+      saveSafely();
+      enterReview();
+      return;
+    }
+    if (action === 'download-rubric-csv' || action === 'download-rubric-html') {
+      if (state.creative.rubric?.rows.length)
+        downloadRubric(rubricForState(state), action.endsWith('csv') ? 'csv' : 'html');
+      return;
     }
     if (action === 'check-workspace-revision') {
       await reviews.check();
@@ -964,7 +1162,10 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
         return;
       }
     }
-    if (['compile-activity','review-my-design','consult-babbage'].includes(action)) { await startCompilation(action); return; }
+    if (['compile-activity', 'review-my-design', 'consult-babbage'].includes(action)) {
+      await startCompilation(action);
+      return;
+    }
     if (action === 'explore-directions') {
       await exploreDirections();
       return;
@@ -1070,6 +1271,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     else if (action === 'approve-version' && finalCheckReady(state)) {
       state.finalCheck.approved = state.finalCheck.completed = true;
       reviewPage = 'guide';
+      if (!state.creative.rubric?.rows.length) ui.popup = 'rubric';
       saveSafely();
       render();
       document.getElementById('review-title')?.focus({ preventScroll: true });
@@ -1080,11 +1282,12 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
           teacher: state.teacher,
           workspace: state.workspace,
           conversationNotes: savedFeedbackNotes(state),
-          rubric:rubricForState(state),
+          rubric: rubricForState(state),
         });
         app.querySelector('.design-notice').textContent = 'Your Course Guide download has started.';
       } catch (error) {
-        app.querySelector('.design-notice').textContent = error.message || 'The guide could not be downloaded. Your work is saved.';
+        app.querySelector('.design-notice').textContent =
+          error.message || 'The guide could not be downloaded. Your work is saved.';
       }
     } else if (action === 'read-final-directions' || action === 'return-final-checks') {
       const target = app.querySelector(

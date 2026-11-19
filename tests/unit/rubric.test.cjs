@@ -3,8 +3,15 @@ const assert = require('node:assert/strict');
   const { freshWorkspace, saveWorkspace, readWorkspace } = await import(
     '../../src/features/workspace/storage.js'
   );
-  const { generateRubric, rubricCSV, rubricDocument, renderRubricTable, rubricIssue } =
-    await import('../../src/features/workspace/rubric.js');
+  const {
+    generateRubric,
+    rubricCSV,
+    rubricDocument,
+    renderRubricTable,
+    rubricIssue,
+    renderAssessmentSetup,
+    renderRubricEditor,
+  } = await import('../../src/features/workspace/rubric.js');
   const { createProjectFile, parseProjectFile } = await import(
     '../../src/features/workspace/project-file.js'
   );
@@ -64,7 +71,7 @@ const assert = require('node:assert/strict');
   assert(
     !renderBuildPage(state, { pending: false }, 'rubric').includes('What will students submit?'),
   );
-  assert(renderBuildPage(state, { pending: false }, 'assessment').includes('Add a criterion'));
+  assert(renderAssessmentSetup(state).includes('Add a criterion'));
   const guideWithRubric = createGuide(state.design, {
     teacher: state.teacher,
     workspace: state.workspace,
@@ -72,6 +79,12 @@ const assert = require('node:assert/strict');
     conversationNotes: 'Maya: Private NPC question\nEducator: Internal answer',
   });
   assert(guideWithRubric.includes('Staffing choices rubric'));
+  assert(guideWithRubric.includes('Download Canvas rubric template (.csv)'));
+  const encoded = guideWithRubric.match(/href="data:text\/csv;charset=utf-8,([^"]+)"/)[1];
+  assert.equal(decodeURIComponent(encoded), rubricCSV(rubricForState(state)));
+  assert(renderRubricEditor(rubricForState(state)).includes('Criterion 1 of'));
+  assert(renderRubricTable(rubricForState(state)).includes('rubric-score'));
+
   assert(guideWithRubric.includes('<title>Staffing choices</title>'));
   assert(
     !guideWithRubric.includes('Private NPC question') &&
@@ -108,7 +121,7 @@ const assert = require('node:assert/strict');
     drafted.reduce((n, row) => n + row.points, 0),
     10,
   );
-  const setup = renderBuildPage(uncertain, { pending: false }, 'assessment');
+  const setup = renderAssessmentSetup(uncertain);
   assert(setup.includes('Not sure? Draft criteria with Babbage'));
   assert.equal((setup.match(/<article>/g) || []).length, 3, 'Levels are three separate cards');
   assert(setup.includes('data-rubric-criterion="0"'));

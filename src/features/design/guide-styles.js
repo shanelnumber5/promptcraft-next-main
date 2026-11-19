@@ -186,4 +186,4 @@ body :is(h1,h2,h3,h4,h5,h6) { font-family:Georgia,'Times New Roman',serif !impor
 .assignment-rubric thead {background:#12355b;color:#fff}
 .assignment-rubric tbody th {background:#f5f9fc}
 .rubric-table-scroll {overflow-x:auto}
-`;
+.rubric-score{display:block;width:fit-content;padding:6px 10px;margin:0 0 16px;background:#eef4f9;border:1px solid #12355b;border-radius:4px;font:bold 15px Arial;color:#12355b}.rubric-descriptor{line-height:1.6}.rubric-download a{display:inline-block;padding:12px;border:2px solid #12355b;border-radius:4px;font-weight:bold}.guide-preview-toolbar{flex-wrap:wrap}@media print{.rubric-download{display:none}}`;
