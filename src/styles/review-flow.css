@@ -89,8 +89,8 @@ body[data-app-view] #app #workspace-panel .review-actions > .workspace-save-stat
   white-space: normal;
 }
 body[data-app-view] #app #workspace-panel .review-actions > button.primary {
-  order: 3;
-  margin-left: auto;
+  order: 0;
+  margin-left: 0;
 }
 /* One scrolling reading area, rather than two narrow independently scrolling panes. */
 body[data-app-view] #app #workspace-panel .workspace-final-review {
@@ -549,26 +549,30 @@ body[data-app-view] .guide-preview-toolbar {
   flex: none;
   padding: 12px 20px;
 }
-.guide-preview-sections {
+.guide-preview-section-picker {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 8px 16px;
+  flex: none;
   padding: 12px 20px;
-  background: #f5f9fc;
+  background: #f2f2f2;
+  color: #1e2d59;
 }
-.guide-preview-sections button {
-  padding: 8px 12px;
-  border: 1px solid #12355b;
+.guide-preview-section-picker label {
+  font-weight: 700;
+}
+.guide-preview-section-picker select {
+  flex: 1 1 200px;
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
+  border: 2px solid #1e2d59;
   border-radius: 4px;
-  color: #12355b;
+  padding: 8px 12px;
+  font: inherit;
+  color: #1e2d59;
   background: #fff;
-  font:
-    700 16px/1.4 Arial,
-    sans-serif;
-}
-.guide-preview-sections button[aria-current='page'] {
-  background: #12355b;
-  color: #fff;
 }
 body[data-app-view] .guide-preview iframe {
   flex: 1 1 0;
@@ -1325,5 +1329,57 @@ body[data-app-view] #app .partner-heading .babbage-presence img {
     width: 96px !important;
     height: 137px !important;
     margin-top: -29px !important;
+  }
+}
+
+/* Dialog controls wrap inside the same navy/gold frame at every viewport. */
+body[data-app-view] .guide-preview :is(.guide-preview-toolbar, .guide-preview-actions) {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+body[data-app-view] .guide-preview .guide-preview-toolbar button {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+  margin: 0;
+}
+body[data-app-view] .guide-preview .guide-preview-actions button {
+  flex: 1 1 100px;
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+}
+body[data-app-view] .guide-preview .guide-preview-actions [data-guide-page] {
+  font-size: 14px;
+}
+.workspace-popup--rubric :is(input, textarea) {
+  border: 2px solid #1e2d59;
+}
+body[data-app-view='lab'] .lab-footer > p {
+  color: #111111;
+}
+@media (max-width: 700px) {
+  body[data-app-view='workspace']
+    .workspace-shell--focused
+    #workspace-panel
+    .workspace-action-bar
+    > :is(button, a) {
+    flex: 1 1 130px;
+  }
+  body[data-app-view='workspace']
+    .workspace-shell--focused
+    #workspace-panel
+    .workspace-action-bar
+    > .workspace-save-status {
+    flex-basis: 100%;
+    white-space: normal;
+  }
+  body[data-app-view] .guide-preview .guide-preview-toolbar strong {
+    flex-basis: 100%;
+  }
+  body[data-app-view] .guide-preview .guide-preview-actions [data-guide-page] {
+    order: -1;
+    flex-basis: 100%;
+    text-align: center;
   }
 }

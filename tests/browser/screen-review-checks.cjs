@@ -6,15 +6,43 @@ module.exports = async ({ send, evaluate, waitFor, shot, accessibleScreen }) => 
     await waitFor('document.readyState === "complete" && !!document.querySelector("h1")');
     await evaluate('document.fonts.ready');
   };
+  const navigationIssues = [];
   const capture = async (label) => {
     await evaluate('window.scrollTo(0,0)');
     await evaluate('Promise.all([...document.images].map(image=>image.decode().catch(()=>{})))');
     if (label.endsWith('-dialog-maya-reading') || label.endsWith('-dialog-pixel')) {
+      const navVisible = await evaluate(
+        `(()=>{const dialog=document.querySelector('.maya-dialog[open]');const bounds=dialog.getBoundingClientRect();return [...dialog.querySelectorAll('.maya-scene-nav button:not([hidden])')].every(button=>{const r=button.getBoundingClientRect();return r.top>=bounds.top && r.bottom<=bounds.bottom && r.left>=bounds.left && r.right<=bounds.right;});})()`,
+      );
+      if (!navVisible)
+        navigationIssues.push(label + ': dialogue navigation extends outside its dialog');
+    }
+    if (label.endsWith('build-ai-use'))
       assert(
         await evaluate(
-          `(()=>{const dialog=document.querySelector('.maya-dialog[open]');const bounds=dialog.getBoundingClientRect();return [...dialog.querySelectorAll('.maya-scene-nav button')].every(button=>{const r=button.getBoundingClientRect();return r.top>=bounds.top && r.bottom<=bounds.bottom && r.left>=bounds.left && r.right<=bounds.right;});})()`,
+          `(()=>{const choices=[...document.querySelectorAll('.workspace-requirements .radio-cards label')];const preference=document.querySelector('.studio-rubric-choice').getBoundingClientRect();return choices.every(el=>el.getBoundingClientRect().bottom<=preference.top);})()`,
         ),
-        label + ': both dialogue navigation buttons stay visible',
+        label + ': AI choices do not overlap rubric preference',
+      );
+    if (label.includes('-studio-') && !label.endsWith('restore-error')) {
+      const navigation = await evaluate(
+        `(()=>{const nav=document.querySelector('.studio-navigation');if(!nav)return {visible:true};const r=nav.getBoundingClientRect();return {visible:r.top>=0 && r.bottom<=innerHeight+1,footer:r.toJSON(),height:innerHeight,shell:document.querySelector('.workspace-shell').getBoundingClientRect().toJSON(),header:document.querySelector('.app-header').getBoundingClientRect().toJSON(),app:document.getElementById('app').getBoundingClientRect().toJSON(),appCSS:{padding:getComputedStyle(document.getElementById('app')).padding,margin:getComputedStyle(document.getElementById('app')).margin},shellCSS:{padding:getComputedStyle(document.querySelector('.workspace-shell')).padding,margin:getComputedStyle(document.querySelector('.workspace-shell')).margin,minHeight:getComputedStyle(document.querySelector('.workspace-shell')).minHeight},task:document.querySelector('.design-page-heading').getBoundingClientRect().toJSON()};})()`,
+      );
+      if (!navigation.visible) await shot(label + '-navigation-failure');
+      assert(
+        navigation.visible,
+        label + ': Back/Continue stay visible ' + JSON.stringify(navigation),
+      );
+    }
+    if (label.includes('-studio-build-')) {
+      const editorArea = await evaluate(
+        `(()=>{const fields=document.querySelector('.build-page-fields'),page=document.querySelector('.workspace-page'),shell=document.querySelector('.workspace-shell');return {height:innerHeight,fields:fields.getBoundingClientRect().toJSON(),page:page.getBoundingClientRect().toJSON(),pageGap:getComputedStyle(page).gap,pagePadding:getComputedStyle(page).padding,shell:shell.getBoundingClientRect().toJSON(),shellGap:getComputedStyle(shell).gap,header:page.querySelector('header').getBoundingClientRect().toJSON(),footer:page.querySelector('footer').getBoundingClientRect().toJSON()};})()`,
+      );
+      if (editorArea.height <= 450 && editorArea.fields.height < 80)
+        await shot(label + '-editing-failure');
+      assert(
+        editorArea.height > 450 || editorArea.fields.height >= 80,
+        label + ': usable editing area ' + JSON.stringify(editorArea),
       );
     }
     await accessibleScreen(label);
@@ -151,6 +179,16 @@ module.exports = async ({ send, evaluate, waitFor, shot, accessibleScreen }) => 
       ['review-error', { panel: 'reason', reviewError: true }],
       ['approved', { panel: 'reason', review: 'checks', approved: true }],
     ];
+    const buildIds = await evaluate(
+      `(async()=>{const {buildSections}=await import('/src/features/workspace/build-view.js');return buildSections.map(section=>section.id);})()`,
+    );
+    cases.push(
+      ...buildIds.map((build) => ['build-' + build, { panel: 'revision', build }]),
+      ...['rationale', 'reasoning', 'rubric', 'checks', 'help'].map((review) => [
+        'review-' + review,
+        { panel: 'reason', review },
+      ]),
+    );
     for (const [name, options] of cases) {
       await evaluate(`window.renderScreenReview(${JSON.stringify(options)})`);
       await capture(`${device}-studio-${name}`);
@@ -217,6 +255,24 @@ module.exports = async ({ send, evaluate, waitFor, shot, accessibleScreen }) => 
     );
     await go('guide');
     await capture(`${device}-guide-saved`);
+    for (const [popup, rubricPart] of [
+      ['ai-use', ''],
+      ['rubric-choice', ''],
+      ['rubric', 'view'],
+      ['rubric', 'edit'],
+      ['rubric', 'criteria'],
+    ]) {
+      await evaluate(`(async()=>{
+        const {mountWorkspacePopup}=await import('/src/features/workspace/popups.js');
+        const {readWorkspace}=await import('/src/features/workspace/storage.js');
+        const state=readWorkspace().state;
+        Object.assign(state.creative.rubric,{title:'Staffing decision rubric',criteria:['Evidence','Reasoning'].join(String.fromCharCode(10)),basis:state.design.revision,rows:['Evidence','Reasoning'].map(name=>({name,description:'Assess '+name,points:50,ratings:['Explains the decision with case evidence.','Provides some evidence but leaves its connection unclear.','No supporting evidence is supplied.']}))});
+        mountWorkspacePopup(document.getElementById('app'),state,{popup:${JSON.stringify(popup)},rubricPart:${JSON.stringify(rubricPart)}},()=>document.querySelector('dialog[open]')?.close());
+      })()`);
+      await capture(`${device}-popup-${popup}-${rubricPart || 'choices'}`);
+      await evaluate('document.querySelector("dialog[open]").close()');
+      await waitFor('!document.querySelector("dialog[open]")');
+    }
     await go('lab');
     const ids = await evaluate(
       `(async()=>{const {ideas}=await import('/src/features/idea-lab/ideas.js');return ideas.map(idea=>idea.id);})()`,
@@ -236,4 +292,5 @@ module.exports = async ({ send, evaluate, waitFor, shot, accessibleScreen }) => 
       `${device} captured: public topics, all story stages and choices, studio utilities, AI states, closing, dialogs and all Idea Lab details.`,
     );
   }
+  assert.deepEqual(navigationIssues, [], 'Dialogue navigation stays inside every dialog');
 };

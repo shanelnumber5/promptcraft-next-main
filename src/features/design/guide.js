@@ -1,11 +1,12 @@
-import { renderRubricTable, rubricCSV } from '../workspace/rubric.js';
+import { savedFeedbackNotes } from './feedback-conversation.js';
+import { renderRubricTable, rubricCSV, rubricForState } from '../workspace/rubric.js';
 import { renderGuideHelp } from '../../shared/guide-help.js';
 import { guideStyles } from './guide-styles.js';
 import { renderAssignmentDirections } from '../../shared/directions.js';
 import { teacherSetup } from '../setup/content.js';
 import { escapeHTML as e } from '../../shared/html.js';
-import { discussionOpening } from '../opening/content.js';
-import { lemonadeVisual, planVisuals } from '../../shared/lemonade-visuals.js';
+import { scenarioGuideSections } from '../opening/guide-content.js';
+import { designRoute } from '../workspace/routes.js';
 import { designEvidence, renderDesignRationale } from '../../shared/design-evidence.js';
 
 export function renderConversationNotes(notes) {
@@ -25,19 +26,6 @@ export function renderConversationNotes(notes) {
   );
 }
 
-function lemonadeExample() {
-  const scene = (id) => discussionOpening.scenes.find((item) => item.id === id);
-  const flow = (board) =>
-    `<ol class="flow" aria-label="${e(board.flowLabel)}">${board.nodes.map((node, index) => `<li>${planVisuals(board)[index]}<strong>${e(node.title)}</strong><p>${e(node.detail)}</p></li>`).join('')}</ol><p>${e(board.note)}</p>`;
-  return `<section><h2>The lemonade example</h2><p>The old assignment asked students to describe a lemonade stand and reply to two classmates. Maya could finish without using anyone else’s ideas. The revised discussion gives the reply a purpose: examine a choice and use the question to revise or defend it.</p><div class="example-situation"><div>${lemonadeVisual('stand')}</div><div><h3>The situation</h3><ul>${scene(
-    'meet-plan',
-  )
-    .board.facts.map((fact) => `<li>${e(fact)}</li>`)
-    .join(
-      '',
-    )}</ul></div></div><div class="plans"><article><h3>First plan</h3>${flow(scene('spot-hole').board)}</article><article><h3>A revision to test</h3>${flow(scene('revised-plan').board)}</article></div><h3>The useful peer question</h3><blockquote>${e(scene('peer-question').board.quote)}</blockquote><p>The question points to a specific concern: Alex handles both payments and drinks while Sam may have no supplies to restock. It helps the group reconsider how the helpers share service work.</p><h3 class="practice-title">What students practice</h3><ol class="flow practice-steps"><li><strong>Propose</strong><p>Choose a plan and explain the helper roles.</p></li><li><strong>Question</strong><p>Name a choice, explain a concern, and ask a question about it.</p></li><li><strong>Respond</strong><p>Revise or defend the plan with reasons that address the question.</p></li></ol><p class="practice-note">The revised plan is a possibility to test, not proof of faster service. Defending the original plan can also be a useful response if the group addresses the concern.</p><h3>Use the same approach in your course</h3><p>Choose a decision students need to explain. Ask classmates to test one part of that decision. Then ask students to show how the reply informed their revision or defense.</p></section>`;
-}
-
 function alignmentGuidance(teacher) {
   const labels = {
     'montana-k12': 'Montana K–12 Content Standards',
@@ -47,6 +35,23 @@ function alignmentGuidance(teacher) {
   const guide = labels[teacher?.alignmentGuide];
   if (!guide) return null;
   return `<section><h2>Optional assignment guidance</h2><p><strong>Selected guide:</strong> ${e(guide)}</p>${teacher.alignmentReference?.trim() ? `<h3>Reference supplied by the instructor</h3><p>${e(teacher.alignmentReference)}</p>` : '<p>No standard, outcome, or rubric item was supplied.</p>'}<p>This guide was used as an optional design reference, not as verification of official alignment or compliance.</p></section>`;
+}
+
+// Preview, download and the library must describe the same saved experience.
+// Keep scenario identity separate from the shared studio's planning metadata.
+export function guideOptions(state) {
+  return {
+    approved: state.finalCheck.approved,
+    conversationNotes: savedFeedbackNotes(state),
+    rubric: structuredClone(rubricForState(state)),
+    experience: state.experience || (state.workspace ? 'workspace' : 'scenario'),
+    teacher: { ...state.teacher },
+    workspace: state.workspace ? { ...state.workspace } : null,
+    scenarioSections:
+      designRoute(
+        state.experience || (state.workspace ? 'workspace' : 'scenario'),
+      ).guideSections?.() || [],
+  };
 }
 
 let logoPromise;
@@ -70,10 +75,13 @@ export function createGuide(
     logo = null,
     teacher = null,
     workspace = null,
+    experience = workspace ? 'workspace' : 'scenario',
+    scenarioSections = null,
     conversationNotes = '',
     rubric = null,
   } = {},
 ) {
+  const isScenario = experience === 'scenario';
   const example = teacherSetup.steps[1].example.directions;
   const stale =
     teacher &&
@@ -93,9 +101,8 @@ export function createGuide(
   const chosenTitle = workspace
     ? assignmentTitle || 'Activity directions'
     : 'Your revised discussion board';
-  const sections = workspace
-    ? []
-    : [{ id: 'lemonade-example', title: 'The lemonade example', body: lemonadeExample() }];
+  const sections = isScenario ? [...(scenarioSections || scenarioGuideSections())] : [];
+  const scenarioOrder = sections.map((section) => section.id);
   const alignmentSection = teacher && alignmentGuidance(teacher);
   if (alignmentSection)
     sections.push({
@@ -146,15 +153,12 @@ export function createGuide(
         .join('') +
       '</ul></section>',
   });
-  if (!workspace)
-    sections.push({
-      id: 'using-guide',
-      title: 'Using your downloaded guide',
-      body:
-        '<section class="guide-help-section">' +
-        renderGuideHelp({ standalone: true }) +
-        '</section>',
-    });
+  sections.push({
+    id: 'using-guide',
+    title: 'Using your downloaded guide',
+    body:
+      '<section class="guide-help-section">' + renderGuideHelp({ standalone: true }) + '</section>',
+  });
   if (rubric?.rows?.length)
     sections.push({
       id: 'assignment-rubric',
@@ -171,7 +175,7 @@ export function createGuide(
         '</section>',
     });
   const order = [
-    'lemonade-example',
+    ...scenarioOrder,
     'your-assignment',
     'assignment-rubric',
     'assignment-pending',
@@ -189,7 +193,7 @@ export function createGuide(
 <style>${guideStyles}</style></head>
 
 
-<body${workspace ? ' class="workspace-guide"' : ''}><main><header><div class="guide-brand">${logo ? `<img src="${e(logo)}" alt="PromptCraft Babbage emblem">` : ''}<div><div class="wordmark">Prompt<span>Craft</span></div><small>The Prompt Lab · Great Falls College MSU</small></div></div><div class="guide-heading"><h1>${workspace ? e(assignmentTitle || 'Course Guide · Your activity') : 'Discussion guide'}</h1><p>${approved ? 'Your approved version' : 'Draft preview · Not yet approved'}</p><p>${workspace ? 'Your activity directions and assessment rubric.' : 'Your discussion directions, teaching decisions, and a worked example to revisit.'}</p></div></header>${workspace ? '' : `<nav class="toc" aria-labelledby="contents-title"><h2 id="contents-title">In this guide</h2><ol>${contents}</ol></nav>`}${sections.map((section) => `<div class="guide-section" id="${section.id}">${section.body}</div>`).join('')}</main></body></html>`;
+<body${workspace ? ' class="workspace-guide"' : ''}><main><header><div class="guide-brand">${logo ? `<img src="${e(logo)}" alt="PromptCraft Babbage emblem">` : ''}<div><div class="wordmark">Prompt<span>Craft</span></div><small>The Prompt Lab · Great Falls College MSU</small></div></div><div class="guide-heading"><h1>${isScenario ? 'Course Guide · Guided scenario' : workspace ? e(assignmentTitle || 'Course Guide · Your activity') : 'Discussion guide'}</h1><p>${approved ? 'Your approved version' : 'Draft preview · Not yet approved'}</p><p>${isScenario ? 'Your scenario example, teaching guidance, activity directions, and assessment rubric.' : 'Your activity directions and assessment rubric.'}</p></div></header>${`<nav class="toc" aria-labelledby="contents-title"><h2 id="contents-title">In this guide</h2><ol>${contents}</ol></nav>`}${sections.map((section) => `<div class="guide-section" id="${section.id}">${section.body}</div>`).join('')}</main></body></html>`;
 }
 
 export function downloadGuide(design, options) {

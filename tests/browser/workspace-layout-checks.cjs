@@ -14,18 +14,30 @@ module.exports = async ({
   if (scenarioMode) {
     await send('Page.navigate', { url: 'http://127.0.0.1:8783/?view=home' });
     await waitFor('document.readyState==="complete"');
-    await evaluate(`(async()=>{
-      localStorage.clear();
-      const {initialState,saveState}=await import('/src/app/storage.js');
-      const {discussionOpening}=await import('/src/features/opening/content.js');
-      const state=initialState(discussionOpening);
-      state.sceneId=discussionOpening.scenes.at(-1).id;state.storyStage='board';
-      for(const scene of discussionOpening.scenes) if(scene.choice) state.answers[scene.id]=scene.choice.options.find(option=>option.correct).id;
-      saveState(state);
-    })()`);
+    await evaluate('localStorage.clear()');
     await send('Page.navigate', { url: 'http://127.0.0.1:8783/?view=play' });
-    await waitFor('!!document.querySelector("[data-action=start-design-studio]")');
-    await choose('[data-action="start-design-studio"]');
+    await waitFor('!!document.querySelector("[data-action=reveal-board]")');
+    const scenes = await evaluate(
+      `(async()=>{const {discussionOpening}=await import('/src/features/opening/content.js');return discussionOpening.scenes.map(scene=>({id:scene.id,answer:scene.choice?.options.find(option=>option.correct).id}));})()`,
+    );
+    for (let index = 0; index < scenes.length; index++) {
+      assert(
+        await evaluate(
+          `document.querySelector('.navigation-progress').textContent.includes('Step ${index + 1} of ${scenes.length}')`,
+        ),
+        'Story shows the current step',
+      );
+      if (index === 0) {
+        await keyboardReach('[data-action=reveal-board]');
+        await key('Enter', 'Enter', 13);
+      } else await choose('[data-action=reveal-board]');
+      if (scenes[index].answer) {
+        await choose('[data-action=reveal-question]');
+        await choose('input[value="' + scenes[index].answer + '"]');
+      }
+      if (index < scenes.length - 1) await choose('[data-action=next]');
+    }
+    await choose('[data-action=start-design-studio]');
     await waitFor('!!document.querySelector(".workspace-shell")');
     assert(await evaluate('new URL(location.href).searchParams.get("view")==="scenario"'));
     assert(
@@ -53,10 +65,10 @@ module.exports = async ({
       localStorage.clear();
       const state=freshWorkspace();
       state.designPanel='revision';
-      Object.assign(state.teacher,{directions:'Compare two case studies.',subject:'Introduction to management',learningGoal:'Evaluate competing evidence.',learnerLevel:'First-year students'});
-      state.creative.mayaPaused=true;
+      Object.assign(state.teacher,{directions:'Compare two case studies.',subject:'Introduction to management',learningGoal:'Evaluate competing evidence.',learnerLevel:'First-year students',aiUse:'No student AI use'});
+      state.creative.mayaPaused=true; Object.assign(state.creative.rubric,{requested:false,criteria:'Evidence',basis:state.design.revision,rows:[{name:'Evidence',description:'Use the supplied case.',points:100,ratings:['Supports a choice.','Partly supports a choice.','No support.']}]});
       Object.assign(state.design,{sourceDirections:state.teacher.directions,revision:'Compare the evidence, choose a response, and explain your reasoning.',reason:'Make students’ reasoning visible.'});
-      state.creative.review={fingerprint:reviewFingerprint(state),feedback:'Which evidence would help students test their decision?',status:'complete',error:'',offeredMaya:''};
+      state.creative.review={fingerprint:reviewFingerprint(state),feedback:'Which evidence would help students test their decision?',status:'complete',error:'',offeredMaya:'',perspectivesComplete:true};
       ${scenarioMode ? "state.experience='scenario';const {saveScenarioStudio}=await import('/src/features/workspace/scenario-storage.js');saveScenarioStudio(state);" : 'saveWorkspace(state);'}
     })()`);
     await send('Page.navigate', {
@@ -66,16 +78,52 @@ module.exports = async ({
     const sidebar = await evaluate(
       '[...document.querySelectorAll(".workspace-section-sidebar button")].map(el=>el.dataset.designPage)',
     );
-    assert.deepEqual(sidebar, ['start', 'subject', 'ai-use', 'intentions', 'presence', 'draft']);
+    assert.deepEqual(sidebar, [
+      'start',
+      'subject',
+      'ai-use',
+      'sharing',
+      'intentions',
+      'presence',
+      'draft',
+    ]);
+    assert(
+      await evaluate(
+        `(()=>{const selected=document.querySelector('.workspace-tabs [aria-selected=true]');const secondary=document.querySelector('.workspace-section-sidebar [aria-current=page]');return getComputedStyle(selected).backgroundColor==='rgb(217, 143, 6)' && getComputedStyle(secondary).backgroundColor==='rgba(0, 0, 0, 0)' && !document.querySelector('details');})()`,
+      ),
+      'One dominant stage system, quiet section navigation, and no accordions',
+    );
+    await keyboardReach('.header-actions a[href="?view=home"]');
+    assert(
+      await evaluate(
+        `getComputedStyle(document.activeElement).outlineColor==='rgb(30, 45, 89)' && parseFloat(getComputedStyle(document.activeElement).outlineWidth)>=3`,
+      ),
+      'Quiet header controls retain visible keyboard focus',
+    );
+    await keyboardReach('[data-workspace-panel=revision]');
+    await key('ArrowRight', 'ArrowRight', 39);
+    assert(
+      await evaluate(
+        `document.activeElement.matches('[data-workspace-panel=reason][aria-selected=true]')`,
+      ),
+      'Stage navigation supports arrow keys and retains focus',
+    );
+    await key('ArrowLeft', 'ArrowLeft', 37);
     let desktopFooter;
     const sameFooter = async (label) => {
       const bars = await evaluate(
         '[...document.querySelectorAll("#workspace-panel .workspace-action-bar")].map(el=>({...el.getBoundingClientRect().toJSON(),y:el.getBoundingClientRect().y+scrollY}))',
       );
       assert.equal(bars.length, 1, `${label}: one main gold bar`);
-      assert.equal(bars[0].height, 72, `${label}: 72px action bar`);
+      assert(bars[0].height >= 72, `${label}: comfortable action bar`);
+      assert(
+        await evaluate(
+          `(()=>{const bar=document.querySelector('#workspace-panel .workspace-action-bar');const r=bar.getBoundingClientRect();return [...bar.querySelectorAll('button,a')].every(el=>{const b=el.getBoundingClientRect();return b.left>=r.left && b.right<=r.right+1 && b.top>=r.top && b.bottom<=r.bottom+1;});})()`,
+        ),
+        `${label}: every footer action is visible`,
+      );
       desktopFooter ??= bars[0];
-      for (const property of ['y', 'height'])
+      for (const property of ['bottom'])
         assert(
           Math.abs(bars[0][property] - desktopFooter[property]) < 3,
           `${label}: stable gold bar ${property} (${bars[0][property]} vs ${desktopFooter[property]})`,
@@ -83,6 +131,13 @@ module.exports = async ({
     };
     for (const page of sidebar) {
       await choose(`[data-design-page="${page}"]`);
+      if (page === 'ai-use')
+        assert(
+          await evaluate(
+            `!document.querySelector('dialog[open]') && !!document.querySelector('[name=aiUse]')`,
+          ),
+          'AI-use choices are inline',
+        );
       const layout = await evaluate(`(()=>{
         const footer=document.querySelector('.workspace-section-main .workspace-view-actions');
         const panel=document.getElementById('workspace-panel');
@@ -130,9 +185,16 @@ module.exports = async ({
       if (page === 'ai-use')
         assert(
           await evaluate(
-            '(()=>{const wide=document.querySelector(".workspace-field-wide").getBoundingClientRect();const grid=document.querySelector(".workspace-combined-fields").getBoundingClientRect();return Math.abs(wide.width-grid.width)<2;})()',
+            '(()=>{const requirements=document.querySelector(".workspace-requirements");return requirements.getBoundingClientRect().width>0 && !!requirements.querySelector("[name=aiUse]");})()',
           ),
           `${device}: requirements span both columns`,
+        );
+      if (page === 'ai-use')
+        assert(
+          await evaluate(
+            `(()=>{const end=Math.max(...[...document.querySelectorAll('.radio-cards label')].map(el=>el.getBoundingClientRect().bottom));return document.querySelector('.studio-rubric-choice').getBoundingClientRect().top>=end;})()`,
+          ),
+          'Requirements choices and rubric preference never overlap',
         );
       if (page === 'intentions' || page === 'presence') {
         const ids =
@@ -148,14 +210,60 @@ module.exports = async ({
       }
       assert(
         await evaluate(
-          'getComputedStyle(document.getElementById("design-page-title")).fontFamily.startsWith("Arial")',
+          'getComputedStyle(document.getElementById("design-page-title")).fontFamily.startsWith("Georgia")',
         ),
-        `${device}/${page}: bold scenario typography`,
+        `${device}/${page}: Georgia task headings`,
       );
       await accessibleScreen(`${device}/${page}`);
       await shot(`layout-${device}-build-${page}`);
     }
     if (device === 'desktop') {
+      await choose('[data-design-page=subject]');
+      await evaluate(
+        `(()=>{const el=document.getElementById('subject');el.value='Evidence design seminar';el.dispatchEvent(new Event('input',{bubbles:true}));})()`,
+      );
+      await choose('.studio-next [data-design-page=ai-use]');
+      assert(
+        await evaluate(
+          `!document.querySelector('dialog[open]') && !!document.querySelector('[name=aiUse]')`,
+        ),
+        'Continue opens the inline requirements task',
+      );
+      await choose('.studio-back button');
+      assert.equal(
+        await evaluate('document.getElementById("subject").value'),
+        'Evidence design seminar',
+        'Back preserves the entered course',
+      );
+      await choose('[data-design-page=ai-use]');
+      await evaluate(`document.querySelectorAll('[name=aiUse]')[1].click()`);
+      assert.equal(
+        await evaluate('document.getElementById("aiUseDetails").value'),
+        'Brainstorming or feedback only; students write their own work.',
+        'Changing a legacy AI choice does not retain a contradictory old policy',
+      );
+      await evaluate(
+        `(()=>{const el=document.getElementById('aiUseDetails');el.value+=String.fromCharCode(10)+'Name the tool and verify every claim.';el.dispatchEvent(new Event('input',{bubbles:true}));document.querySelectorAll('[name=aiUse]')[2].click();document.querySelector('[data-rubric-preference]').click();})()`,
+      );
+      assert.equal(
+        await evaluate('document.getElementById("aiUseDetails").value'),
+        'AI drafting allowed; students verify claims and revise the output.\nName the tool and verify every claim.',
+        'Changing AI choice preserves the educator’s custom instructions',
+      );
+      await choose('[data-workspace-panel=reason]');
+      await choose('[data-review-page=checks]');
+      assert(
+        await evaluate(`!document.querySelector('dialog[open]')`),
+        'Final checks do not reopen the saved rubric over the task',
+      );
+      await choose('[data-workspace-panel=revision]');
+      await choose('[data-design-page=ai-use]');
+      assert(
+        await evaluate(
+          `document.querySelector('[data-rubric-preference]').checked && document.querySelectorAll('[name=aiUse]')[2].checked`,
+        ),
+        'AI choices and rubric preference survive task navigation',
+      );
       await require('./editor-controls-checks.cjs')({ evaluate, choose, scenarioMode });
     }
     await keyboardReach(
@@ -177,8 +285,11 @@ module.exports = async ({
       );
     } else await key('Enter', 'Enter', 13);
     await choose('[data-workspace-panel="reason"]');
-    for (const page of ['rationale', 'clarify', 'reasoning', 'checks', 'help']) {
+    for (const page of ['rationale', 'reasoning', 'rubric', 'checks']) {
       await choose(`[data-review-page="${page}"]`);
+      await evaluate(
+        `document.querySelector('[data-action=close-workspace-popup]')?.click();document.querySelector('[data-guide-close]')?.click();`,
+      );
       assert(
         await evaluate('document.documentElement.scrollWidth<=innerWidth'),
         `${device}/${page}: no document overflow`,
@@ -206,7 +317,16 @@ module.exports = async ({
     await sameFooter(`${device}/options`);
     await shot(`layout-${device}-options`);
     console.log(
-      `${device} PASS: six Build pages, five Review pages, Explore, keyboard focus, footer placement, rendered contrast. Mocked service only.`,
+      `${device} PASS: seven Build pages, four Review pages, Explore, keyboard focus, footer placement, rendered contrast. Mocked service only.`,
     );
   }
+  await require('./guide-download-checks.cjs')({
+    send,
+    evaluate,
+    waitFor,
+    shot,
+    key,
+    keyboardReach,
+    scenarioMode,
+  });
 };

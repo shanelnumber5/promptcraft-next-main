@@ -1,5 +1,6 @@
+import { renderStudioPage } from './page-frame.js';
 import { assignmentName } from './rubric.js';
-import { renderAiUseSummary } from './popups.js';
+import { aiUseOptions } from './popups.js';
 import { isUncertainAnswer } from '../design/input-quality.js';
 import { findIdea } from '../idea-lab/ideas.js';
 import { teacherSetup } from '../setup/content.js';
@@ -62,7 +63,7 @@ export const buildSections = [
     id: 'ai-use',
     title: 'Activity requirements',
     render: (state) =>
-      `<div class="workspace-requirements"><p>Choose what students may use AI for. Add any disclosure, verification, or limits below.</p>${renderAiUseSummary(state)}<div data-setup-form>${renderField({ id: 'aiUseDetails', type: 'textarea', rows: 3, label: 'AI-use instructions and limits (optional)', help: '' }, { aiUseDetails: state.teacher.aiUse })}${teacherField(state, 'mustStay')}</div></div>`,
+      `<div class="workspace-requirements" data-setup-form><p>Choose what students may use AI for. Add any disclosure, verification, or limits below.</p>${renderField({ id: 'aiUse', type: 'radio', label: 'Student AI use', help: '', options: aiUseOptions }, { aiUse: state.workspace.aiUseChoice || state.teacher.aiUse })}<label class="studio-rubric-choice"><input type="checkbox" data-rubric-preference${state.creative.rubric.requested === true ? ' checked' : ''}> Automatically draft an assessment rubric (optional)</label><div data-setup-form>${renderField({ id: 'aiUseDetails', type: 'textarea', rows: 3, label: 'AI-use instructions and limits (optional)', help: '' }, { aiUseDetails: state.teacher.aiUse })}${teacherField(state, 'mustStay')}</div></div>`,
   },
   {
     id: 'sharing',
@@ -107,6 +108,8 @@ export function renderBuildPage(state, ai, pageId = 'start') {
       Math.min(buildPages.findIndex(([id]) => id === designPage) + 1, buildPages.length - 1)
     ][0];
   const hasDraft = designPage === 'draft' && state.design.revision.trim();
+  const sectionIndex = buildPages.findIndex(([id]) => id === designPage);
+  const previousPage = buildPages[Math.max(0, sectionIndex - 1)][0];
   const primaryAction =
     designPage === 'rubric'
       ? '<button type="button" class="primary" data-workspace-panel="reason">Review my activity</button>'
@@ -114,10 +117,25 @@ export function renderBuildPage(state, ai, pageId = 'start') {
         ? '<button type="button" class="primary" data-workspace-panel="reason">Review my activity</button>'
         : section.compile
           ? `<button type="button" class="primary" data-action="compile-activity"${ai.pending ? ' disabled' : ''}>Build my activity</button>`
-          : `<button type="button" class="primary" data-design-page="${nextPage}">Next section</button>`;
+          : `<button type="button" class="primary" data-design-page="${nextPage}">Continue</button>`;
   const rebuildAction = hasDraft
     ? `<button type="button" data-action="compile-activity"${ai.pending ? ' disabled' : ''}>Rebuild with Babbage</button>`
     : '';
-  const body = `<section class="workspace-view workspace-page"><header class="design-page-heading"><h2 class="workspace-build-title" id="design-page-title" tabindex="-1">${designPage === 'rubric' ? e(assignmentName(state)) + ' rubric' : title}</h2></header><div class="design-page-fields build-page-fields" data-build-page="${designPage}">${fields}</div><nav class="workspace-action-bar workspace-view-actions${designPage === 'ai-use' ? ' workspace-view-actions--gold' : ''}" aria-label="Design actions">${primaryAction}<button type="button" id="workspace-show-preview" data-workspace-view="preview">Preview activity</button><span class="workspace-save-status">Saved in this browser.</span>${rebuildAction}</nav></section>`;
+  const body = renderStudioPage({
+    title: designPage === 'rubric' ? assignmentName(state) + ' rubric' : title,
+    titleId: 'design-page-title',
+    titleClass: 'workspace-build-title',
+    step: `Build · Step ${sectionIndex + 1} of ${buildPages.length}`,
+    content: fields,
+    bodyClass: 'build-page-fields',
+    bodyAttributes: `data-build-page="${designPage}"`,
+    back: sectionIndex
+      ? `<button type="button" data-design-page="${previousPage}">Back</button>`
+      : '<button type="button" data-workspace-panel="babbage">Back</button>',
+    next: primaryAction,
+    actions: `<button type="button" id="workspace-show-preview" data-workspace-view="preview">Preview activity</button>${rebuildAction}`,
+    actionClass: 'workspace-view-actions',
+    actionLabel: 'Design actions',
+  });
   return renderSectionFrame(buildPages, designPage, 'data-design-page', body, 'Build sections');
 }

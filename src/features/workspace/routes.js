@@ -1,3 +1,4 @@
+import { scenarioGuideSections } from '../opening/guide-content.js';
 import { readWorkspace, saveWorkspace, resetWorkspace } from './storage.js';
 import { readScenarioStudio, saveScenarioStudio, resetScenarioStudio } from './scenario-storage.js';
 
@@ -21,6 +22,7 @@ const routes = {
   },
   scenario: {
     id: 'scenario',
+    guideSections: scenarioGuideSections,
     heading: 'Scenario 1 · Design your activity',
     navigation: 'Scenario design stages',
     options: 'Scenario options',

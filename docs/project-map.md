@@ -39,3 +39,9 @@ The stylesheet layers still include shared rules accumulated across development.
 The architecture suite follows static and lazy imports, checks every app module and stylesheet is reachable, and verifies relative test helpers exist. Repository tests reject unused assets and missing references. Other offline suites cover saved-state restoration, independent routes, project import/export, request ownership, cancellation, stale feedback and guide rendering.
 
 Browser fixtures cover current shared routes and Idea Lab with mocked AI. A syntax check does not establish visual correctness. No live AI call is necessary for repository cleanup.
+
+## Shared task interface
+
+`src/features/workspace/page-frame.js` owns the task heading, progress label, secondary tools and the fixed Back/Continue row. Build, Review, Explore, previews and project tools use this component. `section-frame.js` owns the quieter section rail and native narrow-screen chooser. `src/styles/studio-layout.css` defines their visual hierarchy after the legacy feature styles.
+
+Scenario-specific guide content lives in `src/features/opening/guide-content.js`. The scenario route supplies its `guideSections` adapter; `guideOptions()` snapshots that content together with the approved design and rubric. The exporter and paginated preview share that snapshot. See the [navigation audit](navigation-audit-20261118.md) for the screen structure and verification coverage.

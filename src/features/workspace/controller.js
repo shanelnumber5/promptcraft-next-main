@@ -1,4 +1,4 @@
-import { mountWorkspacePopup } from './popups.js';
+import { aiUseOptions, mountWorkspacePopup } from './popups.js';
 import { emptyRubric, generateRubric, downloadRubric, rubricForState } from './rubric.js';
 import { requestConversationRevision } from './conversation-revision.js';
 import {
@@ -46,7 +46,7 @@ import { bindDirectionsEditorControls } from '../../shared/directions-editor-con
 import { showBabbageCameo } from '../../shared/babbage-cameo.js';
 import { openMayaDialog } from '../design/maya-dialog.js';
 import { openGuidePreview } from '../design/guide-preview.js';
-import { downloadGuide } from '../design/guide.js';
+import { downloadGuide, guideOptions } from '../design/guide.js';
 import { confirmRestart } from '../../shared/restart-dialog.js';
 import { openReferences } from '../../shared/reference-dialog.js';
 
@@ -71,9 +71,11 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
   let showingWrapUp = scenario && restored.wrapUp;
   let closingStage = scenario ? 'board' : 'dialogue';
   let closingPage = 0;
-  if (!scenario && params.get('build') === 'start') {
+  if (['start', 'draft'].includes(params.get('build'))) {
     state.designPanel = 'revision';
-    designPage = 'start';
+    designPage = params.get('build');
+    showingWrapUp = false;
+    if (scenario) state.phase = 'design';
   }
   let reworkForReview = false;
   let draftDestination = 'review';
@@ -112,9 +114,10 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     },
   });
   const render = ({ focus = false } = {}) => {
-    app.innerHTML = showingWrapUp
-      ? renderClosing(state, closingStage, closingPage)
-      : renderWorkspace(state, ai, readError, designPage, partnerPage, reviewPage, ui);
+    app.innerHTML =
+      showingWrapUp && ui.screen === 'work'
+        ? renderClosing(state, closingStage, closingPage)
+        : renderWorkspace(state, ai, readError, designPage, partnerPage, reviewPage, ui);
     fitWorkspace(app);
     if (ui.popup && !ai.pending)
       mountWorkspacePopup(app, state, ui, () => {
@@ -360,6 +363,11 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       controller.refreshBabbageConnection();
       return;
     }
+    if (control.matches('[data-rubric-preference]')) {
+      state.creative.rubric.requested = control.checked;
+      saveSafely();
+      return;
+    }
     if (control.name === 'aiUseDetails' && control.closest('[data-setup-form]')) {
       const previousContext = assignmentContext(state);
       state.teacher.aiUse = control.value;
@@ -407,7 +415,12 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       const previousAI = state.teacher.aiUse;
       state.teacher[control.name] = control.type === 'checkbox' ? control.checked : control.value;
       if (control.name === 'aiUse') {
-        const oldChoice = state.workspace.aiUseChoice;
+        const oldChoice =
+          state.workspace.aiUseChoice ||
+          aiUseOptions.find(
+            ([value]) => previousAI === value || previousAI.startsWith(value + '\n'),
+          )?.[0] ||
+          '';
         state.workspace.aiUseChoice = control.value;
         const detail =
           oldChoice && previousAI.startsWith(oldChoice)
@@ -560,26 +573,24 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     }
     return;
   }
-  function askRubricPreference(resume) {
-    if (state.creative.rubric.requested !== null || state.creative.rubric.rows.length) return false;
-    ui.popup = 'rubric-choice';
-    ui.resumeAction = resume;
-    render();
-    return true;
-  }
   function showRubricAutomatically(force = false) {
-    if (state.creative.rubric.requested === false && !force) return;
     if (force) {
-      state.creative.rubric.requested = true;
-      saveSafely();
+      ui = workspaceViews();
+      state.designPanel = 'reason';
+      reviewPage = 'rubric';
+      render();
+      focusTask();
+      return;
     }
-    ui.popup = 'rubric';
-    ui.rubricPart = 'preview';
-    render();
-    if (!state.creative.rubric.rows.length) void createRubric();
+    if (
+      state.creative.rubric.requested === true &&
+      !state.creative.rubric.rows.length &&
+      !ai.pending &&
+      !reviews.pending
+    )
+      void createRubric();
   }
   async function startCompilation(action) {
-    if (askRubricPreference(action)) return;
     if (ai.pending || reviews.pending || !state.teacher.directions.trim()) return;
     reworkForReview = action !== 'consult-babbage';
     draftDestination = action === 'compile-activity' ? 'draft' : 'review';
@@ -688,6 +699,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     if (destination === 'rubric') return false;
     if (
       destination === 'rationale' ||
+      state.creative.mayaPaused ||
       state.finalCheck.approved ||
       review.manualOnly ||
       review.perspectivesComplete ||
@@ -708,7 +720,6 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     return true;
   }
   function enterReview() {
-    if (askRubricPreference('enter-review')) return;
     ui = workspaceViews();
     state.designPanel = 'reason';
     reviewPage = state.creative.review.manualOnly
@@ -824,12 +835,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     render({ focus: true });
     app.querySelector('.design-notice').textContent =
       'Project opened. Your editable work has been restored.';
-    if (
-      state.designPanel === 'reason' &&
-      !askRubricPreference('enter-review') &&
-      !requirePerspectives()
-    )
-      void reviews.runAutomatic();
+    if (state.designPanel === 'reason' && !requirePerspectives()) void reviews.runAutomatic();
   });
   // Delegated navigation and actions remain bound while render replaces page contents.
   app.addEventListener('click', async (event) => {
@@ -954,7 +960,6 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
         show();
       } else show();
       if (destination === 'checks') showRubricAutomatically();
-      if (destination === 'help') openGuidePreview(state, app);
       return;
     }
     const page = event.target.closest('[data-design-page]');
@@ -962,7 +967,6 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       ui = workspaceViews();
       state.designPanel = 'revision';
       designPage = page.dataset.designPage;
-      if (designPage === 'ai-use') ui.popup = 'ai-use';
       saveSafely();
       render();
       document.getElementById('design-page-title')?.focus({ preventScroll: true });
@@ -1002,8 +1006,11 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
         showRubricAutomatically(true);
         return;
       }
-      ui.popup = 'ai-use';
+      ui = workspaceViews();
+      state.designPanel = 'revision';
+      designPage = 'ai-use';
       render();
+      focusTask();
       return;
     }
     if (action === 'include-rubric' || action === 'skip-rubric') {
@@ -1054,6 +1061,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       return;
     }
     if (action === 'reset-workspace') return reset();
+    if (action === 'open-references') return openReferences(event.target.closest('[data-action]'));
     if (readError) return;
     if (action === 'finish-workspace' && state.finalCheck.approved && finalCheckReady(state)) {
       reviews.cancel();
@@ -1350,11 +1358,8 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     } else if (action === 'download-guide' && state.design.revision.trim()) {
       try {
         downloadGuide(state.design, {
+          ...guideOptions(state),
           approved: state.finalCheck.approved && finalCheckReady(state),
-          teacher: state.teacher,
-          workspace: state.workspace,
-          conversationNotes: savedFeedbackNotes(state),
-          rubric: rubricForState(state),
         });
         app.querySelector('.design-notice').textContent = 'Your Course Guide download has started.';
       } catch (error) {
@@ -1369,14 +1374,23 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       target?.focus();
     }
   });
-  document
-    .querySelector('[data-action="open-references"]')
-    ?.addEventListener('click', (event) => openReferences(event.currentTarget));
+  const projectTools = document.querySelector('.header-actions [data-action="open-references"]');
+  if (projectTools) {
+    projectTools.removeAttribute('data-action');
+    projectTools.dataset.workspaceView = 'options';
+    projectTools.id = 'workspace-project-tools';
+    projectTools.textContent = 'Project';
+    projectTools.setAttribute('aria-label', route.options);
+    projectTools.addEventListener('click', () => {
+      if (readError) return;
+      ui = { ...workspaceViews(), screen: 'options', opener: projectTools.id };
+      render();
+      focusTask();
+    });
+  }
   const restart = document.querySelector('[data-action="restart-module"]');
   if (restart) {
-    restart.hidden = false;
-    restart.textContent = route.restartLabel;
-    restart.addEventListener('click', reset);
+    restart.hidden = true;
   }
   document.addEventListener('click', (event) => {
     if (event.target.closest('a[href^="?"]') && !readError && !saveSafely()) {
@@ -1391,11 +1405,6 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     reviews.cancel();
   });
   render();
-  if (
-    state.designPanel === 'reason' &&
-    !askRubricPreference('enter-review') &&
-    !requirePerspectives()
-  )
-    void reviews.runAutomatic();
+  if (state.designPanel === 'reason' && !requirePerspectives()) void reviews.runAutomatic();
   if (!readError && state.babbage.mode !== 'dev') controller.refreshBabbageConnection();
 }

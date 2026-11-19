@@ -185,7 +185,7 @@ const assert = require('node:assert/strict');
     checks.includes('data-action="preview-guide"') &&
       checks.includes('data-action="download-guide"'),
   );
-  const checkFooter = checks.slice(checks.indexOf('<nav class="workspace-action-bar'));
+  const checkFooter = checks.slice(checks.indexOf('<footer class="workspace-action-bar'));
   assert(
     checkFooter.includes('data-action="preview-guide"') &&
       checkFooter.includes('data-action="download-guide"'),
@@ -223,7 +223,7 @@ const assert = require('node:assert/strict');
   assert(!html.includes('data-action="check-workspace-revision"'));
   assert(!html.includes('data-action="continue-to-maya"'), 'Maya waits for the review request');
   assert(!html.includes('Your first review will begin automatically.'));
-  assert(html.includes('data-action="edit-draft"'), 'Edit activity returns to the working draft');
+  assert(html.includes('data-design-page="draft"'), 'Back returns to the working draft');
   assert(html.indexOf('workspace-ai-disclosure') < html.indexOf('workspace-review-feedback'));
   state.babbage.mode = 'dev';
   assert(
@@ -241,7 +241,7 @@ const assert = require('node:assert/strict');
       `${page} actions stay outside scrolling content`,
     );
     if (page === 'ideas')
-      assert(partner.indexOf('</div><footer class="workspace-action-bar partner-actions">') > 0);
+      assert(partner.indexOf('</div><footer class="workspace-action-bar partner-actions"') > 0);
   }
   const { renderWorkspace } = await import('../../src/features/workspace/screen.js');
   const { buildPages, renderUtility } = await import('../../src/features/workspace/views.js');
@@ -323,7 +323,14 @@ const assert = require('node:assert/strict');
     course.indexOf('id="learningGoal"') > course.indexOf('workspace-course-long'),
     'Larger fields are on the right',
   );
-  assert(requirements.includes('open-ai-use-popup'), 'AI instructions span both columns');
+  assert(
+    requirements.includes('name="aiUse"') && !requirements.includes('open-ai-use-popup'),
+    'AI-use choices stay inside Build',
+  );
+  assert(
+    requirements.includes('data-rubric-preference'),
+    'Rubric preference is an inline optional choice',
+  );
   assert(
     renderPartner(buildState, { pending: true, configured: true }, 'work', '', {
       task: 'draft',
@@ -356,7 +363,9 @@ const assert = require('node:assert/strict');
   const options = renderUtility(state, { pending: false, configured: true }, { screen: 'options' });
   assert(!options.includes('Workspace options'));
   assert(!options.includes('Shortcuts for your workspace'));
-  assert(options.includes('aria-label="Project options"'));
+  assert(
+    options.includes('aria-labelledby="workspace-view-title"') && options.includes('Project tools'),
+  );
   assert(
     !options.includes('data-review-page="guide"'),
     'Guide remains in Review rather than duplicating options',
@@ -366,13 +375,15 @@ const assert = require('node:assert/strict');
     'Routine navigation is not duplicated',
   );
   assert(!options.includes('<details'), 'Options has no accordion');
-  const mainOptions = options.split('<nav class="workspace-welcome-choices"')[1];
+  const mainOptions = options
+    .split('<section class="workspace-welcome-choices"')[1]
+    .split('</section>')[0];
   assert.equal(
     (mainOptions.match(/data-action=/g) || []).length,
     2,
     'Only download and open project buttons are prominent',
   );
-  assert(mainOptions.includes('Save and leave'));
+  assert(!options.includes('Save and leave'), 'Home is the single leave action');
   assert(
     options.includes('workspace-project-menu'),
     'Project options follow the main menu structure',
@@ -644,7 +655,11 @@ const assert = require('node:assert/strict');
   const noteUI = renderReview(notes, { pending: false }, 'rationale', '', {
     showTeachingNotes: true,
   });
-  assert(noteUI.includes('Create or edit assignment rubric'));
+  assert(
+    noteUI.includes('data-review-page="rubric"') &&
+      !noteUI.includes('Create or edit assignment rubric'),
+    'Rubric has one secondary destination',
+  );
   assert(!noteUI.includes('Suggestions for your teaching notes'));
   assert.equal(JSON.stringify(notes), untouched, 'Offering suggestions never edits the project');
   const importedNotes = parseProjectFile(createProjectFile(notes));
