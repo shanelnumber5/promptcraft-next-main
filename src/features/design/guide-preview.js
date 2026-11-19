@@ -1,6 +1,6 @@
 import { rubricForState, downloadRubric } from '../workspace/rubric.js';
 import { savedFeedbackNotes } from './feedback-conversation.js';
-import { createGuide } from './guide.js';
+import { createGuide, downloadGuideHTML } from './guide.js';
 import { showModal } from '../../shared/modal.js';
 export function openGuidePreview(state, app, { onClose = null } = {}) {
   const dialog = document.createElement('dialog');
@@ -10,7 +10,7 @@ export function openGuidePreview(state, app, { onClose = null } = {}) {
     '<header class="guide-preview-toolbar"><strong>Course Guide preview</strong><button type="button" data-guide-close aria-label="Close assignment guide preview">Close</button></header><nav class="guide-preview-sections" aria-label="Guide sections"></nav><iframe title="Your assignment guide" sandbox="allow-downloads allow-popups allow-popups-to-escape-sandbox"></iframe><footer class="guide-preview-actions"><button type="button" data-guide-back>Previous section</button><span data-guide-page></span><button type="button" data-guide-next>Next section</button></footer>';
   const download = document.createElement('button');
   download.type = 'button';
-  download.textContent = 'Download Canvas rubric template';
+  download.textContent = 'Download rubric for Canvas import (.csv)';
   download.disabled = !state.creative.rubric?.rows.length;
   download.addEventListener('click', () => downloadRubric(rubricForState(state), 'csv'));
   dialog
@@ -26,6 +26,11 @@ export function openGuidePreview(state, app, { onClose = null } = {}) {
       rubric: rubricForState(state),
     },
   );
+  const guideDownload = document.createElement('button');
+  guideDownload.type = 'button';
+  guideDownload.textContent = 'Download instructor guide (.html)';
+  guideDownload.addEventListener('click', () => downloadGuideHTML(html));
+  dialog.querySelector('.guide-preview-toolbar').insertBefore(guideDownload, download);
   const parsed = new DOMParser().parseFromString(html, 'text/html');
   const sections = [...parsed.querySelectorAll('.guide-section')];
   let page = 0;
@@ -71,7 +76,14 @@ export function openGuidePreview(state, app, { onClose = null } = {}) {
     } else dialog.close();
   });
   dialog.querySelector('[data-guide-close]').addEventListener('click', () => dialog.close());
-  if (onClose) dialog.addEventListener('close', onClose, { once: true });
+  dialog.addEventListener(
+    'close',
+    () => {
+      if (onClose) onClose();
+      else if (state.workspace && page === sections.length - 1) window.location.href = '?view=home';
+    },
+    { once: true },
+  );
   render();
   showModal(dialog, { fallback: () => app.querySelector('[data-action="preview-guide"]') });
   dialog.querySelector('[data-guide-close]').focus();

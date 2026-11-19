@@ -79,7 +79,10 @@ const assert = require('node:assert/strict');
     conversationNotes: 'Maya: Private NPC question\nEducator: Internal answer',
   });
   assert(guideWithRubric.includes('Staffing choices rubric'));
-  assert(guideWithRubric.includes('Download Canvas rubric template (.csv)'));
+  assert(guideWithRubric.includes('How PromptCraft uses this:'));
+  assert(guideWithRubric.includes('attach the imported rubric to your assignment'));
+  state.creative.rubric.requested = true;
+  assert(guideWithRubric.includes('Download rubric for Canvas import (.csv)'));
   const encoded = guideWithRubric.match(/href="data:text\/csv;charset=utf-8,([^"]+)"/)[1];
   assert.equal(decodeURIComponent(encoded), rubricCSV(rubricForState(state)));
   assert(renderRubricEditor(rubricForState(state)).includes('Criterion 1 of'));
@@ -172,6 +175,52 @@ const assert = require('node:assert/strict');
     }),
     /incomplete/,
   );
+
+  const { mountWorkspacePopup } = await import('../../src/features/workspace/popups.js');
+  const originalDocument = global.document;
+  let mounted,
+    closed = false,
+    opened = false,
+    cancel;
+  global.document = {
+    createElement: () => ({
+      setAttribute() {},
+      addEventListener(name, fn) {
+        if (name === 'cancel') cancel = fn;
+      },
+      showModal() {
+        opened = true;
+      },
+      querySelector() {
+        return { focus() {} };
+      },
+    }),
+  };
+  try {
+    const app = {
+      append(node) {
+        mounted = node;
+      },
+    };
+    mountWorkspacePopup(app, state, { popup: 'rubric' }, () => {
+      closed = true;
+    });
+    assert(opened, 'Rubric opens as a modal');
+    assert(mounted.innerHTML.includes('<table class="assignment-rubric">'));
+    assert(!mounted.innerHTML.includes('<textarea'), 'Rubric is readable before choosing edit');
+    assert(mounted.innerHTML.includes('Edit rubric'));
+    assert(mounted.innerHTML.includes('attach it to your assignment'));
+    cancel({ preventDefault() {} });
+    assert(closed, 'Escape closes popup');
+    mountWorkspacePopup(app, state, { popup: 'rubric', rubricPart: 'edit' }, () => {});
+    assert(mounted.innerHTML.includes('data-rubric-row="0"'));
+    assert(mounted.innerHTML.includes('Done editing'));
+    mountWorkspacePopup(app, state, { popup: 'rubric-choice' }, () => {});
+    assert(mounted.innerHTML.includes('create a rubric automatically'));
+    assert(mounted.innerHTML.includes('Continue without a rubric'));
+  } finally {
+    global.document = originalDocument;
+  }
   console.log(
     'PASS: rubric grounding, exact Canvas template columns, weights, CSV escaping, editable visual, guide inclusion, persistence and malformed responses. Mocked AI.',
   );

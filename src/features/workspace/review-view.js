@@ -70,6 +70,7 @@ export function renderReview(state, ai, page, preview, ui = {}) {
     [
       ['rationale', 'Babbage feedback'],
       ['reasoning', 'Your reasoning'],
+      ['rubric', 'Assignment rubric'],
       ['checks', 'Final checks & guide'],
       ['help', 'Using your guide'],
     ],

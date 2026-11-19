@@ -1121,3 +1121,186 @@ body[data-app-view='workspace']
     justify-content: flex-end;
   }
 }
+
+/* Keep the collaborator alongside the title rather than reserving a blank row. */
+body[data-app-view] #app .partner-heading:has(.babbage-presence) {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 24px !important;
+  min-height: 0 !important;
+}
+body[data-app-view] #app .partner-heading .babbage-presence {
+  order: 2;
+  float: none !important;
+  flex: 0 0 132px;
+  width: 132px !important;
+  height: 94px !important;
+  margin: 0 !important;
+}
+body[data-app-view] #app .partner-heading .babbage-presence img {
+  width: 132px !important;
+  height: 94px !important;
+  object-fit: contain !important;
+  margin: 0 !important;
+}
+body[data-app-view] #app .partner-heading h2 {
+  order: 1;
+  flex: 1;
+  min-width: 0;
+}
+body[data-app-view] #app .partner-card--welcome .partner-content {
+  padding-top: 4px !important;
+}
+body[data-app-view] #app .partner-card--welcome .workspace-ai-disclosure {
+  max-width: none;
+  margin-bottom: 16px !important;
+}
+body[data-app-view] #app .partner-card--welcome .ai-status:empty {
+  display: none;
+}
+body[data-app-view] #app .workspace-welcome-board {
+  gap: 24px;
+  margin-top: 0;
+}
+body[data-app-view] #app .workspace-welcome-intro h3,
+body[data-app-view] #app .workspace-welcome-choices h3 {
+  margin: 0 0 12px;
+  font-size: 24px;
+}
+body[data-app-view] #app .workspace-welcome-actions > * {
+  min-height: 46px;
+  padding: 12px 16px;
+}
+.workspace-popup--rubric {
+  width: calc(100vw - 32px);
+  max-width: none;
+  height: calc(100dvh - 32px);
+  max-height: none;
+}
+.workspace-popup--rubric .workspace-popup-body {
+  flex: 1;
+  padding: 24px 32px;
+}
+.workspace-popup--rubric .assignment-rubric {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font: 16px/1.6 Arial;
+  color: #12355b;
+}
+.workspace-popup--rubric .assignment-rubric caption {
+  font: bold 26px/1.3 Georgia;
+  text-align: left;
+  padding: 0 0 20px;
+}
+.workspace-popup--rubric .assignment-rubric th,
+.workspace-popup--rubric .assignment-rubric td {
+  border: 1px solid #12355b;
+  padding: 16px;
+  vertical-align: top;
+  text-align: left;
+  width: 25%;
+  overflow-wrap: break-word;
+}
+.workspace-popup--rubric .assignment-rubric thead {
+  background: #12355b;
+  color: white;
+}
+.workspace-popup--rubric .assignment-rubric tbody th {
+  background: #f5f9fc;
+}
+.workspace-popup--rubric .assignment-rubric tbody th p {
+  font-weight: normal;
+}
+.workspace-popup--rubric .assignment-rubric textarea {
+  field-sizing: content;
+  min-height: 100px;
+  resize: vertical;
+}
+.workspace-popup--rubric .rubric-table-scroll {
+  overflow: auto;
+}
+.rubric-edit-settings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: end;
+  margin-bottom: 20px;
+}
+.rubric-edit-settings label {
+  flex: 1;
+  min-width: 180px;
+}
+.rubric-choice-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 24px 0;
+}
+.workspace-popup-footer {
+  flex-wrap: wrap;
+}
+.workspace-popup-footer > button:last-child {
+  margin-left: auto;
+}
+body[data-app-view] #app .closing-experience .scene-actions {
+  padding: 12px max(24px, calc((100vw - 1180px) / 2)) !important;
+  box-sizing: border-box;
+}
+.guide-preview-actions {
+  padding: 12px 24px !important;
+  gap: 16px;
+}
+.guide-preview-actions button {
+  flex-shrink: 0;
+}
+@media (max-width: 760px) {
+  body[data-app-view] #app .workspace-section-frame--sidebar {
+    grid-template-columns: 1fr !important;
+    min-width: 0;
+  }
+  body[data-app-view] #app .workspace-section-sidebar {
+    display: none !important;
+  }
+  body[data-app-view] #app .workspace-section-mobile {
+    display: block !important;
+  }
+  body[data-app-view] #app .workspace-section-main {
+    min-width: 0;
+    width: 100%;
+  }
+  .workspace-popup--rubric .assignment-rubric {
+    min-width: 720px;
+  }
+  .workspace-popup--rubric .workspace-popup-body {
+    padding: 16px;
+  }
+  .workspace-popup--rubric {
+    width: calc(100vw - 12px);
+    height: calc(100dvh - 12px);
+  }
+  .workspace-popup-footer button {
+    font-size: 14px;
+  }
+  .guide-preview-toolbar {
+    gap: 10px;
+    padding: 12px;
+  }
+  .guide-preview-toolbar button {
+    font-size: 14px;
+  }
+  .guide-preview-actions {
+    padding: 12px !important;
+  }
+  body[data-app-view] #app .partner-heading .babbage-presence {
+    flex-basis: 96px;
+    width: 96px !important;
+    height: 76px !important;
+  }
+  body[data-app-view] #app .partner-heading .babbage-presence img {
+    width: 96px !important;
+    height: 76px !important;
+  }
+}

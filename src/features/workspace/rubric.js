@@ -4,6 +4,7 @@ import { BABBAGE_ENDPOINT, buildBabbageRequest } from '../design/babbage-client.
 
 export const emptyRubric = () => ({
   title: 'Assignment rubric',
+  requested: null,
   submission: '',
   criteria: '',
   total: '100',
@@ -44,6 +45,7 @@ export function restoreRubric(value) {
     if (typeof value[key] === 'string')
       result[key] = value[key].slice(0, key === 'basis' ? 24000 : 2000);
   result.confirmed = value.confirmed === true;
+  result.requested = typeof value.requested === 'boolean' ? value.requested : null;
   if (Array.isArray(value.rows))
     result.rows = value.rows
       .slice(0, 8)

@@ -404,12 +404,22 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     else if (control.closest('[data-design-form]') && Object.hasOwn(state.design, control.name))
       state.design[control.name] = control.value;
     else if (control.closest('[data-setup-form]') && Object.hasOwn(state.teacher, control.name)) {
+      const previousAI = state.teacher.aiUse;
       state.teacher[control.name] = control.type === 'checkbox' ? control.checked : control.value;
       if (control.name === 'aiUse') {
+        const oldChoice = state.workspace.aiUseChoice;
         state.workspace.aiUseChoice = control.value;
+        const detail =
+          oldChoice && previousAI.startsWith(oldChoice)
+            ? previousAI.slice(oldChoice.length).trim()
+            : previousAI;
+        if (detail) state.teacher.aiUse = control.value + '\n' + detail;
         if (ui.popup === 'ai-use') {
           ui.popup = '';
-          queueMicrotask(() => render());
+          queueMicrotask(() => {
+            render();
+            app.querySelector('[data-action="open-ai-use-popup"]')?.focus();
+          });
         }
         const details = app.querySelector('#aiUseDetails');
         if (details) details.value = state.teacher.aiUse;
@@ -490,7 +500,86 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       open();
     },
   });
+  async function createRubric(action = 'generate-rubric') {
+    if (ai.pending || reviews.pending) return;
+    const source = state,
+      basis = state.design.revision,
+      request = new AbortController();
+    const snapshot = structuredClone(state);
+    if (action === 'draft-rubric-criteria') snapshot.creative.rubric.criteria = '';
+    Object.assign(ai, {
+      pending: true,
+      requestController: request,
+      intent: 'review',
+      stage: 'sending',
+      error: '',
+    });
+    render();
+    try {
+      const rows = await generateRubric(snapshot, {
+        signal: AbortSignal.any([request.signal, AbortSignal.timeout(180000)]),
+        onProgress: (stage) => {
+          if (source === state && ai.requestController === request && !request.signal.aborted) {
+            ai.stage = stage;
+            render();
+          }
+        },
+      });
+      if (source !== state || request.signal.aborted || ai.requestController !== request) return;
+      if (basis !== state.design.revision)
+        throw Error('Your assignment changed. Create the rubric again for the current draft.');
+      Object.assign(state.creative.rubric, {
+        title: rubricForState(snapshot).title,
+        submission: rubricForState(snapshot).submission,
+      });
+      ui.rubricPart = 'rubric';
+      state.creative.rubric.rows = rows;
+      if (!snapshot.creative.rubric.criteria.trim())
+        state.creative.rubric.criteria = rows.map((row) => row.name).join('\n');
+      state.creative.rubric.basis = basis;
+      state.creative.rubric.confirmed = true;
+      if (!state.workspace.assignmentTitle?.trim() && rows.assignmentTitle)
+        state.workspace.assignmentTitle = rows.assignmentTitle;
+      state.creative.rubric.title = rubricForState(state).title;
+      saveSafely();
+    } catch (error) {
+      if (source === state && !request.signal.aborted) ai.error = error.message;
+    } finally {
+      if (ai.requestController === request) {
+        ai.pending = false;
+        ai.requestController = null;
+        render();
+        const notice = app.querySelector('[data-rubric-notice]');
+        if (notice)
+          notice.textContent =
+            ai.error ||
+            (request.signal.aborted
+              ? 'Rubric cancelled. Your work is saved.'
+              : 'Rubric created. Edit the descriptors, then continue.');
+      }
+    }
+    return;
+  }
+  function askRubricPreference(resume) {
+    if (state.creative.rubric.requested !== null || state.creative.rubric.rows.length) return false;
+    ui.popup = 'rubric-choice';
+    ui.resumeAction = resume;
+    render();
+    return true;
+  }
+  function showRubricAutomatically(force = false) {
+    if (state.creative.rubric.requested === false && !force) return;
+    if (force) {
+      state.creative.rubric.requested = true;
+      saveSafely();
+    }
+    ui.popup = 'rubric';
+    ui.rubricPart = 'preview';
+    render();
+    if (!state.creative.rubric.rows.length) void createRubric();
+  }
   async function startCompilation(action) {
+    if (askRubricPreference(action)) return;
     if (ai.pending || reviews.pending || !state.teacher.directions.trim()) return;
     reworkForReview = action !== 'consult-babbage';
     draftDestination = action === 'compile-activity' ? 'draft' : 'review';
@@ -619,6 +708,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     return true;
   }
   function enterReview() {
+    if (askRubricPreference('enter-review')) return;
     ui = workspaceViews();
     state.designPanel = 'reason';
     reviewPage = state.creative.review.manualOnly
@@ -731,7 +821,12 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     render({ focus: true });
     app.querySelector('.design-notice').textContent =
       'Project opened. Your editable work has been restored.';
-    if (state.designPanel === 'reason' && !requirePerspectives()) void reviews.runAutomatic();
+    if (
+      state.designPanel === 'reason' &&
+      !askRubricPreference('enter-review') &&
+      !requirePerspectives()
+    )
+      void reviews.runAutomatic();
   });
   // Delegated navigation and actions remain bound while render replaces page contents.
   app.addEventListener('click', async (event) => {
@@ -830,8 +925,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     if (review) {
       const destination = review.dataset.reviewPage;
       if (destination === 'rubric') {
-        ui.popup = 'rubric';
-        render();
+        showRubricAutomatically(true);
         return;
       }
       if (requirePerspectives(destination)) return;
@@ -856,6 +950,8 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
         }
         show();
       } else show();
+      if (destination === 'checks') showRubricAutomatically();
+      if (destination === 'help') openGuidePreview(state, app);
       return;
     }
     const page = event.target.closest('[data-design-page]');
@@ -863,6 +959,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       ui = workspaceViews();
       state.designPanel = 'revision';
       designPage = page.dataset.designPage;
+      if (designPage === 'ai-use') ui.popup = 'ai-use';
       saveSafely();
       render();
       document.getElementById('design-page-title')?.focus({ preventScroll: true });
@@ -898,7 +995,31 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     }
     let action = event.target.closest('[data-action]')?.dataset.action;
     if (action === 'open-ai-use-popup' || action === 'open-rubric-popup') {
-      ui.popup = action === 'open-ai-use-popup' ? 'ai-use' : 'rubric';
+      if (action === 'open-rubric-popup') {
+        showRubricAutomatically(true);
+        return;
+      }
+      ui.popup = 'ai-use';
+      render();
+      return;
+    }
+    if (action === 'include-rubric' || action === 'skip-rubric') {
+      const resume = ui.resumeAction;
+      state.creative.rubric.requested = action === 'include-rubric';
+      ui.popup = '';
+      saveSafely();
+      if (resume === 'enter-review') enterReview();
+      else if (resume) await startCompilation(resume);
+      else render();
+      return;
+    }
+    if (action === 'edit-rubric') {
+      ui.rubricPart = 'edit';
+      render();
+      return;
+    }
+    if (action === 'view-rubric') {
+      ui.rubricPart = 'preview';
       render();
       return;
     }
@@ -973,9 +1094,13 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       }
       ui = workspaceViews();
       reviewPage = 'guide';
-      if (!state.creative.rubric?.rows.length) ui.popup = 'rubric';
+
       render();
-      openGuidePreview(state, app);
+      openGuidePreview(state, app, {
+        onClose: () => {
+          window.location.href = '?view=home';
+        },
+      });
       return;
     }
     if (action === 'return-assignment' && showingWrapUp) {
@@ -986,7 +1111,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       }
       ui = workspaceViews();
       reviewPage = 'guide';
-      if (!state.creative.rubric?.rows.length) ui.popup = 'rubric';
+
       render();
       document.getElementById('review-title')?.focus({ preventScroll: true });
       return;
@@ -1043,63 +1168,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       return;
     }
     if (action === 'generate-rubric' || action === 'draft-rubric-criteria') {
-      if (ai.pending || reviews.pending) return;
-      const source = state,
-        basis = state.design.revision,
-        request = new AbortController();
-      const snapshot = structuredClone(state);
-      if (action === 'draft-rubric-criteria') snapshot.creative.rubric.criteria = '';
-      Object.assign(ai, {
-        pending: true,
-        requestController: request,
-        intent: 'review',
-        stage: 'sending',
-        error: '',
-      });
-      render();
-      try {
-        const rows = await generateRubric(snapshot, {
-          signal: AbortSignal.any([request.signal, AbortSignal.timeout(180000)]),
-          onProgress: (stage) => {
-            if (source === state && ai.requestController === request && !request.signal.aborted) {
-              ai.stage = stage;
-              render();
-            }
-          },
-        });
-        if (source !== state || request.signal.aborted || ai.requestController !== request) return;
-        if (basis !== state.design.revision)
-          throw Error('Your assignment changed. Create the rubric again for the current draft.');
-        Object.assign(state.creative.rubric, {
-          title: rubricForState(snapshot).title,
-          submission: rubricForState(snapshot).submission,
-        });
-        ui.rubricPart = 'rubric';
-        state.creative.rubric.rows = rows;
-        if (!snapshot.creative.rubric.criteria.trim())
-          state.creative.rubric.criteria = rows.map((row) => row.name).join('\n');
-        state.creative.rubric.basis = basis;
-        state.creative.rubric.confirmed = true;
-        if (!state.workspace.assignmentTitle?.trim() && rows.assignmentTitle)
-          state.workspace.assignmentTitle = rows.assignmentTitle;
-        state.creative.rubric.title = rubricForState(state).title;
-        saveSafely();
-      } catch (error) {
-        if (source === state && !request.signal.aborted) ai.error = error.message;
-      } finally {
-        if (ai.requestController === request) {
-          ai.pending = false;
-          ai.requestController = null;
-          render();
-          const notice = app.querySelector('[data-rubric-notice]');
-          if (notice)
-            notice.textContent =
-              ai.error ||
-              (request.signal.aborted
-                ? 'Rubric cancelled. Your work is saved.'
-                : 'Rubric created. Edit the descriptors, then continue.');
-        }
-      }
+      await createRubric(action);
       return;
     }
     if (action === 'rubric-continue') {
@@ -1271,7 +1340,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     else if (action === 'approve-version' && finalCheckReady(state)) {
       state.finalCheck.approved = state.finalCheck.completed = true;
       reviewPage = 'guide';
-      if (!state.creative.rubric?.rows.length) ui.popup = 'rubric';
+
       saveSafely();
       render();
       document.getElementById('review-title')?.focus({ preventScroll: true });
@@ -1319,6 +1388,11 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     reviews.cancel();
   });
   render();
-  if (state.designPanel === 'reason' && !requirePerspectives()) void reviews.runAutomatic();
+  if (
+    state.designPanel === 'reason' &&
+    !askRubricPreference('enter-review') &&
+    !requirePerspectives()
+  )
+    void reviews.runAutomatic();
   if (!readError && state.babbage.mode !== 'dev') controller.refreshBabbageConnection();
 }

@@ -133,7 +133,15 @@ export function createGuide(
             e(source.short) +
             '</a><span>' +
             e(source.citation) +
-            '</span></li>',
+            '</span><p><strong>How PromptCraft uses this:</strong> ' +
+            e(
+              source.id === 'alignment'
+                ? 'The learning-goal check and rubric ask whether the activity and assessment give students practice with the intended learning.'
+                : source.id === 'discussion'
+                  ? 'The design prompts ask instructors to give sharing and peer responses a specific purpose, such as examining evidence or comparing decisions. This study informs the discussion-design approach; it does not validate this particular assignment.'
+                  : 'The feedback prompts invite students to judge a peer contribution and explain a revision or a reasoned decision to keep their work. This connects feedback with an action students take.',
+            ) +
+            '</p></li>',
         )
         .join('') +
       '</ul></section>',
@@ -158,7 +166,7 @@ export function createGuide(
           : '') +
         '<p class="rubric-download"><a download="assignment-rubric-canvas.csv" href="data:text/csv;charset=utf-8,' +
         encodeURIComponent(rubricCSV(rubric)) +
-        '">Download Canvas rubric template (.csv)</a></p>' +
+        '">Download rubric for Canvas import (.csv)</a></p><p>Import this CSV into Canvas Rubrics, then attach the imported rubric to your assignment. Review the criteria and points before using it with students.</p>' +
         renderRubricTable(rubric) +
         '</section>',
     });
@@ -191,9 +199,10 @@ export function downloadGuide(design, options) {
       (design.sourceDirections && design.sourceDirections !== options.teacher.directions))
   )
     throw Error('Review a revision for the current assignment before downloading.');
-  const url = URL.createObjectURL(
-    new Blob([createGuide(design, options)], { type: 'text/html;charset=utf-8' }),
-  );
+  downloadGuideHTML(createGuide(design, options));
+}
+export function downloadGuideHTML(html) {
+  const url = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
   const link = document.createElement('a');
   link.href = url;
   link.download = 'promptcraft-assignment-guide.html';
