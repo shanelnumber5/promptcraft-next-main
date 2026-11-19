@@ -11,10 +11,12 @@ module.exports = async ({ send, evaluate, waitFor, accessibleScreen, shot, key }
       await shot(`accessibility-${width}-${view}`);
     }
     // Native dialogs must close with Escape and return focus to the opener.
+    await evaluate('document.getElementById("site-menu-toggle").click()');
     await evaluate('document.querySelector("[data-action=open-references]").focus(); document.querySelector("[data-action=open-references]").click()');
     await waitFor('!!document.querySelector("dialog[open]")');
     await accessibleScreen(`${width}/references`);
     await shot(`accessibility-${width}-references`);
+    await evaluate('document.querySelector("[data-reference-tab=samples]")?.click()');
     await key('Escape', 'Escape', 27);
     await waitFor('!document.querySelector("dialog[open]")');
     assert(await evaluate('document.activeElement.matches("[data-action=open-references]")'), 'References restore focus');
@@ -27,6 +29,7 @@ module.exports = async ({ send, evaluate, waitFor, accessibleScreen, shot, key }
     assert(await evaluate('document.activeElement.matches("[data-action=restart-module]")'), 'Restart restores focus');
     await send('Page.navigate', { url: 'http://127.0.0.1:8783/?view=home' });
     await waitFor('document.readyState === "complete" && !!document.querySelector(".info-nav")');
+    await evaluate('document.getElementById("site-menu-toggle").click()');
     await evaluate(`document.querySelector('.info-nav a[href="?view=about"]').click()`);
     assert(await evaluate('document.activeElement.id === "entry-title" && document.title.includes("About PromptCraft")'), 'Information navigation announces the new page');
     console.log(`${width}px PASS: public routes, skip destinations, dialog Escape and focus restoration, in-place page navigation.`);

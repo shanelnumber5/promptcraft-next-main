@@ -34,13 +34,15 @@ const assert = require('node:assert/strict');
     assert.equal(portrait.source, 'latest.png', 'Closed scenes ignore pending changes');
     const warming = preloadDialoguePortraits(['warm-a.webp', 'warm-b.webp', 'warm-a.webp', 'warm-c.webp']);
     assert.equal(prepared.length, 7, 'Preloading starts only two unique downloads');
+    const otherScene = preloadDialoguePortraits(['warm-d.webp', 'warm-a.webp']);
+    assert.equal(prepared.length, 7, 'Concurrent scenes share the same two-download limit');
     prepared[5].resolve(); prepared[6].resolve();
     await new Promise(resolve => setImmediate(resolve));
-    assert.equal(prepared.length, 8, 'Remaining expression starts after a slot is free');
-    prepared[7].resolve(); await warming;
+    assert.equal(prepared.length, 9, 'Queued expressions start when slots are free');
+    prepared[7].resolve(); prepared[8].resolve(); await warming; await otherScene;
     portrait.isConnected = true;
     await updateDialoguePortrait(portrait, 'warm-a.webp');
-    assert.equal(prepared.length, 8, 'Visible expression reuses the preloaded decoded image');
+    assert.equal(prepared.length, 9, 'Visible expression reuses the preloaded decoded image');
     assert.equal(portrait.source, 'warm-a.webp');
     console.log('PASS: repeated expressions, decode continuity, rapid navigation, cancellation, failed art and closed scenes. Mocked images.');
   } finally {

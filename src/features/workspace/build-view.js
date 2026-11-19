@@ -1,3 +1,6 @@
+import { renderStudioPage } from './page-frame.js';
+import { assignmentName } from './rubric.js';
+import { aiUseOptions } from './popups.js';
 import { isUncertainAnswer } from '../design/input-quality.js';
 import { findIdea } from '../idea-lab/ideas.js';
 import { teacherSetup } from '../setup/content.js';
@@ -38,7 +41,7 @@ export const buildSections = [
     id: 'start',
     title: 'Starting point',
     render: (state) =>
-      `<fieldset><legend>What are you bringing?</legend>${[
+      `<div class="setup-field assignment-title-field"><label for="assignment-title">Assignment title</label><input id="assignment-title" data-workspace-meta="assignmentTitle" maxlength="200" value="${e(assignmentName(state) === 'Your activity' ? '' : assignmentName(state))}" placeholder="Name your assignment"></div><fieldset><legend>What are you bringing?</legend>${[
         ['existing', 'Existing directions'],
         ['idea', 'A rough idea'],
       ]
@@ -60,38 +63,23 @@ export const buildSections = [
     id: 'ai-use',
     title: 'Activity requirements',
     render: (state) =>
-      `<div class="workspace-combined-fields workspace-ai-columns"><p class="workspace-field-help workspace-field-wide">Choose what students may use AI for. Explain any required disclosure, verification, or limits in the instructions.</p><div data-setup-form>${renderField(
-        {
-          id: 'aiUse',
-          type: 'radio',
-          label: 'Student AI use',
-          help: '',
-          options: [
-            ['No student AI use', 'No AI: students complete the activity themselves'],
-            [
-              'Brainstorming or feedback only; students write their own work.',
-              'Ideas or feedback: students write their own work',
-            ],
-            [
-              'AI drafting allowed; students verify claims and revise the output.',
-              'Drafting allowed: students check and revise AI output',
-            ],
-            ['Not sure yet', 'Not sure yet: help me decide appropriate limits'],
-          ],
-        },
-        state.teacher,
-      )}</div><div data-setup-form>${renderField({ id: 'aiUseDetails', type: 'textarea', rows: 3, label: 'AI-use instructions and limits (optional)', help: '', placeholder: 'For example: name the tool, describe how it helped, verify claims, and identify the student’s own contribution.' }, { aiUseDetails: state.teacher.aiUse })}</div><div class="workspace-field-wide" data-setup-form>${teacherField(state, 'mustStay')}</div></div>`,
+      `<div class="workspace-requirements" data-setup-form><p>Choose what students may use AI for. Add any disclosure, verification, or limits below.</p>${renderField({ id: 'aiUse', type: 'radio', label: 'Student AI use', help: '', options: aiUseOptions }, { aiUse: state.workspace.aiUseChoice || state.teacher.aiUse })}<label class="studio-rubric-choice"><input type="checkbox" data-rubric-preference${state.creative.rubric.requested === true ? ' checked' : ''}> Automatically draft an assessment rubric (optional)</label><div data-setup-form>${renderField({ id: 'aiUseDetails', type: 'textarea', rows: 3, label: 'AI-use instructions and limits (optional)', help: '' }, { aiUseDetails: state.teacher.aiUse })}${teacherField(state, 'mustStay')}</div></div>`,
+  },
+  {
+    id: 'sharing',
+    title: 'Student work & sharing',
+    render: (state) =>
+      `<div class="workspace-stacked-fields">${metaField('student-contribution', 'studentContribution', 'What will students share, create, decide, or investigate?', state.workspace.studentContribution, 3)}${metaField('peer-interaction', 'peerInteraction', 'How will students interact with one another’s work?', state.workspace.peerInteraction, 3)}</div>`,
   },
   {
     id: 'intentions',
     title: 'Creative direction',
     render: (state) =>
-      `${state.experience === 'scenario' ? '<p class="workspace-field-help">Use the board to support the activity: students might share work, compare approaches, collaborate, or give focused feedback.</p>' : ''}${state.workspace.ideaId ? '<p class="workspace-field-help"><strong>Selected inspiration: ' + e(findIdea(state.workspace.ideaId)?.title || 'Idea Lab') + '</strong>. Describe the creative core you want to keep, then develop the draft with Babbage.</p>' : ''}<div class="workspace-stacked-fields">${metaField('student-contribution', 'studentContribution', 'What will students share, create, decide, or investigate?', state.workspace.studentContribution || '', 3)}${metaField('peer-interaction', 'peerInteraction', 'How will students interact with one another’s work?', state.workspace.peerInteraction || '', 3)}${renderCreativeCore(state)}<div data-design-form>${renderField({ id: 'concern', label: 'What would you like to improve? (optional)', help: '', type: 'textarea', rows: 3 }, state.design)}</div></div>`,
+      `<div class="workspace-stacked-fields">${renderCreativeCore(state)}<div data-design-form>${renderField({ id: 'concern', label: 'What would you like to improve? (optional)', help: '', type: 'textarea', rows: 3 }, state.design)}</div></div>`,
   },
   {
     id: 'presence',
     title: 'Instructor interaction',
-    compile: true,
     render: (state) =>
       `<p class="workspace-field-help">Where could your feedback, questions, or check-ins help students learn? Consider an approach that is realistic for your workload.</p><div class="workspace-stacked-fields"><div>${metaField('instructor-plan', 'instructorPlan', 'How will you interact with students?', state.workspace.instructorPlan)}</div><div>${metaField('open-questions', 'openQuestions', 'Questions to revisit (optional)', state.workspace.openQuestions)}</div></div>`,
   },
@@ -120,14 +108,34 @@ export function renderBuildPage(state, ai, pageId = 'start') {
       Math.min(buildPages.findIndex(([id]) => id === designPage) + 1, buildPages.length - 1)
     ][0];
   const hasDraft = designPage === 'draft' && state.design.revision.trim();
-  const primaryAction = hasDraft
-    ? '<button type="button" class="primary" data-workspace-panel="reason">Review my activity</button>'
-    : section.compile
-      ? `<button type="button" class="primary" data-action="compile-activity"${ai.pending ? ' disabled' : ''}>Build my activity</button>`
-      : `<button type="button" class="primary" data-design-page="${nextPage}">Next section</button>`;
+  const sectionIndex = buildPages.findIndex(([id]) => id === designPage);
+  const previousPage = buildPages[Math.max(0, sectionIndex - 1)][0];
+  const primaryAction =
+    designPage === 'rubric'
+      ? '<button type="button" class="primary" data-workspace-panel="reason">Review my activity</button>'
+      : hasDraft
+        ? '<button type="button" class="primary" data-workspace-panel="reason">Review my activity</button>'
+        : section.compile
+          ? `<button type="button" class="primary" data-action="compile-activity"${ai.pending ? ' disabled' : ''}>Build my activity</button>`
+          : `<button type="button" class="primary" data-design-page="${nextPage}">Continue</button>`;
   const rebuildAction = hasDraft
     ? `<button type="button" data-action="compile-activity"${ai.pending ? ' disabled' : ''}>Rebuild with Babbage</button>`
     : '';
-  const body = `<section class="workspace-view workspace-page"><header class="design-page-heading"><h2 class="workspace-build-title" id="design-page-title" tabindex="-1">${title}</h2></header><div class="design-page-fields build-page-fields" data-build-page="${designPage}">${fields}</div><nav class="workspace-action-bar workspace-view-actions${designPage === 'ai-use' ? ' workspace-view-actions--gold' : ''}" aria-label="Design actions">${primaryAction}<button type="button" id="workspace-show-preview" data-workspace-view="preview">Preview activity</button><span class="workspace-save-status">Saved in this browser.</span>${rebuildAction}</nav></section>`;
+  const body = renderStudioPage({
+    title: designPage === 'rubric' ? assignmentName(state) + ' rubric' : title,
+    titleId: 'design-page-title',
+    titleClass: 'workspace-build-title',
+    step: `Build · Step ${sectionIndex + 1} of ${buildPages.length}`,
+    content: fields,
+    bodyClass: 'build-page-fields',
+    bodyAttributes: `data-build-page="${designPage}"`,
+    back: sectionIndex
+      ? `<button type="button" data-design-page="${previousPage}">Back</button>`
+      : '<button type="button" data-workspace-panel="babbage">Back</button>',
+    next: primaryAction,
+    actions: `<button type="button" id="workspace-show-preview" data-workspace-view="preview">Preview activity</button>${rebuildAction}`,
+    actionClass: 'workspace-view-actions',
+    actionLabel: 'Design actions',
+  });
   return renderSectionFrame(buildPages, designPage, 'data-design-page', body, 'Build sections');
 }

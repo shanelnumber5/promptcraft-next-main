@@ -8,7 +8,7 @@ On Windows, double-click **start-local.cmd** and open **http://127.0.0.1:3080** 
 
 ## Design an activity
 
-- **Guided Scenario** starts with Pixel’s lemonade example, then opens the shared studio.
+- **Guided Scenario** starts with Pixel and Maya’s classroom example, with on-screen dialogue and optional device-voice narration, then opens the shared studio. Returning learners can replay the story without changing their saved design.
 - **Creative Workspace** opens that studio directly.
 - **Idea Lab** offers 12 illustrative starting points to adapt.
 - **Course Guide** previews your saved design and approved teaching decisions.
@@ -17,17 +17,21 @@ Both routes use **Explore → Build → Review**. Explore offers three possibili
 
 Review starts the first Babbage check automatically; subsequent checks are educator controlled. Maya and Pixel offer perspectives and questions to clarify. Teaching-note proposals change your saved wording only when you accept them. Complete the final checks to save the approved version, preview or download the guide, and finish with Pixel.
 
-**Options** includes editable JSON project backup/import and reset. Scenario and Workspace saves are independent. Use project backup to move work between browsers or addresses. Existing saved-project keys and validation remain compatible. Scenario uses `promptcraft_next_opening_v1` plus `promptcraft_scenario_studio_v1`; Workspace uses `promptcraft_assignment_workspace_v1`. Browser addresses have separate local storage.
+**Menu** contains site navigation and **Project**, with editable JSON backup/import, resources and reset. **Activity tools** groups previews and secondary task actions; the guide library uses **Guide options**. Explore → Build → Review remains the main task navigation, with quieter section links and predictable Back/Continue controls. AI-use choices and the optional rubric preference stay inside Build. Rubric review and editing share the Review screen, without opening automatically over Final checks. Scenario and Workspace saves are independent. Use project backup to move work between browsers or addresses. Existing saved-project keys and validation remain compatible. Scenario uses `promptcraft_next_opening_v1` plus `promptcraft_scenario_studio_v1`; Workspace uses `promptcraft_assignment_workspace_v1`. Browser addresses have separate local storage.
+
+The [editorial visual system](docs/editorial-design-20261119.md) uses full-bleed color and imagery, oversized Georgia headings, Arial body text, and plain numbered navigation. Cards, outer frames, rounded panels, shadows, eyebrow labels, and decorative menu arrows are removed.
 
 ## AI and privacy
 
-AI requests send assignment details and design notes to the configured Babbage service and OpenAI. Babbage is a collaborator; the educator decides what to accept. Maya is a fictional student perspective, not evidence of actual student experience. The prototype does not collect formal participant research data.
+AI requests send assignment details and design notes to the configured Babbage service and Chat MT AI. Babbage is a collaborator; the educator decides what to accept. Maya is a fictional student perspective, not evidence of actual student experience. The prototype does not collect formal participant research data.
 
 The browser uses the existing backend at `https://promptcraft-discussion.netlify.app/.netlify/functions/babbage`. Its API key stays on the backend. The `scenario1` request envelope and legacy response field names remain unchanged. The local server serves static files and needs no AI key. Errors preserve your work; Dev simulation is labeled and never silently substitutes for a failed live request.
 
 ## Checks
 
-- `npm run test:unit`: 17 offline suites; unmocked global fetch is blocked.
+- `npm run test:unit`: 25 offline suites; unmocked global fetch is blocked.
+- `node tests/browser/story-audio.test.cjs`: keyboard story entry, replay preservation, and narration controls; speech output is mocked.
+- `node tests/browser/menu-navigation.test.cjs`: keyboard dropdowns, full-bleed home layout, saved-work entry, and no-scroll checks at six sizes.
 - `npm test`: offline suites plus local static-server checks.
 - `npm run test:browser`: shared Scenario and Workspace browser fixtures.
 - `npm run test:lab`: Idea Lab browser fixtures.
@@ -53,3 +57,5 @@ The browser uses optimized WebP artwork and `babbage-mark-small.svg`; original P
 See [the source map](docs/project-map.md), [cleanup record](docs/repository-cleanup-20261030.md), [artwork provenance](docs/asset-provenance.md), and [character guidance](docs/characters/guide.md). This is a complete cleaned repository. Extract it into a fresh folder rather than overlaying it on an older checkout, which would leave retired files behind. No deletion script is required. Historical development notes and retired artwork remain preserved in the original uploaded repository archive.
 
 For new scenes, Build sections, saved fields, ideas, or AI workflows, follow [Expanding PromptCraft](docs/expanding-promptcraft.md). It explains the reusable modules, extension points, save compatibility, and checks to run.
+
+The [November 18 navigation audit](docs/navigation-audit-20261118.md) records the new-user walkthrough and shared screen structure. The guided scenario's HTML guide includes its worked example, Maya's before/after experience, teaching guidance, activity, references, and any saved assessment rubric. Both routes' browser checks open actual downloaded HTML files offline and verify the embedded Canvas CSV download.

@@ -6,8 +6,8 @@ export function renderSectionFrame(items, current, attribute, content, label) {
   if (attribute === 'data-design-page' || attribute === 'data-review-page') {
     const buttons = items
       .map(
-        ([id, title]) =>
-          `<button type="button" ${attribute}="${e(id)}"${id === current ? ' aria-current="page"' : ''}>${e(title)}</button>`,
+        ([id, title], index) =>
+          `<button type="button" ${attribute}="${e(id)}"${id === current ? ' aria-current="page"' : ''}><span class="studio-section-number">${index + 1}</span>${e(title)}</button>`,
       )
       .join('');
     const options = items
@@ -16,7 +16,12 @@ export function renderSectionFrame(items, current, attribute, content, label) {
           `<option value="${e(id)}"${id === current ? ' selected' : ''}>${e(title)}</option>`,
       )
       .join('');
-    const picker = `<div class="workspace-section-mobile"><label for="workspace-section-picker">${e(label)}</label><select id="workspace-section-picker" data-workspace-section-picker="${attribute}">${options}</select></div>`;
+    const picker = `<div class="workspace-section-mobile"><label for="workspace-section-picker">${e(label.replace(' sections', ''))} · ${
+      Math.max(
+        0,
+        items.findIndex(([id]) => id === current),
+      ) + 1
+    } of ${items.length}</label><select id="workspace-section-picker" data-workspace-section-picker="${attribute}">${options}</select></div>`;
     return `<div class="workspace-section-frame workspace-section-frame--sidebar">${picker}<nav class="workspace-section-sidebar" aria-label="${e(label)}">${buttons}</nav><div class="workspace-section-main">${content}</div></div>`;
   }
   const options = items

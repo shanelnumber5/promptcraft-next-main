@@ -39,3 +39,15 @@ The stylesheet layers still include shared rules accumulated across development.
 The architecture suite follows static and lazy imports, checks every app module and stylesheet is reachable, and verifies relative test helpers exist. Repository tests reject unused assets and missing references. Other offline suites cover saved-state restoration, independent routes, project import/export, request ownership, cancellation, stale feedback and guide rendering.
 
 Browser fixtures cover current shared routes and Idea Lab with mocked AI. A syntax check does not establish visual correctness. No live AI call is necessary for repository cleanup.
+
+## Shared task interface
+
+`src/features/workspace/page-frame.js` owns the task heading, progress label, secondary tools and the fixed Back/Continue row. Build, Review, Explore, previews and project tools use this component. `section-frame.js` owns the quieter section rail and native narrow-screen chooser. `src/styles/studio-layout.css` defines their visual hierarchy after the legacy feature styles.
+
+Scenario-specific guide content lives in `src/features/opening/guide-content.js`. The scenario route supplies its `guideSections` adapter; `guideOptions()` snapshots that content together with the approved design and rubric. The exporter and paginated preview share that snapshot. See the [navigation audit](navigation-audit-20261118.md) for the screen structure and verification coverage.
+
+The main menu's component styles live in `src/styles/entry.css`; older menu passes have been removed from the shared override files. `src/shared/narration.js` owns cancellable device speech, and `narration-controls.js` updates the shared controls. `src/features/opening/narration.js` maps authored scenario content to speech without owning persistence. Opening and completion share the classroom renderer and audio controls. See the [menu and story audit](menu-story-audit-20261119.md) for replay preservation, accessibility, and listening-verification limits.
+
+`src/shared/dropdown.js` supplies the shared site, activity, and guide menus. `src/styles/editorial.css` owns the current full-bleed visual theme, loaded after compatibility styles. See the [editorial design notes](editorial-design-20261119.md) for the current appearance and verification scope.
+
+`src/styles/navigation-structure.css` groups the global menu, anchors the stage navigation, aligns topic indexes and task actions, and keeps Idea Lab's learning-focus dropdown visible without a duplicate sidebar.

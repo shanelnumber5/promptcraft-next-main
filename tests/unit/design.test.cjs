@@ -118,7 +118,7 @@ const assert = require('node:assert/strict');
   assert(!renderDesignRationale(rawReason,{showSources:false}).includes('https://'));
   const longExplanation='Students compare a staffing choice and explain the evidence behind their decision. '.repeat(7);
   const spacedExplanation=renderDesignRationale(longExplanation,{paragraphBreaks:true});
-  assert.equal((spacedExplanation.match(/<p>/g)||[]).length,7,'Long guide explanations have readable paragraph breaks');
+  assert.equal((spacedExplanation.match(/<p>/g)||[]).length,2,'Long guide explanations group related sentences into readable paragraphs');
   assert(rawReason.includes('https://'), 'Display formatting leaves the original text intact');
   assert.ok(!renderDesignRationale('[Unverified](https://unverified.example)').includes('<a '));
   const report = renderAssignmentDirections(
@@ -226,6 +226,9 @@ const assert = require('node:assert/strict');
   };
   downloadGuide({ revision: 'My directions', reason: 'My reason' });
   assert.equal(downloaded, true);
+  downloaded = false;
+  downloadGuide({revision:'Manually written activity',reason:'Practice a decision.'}, {teacher:{directions:'Starting activity'},approved:false,workspace:{}});
+  assert.equal(downloaded, true, 'A manually written draft can be downloaded without the legacy source field');
   assert.equal(downloadLink.download, 'promptcraft-assignment-guide.html');
   assert.ok(downloadLink.href.startsWith('blob:'));
   global.document = previousDocument;

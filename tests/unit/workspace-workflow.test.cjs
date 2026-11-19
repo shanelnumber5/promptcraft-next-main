@@ -30,7 +30,7 @@ const deferred = () => {
     state.design.revision = 'Compare two schedules and justify a choice.';
     return state;
   };
-  function harness({ prepareMaya } = {}) {
+  function harness() {
     let state = freshReviewState();
     let allowed = true;
     const calls = [],
@@ -48,11 +48,10 @@ const deferred = () => {
         calls.push({ snapshot, previous, signal, ...result });
         return result.promise;
       },
-      prepareMaya: async (source) => {
-        mayaCalls.push(source);
-        if (prepareMaya) await prepareMaya(source);
+      onMayaReady: (offer) => {
+        mayaCalls.push(offer.source);
+        offers.push(offer);
       },
-      onMayaReady: (offer) => offers.push(offer),
     });
     return {
       controller,
@@ -158,28 +157,17 @@ const deferred = () => {
   await retry;
   assert.equal(failed.state.creative.review.status, 'complete');
 
-  const mayaFailure = Error('Maya unavailable');
-  const maya = harness({
-    prepareMaya: async () => {
-      throw mayaFailure;
-    },
-  });
+  const maya = harness();
   const reading = maya.controller.check();
   maya.calls[0].resolve('A useful current review');
   await reading;
-  assert.equal(
-    maya.state.creative.review.status,
-    'complete',
-    'Maya failure preserves Babbage feedback',
-  );
-  assert.equal(maya.offers[0].error, mayaFailure, 'Maya dialog receives its own recoverable error');
+  assert.equal(maya.state.creative.review.status, 'complete');
+  assert.equal(maya.controller.pending, false, 'Babbage finishes without waiting for a hidden Maya request');
+  assert.equal(maya.offers.length, 1, 'The perspective dialog is offered immediately after the review');
+  assert.equal(maya.offers[0].error, undefined, 'The dialog owns its loading and recoverable errors');
   await maya.controller.runAutomatic();
-  assert.equal(
-    maya.calls.length,
-    1,
-    'Returning to an unoffered current review reuses Babbage feedback',
-  );
-  assert.equal(maya.mayaCalls.length, 2);
+  assert.equal(maya.calls.length, 1, 'Returning to an unoffered review reuses Babbage feedback');
+  assert.equal(maya.offers.length, 2);
 
   const navigating = harness();
   const away = navigating.controller.check();

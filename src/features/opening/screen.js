@@ -19,13 +19,18 @@ export function renderBoard(board, { afterContent = '' } = {}) {
     content += `<${tag} class="service-flow${board.numbered === false ? ' service-flow--roles' : ''}" aria-label="${e(board.flowLabel || 'Plan in order')}">${board.nodes.map((n, i) => `<li>${board.visual === 'plan' ? planVisuals(board)[i] : ''}${board.numbered === false ? '' : `<span class="flow-number" aria-hidden="true">${i + 1}</span>`}<strong>${e(n.title)}</strong><span>${e(n.detail)}</span></li>`).join('')}</${tag}>`;
   }
   if (board.note) content += `<p class="board-note">${e(board.note)}</p>`;
-  const reading = (board.text || board.quote) && !board.visual && !board.nodes?.length && !board.facts?.length && !afterContent;
+  const reading =
+    (board.text || board.quote) &&
+    !board.visual &&
+    !board.nodes?.length &&
+    !board.facts?.length &&
+    !afterContent;
   const title = board.title;
   return `<section class="smartboard${reading ? ' smartboard--reading' : ''}${board.facts?.length ? ' smartboard--facts' : ''}" aria-labelledby="board-title"><div class="board-camera" aria-hidden="true"><span></span></div><div class="board-screen"><div class="board-heading"><div><h2 id="board-title">${e(title)}</h2></div><span class="lemonade-icon">${lemonadeIcon}</span></div>${content}${afterContent}</div><div class="board-frame" aria-hidden="true"><span class="board-status"><span class="board-light"></span><span class="board-speaker"></span></span><span class="board-brand">PROMPTCRAFT</span><span class="board-power"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2v7m-4-5a7 7 0 1 0 8 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span></div><div class="board-pen-tray" aria-hidden="true"><span class="board-stylus"></span><span class="board-stylus board-stylus--gold"></span></div></section>`;
 }
 
 export function renderCharacter(character, active) {
-  return `<figure class="character character--${e(character.side)}${active ? ' is-speaking' : ''}"><img src="${e(character.src)}" alt="${e(character.alt)}" data-character="${e(character.id)}"><figcaption>${e(character.name)}</figcaption></figure>`;
+  return `<figure class="character character--${e(character.side)}${active ? ' is-speaking' : ''}"><img src="${e(character.src)}" alt="${e(character.alt)}" data-character="${e(character.id)}" width="832" height="1177" decoding="async"><figcaption>${e(character.name)}</figcaption></figure>`;
 }
 
 function renderNarrativeFeedback(narrative) {
@@ -67,8 +72,20 @@ function smartboardExpressions(scene, answer) {
 function renderSmartboardCast(scene, answer, board) {
   const expressions = smartboardExpressions(scene, answer);
   const characters = [
-    { id: 'maya', name: 'Maya', side: 'left', src: expressions.maya, alt: 'Maya, considering the plan.' },
-    { id: 'pixel', name: 'Professor Pixel', side: 'right', src: expressions.pixel, alt: 'Professor Pixel, considering the plan.' },
+    {
+      id: 'maya',
+      name: 'Maya',
+      side: 'left',
+      src: expressions.maya,
+      alt: 'Maya, considering the plan.',
+    },
+    {
+      id: 'pixel',
+      name: 'Professor Pixel',
+      side: 'right',
+      src: expressions.pixel,
+      alt: 'Professor Pixel, considering the plan.',
+    },
   ];
   return `<div class="smartboard-stage"><div class="smartboard-cast smartboard-cast--left">${renderCharacter(characters[0], false)}</div><div class="smartboard-stage-board">${board}</div><div class="smartboard-cast smartboard-cast--right">${renderCharacter(characters[1], false)}</div></div>`;
 }
@@ -92,8 +109,22 @@ export function renderScene(scenario, scene, state, index, options = {}) {
   const ready = !showingQuestion || sceneReady(scene, state);
   const isLast = index === scenario.scenes.length - 1;
   const boardContent = options.boardContent ?? '';
-  const nextAction = !showingBoard ? 'reveal-board' : scene.choice && !showingQuestion ? 'reveal-question' : isLast ? 'start-design-studio' : 'next';
-  const nextLabel = !showingBoard ? 'View smartboard' : scene.choice && !showingQuestion ? 'See the question' : isLast ? 'Design my activity' : 'Continue';
+  const nextAction = !showingBoard
+    ? 'reveal-board'
+    : scene.choice && !showingQuestion
+      ? 'reveal-question'
+      : isLast
+        ? 'start-design-studio'
+        : 'next';
+  const nextLabel = !showingBoard
+    ? 'View smartboard'
+    : scene.choice && !showingQuestion
+      ? 'See the question'
+      : isLast
+        ? options.replay
+          ? 'Return to my activity'
+          : 'Design my activity'
+        : 'Continue';
   const cast = Object.values(scenario.characters).map((c) => ({
     ...c,
     src: scene.portraits?.[c.id] || c.src,
@@ -105,12 +136,22 @@ export function renderScene(scenario, scene, state, index, options = {}) {
     options.progressLabel ?? scene.part + ' · ' + (index + 1) + ' of ' + scenario.scenes.length;
   const speaker = cast.find((c) => c.id === scene.speaker);
   const board = showingQuestion
-    ? renderBoard({ label: 'Think it through', title: scene.board.title }, { afterContent: renderChoices(scene.choice, answer) })
-    : renderBoard(scene.board, { afterContent: boardContent + (isLast && options.showHandoff !== false ? `<div class="handoff"><strong>Explore, build, and review your activity</strong><p>${e(scenario.endNote)}</p></div>` : '') });
+    ? renderBoard(
+        { label: 'Think it through', title: scene.board.title },
+        { afterContent: renderChoices(scene.choice, answer) },
+      )
+    : renderBoard(scene.board, {
+        afterContent:
+          boardContent +
+          (isLast && options.showHandoff !== false
+            ? `<div class="handoff"><strong>Explore, build, and review your activity</strong><p>${e(scenario.endNote)}</p></div>`
+            : ''),
+      });
   const content = showingQuestion
     ? renderSmartboardCast(scene, answer, board)
     : showingBoard
-    ? renderSmartboardCast(scene, answer, board)
-    : `<div class="speaker-panel"><div class="cast">${renderCharacter(speaker, true)}</div><section class="speech-bubble speech-bubble--${e(speaker.side)}" aria-labelledby="speaker-label"><h2 id="speaker-label">${e(speaker.name)}</h2>${(Array.isArray(scene.dialogue) ? scene.dialogue : [scene.dialogue]).map(line => `<p>${e(line)}</p>`).join('')}</section></div>`;
-  return `<section class="experience focused-scene focus--${e(stage)} camera--${e(speaker.side)}${options.className ? ' ' + e(options.className) : ''}" aria-label="${e(scenario.title)}"><div class="chapter-line" hidden><span>${e(scenario.title)}</span><span>${e(progressLabel)} · ${showingQuestion ? 'Question' : showingBoard ? 'Smartboard' : 'Dialogue'}</span></div><h1 id="${e(options.titleId ?? 'scene-title')}" class="sr-only" tabindex="-1">${e(scene.title)}</h1><div class="classroom">${content}</div><section class="dialogue" aria-label="Story navigation">${navigation}</section>${options.designNotice ? '<p class="design-notice" role="status"></p>' : ''}<p class="save-notice" role="status">${e(state.saveNotice || '')}</p></section>`;
+      ? renderSmartboardCast(scene, answer, board)
+      : `<div class="speaker-panel"><div class="cast">${renderCharacter(speaker, true)}</div><section class="speech-bubble speech-bubble--${e(speaker.side)}" aria-labelledby="speaker-label"><h2 id="speaker-label">${e(speaker.name)}</h2>${(Array.isArray(scene.dialogue) ? scene.dialogue : [scene.dialogue]).map((line) => `<p>${e(line)}</p>`).join('')}</section></div>`;
+  const audio = `<div class="story-toolbar"><div class="story-identity"><strong>${e(options.audioTitle || 'Guided Scenario')}</strong>${options.replay ? '<span class="sr-only">Story replay · your saved design is preserved</span>' : `<span>${e(options.audioDescription || 'Pixel & Maya’s classroom')}</span>`}</div><div class="narration-controls" role="group" aria-label="Story audio"><button type="button" data-action="toggle-narration" aria-pressed="false">Read aloud</button><button type="button" data-action="repeat-narration" disabled>Read again</button><span class="narration-status" role="status">Dialogue and smartboard audio · device voices</span></div></div>`;
+  return `<section class="experience focused-scene focus--${e(stage)} camera--${e(speaker.side)}${options.className ? ' ' + e(options.className) : ''}" aria-label="${e(scenario.title)}"><div class="chapter-line" hidden><span>${e(scenario.title)}</span><span>${e(progressLabel)} · ${showingQuestion ? 'Question' : showingBoard ? 'Smartboard' : 'Dialogue'}</span></div><h1 id="${e(options.titleId ?? 'scene-title')}" class="sr-only" tabindex="-1">${e(scene.title)}</h1>${audio}<div class="classroom">${content}</div><section class="dialogue" aria-label="Story navigation">${navigation}</section>${options.designNotice ? '<p class="design-notice" role="status"></p>' : ''}<p class="save-notice" role="status">${e(state.saveNotice || '')}</p></section>`;
 }

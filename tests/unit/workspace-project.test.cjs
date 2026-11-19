@@ -82,7 +82,9 @@ const assert = require('node:assert/strict');
       'Changed interaction plan needs a current review',
     );
     restored.designPanel = 'revision';
-    const html = renderWorkspace(restored, { pending: false, configured: true }, '', 'intentions');
+    const html =
+      renderWorkspace(restored, { pending: false, configured: true }, '', 'sharing') +
+      renderWorkspace(restored, { pending: false, configured: true }, '', 'intentions');
     for (const label of [
       'What will students share, create, decide, or investigate?',
       'How will students interact with one another’s work?',
@@ -121,15 +123,12 @@ const assert = require('node:assert/strict');
       'Creative core and design intentions',
       'Chosen improvement',
       'Approved milestone',
-      'Using your downloaded guide',
-      '<nav class="toc"',
     ])
       assert(!guide.includes(removed), 'Workspace Guide omits redundant sections');
     for (const text of [
       'Course Guide · Your activity',
       'Activity directions',
-      result.workspace.instructorPlan,
-      result.design.reason,
+      result.teacher.learningGoal,
     ])
       assert(guide.includes(text));
     assert(renderClosing(result).includes('data-action="return-assignment"'));

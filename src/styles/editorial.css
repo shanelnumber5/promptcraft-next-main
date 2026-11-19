@@ -1,0 +1,779 @@
+/* PromptCraft's studio edition: Georgia, Arial, navy, white and one committed gold. */
+body[data-app-view] {
+  --pc-brand-gold: #f3bf4b;
+  --gold: #f3bf4b;
+  --editorial-gutter: clamp(24px, 5vw, 80px);
+  background: #fff;
+  color: #1e2d59;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+body[data-app-view]:not([data-app-view='']) {
+  background: #fff;
+}
+body[data-app-view='home'][data-info-reader] {
+  background: #f3bf4b;
+}
+body[data-app-view] .app-footer {
+  background: #fff !important;
+}
+body[data-app-view='home'] .app-footer {
+  background: #f3bf4b !important;
+}
+body[data-app-view] .campus-signature {
+  border-radius: 0 !important;
+  box-shadow: none;
+}
+body[data-app-view] :is(.lab-phases li, .assessment-level-grid article) {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0;
+  box-shadow: none;
+}
+body[data-app-view] dialog > header {
+  background: #fff !important;
+  color: #1e2d59;
+}
+body[data-app-view] dialog > header :is(h2, button) {
+  color: #1e2d59 !important;
+  -webkit-text-fill-color: currentColor;
+}
+body[data-app-view] .maya-dialog :is(.maya-body, .maya-scene-nav) {
+  background: #f3bf4b !important;
+  color: #1e2d59;
+}
+body[data-app-view] #app .focused-scene .smartboard .flow-number {
+  background: transparent !important;
+  color: #1e2d59 !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+body[data-app-view] #app .focused-scene .smartboard .board-heading {
+  background: transparent !important;
+  color: #1e2d59;
+  padding: 0;
+}
+body[data-app-view] .focused-scene :is(.dialogue, .scene-actions) {
+  background: #f3bf4b !important;
+}
+body[data-app-view] .info-shell .info-sidebar button {
+  padding: 10px 0 !important;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+body[data-app-view]
+  :is(
+    .info-art,
+    .maya-dialogue,
+    .maya-state,
+    .feedback-turn,
+    .assessment-level-grid article,
+    .assessment-criterion
+  ) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+body[data-app-view] :is(.flow-number, .guide-entry-status, .partner-mode, .babbage-mode) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none;
+  background: transparent;
+}
+body[data-app-view] dialog button:not(.primary) {
+  border: 0 !important;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+body[data-app-view] :is(.info-portrait, .portrait-crop, .engine-crop) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none;
+}
+body[data-app-view] :is(.info-sidebar, .lab-sidebar) :is(a, button) {
+  background: transparent !important;
+  color: #1e2d59 !important;
+  -webkit-text-fill-color: currentColor !important;
+  border: 0 !important;
+  border-radius: 0;
+}
+body[data-app-view] :is(.info-sidebar, .lab-sidebar) :is(a, button):focus-visible {
+  outline: 3px solid #1e2d59 !important;
+  outline-offset: 2px;
+}
+body[data-app-view='workspace'] #app #workspace-panel .workspace-section-sidebar,
+body[data-app-view='workspace'] #app #workspace-panel .workspace-section-sidebar button {
+  border: 0 !important;
+  box-shadow: none;
+}
+body[data-app-view] #app .focused-scene .smartboard {
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+body[data-app-view] #app .focused-scene .smartboard .board-screen {
+  border: 0 !important;
+  border-radius: 0;
+}
+body[data-app-view] #app .focused-scene .smartboard .board-heading h2 {
+  background: transparent !important;
+  color: #1e2d59 !important;
+  border-radius: 0 !important;
+  text-align: left;
+  padding: 0;
+}
+body[data-app-view] #app .focused-scene .smartboard .choices .choice {
+  background: transparent !important;
+}
+body[data-app-view] #app .focused-scene .smartboard .choices :is(.feedback, .feedback-turn) {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none;
+  height: auto;
+  max-height: none;
+  overflow: visible;
+}
+body[data-app-view] #app .focused-scene .smartboard :is(.service-flow li, .handoff, .closing-goal) {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0;
+}
+body[data-app-view] .focused-scene .classroom::before {
+  background-image: url('../../assets/backgrounds/classroom.webp');
+}
+body[data-app-view='lab'] #app .lab-browser :is(button, .lab-button):not(.primary) {
+  background: transparent !important;
+  color: #1e2d59 !important;
+  border: 0 !important;
+  border-radius: 0;
+  padding: 10px 0;
+  font-weight: 400;
+}
+body[data-app-view='lab'] #app .lab-browser :is(button, .lab-button):hover {
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+body[data-app-view='lab'] #app .lab-browser .lab-button.primary {
+  border: 0;
+  border-radius: 0;
+}
+body[data-app-view='lab'] #app .lab-browser .lab-footer {
+  background: #fff;
+  border: 0;
+}
+body[data-app-view]
+  :is(
+    .entry-shell,
+    .menu-board,
+    .workspace-shell,
+    .workspace-page,
+    .workspace-section-main,
+    .workspace-section-frame,
+    .partner-card,
+    .review-card,
+    .info-book,
+    .lab-card,
+    .lab-context,
+    .lab-detail,
+    .guide-entry,
+    .guide-board
+  ) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+body[data-app-view]:not([data-app-view='']) > header.app-header {
+  min-height: 64px;
+  padding: 8px var(--editorial-gutter);
+  border: 0;
+  background: #fff !important;
+  box-shadow: none;
+}
+body[data-app-view='home']:not([data-app-view='']) > header.app-header {
+  background: #f3bf4b !important;
+}
+body[data-app-view] #site-menu-toggle {
+  padding: 8px 0;
+  border: 0 !important;
+  border-radius: 0;
+  background: transparent !important;
+  color: #1e2d59 !important;
+  font-weight: 400;
+}
+body[data-app-view]:not([data-app-view='']) > header.app-header .brand strong {
+  font-size: 24px;
+}
+body[data-app-view]:not([data-app-view='']) > header.app-header .brand small {
+  font-size: 16px;
+}
+body[data-app-view]:not([data-app-view='']) > header.app-header .brand > img {
+  width: 40px;
+  height: 40px;
+}
+body[data-app-view] .app-footer {
+  background: #fff;
+  color: #1e2d59;
+  border: 0;
+  padding: 8px var(--editorial-gutter);
+  font-weight: 400;
+}
+body[data-app-view='home'] .app-footer {
+  background: #f3bf4b;
+}
+body[data-app-view] #app {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+body[data-app-view][data-info-reader] #app {
+  max-width: none;
+  padding: 0;
+}
+body[data-app-view] #app :is(h1, h2, h3, h4, h5, h6),
+body[data-app-view] #app #workspace-panel :is(h1, h2, h3, h4, h5, h6) {
+  font-family: Georgia, 'Times New Roman', serif !important;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+}
+body[data-app-view] :is(.info-heading, .library-heading, .lab-heading) h1 {
+  font-size: clamp(40px, 6vw, 88px) !important;
+  line-height: 1 !important;
+}
+body[data-app-view] .info-heading {
+  height: auto;
+  padding: 24px var(--editorial-gutter);
+  margin: 0;
+}
+body[data-app-view='home'] .home-shell .info-heading h1 {
+  font-size: clamp(40px, 8.4vw, 144px) !important;
+  line-height: 0.95 !important;
+}
+body[data-app-view] :is(.menu-board, .guide-board, .info-book) {
+  background: transparent;
+}
+body[data-app-view] .info-book {
+  gap: clamp(24px, 4vw, 64px);
+  align-items: start;
+  grid-template-columns: minmax(180px, 0.7fr) minmax(0, 2fr) minmax(220px, 1fr);
+}
+body[data-app-view] .info-sidebar {
+  background: transparent !important;
+  padding: 0 0 24px var(--editorial-gutter) !important;
+  border: 0;
+}
+body[data-app-view] .info-sidebar button {
+  background: transparent !important;
+  color: #1e2d59 !important;
+  border: 0 !important;
+  border-radius: 0;
+  padding: 12px 0;
+  font-size: 16px;
+}
+body[data-app-view] .info-sidebar button[aria-current] {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+body[data-app-view] .info-page {
+  padding: 0;
+}
+body[data-app-view] .info-page h2 {
+  font-size: clamp(28px, 3vw, 48px);
+  margin: 0 0 24px;
+}
+body[data-app-view] .info-copy {
+  font-size: 18px;
+  line-height: 1.55;
+}
+body[data-app-view] .info-art {
+  padding: 24px;
+  border-radius: 0;
+  background: #f3bf4b;
+  color: #1e2d59;
+}
+body[data-app-view] .info-art figcaption {
+  color: #1e2d59;
+}
+body[data-app-view] .info-topic-label {
+  color: #1e2d59 !important;
+}
+body[data-app-view] :is(.info-topic-select, .info-nav-select) {
+  border: 0;
+  border-bottom: 1px solid #1e2d59;
+  border-radius: 0;
+  background: #fff;
+  color: #1e2d59;
+}
+
+/* Menus are flat color fields; ordinary navigation never resembles a button. */
+body[data-app-view] :is(#site-menu-panel, #activity-tools-panel, [id^='guide-options-']) {
+  border: 0 !important;
+  border-radius: 0;
+  box-shadow: none;
+  background: #1e2d59 !important;
+  color: #fff;
+}
+body[data-app-view]
+  :is(#site-menu-panel, #activity-tools-panel, [id^='guide-options-'])
+  :is(a, button) {
+  background: transparent !important;
+  color: #fff !important;
+  border: 0 !important;
+  border-radius: 0;
+  font-weight: 400;
+  text-decoration: none !important;
+}
+body[data-app-view]
+  :is(#site-menu-panel, #activity-tools-panel, [id^='guide-options-'])
+  :is(a, button):hover {
+  background: transparent !important;
+  color: #fff !important;
+  text-decoration: underline !important;
+  text-underline-offset: 5px;
+}
+body[data-app-view] #site-menu-panel a[aria-current='page'] {
+  background: transparent !important;
+  color: #fff !important;
+  font-weight: 700;
+  text-decoration: underline !important;
+  text-underline-offset: 5px;
+}
+body[data-app-view]
+  :is(#site-menu-panel, #activity-tools-panel, [id^='guide-options-'])
+  :is(a, button):focus-visible {
+  outline: 3px solid white !important;
+  outline-offset: -3px;
+}
+body[data-app-view] .dropdown > button[data-dropdown-toggle],
+body[data-app-view] #app #workspace-panel .studio-secondary-actions .dropdown > button {
+  border: 0 !important;
+  border-radius: 0;
+  background: transparent !important;
+  color: #1e2d59 !important;
+  padding: 8px 0;
+  font-weight: 400;
+  text-decoration: none;
+}
+body[data-app-view] .dropdown > button[aria-expanded='true'] {
+  background: transparent !important;
+  text-decoration: underline;
+}
+
+/* The work surface uses the whole page; a typographic index replaces the framed app. */
+body[data-app-view][data-app-view='workspace'] {
+  background: #fff;
+}
+body[data-app-view][data-app-view='workspace'] #app {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+body[data-app-view='workspace'] #app .workspace-shell {
+  padding: 0;
+  border: 0;
+  background: #fff;
+}
+body[data-app-view='workspace'] #app .workspace-shell .workspace-tabs {
+  background: #fff;
+  border: 0;
+  padding: 0 var(--editorial-gutter);
+  gap: 24px;
+}
+body[data-app-view='workspace'] #app .workspace-shell .workspace-tabs button {
+  justify-content: flex-start;
+  background: transparent;
+  color: #1e2d59;
+  border: 0;
+  padding: 12px 0;
+  font-weight: 400;
+}
+body[data-app-view='workspace'] #app .workspace-shell .workspace-tabs button[aria-selected='true'] {
+  background: transparent;
+  color: #1e2d59;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 8px;
+}
+body[data-app-view='workspace'] #app .studio-stage-number {
+  font-size: 16px;
+}
+body[data-app-view='workspace'] #app #workspace-panel .workspace-section-frame {
+  border: 0;
+  border-radius: 0;
+  gap: 0;
+}
+body[data-app-view='workspace'] #app .workspace-section-frame--sidebar {
+  grid-template-columns: clamp(180px, 21vw, 300px) minmax(0, 1fr);
+}
+body[data-app-view='workspace'] #app #workspace-panel .workspace-section-sidebar {
+  background: #fff;
+  border: 0;
+  padding: 24px 24px 24px var(--editorial-gutter);
+}
+body[data-app-view='workspace'] #app #workspace-panel .workspace-section-sidebar button {
+  background: transparent;
+  border: 0;
+  padding: 10px 0;
+}
+body[data-app-view='workspace']
+  #app
+  #workspace-panel
+  .workspace-section-sidebar
+  button[aria-current='page'] {
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+body[data-app-view='workspace'] #app #workspace-panel .workspace-page {
+  background: #fff;
+  border: 0;
+  border-radius: 0;
+}
+body[data-app-view='workspace'] #app #workspace-panel .design-page-heading,
+body[data-app-view='workspace'] #app #workspace-panel .partner-heading {
+  background: #fff;
+  border: 0;
+  padding: 24px var(--editorial-gutter) 24px 24px;
+}
+body[data-app-view='workspace'] #app #workspace-panel .design-page-heading h2,
+body[data-app-view='workspace'] #app #workspace-panel .partner-heading h2 {
+  font-size: clamp(32px, 4.5vw, 64px) !important;
+  line-height: 1.02;
+  margin: 0;
+}
+body[data-app-view='workspace'] #app #workspace-panel .design-page-fields {
+  padding: 8px var(--editorial-gutter) 24px 24px;
+  background: #fff;
+}
+body[data-app-view='workspace'] #app #workspace-panel .workspace-action-bar {
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+}
+body[data-app-view='workspace']
+  #app
+  #workspace-panel
+  :is(.studio-secondary-actions, .studio-navigation) {
+  background: #fff;
+  border: 0;
+  padding-inline: 24px var(--editorial-gutter);
+}
+body[data-app-view='workspace'] #app #workspace-panel .studio-navigation {
+  min-height: 64px;
+  padding-block: 8px;
+}
+body[data-app-view='workspace'] #app #workspace-panel .workspace-page button:not(.primary) {
+  border: 0 !important;
+  border-radius: 0;
+  background: transparent !important;
+  color: #1e2d59;
+  box-shadow: none;
+  text-decoration: none;
+}
+body[data-app-view='workspace'] #app #workspace-panel .workspace-page button:not(.primary):hover {
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+body[data-app-view='workspace'] #app #workspace-panel .workspace-page button.primary {
+  background: #1e2d59;
+  color: white;
+  border: 0;
+  border-radius: 0;
+  padding: 12px 24px;
+  box-shadow: none;
+}
+body[data-app-view='workspace']
+  #app
+  #workspace-panel
+  :is(
+    .partner-card,
+    .workspace-welcome-board,
+    .workspace-check-reference,
+    .workspace-check-tools,
+    .workspace-check-item,
+    .review-notes,
+    .creative-core,
+    .workspace-option
+  ) {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+body[data-app-view='workspace'] #app #workspace-panel .workspace-section-mobile {
+  border: 0;
+  background: #fff;
+  padding: 8px var(--editorial-gutter);
+}
+body[data-app-view='workspace'] #app #workspace-panel .workspace-section-mobile select {
+  border: 0;
+  border-bottom: 1px solid #1e2d59;
+  border-radius: 0;
+}
+body[data-app-view='workspace']
+  #app
+  #workspace-panel
+  :is(input:not([type='radio']):not([type='checkbox']), textarea, .directions-editor) {
+  border: 0;
+  border-bottom: 1px solid #1e2d59;
+  border-radius: 0;
+  box-shadow: none;
+  background: #fff;
+  color: #1e2d59;
+}
+body[data-app-view='workspace']
+  #app
+  #workspace-panel
+  :is(.radio-cards, .workspace-requirements)
+  label {
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* Characters and classroom fill the scene; the authored board is a reading field. */
+body[data-app-view] .focused-scene .story-toolbar {
+  background: #1e2d59;
+  border: 0;
+  padding-inline: var(--editorial-gutter);
+}
+body[data-app-view] .focused-scene .narration-controls button {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0;
+  color: #fff !important;
+  font-weight: 400;
+}
+body[data-app-view] .focused-scene .story-toolbar .narration-controls button[aria-pressed='true'] {
+  background: transparent !important;
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+body[data-app-view] .focused-scene .story-identity strong {
+  font-size: clamp(20px, 2vw, 28px);
+}
+body[data-app-view]
+  .focused-scene
+  :is(
+    .smartboard,
+    .board-screen,
+    .speech-bubble,
+    .choices,
+    .choice,
+    .service-flow li,
+    .feedback,
+    .handoff
+  ) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+body[data-app-view] .focused-scene .speaker-panel > .speech-bubble {
+  background: #1e2d59;
+  color: #fff;
+}
+body[data-app-view] .focused-scene .speech-bubble h2 {
+  font-size: clamp(28px, 3.5vw, 48px);
+}
+body[data-app-view]
+  .focused-scene
+  :is(.board-camera, .board-frame, .board-pen-tray, .board-heading .lemonade-icon) {
+  display: none;
+}
+body[data-app-view] .focused-scene .board-screen {
+  background: #fff;
+  color: #1e2d59;
+}
+body[data-app-view] .focused-scene .board-heading {
+  background: transparent;
+  border: 0;
+}
+body[data-app-view] .focused-scene .board-heading h2 {
+  background: transparent;
+  color: #1e2d59;
+  border-radius: 0;
+  font-size: clamp(28px, 3vw, 44px);
+}
+body[data-app-view] .focused-scene .scene-actions {
+  background: #f3bf4b;
+  color: #1e2d59;
+  border: 0;
+  box-shadow: none;
+}
+body[data-app-view] .focused-scene .scene-actions button:not(.primary) {
+  background: transparent !important;
+  color: #1e2d59;
+  border: 0 !important;
+  border-radius: 0;
+  box-shadow: none;
+}
+body[data-app-view] .focused-scene .scene-actions button.primary {
+  background: #1e2d59;
+  color: #fff;
+  border: 0 !important;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Idea and guide indexes are lists, not a grid of cards. */
+body[data-app-view='lab'] #app {
+  max-width: none;
+  padding: 24px var(--editorial-gutter);
+}
+body[data-app-view='lab'] :is(.lab-browser, .lab-menu-layout, .lab-listing, .lab-detail) {
+  max-width: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+body[data-app-view='lab'] .lab-heading {
+  padding: 8px 0 32px;
+}
+body[data-app-view='lab'] .lab-browser > .lab-heading {
+  padding: 24px var(--editorial-gutter);
+}
+body[data-app-view='lab'] :is(.lab-menu-layout, .lab-detail, .lab-footer) {
+  padding-inline: var(--editorial-gutter);
+}
+body[data-app-view='lab'] .lab-grid {
+  display: block;
+}
+body[data-app-view='lab'] .lab-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 32px;
+  margin: 0;
+  padding: 32px 0;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+}
+body[data-app-view='lab'] .lab-card h2 {
+  font-size: clamp(28px, 3.5vw, 48px);
+}
+body[data-app-view='lab'] .lab-sidebar {
+  background: transparent;
+  border: 0;
+}
+body[data-app-view='lab'] .lab-sidebar button {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: #1e2d59;
+}
+body[data-app-view='lab'] .lab-sidebar button[aria-current] {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+body[data-app-view='lab'] .lab-button {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: #1e2d59;
+  padding: 12px 0;
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+body[data-app-view='lab'] .lab-button.primary {
+  background: #1e2d59;
+  color: #fff;
+  padding: 12px 24px;
+  text-decoration: none;
+}
+body[data-app-view='lab'] .lab-context {
+  background: #f3bf4b;
+  color: #1e2d59;
+  border: 0;
+  border-radius: 0;
+}
+body[data-app-view='guide'] :is(.guide-library, .guide-entry, .guide-library-intro) {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+body[data-app-view='guide'] .guide-entry {
+  padding: 32px 0;
+}
+body[data-app-view='guide'] .guide-entry h3 {
+  font-size: clamp(28px, 3.5vw, 48px);
+}
+body[data-app-view='guide'] .guide-entry-status {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  color: #1e2d59;
+}
+body[data-app-view='guide']
+  :is(.guide-library-intro, .guide-list, .guide-empty, .guide-library-note) {
+  padding-inline: var(--editorial-gutter);
+}
+
+body[data-app-view] dialog {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+body[data-app-view] :is(button, a, input, textarea, select, [role='textbox']):focus-visible {
+  outline: 3px solid #1e2d59;
+  outline-offset: 4px;
+}
+body[data-app-view] ::selection {
+  background: #1e2d59;
+  color: #fff;
+}
+@media (max-width: 760px) {
+  body[data-app-view] {
+    --editorial-gutter: 24px;
+  }
+  body[data-app-view]:not([data-app-view='']) > header.app-header {
+    min-height: 56px;
+    padding: 4px 24px;
+  }
+  body[data-app-view='workspace'] #app .workspace-shell .workspace-tabs {
+    padding: 0 24px;
+    gap: 12px;
+  }
+  body[data-app-view='workspace'] #app #workspace-panel .design-page-heading,
+  body[data-app-view='workspace'] #app #workspace-panel .partner-heading {
+    padding: 16px 24px;
+  }
+  body[data-app-view='workspace'] #app #workspace-panel .design-page-fields {
+    padding: 8px 24px 24px;
+  }
+  body[data-app-view='workspace']
+    #app
+    #workspace-panel
+    :is(.studio-secondary-actions, .studio-navigation) {
+    padding-inline: 24px;
+  }
+  body[data-app-view='lab'] .lab-card {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+  body[data-app-view] .info-book {
+    gap: 24px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-app-view] :is(.info-sidebar, .info-page) {
+    padding-inline: 24px !important;
+  }
+  body[data-app-view] .info-page h2 {
+    font-size: 32px;
+  }
+}
+@media (max-height: 650px) {
+  body[data-app-view='workspace'] #app #workspace-panel .design-page-heading h2 {
+    font-size: 28px !important;
+  }
+  body[data-app-view='workspace'] #app #workspace-panel .design-page-heading {
+    padding-block: 12px !important;
+  }
+}

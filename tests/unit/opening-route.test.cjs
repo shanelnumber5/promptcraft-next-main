@@ -88,6 +88,65 @@ const assert = require('node:assert/strict');
   assert.equal(design.designStep, 2);
   assert.equal(design.teacher.directions, main.teacher.directions);
   dispose();
+  const { finalCheckContext } = await import('../../src/features/design/content.js');
+  design.teacher.learningGoal = 'Explain a decision.';
+  design.design.revision = 'Saved approved activity.';
+  design.design.reason = 'Show the reasoning.';
+  design.finalCheck = {
+    instructions: true,
+    learning: true,
+    requirements: true,
+    completed: true,
+    approved: true,
+    context: finalCheckContext(design.teacher, design.design),
+  };
+  for (const phase of ['design', 'closing']) {
+    design.phase = phase;
+    saveState(design, storage);
+    assert.equal(
+      loadState(discussionOpening, storage).phase,
+      phase,
+      'Replay fixture retains its approved completion state',
+    );
+    records.set('promptcraft_scenario_studio_v1', 'preserve scenario extras exactly');
+    records.set('promptcraft_workspace_v1', 'preserve independent workspace exactly');
+    const before = [...records.entries()];
+    navigated = '';
+    const closeReplay = mountOpening(app, {
+      storage,
+      location: { href: 'https://example.test/?view=play&story=1' },
+      navigate: (url) => (navigated = url),
+    });
+    assert.match(app.innerHTML, /Story replay/);
+    assert.match(app.innerHTML, /Maya/);
+    for (let i = 0; i < discussionOpening.scenes.length; i++) {
+      const scene = discussionOpening.scenes[i];
+      handlers.click({ target: { closest: () => ({ dataset: { action: 'reveal-board' } }) } });
+      if (scene.choice) {
+        handlers.click({ target: { closest: () => ({ dataset: { action: 'reveal-question' } }) } });
+        handlers.change({
+          target: { name: 'scene-choice', value: scene.choice.options.find((o) => o.correct).id },
+        });
+      }
+      handlers.click({
+        target: {
+          closest: () => ({
+            dataset: {
+              action: i === discussionOpening.scenes.length - 1 ? 'start-design-studio' : 'next',
+            },
+          }),
+        },
+      });
+    }
+    assert.equal(new URL(navigated).searchParams.get('view'), 'scenario');
+    assert.equal(new URL(navigated).searchParams.has('story'), false);
+    assert.deepEqual(
+      [...records.entries()],
+      before,
+      'A complete replay preserves all saved records byte for byte',
+    );
+    closeReplay();
+  }
   let failedNavigation = false;
   const blocked = {
     getItem: (k) => records.get(k) || null,

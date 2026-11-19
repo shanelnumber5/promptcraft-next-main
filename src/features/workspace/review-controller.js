@@ -4,9 +4,8 @@ import {
   requestWorkspaceReview,
   shouldOpenMaya,
 } from './review-ai.js';
-import { prepareMayaReading } from '../design/maya-dialog.js';
 
-const REVIEW_TIMEOUT_MS = 90000;
+const REVIEW_TIMEOUT_MS = 300000;
 const sampleReview =
   'Sample review only; no AI analysis was performed. Consider what students will produce, how you will respond to their thinking, and what changes would make the learning purpose clearer.';
 
@@ -21,7 +20,6 @@ export function createWorkspaceReviewController({
   render,
   onMayaReady,
   requestReview = requestWorkspaceReview,
-  prepareMaya = prepareMayaReading,
 }) {
   let activeRequest = null;
   let sequence = 0;
@@ -49,8 +47,8 @@ export function createWorkspaceReviewController({
     const isCurrent = () =>
       requestSequence === sequence && source === getState() && !abort.signal.aborted;
     const signal = () => AbortSignal.any([abort.signal, AbortSignal.timeout(REVIEW_TIMEOUT_MS)]);
-    let mayaError = null;
     review.status = 'pending';
+    review.stage='sending';
     review.error = '';
     save();
     render();
@@ -59,16 +57,9 @@ export function createWorkspaceReviewController({
         ? review.feedback
         : source.babbage.mode === 'dev'
           ? sampleReview
-          : await requestReview(structuredClone(source), previous, { signal: signal() });
+          : await requestReview(structuredClone(source), previous, { signal: signal(), onProgress:stage=>{if(isCurrent()){review.stage=stage;render();}} });
       if (!isCurrent()) return;
       Object.assign(review, { fingerprint, feedback, status: 'complete', error: '' });
-      if (shouldOpenMaya(getState())) {
-        try {
-          await prepareMaya(source, { signal: signal() });
-        } catch (error) {
-          mayaError = error;
-        }
-      }
     } catch (error) {
       if (!isCurrent()) return;
       review.status = 'error';
@@ -82,7 +73,7 @@ export function createWorkspaceReviewController({
           if (source.designPanel === 'reason') {
             render();
             if (shouldOpenMaya(source))
-              onMayaReady({ source, review, error: mayaError, isCurrent });
+              onMayaReady({ source, review, isCurrent });
           }
         }
       }
@@ -91,6 +82,7 @@ export function createWorkspaceReviewController({
 
   async function runAutomatic() {
     const state = getState();
+    if (state.creative.review.manualOnly) return;
     if (!canReview() || state.designPanel !== 'reason' || !reviewEligible(state) || activeRequest)
       return;
     const review = state.creative.review;

@@ -1,0 +1,252 @@
+/* One global menu; contextual activity actions use the same disclosure component. */
+.dropdown {
+  position: relative;
+  flex: none;
+}
+body[data-app-view] #site-menu-toggle {
+  display: inline-flex !important;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 2px solid #1e2d59 !important;
+  border-radius: 5px;
+  background: #d8edfc !important;
+  color: #1e2d59 !important;
+  text-decoration: none !important;
+  font:
+    700 16px/1.4 Arial,
+    Helvetica,
+    sans-serif;
+}
+.dropdown-panel {
+  position: fixed !important;
+  inset: auto;
+  margin: 0 !important;
+  width: min(320px, calc(100vw - 24px));
+  min-width: 0;
+  max-height: calc(100svh - 80px);
+  overflow: auto;
+  padding: 8px !important;
+  border: 2px solid #1e2d59 !important;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px #1e2d5933;
+  background: white !important;
+  color: #1e2d59;
+  z-index: 100;
+}
+.dropdown-panel[hidden],
+#site-menu-panel[hidden] {
+  display: none !important;
+}
+.dropdown-panel:not([hidden]),
+#site-menu-panel:not([hidden]) {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
+}
+body[data-app-view] .dropdown-panel :is(a, button),
+body[data-app-view] #site-menu-panel :is(a, button) {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 12px !important;
+  border: 0 !important;
+  border-radius: 4px;
+  background: white !important;
+  color: #1e2d59 !important;
+  font:
+    400 16px/1.4 Arial,
+    Helvetica,
+    sans-serif;
+  text-align: left;
+  text-decoration: none !important;
+  white-space: normal;
+}
+body[data-app-view] #site-menu-panel [hidden] {
+  display: none !important;
+}
+body[data-app-view] .dropdown-panel :is(a, button):hover,
+body[data-app-view] #site-menu-panel :is(a, button):hover,
+body[data-app-view] #site-menu-panel a[aria-current='page'] {
+  background: #d8edfc !important;
+  color: #1e2d59 !important;
+}
+body[data-app-view] .dropdown-panel :is(a, button):focus-visible {
+  outline: 3px solid #1e2d59 !important;
+  outline-offset: -3px;
+}
+body[data-app-view] .dropdown > button[data-dropdown-toggle],
+body[data-app-view] #app #workspace-panel .studio-secondary-actions .dropdown > button {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 2px solid #1e2d59 !important;
+  border-radius: 5px;
+  background: #d8edfc !important;
+  color: #1e2d59 !important;
+  font:
+    700 16px/1.4 Arial,
+    Helvetica,
+    sans-serif;
+  text-decoration: none;
+}
+body[data-app-view] .dropdown > button[aria-expanded='true'] {
+  background: #ffd579 !important;
+}
+body[data-app-view]:not([data-app-view='']) > header.app-header {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  height: auto;
+  min-height: 64px;
+  padding: 8px 24px;
+  gap: 16px;
+  background: #d8edfc !important;
+  border-bottom: 1px solid #1e2d59;
+}
+body[data-app-view]:not([data-app-view='']) > header.app-header .brand {
+  width: auto;
+  min-width: 0;
+  flex: 0 1 auto;
+  gap: 10px;
+  text-decoration: none;
+}
+body[data-app-view]:not([data-app-view='']) > header.app-header .brand :is(strong, span, small) {
+  color: #1e2d59 !important;
+}
+body[data-app-view]:not([data-app-view='']) > header.app-header .brand > img {
+  width: 36px;
+  height: 36px;
+}
+body[data-app-view]:not([data-app-view='']) > header.app-header .brand strong {
+  font-size: 22px;
+}
+body[data-app-view]:not([data-app-view='']) > header.app-header .header-actions {
+  display: flex;
+  width: auto;
+  flex: none;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 16px;
+}
+body[data-app-view] .app-footer {
+  padding: 6px 16px;
+  min-height: 32px;
+  font-size: 16px;
+}
+.studio-progress {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  font:
+    400 16px/1.4 Arial,
+    Helvetica,
+    sans-serif;
+  color: #111;
+}
+body[data-app-view][data-app-view='workspace'] #app {
+  margin: 12px auto;
+  padding: 0;
+  width: calc(100% - 48px);
+  max-width: 1400px;
+}
+body[data-app-view='workspace'] #app .workspace-heading {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+body[data-app-view] .story-identity > span,
+.narration-status:not([data-audio-error='true']) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+body[data-app-view] .story-toolbar {
+  gap: 8px;
+  padding: 8px 16px;
+}
+@media (max-width: 900px) {
+  body[data-app-view] > header.app-header .header-actions .campus-signature {
+    display: none !important;
+  }
+}
+@media (max-height: 650px) {
+  #site-menu-panel:not([hidden]) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: min(560px, calc(100vw - 24px));
+  }
+}
+@media (max-width: 760px) {
+  body[data-app-view][data-app-view='workspace'] #app {
+    width: calc(100% - 24px);
+    margin: 8px auto;
+  }
+  body[data-app-view]:not([data-app-view='']) > header.app-header {
+    min-height: 56px;
+    padding: 4px 12px;
+    gap: 8px;
+  }
+  body[data-app-view]:not([data-app-view='']) > header.app-header .brand small {
+    display: none;
+  }
+  body[data-app-view]:not([data-app-view='']) > header.app-header .brand strong {
+    font-size: 20px;
+  }
+  .studio-progress {
+    display: none;
+  }
+}
+
+/* Site navigation is grouped by purpose rather than auto-flowing as one long list. */
+#site-menu-panel:not([hidden]) {
+  width: min(880px, calc(100vw - 24px));
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 24px;
+  padding: 24px !important;
+}
+.site-menu-group {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  min-width: 0;
+}
+body[data-app-view] #site-menu-panel .site-menu-journeys a {
+  font:
+    700 clamp(22px, 2.2vw, 32px) / 1.15 Georgia,
+    'Times New Roman',
+    serif;
+  padding: 10px 0 !important;
+}
+body[data-app-view] #site-menu-panel .site-menu-group :is(a, button) {
+  padding: 10px 0 !important;
+}
+@media (max-width: 600px) {
+  #site-menu-panel:not([hidden]) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    padding: 16px !important;
+  }
+  .site-menu-journeys {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #fff;
+  }
+}

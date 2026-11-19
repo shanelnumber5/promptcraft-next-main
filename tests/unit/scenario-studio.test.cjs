@@ -16,7 +16,7 @@ const assert = require('node:assert/strict');
   );
   const { renderWorkspace } = await import('../../src/features/workspace/screen.js');
   const { renderClosing } = await import('../../src/features/design/closing.js');
-  const { createGuide } = await import('../../src/features/design/guide.js');
+  const { createGuide, guideOptions } = await import('../../src/features/design/guide.js');
   const records = new Map([[WORKSPACE_KEY, 'independent workspace']]);
   const storage = {
     getItem: (k) => records.get(k) || null,
@@ -138,9 +138,33 @@ const assert = require('node:assert/strict');
     checks.includes('data-action="preview-guide"') &&
       checks.includes('data-action="download-guide"'),
   );
-  assert(checks.includes('Finish with Pixel'));
-  const guide = createGuide(state.design, { teacher: state.teacher, approved: true });
-  assert(guide.includes('The lemonade example'));
+  assert(checks.includes('Continue with Pixel'));
+  const beforeGuide = JSON.stringify(state);
+  const guide = createGuide(state.design, guideOptions(state));
+  for (const text of [
+    'The lemonade example',
+    'Adapt the teaching moves',
+    'Sam serves drinks',
+    'not proof of faster service',
+    'Maya’s experience after',
+    state.design.revision,
+  ])
+    assert(guide.includes(text));
+  assert.equal(JSON.stringify(state), beforeGuide, 'Guide creation preserves saved work');
+  const custom = createGuide(state.design, {
+    ...guideOptions(state),
+    scenarioSections: [
+      {
+        id: 'other-scenario',
+        title: 'Another scenario',
+        body: '<section><h2>Another scenario</h2><p>Reusable guide frame.</p></section>',
+      },
+    ],
+  });
+  assert(
+    custom.includes('Reusable guide frame.') && !custom.includes('The lemonade example'),
+    'Other scenarios can supply their own guide content',
+  );
   state.phase = 'closing';
   assert(saveScenarioStudio(state, storage));
   assert(readScenarioStudio(storage).wrapUp);

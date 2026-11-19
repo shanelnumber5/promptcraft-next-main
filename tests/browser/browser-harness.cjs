@@ -244,6 +244,10 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
         return issues;
       })()`);
       const collectIssues = process.env.PC_BROWSER_COLLECT_ISSUES === '1';
+      if(process.env.PC_EDITORIAL_AUDIT==='1') {
+        const framed=await evaluate(`(()=>{const issues=[];for(const el of document.querySelectorAll('.home-path,.home-studio,.workspace-shell,.workspace-page,.workspace-section-main,.workspace-section-sidebar,.info-book,.info-art,.lab-card,.guide-entry,.smartboard,.board-screen,.feedback-turn,.speech-bubble,.maya-dialogue')){const r=el.getBoundingClientRect();if(!r.width||!r.height||el.closest('[hidden]'))continue;const s=getComputedStyle(el);if(s.boxShadow!=='none'||parseFloat(s.borderTopLeftRadius)>0||['Top','Right','Bottom','Left'].some(side=>parseFloat(s['border'+side+'Width'])>0))issues.push('Framed surface: '+el.className+' '+JSON.stringify({shadow:s.boxShadow,radius:s.borderRadius,border:s.border}));}return issues;})()`);
+        layoutIssues.push(...framed);
+      }
       if (!collectIssues) assert.deepEqual(layoutIssues, [], label + ' formatting audit');
       let contrastIssues = [];
       if (process.env.PC_CONTRAST_AUDIT === '1') {
@@ -259,7 +263,11 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     await send('Page.addScriptToEvaluateOnNewDocument', {
       source: `(()=>{const original=window.fetch.bind(window);window.fetch=(url,options)=>original(String(url).startsWith('https://promptcraft-discussion.netlify.app/.netlify/functions/babbage')?'/api/babbage':url,options);})()`,
     });
-    if (process.env.PC_BROWSER_FEATURE === 'accessibility') {
+    if (process.env.PC_BROWSER_FEATURE === 'menus') {
+      await require('./menu-navigation-checks.cjs')({send,evaluate,waitFor,shot,key,keyboardReach,accessibleScreen});
+    } else if (process.env.PC_BROWSER_FEATURE === 'story-audio') {
+      await require('./story-audio-checks.cjs')({send,evaluate,waitFor,shot,key,keyboardReach,accessibleScreen});
+    } else if (process.env.PC_BROWSER_FEATURE === 'accessibility') {
       await require('./accessibility-checks.cjs')({send,evaluate,waitFor,shot,key,keyboardReach,accessibleScreen});
     } else if (['workspace-layout','scenario-studio'].includes(process.env.PC_BROWSER_FEATURE)) {
       await require('./workspace-layout-checks.cjs')({send,evaluate,waitFor,shot,key,keyboardReach,accessibleScreen,scenarioMode:process.env.PC_BROWSER_FEATURE==='scenario-studio'});

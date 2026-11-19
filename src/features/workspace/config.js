@@ -12,6 +12,8 @@ export const MAX_SAVED_ALTERNATIVES = 30;
 // These planning fields extend assignment context without discarding answered questions.
 // Reuse this list when restoring saves and handling edits to keep both paths aligned.
 export const workspacePlanningFields = [
+  'aiUseChoice',
+  'assignmentTitle',
   'creativeCore',
   'studentContribution',
   'peerInteraction',

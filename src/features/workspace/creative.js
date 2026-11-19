@@ -1,3 +1,5 @@
+import {emptyRubric,restoreRubric} from './rubric.js';
+import { emptyFeedbackConversation, restoreFeedbackConversation } from '../design/feedback-conversation.js';
 import { emptyReview, restoreReview } from './review-ai.js';
 import { postJSON } from '../../shared/json-request.js';
 import {
@@ -15,6 +17,8 @@ export const creativeDefaults = () => ({
   basis: '',
   mayaPaused: false,
   review: emptyReview(),
+  conversation: emptyFeedbackConversation(),
+  rubric: emptyRubric(),
 });
 export function normalizeDirection(value) {
   if (
@@ -43,7 +47,9 @@ export function restoreCreative(value) {
     typeof value.feedback === 'string' ? value.feedback.slice(0, MAX_WORKSPACE_TEXT) : '';
   result.basis = typeof value.basis === 'string' ? value.basis : '';
   result.mayaPaused = value.mayaPaused === true;
+  result.rubric = restoreRubric(value.rubric);
   result.review = restoreReview(value.review);
+  result.conversation = restoreFeedbackConversation(value.conversation);
   return result;
 }
 export function normalizeCreativeResponse(data) {
@@ -69,6 +75,7 @@ export function buildCreativeRequest(state) {
   const request = buildBabbageRequest(state, 'clarify');
   return {
     ...request,
+    response_kind: 'explore',
     max_output_tokens: 5000,
     system:
       request.system +
@@ -96,6 +103,7 @@ export function buildCreativeRefinementRequest(state, candidates) {
   const last = JSON.parse(request.messages.at(-1).content);
   return {
     ...request,
+    response_kind: 'explore',
     system: request.system + '\n' + creativeChallenge,
     messages: [
       ...request.messages.slice(0, -1),
@@ -113,7 +121,7 @@ export function buildCreativeRefinementRequest(state, candidates) {
 
 export async function requestCreativeDirections(
   state,
-  { fetchImpl = fetch, signal, onStage = () => {}, onRefinementFailure = () => {} } = {},
+  { fetchImpl = fetch, signal, refine = false, onStage = () => {}, onRefinementFailure = () => {} } = {},
 ) {
   // Freeze the supplied context across both calls; neither pass edits the project.
   const snapshot = structuredClone(state);
@@ -122,6 +130,7 @@ export async function requestCreativeDirections(
     const data = await postJSON(BABBAGE_ENDPOINT, request, {
       fetchImpl,
       signal: requestSignal,
+      onProgress: onStage,
       httpError: () =>
         Error(
           'Babbage could not explore new directions. Your work is unchanged. Retry or keep designing.',
@@ -133,6 +142,7 @@ export async function requestCreativeDirections(
   };
   const candidates = await ask(buildCreativeRequest(snapshot));
   signal?.throwIfAborted();
+  if (!refine) return candidates;
   onStage('refining');
   let improved;
   try {

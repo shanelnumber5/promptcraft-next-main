@@ -1,9 +1,8 @@
 import { escapeHTML as e } from './html.js';
 
 // Small escaped subset. Links are active only when explicitly allowlisted by the caller.
-export function renderAssignmentDirections(text, { approved = false, links = [] } = {}) {
-  const inline = (value) =>
-    e(value)
+export function renderInlineProse(value, { links = [] } = {}) {
+  return e(value)
       .replace(/\*\*\*([^*\n]+)\*\*\*/g, '<strong><em>$1</em></strong>')
       .replace(/\*\*([^\n]+?)\*\*/g, '<strong>$1</strong>')
       .replace(/__([^_]+)__/g, '<strong>$1</strong>')
@@ -15,6 +14,10 @@ export function renderAssignmentDirections(text, { approved = false, links = [] 
         const suffix = (linkedURL || bareURL).slice(url.length);
         return `<a href="${e(url)}" target="_blank" rel="noopener noreferrer">${label || e(url)}</a>${suffix}`;
       });
+}
+
+export function renderAssignmentDirections(text, { approved = false, links = [] } = {}) {
+  const inline = value => renderInlineProse(value, { links });
   const source = String(text).trim().replace(/^```(?:markdown|md|text)?\s*\n([\s\S]*?)\n```$/i, '$1');
   const parts = [];
   let paragraph = [],

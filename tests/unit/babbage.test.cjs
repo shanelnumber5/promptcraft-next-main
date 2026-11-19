@@ -103,11 +103,11 @@ const assert = require('node:assert/strict');
     '../../src/features/design/loading.js'
   );
   assert.ok(
-    !renderLoading({ stage: 'waiting', intent: 'revise' }, false).includes('aria-valuenow'),
-    'No percentage while the backend is working',
+    renderLoading({ stage: 'waiting', intent: 'revise' }, false).includes('aria-valuemax="4"'),
+    'Progress counts four observed request stages, not an invented percentage',
   );
   assert.ok(
-    renderLoading({ stage: 'complete', intent: 'revise' }, false).includes('aria-valuenow="100"'),
+    renderLoading({ stage: 'complete', intent: 'revise' }, false).includes('aria-valuenow="4"'),
   );
   const attributes = new Map(),
     note = {},
@@ -126,11 +126,11 @@ const assert = require('node:assert/strict');
           : heading,
   };
   updateLoadingStage(root, 'received');
-  assert.equal(attributes.has('aria-valuenow'), false);
+  assert.equal(attributes.get('aria-valuenow'), '3');
   assert.match(note.textContent, /Response received/);
   updateLoadingStage(root, 'complete');
-  assert.equal(attributes.get('aria-valuenow'), '100');
-  assert.equal(note.textContent, 'Response ready');
+  assert.equal(attributes.get('aria-valuenow'), '4');
+  assert.equal(note.textContent, 'Ready');
   const state = initialState(scenario);
   state.teacher.directions = 'Choose a recommendation; keep the rubric.';
   state.teacher.learningGoal = 'Compare evidence.';

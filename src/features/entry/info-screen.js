@@ -6,10 +6,6 @@ export const infoPages = [
   ['privacy', 'Privacy & Progress'],
 ];
 
-export function renderInfoNavigation(view) {
-  return `<nav class="info-nav" aria-label="About and help"><a href="?view=home"${view === 'home' ? ' aria-current="page"' : ''}>Home</a>${infoPages.map(([id, label]) => `<a href="?view=${id}"${view === id ? ' aria-current="page"' : ''}>${label}</a>`).join('')}<select class="info-nav-select" aria-label="About and help page"><option value="home">Home</option>${view === 'guide' ? '<option value="guide" selected>Course Guide</option>' : ''}${infoPages.map(([id, label]) => `<option value="${id}"${view === id ? ' selected' : ''}>${label}</option>`).join('')}</select></nav>`;
-}
-
 export function renderInfoPage(view, index = 0) {
   const page = pages[view];
   if (!page) return '';
@@ -17,13 +13,13 @@ export function renderInfoPage(view, index = 0) {
   const section = page.sections[current];
   const shortTitle = title => ({ "Good company, different perspectives": "Maya’s view", "Institutional context": "College context", "Independent project": "Independence", "Academic context": "Graduate work", "Browsing and testing": "Browsing", "Resume and reset": "Resume &amp; reset", "About this prototype": "This prototype", "Meet the developer": "The developer", "External service privacy": "Service privacy", "Choose where to begin": "Where to begin", "Keep student information out": "Student privacy", "When you ask for AI help": "AI requests", "You make the decisions": "Your decisions", "Professor Pixel": "Professor Pixel", "A student’s first read": "Maya’s first read" }[title] || title);
   const visual = topicVisuals[section.visual];
-  const portrait = `<img src="${visual.src}" alt="${visual.alt}" class="info-portrait">`;
+  const portrait = `<img src="${visual.src}" alt="${visual.alt}" class="info-portrait" decoding="async">`;
   const artwork = ['character', 'shanel'].includes(visual.kind)
     ? `<div class="portrait-crop">${portrait}</div>` : visual.kind === 'engine' ? `<div class="engine-crop">${portrait}</div>` : portrait;
   return `<section class="entry-shell info-shell menu-shell" aria-labelledby="entry-title">
     <header class="info-heading"><h1 id="entry-title" tabindex="-1">${page.label}</h1></header>
     <div class="info-book menu-board">
-      <aside class="info-sidebar"><nav aria-label="${page.label} topics" data-topic-count="${page.sections.length}" data-current-topic="${current}">${page.sections.map((item, offset) => `<button type="button" data-info-section="${offset}"${offset === current ? ' aria-current="step"' : ''}>${shortTitle(item.title)}</button>`).join('')}</nav><label class="info-topic-label" for="info-topic-select">Topic</label><select id="info-topic-select" class="info-topic-select">${page.sections.map((item, offset) => `<option value="${offset}"${offset === current ? ' selected' : ''}>${item.title}</option>`).join('')}</select></aside>
+      <aside class="info-sidebar"><nav aria-label="${page.label} topics" data-topic-count="${page.sections.length}" data-current-topic="${current}">${page.sections.map((item, offset) => `<button type="button" data-info-section="${offset}"${offset === current ? ' aria-current="step"' : ''}><span class="info-topic-number" aria-hidden="true">${String(offset+1).padStart(2,'0')}</span><span>${shortTitle(item.title)}</span></button>`).join('')}</nav><label class="info-topic-label" for="info-topic-select">Topic</label><select id="info-topic-select" class="info-topic-select">${page.sections.map((item, offset) => `<option value="${offset}"${offset === current ? ' selected' : ''}>${item.title}</option>`).join('')}</select></aside>
       <div class="info-reading"><article class="info-page" aria-labelledby="info-topic-title"><h2 id="info-topic-title" tabindex="-1">${section.title}</h2><div class="info-copy">${section.body}</div></article></div>
       <figure class="info-art info-art--${visual.kind}">${artwork}${visual.caption ? `<figcaption>${visual.caption}</figcaption>` : ''}</figure>
     </div></section>`;
@@ -114,7 +110,7 @@ const pages = {
       },
       {
         "title": "Choose where to begin",
-        "body": "<p>Guided Scenario begins with Pixel’s example, then opens the shared Explore, Build, and Review screens. Creative Workspace opens those design tools directly. Babbage’s Idea Lab offers 12 illustrative discussion starters.</p><p>The current prototype uses discussion boards as spaces for sharing work, peer review, collaboration, direct responses, or discussion. Scenario and workspace saves are separate. Course Guide previews either saved design; Continue Where You Left Off resumes your recent path.</p>",
+        "body": "<p>Guided Scenario begins with Pixel’s example, then opens the shared Explore, Build, and Review screens. Creative Workspace opens those design tools directly. Babbage’s Idea Lab offers 12 illustrative discussion starters.</p><p>The current prototype uses discussion boards as spaces for sharing work, peer review, collaboration, direct responses, or discussion. Scenario and workspace saves are separate. Course Guide previews either saved design; Continue your saved work resumes your recent path.</p>",
         "visual": "pixel"
       }
     ]
@@ -151,6 +147,11 @@ const pages = {
         "title": "Independent project",
         "body": "<p>PromptCraft is an educational and scholarly project developed by Shanel. Its examples and character perspectives are designed to support exploration and discussion.</p><p>The content, interpretations, and design choices do not necessarily represent official policy or positions of Great Falls College MSU, Montana State University, or the Montana University System. Consult your institution’s guidance when applying ideas in practice.</p>",
         "visual": "shanel"
+      },
+      {
+        "title": "Open the published prototype",
+        "body": "<p>To open the published PromptCraft site on another device, scan this code. Preview changes and browser saves stay on this device.</p><p><img src=\"assets/brand/promptcraft-qr.png\" width=\"128\" height=\"128\" alt=\"QR code for the published PromptCraft site\"></p>",
+        "visual": "classroom"
       }
     ]
   },
@@ -209,7 +210,7 @@ const pages = {
       },
       {
         "title": "When you ask for AI help",
-        "body": "<p>Sending a Babbage message shares assignment context and your answers with the existing Babbage service and OpenAI.</p><p>Requesting Maya’s reading shares your original and revised directions, design context, and earlier readings with the same service. Use fictional examples and remove identifying information before requesting help.</p>",
+        "body": "<p>Sending a Babbage message shares assignment context and your answers with the existing Babbage service and Chat MT AI.</p><p>Requesting Maya’s reading shares your original and revised directions, design context, and earlier readings with the same service. Use fictional examples and remove identifying information before requesting help.</p>",
         "visual": "engine"
       },
       {
@@ -219,7 +220,7 @@ const pages = {
       },
       {
         "title": "External service privacy",
-        "body": "<p>AI requests use the existing Babbage service and OpenAI. Information sent with a request leaves the browser to receive a response.</p><p>This prototype does not establish those services’ retention or deletion practices. Resetting a local workspace clears that path’s browser save; it does not request deletion from an external service. Keep confidential information out of requests.</p>",
+        "body": "<p>AI requests use the existing Babbage service and Chat MT AI. Information sent with a request leaves the browser to receive a response.</p><p>This prototype does not establish those services’ retention or deletion practices. Resetting a local workspace clears that path’s browser save; it does not request deletion from an external service. Keep confidential information out of requests.</p>",
         "visual": "engine"
       },
       {

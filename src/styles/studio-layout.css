@@ -1,0 +1,632 @@
+/* The shared studio hierarchy: stages, task, quiet sections, then task actions. */
+body[data-app-view='workspace'] #app .workspace-shell--focused {
+  min-height: 0;
+}
+body[data-app-view='workspace'] #app #workspace-panel .workspace-page {
+  gap: 0;
+}
+body[data-app-view]:is([data-app-view='workspace'], [data-app-view='play']) > header.app-header {
+  height: auto;
+  min-height: 64px;
+  padding: 8px 24px;
+  background: #d8edfc !important;
+  border-bottom: 1px solid #1e2d59;
+  box-shadow: none;
+}
+body[data-app-view]:is([data-app-view='workspace'], [data-app-view='play'])
+  > header.app-header
+  :is(a, strong, small, span, button) {
+  color: #1e2d59 !important;
+}
+body[data-app-view]:is([data-app-view='workspace'], [data-app-view='play'])
+  > header.app-header
+  .brand
+  img {
+  width: 36px;
+  height: 36px;
+}
+body[data-app-view]:is([data-app-view='workspace'], [data-app-view='play'])
+  > header.app-header
+  .brand
+  strong {
+  font-size: 20px;
+}
+body[data-app-view]:is([data-app-view='workspace'], [data-app-view='play'])
+  > header.app-header
+  .brand
+  small {
+  font-size: 16px;
+}
+body[data-app-view]:is([data-app-view='workspace'], [data-app-view='play'])
+  > header.app-header
+  .header-actions
+  :is(a, button) {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none;
+  min-height: 44px;
+  padding: 8px;
+  font-size: 16px;
+  font-weight: 400;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+body[data-app-view='workspace'] #app .workspace-shell .workspace-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 0;
+  gap: 0;
+  background: #d8edfc;
+  border-bottom: 2px solid #1e2d59;
+}
+body[data-app-view='workspace'] #app .workspace-shell .workspace-tabs button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  margin: 0;
+  padding: 10px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #1e2d59;
+  font-weight: 700;
+}
+body[data-app-view='workspace'] #app .workspace-shell .workspace-tabs button[aria-selected='true'] {
+  background: #d98f06;
+  color: #111;
+}
+body[data-app-view='workspace'] #app .workspace-tabs button:focus-visible {
+  outline: 3px solid #1e2d59;
+  outline-offset: -4px;
+}
+.studio-stage-number {
+  font-size: 16px;
+  font-weight: 400;
+}
+body[data-app-view='workspace'] #app .workspace-heading {
+  margin: 8px auto;
+}
+body[data-app-view='workspace'] #app .workspace-heading h1 {
+  font:
+    400 16px/1.4 Georgia,
+    'Times New Roman',
+    serif !important;
+}
+body[data-app-view='workspace'] #app .workspace-section-frame--sidebar {
+  grid-template-columns: 185px minmax(0, 1fr);
+}
+body[data-app-view='workspace']
+  #app
+  .workspace-shell--focused
+  #workspace-panel
+  .workspace-section-sidebar {
+  background: transparent;
+  border-right: 1px solid #b9c2d2;
+  padding: 16px 12px 16px 0;
+}
+body[data-app-view='workspace']
+  #app
+  .workspace-shell--focused
+  #workspace-panel
+  .workspace-section-sidebar
+  button,
+body[data-app-view='workspace']
+  #app
+  .workspace-shell--focused
+  #workspace-panel
+  .workspace-section-sidebar
+  button[aria-current='page'] {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  min-height: 44px;
+  border: 0;
+  border-left: 3px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: #1e2d59;
+  font-weight: 400;
+  padding: 10px 8px;
+}
+body[data-app-view='workspace']
+  #app
+  .workspace-shell--focused
+  #workspace-panel
+  .workspace-section-sidebar
+  button[aria-current='page'] {
+  border-left-color: #d98f06;
+  font-weight: 700;
+}
+body[data-app-view='workspace']
+  #app
+  .workspace-shell--focused
+  #workspace-panel
+  .workspace-section-sidebar
+  button:hover {
+  background: #f2f2f2;
+  color: #1e2d59;
+}
+.studio-section-number {
+  font-size: 16px;
+  font-weight: 400;
+  min-width: 12px;
+}
+.studio-task-heading {
+  flex: 1;
+  min-width: 0;
+}
+body[data-app-view='workspace'] #app .studio-step {
+  margin: 0 0 6px;
+  font:
+    400 16px/1.4 Arial,
+    Helvetica,
+    sans-serif;
+}
+body[data-app-view='workspace'] #app .workspace-page .design-page-heading h2 {
+  margin: 0 0 16px;
+}
+body[data-app-view='workspace']
+  #app
+  .workspace-shell--focused
+  #workspace-panel
+  .workspace-welcome-board {
+  display: block;
+  max-width: 72ch;
+  margin: 0;
+  padding: 0;
+}
+body[data-app-view='workspace']
+  #app
+  .workspace-shell--focused
+  #workspace-panel
+  .workspace-welcome-intro {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+}
+body[data-app-view='workspace']
+  #app
+  .workspace-shell--focused
+  #workspace-panel
+  .workspace-project-menu {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  max-width: none;
+}
+body[data-app-view='workspace']
+  #app
+  .workspace-shell--focused
+  #workspace-panel
+  .workspace-ai-disclosure {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 20px 0;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.studio-optional-link {
+  display: inline-block;
+  margin: 12px 0;
+}
+body[data-app-view='workspace']
+  #app
+  .workspace-shell--focused
+  #workspace-panel
+  .workspace-requirements
+  .radio-cards
+  label {
+  border: 0;
+  background: transparent;
+  padding: 10px 0;
+  min-height: 44px;
+}
+.studio-rubric-choice {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  margin: 20px 0;
+  padding: 16px 0;
+  border-top: 1px solid #b9c2d2;
+}
+.studio-rubric-choice input {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin: 2px 0 0;
+}
+@media (max-width: 700px) {
+  body[data-app-view]:is([data-app-view='workspace'], [data-app-view='play']) > header.app-header {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 6px 12px;
+    min-height: 52px;
+  }
+  body[data-app-view]:is([data-app-view='workspace'], [data-app-view='play'])
+    > header.app-header
+    .brand {
+    gap: 6px;
+    min-width: 0;
+  }
+  body[data-app-view]:is([data-app-view='workspace'], [data-app-view='play'])
+    > header.app-header
+    .brand
+    strong {
+    font-size: 18px;
+  }
+  body[data-app-view]:is([data-app-view='workspace'], [data-app-view='play'])
+    > header.app-header
+    .brand
+    img {
+    width: 28px;
+    height: 28px;
+  }
+  body[data-app-view]:is([data-app-view='workspace'], [data-app-view='play'])
+    > header.app-header
+    .header-actions {
+    width: auto;
+    flex: none;
+    gap: 0;
+    margin: 0;
+  }
+  body[data-app-view]:is([data-app-view='workspace'], [data-app-view='play'])
+    > header.app-header
+    .header-actions
+    :is(a, button) {
+    padding: 6px;
+  }
+}
+body[data-app-view='workspace'] #app #workspace-panel .workspace-action-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex: none;
+  padding: 0;
+  height: auto;
+  min-height: 116px;
+  max-height: none;
+  overflow: visible;
+  gap: 0;
+  background: #fff;
+}
+.studio-secondary-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 0 16px;
+  min-height: 44px;
+}
+body[data-app-view='workspace'] #app #workspace-panel .studio-secondary-actions button {
+  min-height: 44px;
+  height: auto;
+  margin: 0;
+  padding: 6px 0;
+  border: 0;
+  background: transparent;
+  color: #1e2d59;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  font-weight: 400;
+  white-space: normal;
+}
+body[data-app-view='workspace']
+  #app
+  #workspace-panel
+  .studio-secondary-actions
+  .workspace-save-status {
+  flex: 1 1 140px;
+  margin: 0;
+  color: #1e2d59;
+  text-align: right;
+  font:
+    400 16px/1.4 Arial,
+    Helvetica,
+    sans-serif;
+  white-space: normal;
+}
+.studio-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  min-height: 72px;
+  background: #d98f06;
+}
+.studio-back,
+.studio-next {
+  min-width: 0;
+}
+body[data-app-view='workspace'] #app #workspace-panel .studio-navigation button {
+  margin: 0;
+  min-height: 48px;
+  white-space: normal;
+}
+body[data-app-view='workspace'] #app #workspace-panel .studio-navigation button.primary {
+  margin: 0;
+}
+body[data-app-view='workspace'] #app .assessment-level-grid article,
+body[data-app-view='workspace'] #app .rubric-rating {
+  border: 0;
+  background: transparent;
+}
+body[data-app-view='workspace'] #app .rubric-rating header {
+  background: transparent;
+  color: #1e2d59;
+  border: 0;
+}
+@media (max-width: 760px) {
+  body[data-app-view='workspace'] #app .workspace-section-frame--sidebar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-app-view='workspace'] #app .workspace-section-mobile {
+    background: #fff;
+    border-bottom: 1px solid #b9c2d2;
+  }
+  body[data-app-view='workspace'] #app .workspace-section-mobile label {
+    font-size: 16px;
+    font-weight: 400;
+  }
+  body[data-app-view='workspace'] #app .workspace-section-main .studio-step {
+    display: none;
+  }
+  body[data-app-view='workspace']
+    #app
+    .workspace-shell--focused
+    #workspace-panel
+    .workspace-project-menu {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .studio-secondary-actions {
+    gap: 4px 16px;
+  }
+  .studio-navigation {
+    gap: 12px;
+  }
+  .studio-back,
+  .studio-next {
+    max-width: 70%;
+  }
+  body[data-app-view='workspace'] #app .studio-secondary-actions .workspace-save-status {
+    text-align: left;
+  }
+}
+
+body[data-app-view='workspace'] #app #workspace-panel .workspace-check-item {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #b9c2d2;
+  border-radius: 0;
+  padding: 16px 0;
+}
+
+@media (max-width: 760px) {
+  body:is([data-app-view='play'], [data-app-view='workspace']) #app .focused-scene .scene-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 12px;
+    padding: 10px 12px !important;
+  }
+  body:is([data-app-view='play'], [data-app-view='workspace'])
+    #app
+    .focused-scene
+    .scene-actions
+    .navigation-hint {
+    display: block !important;
+    grid-column: 1 / -1;
+    grid-row: 1;
+    margin: 0;
+    padding: 0;
+    width: auto;
+    text-align: center;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+  body:is([data-app-view='play'], [data-app-view='workspace'])
+    #app
+    .focused-scene
+    .navigation-guidance {
+    display: none;
+  }
+  body:is([data-app-view='play'], [data-app-view='workspace'])
+    #app
+    .focused-scene
+    .scene-actions
+    .nav-button {
+    grid-row: 2;
+    min-width: 0;
+    width: 100%;
+    min-height: 48px;
+    height: auto;
+    padding: 8px;
+  }
+  body:is([data-app-view='play'], [data-app-view='workspace'])
+    #app
+    .focused-scene
+    .nav-button--back {
+    grid-column: 1;
+  }
+  body:is([data-app-view='play'], [data-app-view='workspace'])
+    #app
+    .focused-scene
+    .nav-button--next {
+    grid-column: 2;
+  }
+}
+
+/* Requirements grow naturally inside the scrolling task; fieldsets must not shrink. */
+body[data-app-view='workspace'] #app #workspace-panel .workspace-requirements {
+  display: block;
+  flex: none;
+  min-height: max-content;
+}
+body[data-app-view='workspace'] #app #workspace-panel .workspace-requirements .setup-field {
+  display: block;
+  flex: none;
+  min-height: auto;
+  height: auto;
+}
+body[data-app-view='workspace'] #app #workspace-panel .workspace-requirements .radio-cards {
+  flex: none;
+  height: auto;
+  min-height: min-content;
+  grid-auto-rows: auto;
+  margin: 12px 0;
+}
+body[data-app-view='workspace'] #app #workspace-panel .workspace-requirements .radio-cards label {
+  height: auto;
+}
+
+/* Short screens keep the same footer in view and give the task its own scroll area. */
+@media (max-height: 650px) {
+  body[data-app-view][data-app-view='workspace'] > header.app-header {
+    min-height: 48px;
+    padding: 4px 12px;
+  }
+  body[data-app-view][data-app-view='workspace'] > header.app-header .brand small {
+    display: none;
+  }
+  body[data-app-view][data-app-view='workspace'] #app {
+    margin: 8px auto;
+    padding: 0;
+    width: calc(100% - 24px);
+    max-width: none;
+  }
+  body[data-app-view='workspace'] #app .workspace-tabs {
+    margin: 0;
+  }
+  body[data-app-view='workspace'] #app .workspace-tabs button {
+    min-height: 44px;
+    padding: 8px;
+  }
+  body[data-app-view='workspace'] #app .workspace-heading {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  body[data-app-view='workspace']
+    #app
+    .workspace-messages:has(> .design-notice:empty):has(> .save-notice:empty) {
+    display: none;
+  }
+  body[data-app-view='workspace'] #app #workspace-panel .workspace-section-frame--sidebar {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  body[data-app-view='workspace'] #app #workspace-panel .workspace-section-sidebar {
+    display: none !important;
+  }
+  body[data-app-view='workspace'] #app #workspace-panel .workspace-section-mobile {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    background: #fff;
+  }
+  body[data-app-view='workspace'] #app .workspace-section-mobile label {
+    font-size: 16px;
+    font-weight: 400;
+    flex: none;
+    margin: 0;
+  }
+  body[data-app-view='workspace'] #app .workspace-section-mobile select {
+    min-width: 0;
+    width: 100%;
+    min-height: 44px;
+    flex: 1;
+  }
+  body[data-app-view='workspace'] #app .studio-step {
+    display: none;
+  }
+  body[data-app-view='workspace']
+    #app
+    #workspace-panel
+    :is(.design-page-heading, .partner-heading) {
+    padding: 8px 12px !important;
+  }
+  body[data-app-view='workspace'] #app #workspace-panel .design-page-heading h2 {
+    font-size: 22px;
+    margin: 0;
+  }
+  body[data-app-view='workspace'] #app .studio-navigation {
+    padding: 8px 12px;
+    min-height: 64px;
+  }
+  body[data-app-view='workspace'] #app #workspace-panel .workspace-action-bar {
+    min-height: 108px;
+  }
+}
+
+@media (max-height: 450px) {
+  body[data-app-view='workspace'] #app #workspace-panel .partner-heading .babbage-presence {
+    flex-basis: 76px;
+    width: 76px !important;
+    height: 64px !important;
+  }
+  body[data-app-view='workspace'] #app #workspace-panel .partner-heading .babbage-presence img {
+    width: 76px !important;
+    height: 108px !important;
+    margin-top: -23px !important;
+  }
+}
+
+@media (max-height: 450px) {
+  /* The labelled section chooser already names the task in this compact view. */
+  body[data-app-view='workspace']
+    #app
+    #workspace-panel
+    .workspace-section-main
+    .design-page-heading {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    min-height: 0;
+    padding: 0 !important;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+}
+
+/* Include padding in the shared footer's target sizes, independent of legacy rules. */
+body[data-app-view='workspace']
+  #app
+  #workspace-panel
+  :is(.studio-secondary-actions, .studio-navigation, .studio-secondary-actions button) {
+  box-sizing: border-box;
+}
+
+@media (max-height: 450px) {
+  body[data-app-view='workspace'] #app #workspace-panel .design-page-fields {
+    padding: 8px 12px !important;
+  }
+}
+
+body[data-app-view]:is([data-app-view='workspace'], [data-app-view='play'])
+  > header.app-header
+  :is(.brand, .header-actions a, .header-actions button):focus-visible {
+  outline: 3px solid #1e2d59 !important;
+  outline-offset: 2px;
+}
+
+/* Sky surrounds a readable task surface; gold marks the current stage and next action. */
+body[data-app-view][data-app-view='workspace'] {
+  background: #d8edfc;
+}
+body[data-app-view='workspace'] #app .workspace-section-sidebar {
+  background: #e4f3ff;
+}
+body[data-app-view='workspace'] #app #workspace-panel .design-page-heading {
+  background: #e4f3ff;
+  border-bottom: 3px solid #d98f06;
+}

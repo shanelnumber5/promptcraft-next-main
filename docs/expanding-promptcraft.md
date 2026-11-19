@@ -68,8 +68,16 @@ New AI workflows should use the shared JSON transport and existing service adapt
 
 ## Verify an expansion
 
-Run `npm test` for the 16 offline suites and static-server checks. `workspace-workflow.test.cjs` covers review ownership, stale dialogs, retry behavior, and save/export consistency. Architecture and repository checks follow static/lazy imports, including cache-version query strings, and reject missing modules and unused assets.
+Run `npm test` for the 24 offline suites and static-server checks. `workspace-workflow.test.cjs` covers review ownership, stale dialogs, retry behavior, and save/export consistency. Architecture and repository checks follow static/lazy imports, including cache-version query strings, and reject missing modules and unused assets.
 
 Run `npm run test:browser` for both shared routes at four viewport sizes. The browser fixtures include editor heading/format/paste/drop behavior, replacement-editor bindings, layout, contrast, and keyboard focus. Update section fixtures when adding a section. Use `npm run test:lab` for Idea Lab changes and `npm run test:accessibility` for public-page changes. These fixtures mock AI; they do not establish live response quality.
 
 Format changed files with the existing Prettier configuration. Put generated screenshots, logs, and audits in the ignored `artifacts/` directory.
+
+## Reuse the task and guide frames
+
+Render new studio tasks with `renderStudioPage()` from `workspace/page-frame.js`. Pass a task title, `step`, content, `back`, `next` and optional `actions`; the component keeps secondary tools above the shared Back/Continue row. Use `renderSectionFrame()` for section navigation. Do not add a competing dark menu or duplicate navigation inside the task body. Keep scenario wording out of these components.
+
+Scenario guide content is an array of `{ id, title, body }` sections supplied by the route's `guideSections` adapter. The current worked example and teaching moves are owned by `opening/guide-content.js`. New scenarios can supply different sections while reusing the exporter, preview, contents list and offline styling. Continue to provide isolated save adapters and explicit scenario selection as described above; shared layouts do not create storage migrations.
+
+Use the inline AI-use controls and rubric preference in Build. Visiting a stage or section should preserve the draft and its location without opening an optional tool. Review's rubric section supports criteria and descriptor editing in the shared task frame. The existing waiting and character dialogs retain their focused roles.

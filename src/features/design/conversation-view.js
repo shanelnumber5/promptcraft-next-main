@@ -1,6 +1,7 @@
+import { renderBabbageMessage } from '../../shared/babbage-feedback.js';
 import { renderCompactAi } from './compact-ai.js';
 import { renderLoading } from './loading.js';
-import { renderAssignmentDirections } from '../../shared/directions.js';
+import { renderAssignmentDirections, renderInlineProse } from '../../shared/directions.js';
 import { escapeHTML as e } from '../../shared/html.js';
 import { conversationDefaults, assignmentContext } from './babbage-client.js';
 import { answerIssue, clarificationSupport } from './input-quality.js';
@@ -9,12 +10,21 @@ import { renderDesignRationale } from '../../shared/design-evidence.js';
 import { renderScrollableDirections, renderPagedDirections } from '../../shared/paged-directions.js';
 export const aiContext = assignmentContext;
 
+// Older saved questions can carry their choices inline; newer responses use the same markers.
+export function clarificationChoices(text) {
+  const matches=[...text.matchAll(/\(([a-c])\)\s*/gi)];
+  if(matches.length<2) return {prompt:text,choices:[]};
+  return {prompt:text.slice(0,matches[0].index).trim().replace(/[,;:]$/, '?'), choices:matches.map((match,index)=>text.slice(match.index+match[0].length,matches[index+1]?.index ?? text.length).trim().replace(/,?\s*(?:or|and)\s*$/i,'').replace(/[;?]$/,'')).filter(Boolean)};
+}
+
 export function renderQuestion(conversation, available, pending, compact = false, extraAction = '', { workspace = false } = {}) {
   const questions = conversation.questions;
   const ready = hasCompleteClarificationAnswers(conversation);
   return `<div class="babbage-questions"><h3>${workspace ? 'Clarify your activity' : 'One quick check with Babbage'}</h3><p>${workspace ? 'Answer below so Babbage can finish your draft.' : 'Answer these together, then Babbage will prepare your draft. You will not need to confirm each question separately.'}</p>${questions.map((question, index) => {
     const answer = conversation.answers[question.id] || '';
-    return `<div class="babbage-question"><label for="${e(question.id)}">${workspace ? `<span class="workspace-question-number">Question ${index+1} of ${questions.length}</span>` : `${index+1}. `}${e(question.text)}</label><textarea id="${e(question.id)}" data-clarification-answer="${e(question.id)}" aria-describedby="${e(question.id)}-support" rows="3"${pending ? ' disabled' : ''}>${e(answer)}</textarea><p id="${e(question.id)}-support" class="clarification-support" data-answer-support="${e(question.id)}"${clarificationSupport(question,answer)?'':' hidden'}>${e(clarificationSupport(question,answer))}</p></div>`;
+    const {prompt,choices}=clarificationChoices(question.text);
+    const custom=Boolean(answer && !choices.includes(answer));
+    return `<fieldset class="babbage-question"><legend>${workspace ? `<span class="workspace-question-number">Question ${index+1} of ${questions.length}</span>` : `${index+1}. `}${renderInlineProse(prompt)}</legend>${choices.map((choice,i)=>`<label class="clarification-choice"><input type="radio" name="${e(question.id)}-choice" data-clarification-choice="${e(question.id)}" value="${e(choice)}"${answer===choice?' checked':''}${pending?' disabled':''}><span>${e(choice)}</span></label>`).join('')}<label class="clarification-choice"><input type="radio" name="${e(question.id)}-choice" data-clarification-choice="${e(question.id)}" value="__clarify__"${custom || !choices.length?' checked':''}${pending?' disabled':''}><span>Let me clarify</span></label><div data-clarification-custom="${e(question.id)}"${custom || !choices.length?'':' hidden'}><label for="${e(question.id)}">Your clarification</label><textarea id="${e(question.id)}" data-clarification-answer="${e(question.id)}" aria-describedby="${e(question.id)}-support" rows="3"${pending ? ' disabled' : ''}>${e(custom?answer:'')}</textarea></div><p id="${e(question.id)}-support" class="clarification-support" data-answer-support="${e(question.id)}"${clarificationSupport(question,answer)?'':' hidden'}>${e(clarificationSupport(question,answer))}</p></fieldset>`;
   }).join('')}<p class="answer-guidance" role="status">${ready ? 'Ready to send.' : 'Please answer each question before continuing.'}</p><div class="question-actions">${extraAction}<button type="button" class="primary" data-action="send-clarification"${available && ready && !pending ? '' : ' disabled'}>${workspace ? 'Send answers and draft' : 'Send answers and draft with Babbage'}</button></div></div>`;
 }
 
@@ -24,7 +34,7 @@ export function renderAiPanel(state, ai, { compact = false } = {}) {
   const available = dev || ai.configured === true;
   const hasDirections = Boolean(state.teacher.directions.trim());
   const history = conversation.history.length
-    ? `<section class="babbage-history"><h3>Earlier conversation</h3>${conversation.history.slice(-4).map((turn) => `<article class="babbage-turn babbage-turn--${turn.role}"><strong>${turn.role === 'assistant' ? 'Babbage' : 'Your answers'}</strong><p>${e(turn.display || turn.content)}</p></article>`).join('')}</section>`
+    ? `<section class="babbage-history"><h3>Earlier conversation</h3>${conversation.history.slice(-4).map((turn) => `<article class="babbage-turn babbage-turn--${turn.role}"><strong>${turn.role === 'assistant' ? 'Babbage' : 'Your answers'}</strong>${renderBabbageMessage(turn.display || turn.content)}</article>`).join('')}</section>`
     : '';
   const action = ai.pending && compact ? renderLoading(ai, dev) : compact && ai.suggestion
     ? `<section class="ai-suggestion ai-suggestion--focused" aria-label="Suggested draft"><div class="suggestion-reading">${renderScrollableDirections(ai.suggestion.revision)}</div><div class="ai-suggestion-actions"><button type="button" data-action="dismiss-ai">Keep my draft</button></div></section>`
@@ -38,5 +48,5 @@ export function renderAiPanel(state, ai, { compact = false } = {}) {
         ? `<p class="babbage-ready">Your details are ready. Generate a revision, then review it.</p><button type="button" class="primary" data-action="generate-ai"${available && !ai.pending ? '' : ' disabled'}>Draft with Babbage</button>`
         : `<p>Babbage uses your assignment details to prepare a focused draft. You can edit every suggestion.</p><button type="button" class="primary" data-action="ask-ai"${hasDirections && available && !ai.pending ? '' : ' disabled'}>Start with Babbage</button>`;
   if (compact) return renderCompactAi(state, ai, action);
-  return `<section class="ai-panel" aria-labelledby="ai-title"><div class="ai-panel-heading"><div class="babbage-identity"><img src="assets/brand/babbage-mark-small.svg" alt="" width="64" height="64"><div><h2 id="ai-title">Develop your draft with Babbage</h2></div></div><span class="babbage-mode${dev ? ' babbage-mode--dev' : ''}">${dev ? 'Sample responses · no API call' : 'Live Babbage'}</span></div><div class="babbage-workspace"><p>${dev ? 'Simulated answers for testing the workflow. This mode does not analyze your assignment.' : 'Babbage uses your assignment and answers to suggest a revision. Sent details are shared with the PromptCraft Babbage service and OpenAI.'}</p>${!dev && ai.configured === false ? '<p class="ai-setup-message">Babbage is unavailable. Retry the connection, or write your draft below.</p><button type="button" data-action="retry-babbage">Retry connection</button>' : ''}${!hasDirections ? '<p>Add your starting material before asking Babbage. Your draft stays saved.</p>' : ''}${ai.pending ? renderLoading(ai, dev) : ''}<p class="ai-status" role="status" aria-live="polite">${e(ai.error || (ai.pending ? '' : !dev && ai.configured === null ? 'Checking the Babbage connection…' : ''))}</p>${!ai.pending && conversation.history.length && !ai.suggestion ? `<p class="babbage-latest">${e(conversation.history.at(-1).display)}</p>` : ''}${history}${action}</div></section>`;
+  return `<section class="ai-panel" aria-labelledby="ai-title"><div class="ai-panel-heading"><div class="babbage-identity"><img src="assets/brand/babbage-mark-small.svg" alt="" width="64" height="64"><div><h2 id="ai-title">Develop your draft with Babbage</h2></div></div><span class="babbage-mode${dev ? ' babbage-mode--dev' : ''}">${dev ? 'Sample responses · no API call' : 'Live Babbage'}</span></div><div class="babbage-workspace"><p>${dev ? 'Simulated answers for testing the workflow. This mode does not analyze your assignment.' : `Babbage uses your assignment and answers to suggest a revision. Sent details are shared with the PromptCraft Babbage service and Chat MT AI.`}</p>${!dev && ai.configured === false ? '<p class="ai-setup-message">Babbage is unavailable. Retry the connection, or write your draft below.</p><button type="button" data-action="retry-babbage">Retry connection</button>' : ''}${!hasDirections ? '<p>Add your starting material before asking Babbage. Your draft stays saved.</p>' : ''}${ai.pending ? renderLoading(ai, dev) : ''}<p class="ai-status" role="status" aria-live="polite">${e(ai.error || (ai.pending ? '' : !dev && ai.configured === null ? 'Checking the Babbage connection…' : ''))}</p>${!ai.pending && conversation.history.length && !ai.suggestion ? `<div class="babbage-latest">${renderBabbageMessage(conversation.history.at(-1).display)}</div>` : ''}${history}${action}</div></section>`;
 }

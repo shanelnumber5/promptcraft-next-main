@@ -3,6 +3,8 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const tests = [
   'json-request',
+  'chatmt-worker',
+  'chatmt-profile',
   'design',
   'babbage',
   'maya',
@@ -10,15 +12,21 @@ const tests = [
   'dialogue-portrait',
   'idea-lab',
   'creative',
+  'exploration-controller',
   'repository',
   'workspace-review',
+  'rubric',
   'workspace-project',
   'workspace-workflow',
   'babbage-cameo',
   'shared-controller',
+  'ai-waiting',
+  'feedback-conversation',
+  'conversation-revision',
   'architecture',
   'scenario-studio',
   'opening-route',
+  'narration',
 ];
 for (const name of tests) {
   const result = spawnSync(

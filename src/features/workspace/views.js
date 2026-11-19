@@ -3,6 +3,8 @@ import { buildPages } from './build-view.js';
 export { buildPages } from './build-view.js';
 import { escapeHTML as e } from '../../shared/html.js';
 import { renderAssignmentDirections } from '../../shared/directions.js';
+import { renderStudioPage } from './page-frame.js';
+import { designRoute } from './routes.js';
 
 export const workspaceViews = () => ({ screen: 'work', index: 0, saved: false, part: 'overview' });
 export function renderReading(text, renderer = renderAssignmentDirections) {
@@ -11,7 +13,7 @@ export function renderReading(text, renderer = renderAssignmentDirections) {
 export function renderUtility(state, ai, ui) {
   let title, body;
   if (ui.screen === 'options') {
-    title = state.experience === 'scenario' ? 'Scenario options' : 'Workspace options';
+    title = 'Project tools';
     const connectionDescription =
       ai.configured === true
         ? 'Babbage is connected. View details or retry the connection.'
@@ -20,24 +22,26 @@ export function renderUtility(state, ai, ui) {
           : 'Check the connection status or retry Babbage.';
     body = `
       <div class="workspace-welcome-board workspace-project-menu">
-        <section class="workspace-welcome-intro" aria-labelledby="workspace-backup-title">
-          <h2 id="workspace-backup-title">Your project</h2>
-          <p>Keep an editable backup, reopen saved work, or return to the main menu.</p>
-          <p>${connectionDescription}</p>
-          <nav class="workspace-project-actions" aria-label="Additional tools">
-            <button type="button" data-partner-page="history">Earlier conversation</button>
-            ${state.creative.alternatives.length ? '<button type="button" data-workspace-view="saved">Saved ideas</button>' : ''}
-            <button type="button" data-partner-page="options">AI connection</button>
-          </nav>
-        </section>
-        <nav class="workspace-welcome-choices" aria-label="Project files">
-          <h2>What would you like to do?</h2>
+        <section class="workspace-welcome-choices" aria-labelledby="workspace-backup-title">
+          <h3 id="workspace-backup-title">Keep your work</h3>
+          <p>Your work saves in this browser. Download an editable backup to move it or keep a copy.</p>
           <div class="workspace-welcome-actions">
             <button type="button" data-action="save-project-file">Download project</button>
             <button type="button" data-action="open-project-file"${ai.pending ? ' disabled' : ''}>Open project</button>
-            <a href="?view=home">Save and leave</a>
           </div>
-        </nav>
+        </section>
+        <section class="workspace-welcome-intro" aria-labelledby="workspace-tools-title">
+          <h3 id="workspace-tools-title">Additional tools</h3>
+          <p>${connectionDescription}</p>
+          <nav class="workspace-project-actions" aria-label="Additional tools">
+            ${state.experience === 'scenario' ? '<a class="action-link" href="?view=play&amp;story=1">Revisit Pixel &amp; Maya’s story</a>' : ''}
+            <button type="button" data-partner-page="history">Earlier conversation</button>
+            ${state.creative.alternatives.length ? '<button type="button" data-workspace-view="saved">Saved ideas</button>' : ''}
+            <button type="button" data-partner-page="options">AI connection</button>
+            <button type="button" data-action="open-references">Sources &amp; samples</button>
+            <button type="button" data-action="reset-workspace">${e(designRoute(state.experience).restartLabel)}</button>
+          </nav>
+        </section>
       </div>
       <input type="file" data-project-file-input accept=".json,application/json" aria-label="Choose a saved PromptCraft project" hidden>`;
   } else if (ui.screen === 'sections') {
@@ -92,5 +96,10 @@ export function renderUtility(state, ai, ui) {
     title = 'Keep working';
     body = `<nav class="workspace-utility-list"><button type="button" data-review-page="checks">Review checks</button><button type="button" data-action="edit-context">Edit the activity</button><button type="button" data-action="finish-workspace"${!state.finalCheck.approved ? ' disabled' : ''}>Finish with Pixel</button></nav>`;
   } else return null;
-  return `<section class="workspace-view workspace-page" ${ui.screen === 'options' ? 'aria-label="Project options"' : 'aria-labelledby="workspace-view-title"'}>${ui.screen === 'options' ? '' : `<header class="design-page-heading"><h2 id="workspace-view-title" tabindex="-1">${e(title)}</h2></header>`}<div class="workspace-view-body">${body}</div><footer class="workspace-action-bar workspace-view-back"><button type="button" data-workspace-view="work">Back to my work</button></footer></section>`;
+  return renderStudioPage({
+    title,
+    content: body,
+    back: '<button type="button" data-workspace-view="work">Back</button>',
+    actionClass: 'workspace-view-back',
+  });
 }

@@ -4,12 +4,12 @@ import { discussionOpening } from '../opening/content.js';
 import { escapeHTML as e } from '../../shared/html.js';
 
 export function renderClosing(state, stage, page = 0) {
-  const workspace=Boolean(state.workspace && state.experience!=='scenario');
+  const workspace = Boolean(state.workspace && state.experience !== 'scenario');
   stage ||= workspace ? 'dialogue' : 'board';
   const closingDialogue = stage === 'dialogue';
   const goal = (state.teacher.learningGoal || '').trim();
   const intention = (state.workspace?.creativeCore || '').trim();
-  const brief = text => text.length > 180 ? text.slice(0,177) + '…' : text;
+  const brief = (text) => (text.length > 180 ? text.slice(0, 177) + '…' : text);
   const goalText = goal ? brief(goal) : '';
   const goalEnd = goalText && /[.!?…]$/.test(goalText) ? '' : '.';
   const completion = workspace ? 'Design complete' : 'Module complete';
@@ -57,11 +57,20 @@ export function renderClosing(state, stage, page = 0) {
     characters: { pixel: discussionOpening.characters.pixel },
     scenes: [scene],
   };
-  const recap = '<div class="closing-board-recap"><section><h3>Keep it realistic</h3><p>Match the goal, requirements, and time available. If AI is allowed, students still verify claims and explain decisions.</p></section><section><h3>Look for evidence</h3><p>Notice how students use a peer’s contribution to examine their decision. Use what you learn to improve the next discussion.</p></section>'+(state.teacher.learningGoal ? '<div class="closing-goal"><strong>Your learning goal</strong><span>'+e(state.teacher.learningGoal)+'</span></div>' : '')+'</div>';
+  const recap =
+    '<div class="closing-board-recap"><section><h3>Keep it realistic</h3><p>Match the goal, requirements, and time available. If AI is allowed, students still verify claims and explain decisions.</p></section><section><h3>Look for evidence</h3><p>Notice how students use a peer’s contribution to examine their decision. Use what you learn to improve the next discussion.</p></section>' +
+    (state.teacher.learningGoal
+      ? '<div class="closing-goal"><strong>Your learning goal</strong><span>' +
+        e(state.teacher.learningGoal) +
+        '</span></div>'
+      : '') +
+    '</div>';
   const lastPage = page >= dialogue.length - 1;
   const navigation = `<nav class="scene-actions" aria-label="Module navigation"><button type="button" class="nav-button nav-button--back" data-action="${closingDialogue && page > 0 ? 'closing-previous' : 'return-assignment'}"><span>${closingDialogue && page > 0 ? 'Back' : workspace ? 'Your Course Guide' : 'Your assignment'}</span></button><span class="navigation-hint">${completion} · ${closingDialogue ? `Part ${page + 1} of ${dialogue.length}` : 'Take your learning into your course'}</span><button type="button" class="primary nav-button nav-button--next" data-action="${!closingDialogue ? 'closing-pixel' : !lastPage ? 'closing-next' : 'preview-guide'}"><span>${!closingDialogue ? 'Continue with Pixel' : !lastPage ? 'Continue' : 'View guide'}</span></button></nav>`;
   return renderScene(scenario, scene, state, 0, {
     className: 'closing-experience',
+    audioTitle: workspace ? 'Activity complete' : 'Guided Scenario · complete',
+    audioDescription: 'Pixel’s closing reflection',
     stage,
     titleId: 'setup-title',
     progressLabel: completion,

@@ -132,7 +132,8 @@
   gap: 8px;
 }
 .focused-scene .speaker-panel .character {
-  overflow: hidden;
+  /* Arms may extend beyond the transparent portrait framing. */
+  overflow: visible;
 }
 .focused-scene:is(.camera--left,.camera--right) .speaker-panel .character img {
   width: auto;

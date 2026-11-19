@@ -7,13 +7,14 @@ export const guideStyles = `
 .workspace-guide #decision-milestone h3 { margin:20px 0 8px; font-size:20px; }
 .workspace-guide #decision-milestone p { margin-bottom:12px; }
 .workspace-guide #decision-milestone p:last-child { margin-bottom:0; }
+h1,h2,h3,h4,h5,h6,.toc h2,.guide-sources h2,.guide-section > .guide-sources > h2,.rationale > h3,.practice-title { font-family:Georgia,'Times New Roman',serif !important; }
 html { scroll-behavior:auto; }
 ::selection { background:#D98F06; color:#111111; }
 body { margin:0; padding:24px; background:#F2F2F2; color:#1E2D59; font: 16px/1.6 Arial,Helvetica,sans-serif; }
 main { max-width:1000px; margin:auto; }
 a { color:#1E2D59; text-underline-offset:3px; overflow-wrap:anywhere; }
 a:focus-visible { outline:3px solid #1E2D59; outline-offset:4px; }
-h1,h2 { font-family:Arial,Helvetica,sans-serif; font-weight:700; line-height:1.2; }
+h1,h2,h3,h4,h5,h6 { font-family:Georgia,'Times New Roman',serif; font-weight:700; line-height:1.2; }
 h1 { font-size: 32px; margin:0 0 12px; }
 h2 { font-size: 28px; margin:0 0 20px; }
 h3 { font-size:22px; line-height:1.35; margin:24px 0 12px; }
@@ -134,8 +135,8 @@ blockquote { padding:16px 20px;  margin:20px 0; background:#F2F2F2; }
 /* Align the explanation with its heading and give each thought breathing room. */
 .rationale { margin-top:32px; }
 .rationale > h3 { margin-bottom:0; }
-.rationale .rationale-prose { max-width:none; padding:20px 18px 4px; }
-.rationale .rationale-prose p { line-height:1.75; margin:0 0 18px; }
+.rationale .rationale-prose { box-sizing:border-box; max-width:78ch; padding:20px 18px 4px; }
+.rationale .rationale-prose p { font-size:16px; line-height:1.6; margin:0 0 14px; }
 .rationale .rationale-prose p:last-child { margin-bottom:0; }
 @media(max-width:600px) { .rationale .rationale-prose { padding:18px 12px 4px; } }
 @media print { .rationale .rationale-prose { padding:12px 0 0; } }
@@ -152,4 +153,38 @@ blockquote { padding:16px 20px;  margin:20px 0; background:#F2F2F2; }
 
 .guide-help-section ul { padding-left:22px; margin:0; }
 .guide-help-section li { font-size: 16px; line-height:1.6; margin:12px 0; }
-`;
+
+/* Consistent document typography and section padding in preview, download and print. */
+body :is(h1,h2,h3,h4,h5,h6) { font-family:Georgia,'Times New Roman',serif !important; line-height:1.25; }
+.guide-section > section > h2,
+.guide-section > .guide-sources > h2 { margin:0 0 20px; padding:0 0 12px; background:transparent; color:#12355b; border-bottom:3px solid #f2c14e; border-radius:0; }
+.workspace-guide #decision-milestone h2 { padding:0 0 12px; border-bottom:3px solid #f2c14e; }
+.guide-section > .guide-sources { padding:28px 32px; }
+.assignment-content,.guide-section > section { overflow-wrap:anywhere; }
+.assignment-content :is(p,li),.rationale-prose { max-width:78ch; }
+.rationale .rationale-prose { max-width:none; padding:16px 0 0; }
+.guide-sources li { margin:0 0 18px; }
+.guide-sources li span { display:block; margin-top:4px; }
+@media(max-width:600px) {
+ body { padding:12px; }
+ .guide-heading,.workspace-guide .guide-heading,.guide-section > section,.assignment-content,.guide-section > .guide-sources { padding:20px; }
+ .guide-section > section.assignment { padding:0; }
+ .assignment-banner { padding:20px; }
+}
+@media print {
+ body { padding:0; background:#fff; }
+ .guide-section > section,.assignment-content,.guide-section > .guide-sources { padding:16px 0; }
+}
+
+.guide-conversation-notes {display:grid;gap:16px}
+.guide-decision {border:1px solid #12355b;border-radius:5px;padding:16px 20px;break-inside:avoid;background:#f5f9fc}
+.guide-decision p {margin:0 0 14px;white-space:pre-line}
+.guide-decision p:last-child {margin-bottom:0}
+.guide-decision strong {color:#12355b}
+.assignment-rubric {width:100%;border-collapse:collapse;table-layout:fixed;font:16px/1.5 Arial,sans-serif}
+.assignment-rubric caption {font:700 24px Georgia,serif;padding:12px;text-align:left}
+.assignment-rubric th,.assignment-rubric td {width:25%;overflow-wrap:normal;word-break:normal;border:1px solid #12355b;padding:12px;vertical-align:top;text-align:left}
+.assignment-rubric thead {background:#12355b;color:#fff}
+.assignment-rubric tbody th {background:#f5f9fc}
+.rubric-table-scroll {overflow-x:auto}
+.rubric-score{display:block;width:fit-content;padding:6px 10px;margin:0 0 16px;background:#eef4f9;border:1px solid #12355b;border-radius:4px;font:bold 16px Arial;color:#12355b}.rubric-descriptor{line-height:1.6}.rubric-download a{display:inline-block;padding:12px;border:2px solid #12355b;border-radius:4px;font-weight:bold}.guide-preview-toolbar{flex-wrap:wrap}@media print{.rubric-download{display:none}}`;

@@ -3,27 +3,50 @@ const pendingPortraits = new WeakMap();
 const decodedPortraits = new Map();
 
 function preparePortrait(source, priority = 'auto') {
+  if (typeof Image === 'undefined') return Promise.reject(Error('Images unavailable'));
   if (decodedPortraits.has(source)) return decodedPortraits.get(source);
   const prepared = new Image();
   prepared.fetchPriority = priority;
   prepared.src = source;
-  const ready = prepared.decode().then(() => prepared).catch(error => {
-    decodedPortraits.delete(source);
-    throw error;
-  });
+  const ready = prepared
+    .decode()
+    .then(() => prepared)
+    .catch((error) => {
+      decodedPortraits.delete(source);
+      throw error;
+    });
   decodedPortraits.set(source, ready);
   return ready;
 }
 
-// Two low-priority downloads at a time avoid competing with the visible scene.
+// A shared queue bounds background traffic even when several scenes warm at once.
+const warmQueue = [];
+const warming = new Map();
+let activeWarmers = 0;
+function drainWarmQueue() {
+  while (activeWarmers < 2 && warmQueue.length) {
+    const { source, resolve } = warmQueue.shift();
+    activeWarmers += 1;
+    preparePortrait(source, 'low')
+      .catch(() => {})
+      .finally(() => {
+        activeWarmers -= 1;
+        warming.delete(source);
+        resolve();
+        drainWarmQueue();
+      });
+  }
+}
 export function preloadDialoguePortraits(sources) {
-  const queue = [...new Set(sources)];
-  const worker = async () => {
-    while (queue.length) {
-      try { await preparePortrait(queue.shift(), 'low'); } catch { /* Retry when shown. */ }
-    }
-  };
-  return Promise.all([worker(), worker()]);
+  const pending = [...new Set(sources)].filter(Boolean).map((source) => {
+    if (warming.has(source)) return warming.get(source);
+    if (decodedPortraits.has(source)) return decodedPortraits.get(source).catch(() => {});
+    const ready = new Promise((resolve) => warmQueue.push({ source, resolve }));
+    warming.set(source, ready);
+    return ready;
+  });
+  drainWarmQueue();
+  return Promise.all(pending);
 }
 
 export async function updateDialoguePortrait(image, source) {

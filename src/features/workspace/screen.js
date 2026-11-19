@@ -6,6 +6,7 @@ import { renderUtility } from './views.js';
 import { renderBuildPage } from './build-view.js';
 import { workspaceStages } from './config.js';
 import { escapeHTML as e } from '../../shared/html.js';
+import { renderStudioPage } from './page-frame.js';
 
 export function renderWorkspace(
   state,
@@ -18,18 +19,23 @@ export function renderWorkspace(
 ) {
   const route = designRoute(state.experience);
   if (error)
-    return `<section class="entry-shell"><h1 id="setup-title" tabindex="-1">${e(route.heading)} needs attention</h1><p role="status">${e(error)}</p><button type="button" data-action="reset-workspace">${e(route.restartLabel)}</button><a href="?view=home">Return home</a></section>`;
+    return `<section class="entry-shell"><h1 id="setup-title" tabindex="-1">${e(route.heading)} needs attention</h1><p role="status">${e(error)}</p><button type="button" data-action="reset-workspace">${e(route.restartLabel)}</button></section>`;
   const panel = state.designPanel;
   const tabs = workspaceStages;
   let body = renderUtility(state, ai, ui);
   if (ui.screen === 'preview')
-    body = `<section class="workspace-view workspace-page"><header class="design-page-heading"><h2 id="workspace-view-title" tabindex="-1">${workspacePreview(state, designPage).label}</h2></header><div class="workspace-view-body">${renderWorkspacePreview(state, designPage, ui)}</div><footer class="workspace-action-bar workspace-view-back"><button type="button" data-workspace-view="work">Back to my work</button></footer></section>`;
+    body = renderStudioPage({
+      title: workspacePreview(state, designPage).label,
+      content: renderWorkspacePreview(state, designPage, ui),
+      back: '<button type="button" data-workspace-view="work">Back</button>',
+      actionClass: 'workspace-view-back',
+    });
   if (!body && panel === 'babbage') body = renderPartner(state, ai, partnerPage, '', ui);
-  else if (!body && panel === 'reason') body = renderReview(state, ai, reviewPage, '');
+  else if (!body && panel === 'reason') body = renderReview(state, ai, reviewPage, '', ui);
   else if (!body) body = renderBuildPage(state, ai, designPage);
   if (state.saveNotice)
     body = body.replaceAll('Saved in this browser.</span>', 'Not saved in this browser.</span>');
-  return `<section class="workspace-shell workspace-shell--focused" aria-labelledby="setup-title"><div class="workspace-tabs" role="tablist" aria-label="${e(route.navigation)}">${tabs.map(([id, label]) => `<button type="button" role="tab" id="workspace-tab-${id}" aria-controls="workspace-panel" aria-selected="${panel === id}" tabindex="${panel === id ? 0 : -1}" data-workspace-panel="${id}">${label}</button>`).join('')}<button type="button" class="workspace-tabs-option" data-workspace-view="options" aria-label="${e(route.options)}">Options</button></div><header class="workspace-heading"><h1 id="setup-title" tabindex="-1">${e(route.heading)}</h1></header><div class="workspace-messages"><p class="design-notice" role="status" aria-live="polite"></p><p class="save-notice" role="status" aria-live="polite">${e(state.saveNotice)}</p></div><div id="workspace-panel" role="tabpanel" aria-labelledby="workspace-tab-${panel}">${body}</div><p class="workspace-privacy">Saved in this browser.</p></section>`;
+  return `<section class="workspace-shell workspace-shell--focused" aria-labelledby="setup-title"><div class="workspace-tabs" role="tablist" aria-label="${e(route.navigation)}">${tabs.map(([id, label], index) => `<button type="button" role="tab" id="workspace-tab-${id}" aria-controls="workspace-panel" aria-selected="${panel === id}" tabindex="${panel === id ? 0 : -1}" data-workspace-panel="${id}"><span class="studio-stage-number">${index + 1}</span>${label}</button>`).join('')}</div><header class="workspace-heading"><h1 id="setup-title" tabindex="-1">${e(route.heading)}</h1></header><div class="workspace-messages"><p class="design-notice" role="status" aria-live="polite"></p><p class="save-notice" role="status" aria-live="polite">${e(state.saveNotice)}</p></div><div id="workspace-panel" role="tabpanel" aria-labelledby="workspace-tab-${panel}">${body}</div><p class="workspace-privacy">Saved in this browser.</p></section>`;
 }
 export function renderDraftPreview(text, empty = 'Write directions to see them here.') {
   return text.trim() ? renderAssignmentDirections(text) : `<p>${e(empty)}</p>`;
