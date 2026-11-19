@@ -30,3 +30,11 @@ Journey checks cover both studios, story replay, keyboard navigation, focus rest
 Generated screenshots and reports are kept in ignored `artifacts/editorial-*` folders. All changes remain on the preview branch; production is not merged or deployed.
 
 Final verification passed: 25 offline suites and static-server checks; 774 screenshots at six viewport sizes with no reported layout, text-size, contrast, or framed-surface failures; both shared design journeys and real HTML/Canvas CSV downloads; all seven story steps and saved-design replay; keyboard dropdowns and dialog focus restoration; and Idea Lab filtering, paging, details, and adaptation. Ordinary text is checked at 7:1, above the requested AA minimum. The final full inventory is in `artifacts/editorial-verified-audit`, with route downloads in `artifacts/editorial-final-routes/downloads` and focused navigation, story, accessibility, and Idea Lab evidence in the corresponding `editorial-*` folders.
+
+## Menu structure follow-up
+
+The global menu now separates the two design journeys, work/tools, and help into three semantic groups. The journey links carry the main visual emphasis; Home and support links stay quieter. The open menu has an explicit Close control and a navy focus outline that remains visible on the gold home page.
+
+Explore / Build / Review sit together in a full-width navy navigation band. Numbered section choices align below it, and a single rule groups task tools and save status above Back / Continue. Information topics use a consistent numbered index. Idea Lab uses its labelled learning-focus dropdown at every width, replacing the duplicate category sidebar. These navigation rules live in `src/styles/navigation-structure.css`.
+
+This follow-up passes 25 offline suites, static hosting checks, six-size keyboard menu checks, both design journeys and real guide downloads. Its visual inventory contains 516 captures across desktop, phone, small phone, and landscape, with no reported layout, contrast, text-size, or framed-surface failures. Evidence is in ignored `artifacts/menu-structure-*` folders. Submission uses the existing `chatmt-browser-test` preview PR; production remains outside the submission scope.

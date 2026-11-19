@@ -49,3 +49,5 @@ Scenario-specific guide content lives in `src/features/opening/guide-content.js`
 The main menu's component styles live in `src/styles/entry.css`; older menu passes have been removed from the shared override files. `src/shared/narration.js` owns cancellable device speech, and `narration-controls.js` updates the shared controls. `src/features/opening/narration.js` maps authored scenario content to speech without owning persistence. Opening and completion share the classroom renderer and audio controls. See the [menu and story audit](menu-story-audit-20261119.md) for replay preservation, accessibility, and listening-verification limits.
 
 `src/shared/dropdown.js` supplies the shared site, activity, and guide menus. `src/styles/editorial.css` owns the current full-bleed visual theme, loaded after compatibility styles. See the [editorial design notes](editorial-design-20261119.md) for the current appearance and verification scope.
+
+`src/styles/navigation-structure.css` groups the global menu, anchors the stage navigation, aligns topic indexes and task actions, and keeps Idea Lab's learning-focus dropdown visible without a duplicate sidebar.

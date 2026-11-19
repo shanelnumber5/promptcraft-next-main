@@ -9,6 +9,7 @@ export function mountDropdowns(root = document) {
   const close = (menu, focus = false) => {
     const toggle = menu.querySelector('[data-dropdown-toggle]');
     toggle.setAttribute('aria-expanded', 'false');
+    if (toggle.dataset.closedLabel) toggle.textContent = toggle.dataset.closedLabel;
     const panel = menu.querySelector('.dropdown-panel');
     if (panel.isConnected && panel.matches(':popover-open')) panel.hidePopover();
     panel.hidden = true;
@@ -19,6 +20,7 @@ export function mountDropdowns(root = document) {
     const toggle = menu.querySelector('[data-dropdown-toggle]'),
       panel = menu.querySelector('.dropdown-panel');
     toggle.setAttribute('aria-expanded', 'true');
+    if (toggle.dataset.openLabel) toggle.textContent = toggle.dataset.openLabel;
     panel.hidden = false;
     panel.style.maxHeight = '';
     panel.showPopover?.();

@@ -11,6 +11,7 @@ module.exports = async ({send,evaluate,waitFor,key,keyboardReach,accessibleScree
     await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<600});
     await go('?view=lab&mockBabbage=1');
     assert.equal(await evaluate('document.querySelectorAll(".lab-card").length'),6);
+    assert(await evaluate('document.getElementById("idea-category").getClientRects().length>0 && getComputedStyle(document.querySelector(".lab-sidebar")).display==="none"'),'One visible learning-focus dropdown replaces the duplicate category sidebar');
     const footer=await evaluate('(()=>{const r=document.querySelector(".lab-footer").getBoundingClientRect();return {top:r.top+scrollY,height:r.height,bottom:r.bottom+scrollY};})()');
     assert.equal(footer.height,72);
     if (height >= 650) assert(footer.bottom<=height,`${device}: footer stays in the viewport`);

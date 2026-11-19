@@ -75,6 +75,12 @@ module.exports = async ({
     }
     const before = await evaluate('localStorage.getItem("promptcraft_assignment_workspace_v1")');
     await openMenu();
+    assert(
+      await evaluate(
+        'document.querySelectorAll("#site-menu-panel > .site-menu-group").length===3 && document.getElementById("site-menu-toggle").textContent.trim()==="Close"',
+      ),
+      'Menu groups journeys, work, and help and provides an explicit close control',
+    );
     assert(await fits('#site-menu-panel'), 'Global menu fits ' + name);
     assert(
       await evaluate(
