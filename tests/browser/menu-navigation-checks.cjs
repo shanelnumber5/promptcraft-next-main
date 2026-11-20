@@ -46,13 +46,26 @@ module.exports = async ({
         );
         await go('home');
       }
-      assert(
-        (await fits('.home-path--story')) && (await fits('.home-path--workspace')),
-        'Both starting choices are visible without scrolling: ' + name,
+      assert.equal(
+        await evaluate('document.querySelectorAll(".home-paths a:not(.home-path--resume)").length'),
+        4,
+        'Home exposes both journeys and its two supporting destinations',
       );
+      for (const selector of [
+        '.home-path--story',
+        '.home-path--workspace',
+        '.home-path--lab',
+        '.home-path--guide',
+      ]) {
+        await keyboardReach(selector);
+        assert(
+          await fits(selector),
+          'Keyboard focus brings each destination into view: ' + name + '/' + selector,
+        );
+      }
       assert(
         await evaluate(
-          `(()=>{const frame=document.querySelector('.home-studio').getBoundingClientRect(),link=getComputedStyle(document.querySelector('.home-path--story'));return frame.left===0 && Math.abs(frame.right-innerWidth)<1 && link.borderRadius==='0px' && link.boxShadow==='none' && parseFloat(link.borderTopWidth)===0 && link.backgroundColor==='rgba(0, 0, 0, 0)';})()`,
+          `(()=>{const frame=document.querySelector('.home-studio').getBoundingClientRect(),link=getComputedStyle(document.querySelector('.home-path--story'));return frame.left===0 && Math.abs(frame.right-document.documentElement.clientWidth)<1 && link.borderRadius==='0px' && link.boxShadow==='none' && parseFloat(link.borderTopWidth)===0 && link.backgroundColor==='rgba(0, 0, 0, 0)';})()`,
         ),
         'Home is a full-bleed index without cards',
       );
@@ -63,15 +76,19 @@ module.exports = async ({
         'No starting choice is clipped by its frame: ' + name + '/' + saved,
       );
       assert(
-        await evaluate('document.documentElement.scrollHeight<=innerHeight+1'),
-        'Home does not scroll: ' + name + '/' + saved,
+        await evaluate('document.documentElement.scrollWidth<=innerWidth'),
+        'The reference layout scrolls vertically without horizontal overflow',
       );
       assert(
         !(await evaluate(
           '!!document.querySelector(".home-eyebrow,.home-path-action,.studio-step")',
         )),
       );
+      await evaluate('scrollTo(0,0)');
       await shot(name + '-home-' + (saved ? 'saved' : 'fresh'));
+      await evaluate('document.querySelector(".home-studio").scrollIntoView()');
+      await shot(name + '-home-index-' + (saved ? 'saved' : 'fresh'));
+      await evaluate('scrollTo(0,0)');
     }
     const before = await evaluate('localStorage.getItem("promptcraft_assignment_workspace_v1")');
     await openMenu();
@@ -145,7 +162,7 @@ module.exports = async ({
     );
     console.log(
       name +
-        ' PASS: visible home choices, no home scrolling, keyboard dropdowns, Escape, outside click, navigation, preview and preserved draft.',
+        ' PASS: all editorial home choices reachable, keyboard dropdowns, Escape, outside click, navigation, preview and preserved draft.',
     );
   }
   // A narrow, short viewport may scroll rather than clipping text at enlarged layouts.
