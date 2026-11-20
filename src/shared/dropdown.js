@@ -30,7 +30,10 @@ export function mountDropdowns(root = document) {
       up = below < Math.min(panel.scrollHeight, 320) && above > below;
     panel.style.maxHeight = Math.max(80, (up ? above : below) - 8) + 'px';
     const bounds = panel.getBoundingClientRect();
-    panel.style.left = Math.max(12, Math.min(r.left, innerWidth - bounds.width - 12)) + 'px';
+    panel.style.left =
+      panel.id === 'site-menu-panel'
+        ? '0px'
+        : Math.max(12, Math.min(r.left, innerWidth - bounds.width - 12)) + 'px';
     panel.style.top = (up ? Math.max(12, r.top - bounds.height - 8) : r.bottom + 8) + 'px';
   };
   root.addEventListener('click', (event) => {

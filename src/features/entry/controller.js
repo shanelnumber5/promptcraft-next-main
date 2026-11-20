@@ -2,6 +2,7 @@ import { mountHomeInteractions } from './home-interactions.js';
 import { renderHome } from './screen.js';
 import { infoPages, mountInfoPage } from './info-screen.js';
 import { resumePath } from '../workspace/storage.js';
+import { syncPublicNavigation } from '../../shared/public-navigation.js';
 
 export function mountInformation(app, view) {
   let dispose = null;
@@ -15,11 +16,7 @@ export function mountInformation(app, view) {
       app.innerHTML = renderHome(resumePath());
       dispose = mountHomeInteractions(app);
     } else dispose = mountInfoPage(app, nextView);
-    infoNav.querySelectorAll('a[href^="?view="]').forEach((link) => {
-      if (new URL(link.href).searchParams.get('view') === nextView)
-        link.setAttribute('aria-current', 'page');
-      else link.removeAttribute('aria-current');
-    });
+    syncPublicNavigation(nextView);
     const picker = infoNav.querySelector('.info-nav-select');
     if (picker) picker.value = nextView;
     const heading = app.querySelector('h1');

@@ -1,14 +1,14 @@
-/* The entry is a full-bleed editorial spread, with an illustrated field and a numbered index. */
+/* Home follows the reference's navy introduction and gold destination index. */
 body[data-app-view][data-app-view='home'] {
-  background: #f3bf4b;
+  background: #1e2d59;
   min-height: 100svh;
-  height: 100svh;
+  height: auto;
+  overflow: auto;
 }
 body[data-app-view][data-app-view='home'] #app {
   width: 100%;
   max-width: none;
-  flex: 1;
-  min-height: 0;
+  flex: 1 0 auto;
   margin: 0;
   padding: 0;
   display: flex;
@@ -17,72 +17,79 @@ body[data-app-view='home'] .home-shell {
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-height: 0;
   gap: 0;
+  min-height: 0;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+.home-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  min-height: clamp(420px, 65svh, 760px);
+  background: #1e2d59;
+  color: #fff;
+  overflow: hidden;
+  width: 100%;
 }
 body[data-app-view='home'] .home-shell .info-heading {
   height: auto;
   margin: 0;
-  padding: clamp(16px, 2.5vw, 40px) clamp(24px, 5vw, 80px);
-  flex: none;
+  padding: clamp(24px, 4vw, 64px) 0 48px var(--editorial-gutter);
+  align-self: center;
+  display: block;
 }
 body[data-app-view='home'] .home-shell .info-heading h1 {
   font:
-    700 clamp(48px, 8.4vw, 144px) / 0.95 Georgia,
+    700 clamp(64px, 8.8vw, 160px) / 0.94 Georgia,
     'Times New Roman',
     serif;
-  letter-spacing: -0.055em;
+  font-size: clamp(64px, 8.8vw, 160px) !important;
+  line-height: 0.95 !important;
+  letter-spacing: -0.06em;
   margin: 0;
-  color: #1e2d59;
+  color: #fff;
 }
-body[data-app-view='home'] .home-studio {
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-  grid-template-rows: auto;
-  flex: 1;
-  height: auto;
-  min-height: 0;
-  gap: 0;
-  padding: 0;
-  border: 0;
-  overflow: hidden;
-  border-radius: 0;
-  background: #f3bf4b;
-  box-shadow: none;
+.home-hero .info-heading .home-introduction {
+  max-width: 38ch;
+  margin: 32px 0 0;
+  font:
+    400 clamp(18px, 1.7vw, 26px) / 1.5 Arial,
+    Helvetica,
+    sans-serif;
+  color: #fff;
 }
 body[data-app-view='home'] .home-studio-intro {
   display: flex;
+  align-self: stretch;
   min-width: 0;
-  min-height: 0;
   padding: 0;
-  background: #f3bf4b;
+  background: transparent;
 }
 .home-classroom {
   position: relative;
-  isolation: isolate;
   display: flex;
   flex: 1;
   align-items: flex-end;
   justify-content: center;
-  height: 100%;
-  min-height: 0;
   margin: 0;
+  min-width: 0;
   overflow: hidden;
-  background: #f3bf4b url('../../assets/backgrounds/classroom.webp') center/cover;
+  background: transparent;
 }
 .home-classroom img {
-  height: 100%;
-  max-height: none;
-  width: 55%;
+  display: block;
+  width: 58%;
   max-width: none;
-  object-fit: cover;
-  object-position: center 24%;
-  flex: 0 0 55%;
+  height: min(64svh, 730px);
+  object-fit: contain;
+  object-position: center bottom;
+  flex: 0 0 58%;
   margin: 0;
   filter: none;
 }
-.home-classroom .home-pixel {
-  margin-left: -12%;
+.home-classroom .home-maya {
+  margin-left: -16%;
 }
 .home-classroom figcaption {
   position: absolute;
@@ -91,152 +98,210 @@ body[data-app-view='home'] .home-studio-intro {
   overflow: hidden;
   clip-path: inset(50%);
 }
-body[data-app-view='home'] .home-studio .home-choices {
-  display: flex;
+body[data-app-view='home'] .home-studio {
+  display: block;
+  flex: none;
+  height: auto;
   min-height: 0;
-  flex-direction: column;
-  justify-content: center;
-  padding: 24px clamp(24px, 5vw, 80px);
-  gap: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: #f3bf4b;
+  box-shadow: none;
+  overflow: visible;
+}
+body[data-app-view='home'] .home-studio .home-choices {
+  display: block;
+  padding: clamp(32px, 4vw, 64px) var(--editorial-gutter);
   background: #f3bf4b;
 }
 body[data-app-view='home'] .home-studio .home-paths {
   display: grid;
-  grid-template-rows: auto;
-  gap: clamp(24px, 4vh, 48px);
-  min-height: 0;
-  counter-reset: journey;
+  grid-template-rows: none;
+  grid-auto-rows: auto;
+  align-items: start;
+  gap: clamp(36px, 4vw, 64px);
 }
 body[data-app-view='home'] .home-studio .home-path {
   display: grid;
-  grid-template-columns: 32px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: clamp(24px, 6vw, 96px);
   align-items: baseline;
-  gap: 12px;
   padding: 0;
   margin: 0;
+  border: 0;
+  border-radius: 0;
   background: transparent;
   color: #1e2d59;
+  text-decoration: none;
+}
+body[data-app-view='home'] .home-studio .home-path::before {
+  content: none;
+}
+body[data-app-view='home'] .home-studio .home-path h2 {
+  display: block;
+  font:
+    700 clamp(34px, 4.5vw, 72px) / 1.04 Georgia,
+    'Times New Roman',
+    serif;
+  letter-spacing: -0.04em;
+  color: #1e2d59;
+  margin: 0;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+body[data-app-view='home'] .home-studio .home-path-description {
+  display: block;
+  font:
+    400 clamp(16px, 1.5vw, 20px) / 1.5 Arial,
+    Helvetica,
+    sans-serif;
+  color: #1e2d59;
+  max-width: 40ch;
+  margin: 0 0 20px;
+}
+body[data-app-view='home'] .home-studio .home-path--secondary h2 {
+  font-size: clamp(28px, 3.3vw, 52px);
+}
+body[data-app-view='home'] .home-studio .home-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 48px;
+  padding: 12px 20px;
+  background: #1e2d59;
+  color: #fff;
   border: 0;
   border-radius: 0;
   text-decoration: none;
-  counter-increment: journey;
-}
-body[data-app-view='home'] .home-studio .home-path::before {
-  content: counter(journey, decimal-leading-zero);
   font:
-    400 18px/1.4 Arial,
+    700 16px/1.4 Arial,
     Helvetica,
     sans-serif;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+body[data-app-view='home'] .home-studio .home-action:hover {
+  background: #15213f;
 }
 body[data-app-view='home'] .home-studio .home-path--resume {
+  justify-self: start;
+}
+.home-explore {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-top: 24px;
+}
+body[data-app-view='home'] .home-shell .info-heading h1 > span {
   display: block;
-  counter-increment: none;
-  padding: 0;
-  background: transparent;
-  border: 0;
-  text-align: left;
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+body[data-app-view='home'] .home-explore .home-jump {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 48px;
+  padding: 12px 20px;
   font:
-    400 16px/1.4 Arial,
+    700 16px/1.4 Arial,
     Helvetica,
     sans-serif;
-}
-body[data-app-view='home'] .home-studio .home-path--resume::before {
-  content: none;
-}
-body[data-app-view='home'] .home-studio .home-path:hover {
-  background: transparent;
   color: #1e2d59;
+  background: #f3bf4b;
+  text-decoration: none;
 }
-body[data-app-view='home'] .home-studio .home-path:hover strong,
-body[data-app-view='home'] .home-studio .home-path--resume:hover {
-  text-decoration: underline;
-  text-underline-offset: 6px;
+.home-explore p {
+  font:
+    400 16px/1.5 Arial,
+    Helvetica,
+    sans-serif;
+  margin: 0;
+  color: #fff;
 }
-body[data-app-view='home'] .home-studio .home-path strong {
-  display: block;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(28px, 3vw, 48px);
-  font-weight: 700;
-  line-height: 1.08;
-  letter-spacing: -0.03em;
-  color: #1e2d59;
-}
-body[data-app-view='home'] .home-studio .home-path span span {
-  display: block;
-  margin-top: 12px;
-  font-size: 16px;
-  color: #1e2d59;
-  line-height: 1.45;
+body[data-app-view='home'] .home-explore .home-jump:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 4px;
 }
 body[data-app-view='home'] .home-studio a:focus-visible {
   outline: 3px solid #1e2d59 !important;
-  outline-offset: 6px;
+  outline-offset: 8px;
 }
 @media (max-width: 700px) {
+  .home-hero {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
   body[data-app-view='home'] .home-shell .info-heading {
-    padding: 16px 24px;
+    padding: 24px 24px 0;
   }
   body[data-app-view='home'] .home-shell .info-heading h1 {
-    font-size: clamp(40px, 11vw, 64px);
+    font-size: clamp(56px, 15vw, 100px) !important;
   }
-  body[data-app-view='home'] .home-studio {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(76px, 1fr) auto;
+  .home-hero .info-heading .home-introduction {
+    margin-top: 24px;
   }
-  body[data-app-view='home'] .home-studio-intro {
-    grid-row: 1;
-  }
-  body[data-app-view='home'] .home-studio .home-choices {
-    grid-row: 2;
-    padding: 20px 24px;
-  }
-  body[data-app-view='home'] .home-studio .home-paths {
-    gap: 20px;
-  }
-  body[data-app-view='home'] .home-studio .home-path {
-    grid-template-columns: 24px minmax(0, 1fr);
+  .home-explore {
     gap: 8px;
+    margin-top: 16px;
   }
-  body[data-app-view='home'] .home-studio .home-path strong {
-    font-size: clamp(26px, 7vw, 36px);
-  }
-  body[data-app-view='home'] .home-studio .home-path span span {
-    margin-top: 6px;
+  .home-classroom {
+    margin-top: 24px;
+    padding-left: 20%;
   }
   .home-classroom img {
-    object-position: center 14%;
-  }
-}
-@media (max-height: 499px) and (min-width: 701px) {
-  body[data-app-view='home'] .home-shell .info-heading {
-    padding: 8px 24px;
-  }
-  body[data-app-view='home'] .home-shell .info-heading h1 {
-    font-size: 64px;
-  }
-  body[data-app-view='home'] .home-studio {
-    grid-template-columns: 180px minmax(0, 1fr);
+    height: clamp(210px, 65vw, 340px);
   }
   body[data-app-view='home'] .home-studio .home-choices {
-    padding: 12px 24px;
+    padding: 32px 24px 40px;
   }
   body[data-app-view='home'] .home-studio .home-paths {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
+    gap: 40px;
   }
-  body[data-app-view='home'] .home-studio .home-path--resume {
-    grid-column: 1 / -1;
+  body[data-app-view='home'] .home-studio .home-path {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
   }
-  body[data-app-view='home'] .home-studio .home-path strong {
-    font-size: 26px;
+  body[data-app-view='home'] .home-studio .home-path h2 {
+    font-size: clamp(32px, 8vw, 48px);
+  }
+  body[data-app-view='home'] .home-studio .home-path--secondary h2 {
+    font-size: clamp(28px, 7vw, 40px);
   }
 }
-@media (max-width: 700px) and (max-height: 499px) {
-  body[data-app-view][data-app-view='home'] {
-    height: auto;
+@media (max-height: 500px) and (min-width: 701px) {
+  .home-hero {
+    min-height: 320px;
   }
-  body[data-app-view='home'] .home-studio {
-    flex: none;
-    grid-template-rows: 100px auto;
+  body[data-app-view='home'] .home-shell .info-heading {
+    padding-block: 24px;
+  }
+  body[data-app-view='home'] .home-shell .info-heading h1 {
+    font-size: 72px;
+  }
+  .home-hero .info-heading .home-introduction {
+    margin-top: 16px;
+    font-size: 18px;
+  }
+  .home-classroom img {
+    height: 320px;
+  }
+}
+body[data-app-view='home'] .home-shell .info-heading h1 > span {
+  color: #fff !important;
+}
+@media (max-height: 500px) {
+  body[data-app-view='home'] .home-shell .info-heading {
+    padding-block: 16px;
+  }
+  body[data-app-view='home'] .home-shell .info-heading h1 {
+    font-size: 48px !important;
+  }
+  body[data-app-view='home'] .home-explore {
+    margin-top: 12px;
   }
 }
