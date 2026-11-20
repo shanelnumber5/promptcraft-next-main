@@ -690,6 +690,7 @@ body[data-app-view] .app-header .public-navigation {
   padding: 0;
   margin-top: 16px;
 }
+body[data-app-view][data-info-reader] > header.app-header .public-navigation a.public-nav-button,
 body[data-app-view] .app-header .public-navigation a.public-nav-button {
   background: transparent !important;
   color: var(--reference-navy) !important;
@@ -733,4 +734,16 @@ body[data-app-view='workspace'] #app #workspace-panel .studio-secondary-actions 
 }
 body[data-app-view] #app .focused-scene:not(.focus--dialogue) .classroom:after {
   display: none !important;
+}
+
+body[data-app-view][data-info-reader] > header.app-header .public-navigation a.public-nav-button:is([aria-current="page"], :hover) {
+  background: transparent !important;
+  color: var(--reference-navy) !important;
+  text-decoration: underline !important;
+  text-decoration-color: var(--reference-gold) !important;
+  text-underline-offset: 6px !important;
+}
+body[data-app-view] .public-navigation a.public-nav-button:focus-visible {
+  outline: 3px solid var(--reference-navy) !important;
+  outline-offset: 4px;
 }
