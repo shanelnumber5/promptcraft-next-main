@@ -187,4 +187,23 @@ body :is(h1,h2,h3,h4,h5,h6) { font-family:Georgia,'Times New Roman',serif !impor
 .assignment-rubric thead {background:#12355b;color:#fff}
 .assignment-rubric tbody th {background:#f5f9fc}
 .rubric-table-scroll {overflow-x:auto}
-.rubric-score{display:block;width:fit-content;padding:6px 10px;margin:0 0 16px;background:#eef4f9;border:1px solid #12355b;border-radius:4px;font:bold 16px Arial;color:#12355b}.rubric-descriptor{line-height:1.6}.rubric-download a{display:inline-block;padding:12px;border:2px solid #12355b;border-radius:4px;font-weight:bold}.guide-preview-toolbar{flex-wrap:wrap}@media print{.rubric-download{display:none}}`;
+.rubric-score{display:block;width:fit-content;padding:6px 10px;margin:0 0 16px;background:#eef4f9;border:1px solid #12355b;border-radius:4px;font:bold 16px Arial;color:#12355b}.rubric-descriptor{line-height:1.6}.rubric-download a{display:inline-block;padding:12px;border:2px solid #12355b;border-radius:4px;font-weight:bold}.guide-preview-toolbar{flex-wrap:wrap}@media print{.rubric-download{display:none}}
+/* The export uses the same editorial hierarchy with offline-safe font fallbacks. */
+body{background:#f6f1e7;color:#182342;font:17px/1.65 Arial,Helvetica,sans-serif;padding:0}
+main{max-width:none;margin:0}
+.guide-brand{background:#202d56!important;color:#fff!important;padding:24px clamp(20px,5vw,72px)!important}
+.guide-brand small{color:#fff!important}
+.guide-heading,.workspace-guide .guide-heading{background:#202d56!important;color:#fff!important;padding:40px clamp(20px,5vw,72px)!important;border:0}
+.guide-heading h1{font-size:clamp(38px,6vw,80px);line-height:1.05;letter-spacing:-.04em;max-width:20ch;font-weight:400}
+.guide-heading p,.workspace-guide .guide-heading p:first-of-type{color:#fff!important}
+.guide-section{margin:0;border:0;background:transparent}
+.guide-section>section,.assignment-content,.guide-section>.guide-sources{padding:32px clamp(20px,5vw,72px)!important;background:transparent;border:0;border-bottom:1px solid #18234230;border-radius:0;box-shadow:none}
+.assignment-banner{background:transparent!important;color:#182342!important;padding:32px clamp(20px,5vw,72px) 0!important;border:0}
+.assignment-banner h2{color:#182342!important;font-size:30px}
+.guide-section h2{border:0;font-size:30px}
+.guide-section h3{font-size:23px}
+.guide-section :is(.rationale,.guide-decision){background:transparent;border:0;border-bottom:1px solid #18234230;border-radius:0;box-shadow:none;padding:20px 0}
+.assignment-rubric thead{background:#202d56;color:white}.rubric-score{border:0;border-bottom:2px solid #d98f06;border-radius:0;background:transparent;padding:4px 0}
+@media(max-width:600px){body{font-size:16px}.guide-heading h1{font-size:38px}.assignment-rubric{min-width:680px}}
+@media print{body{background:#fff}.guide-brand,.guide-heading,.workspace-guide .guide-heading{background:white!important;color:#182342!important;padding:20px!important}.guide-heading p,.workspace-guide .guide-heading p:first-of-type,.guide-brand small{color:#182342!important}.guide-heading h1{font-size:36px}.guide-section>section,.assignment-content,.guide-section>.guide-sources{padding:20px!important}.assignment-rubric{min-width:0;font-size:12px}.assignment-rubric th,.assignment-rubric td{padding:8px}thead{display:table-header-group}}
+`;

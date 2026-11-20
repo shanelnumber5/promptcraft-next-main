@@ -108,7 +108,16 @@ export function renderScene(scenario, scene, state, index, options = {}) {
   const answer = state.answers[scene.id];
   const ready = !showingQuestion || sceneReady(scene, state);
   const isLast = index === scenario.scenes.length - 1;
-  const boardContent = options.boardContent ?? '';
+  const comparing = scene.id === 'revised-plan' && !showingQuestion;
+  const comparisonMode = options.comparisonMode === 'original' ? 'original' : 'revised';
+  const comparisonControls = comparing
+    ? `<div class="reference-comparison"><p>Compare how the group’s roles change after the peer question.</p><div class="reference-comparison-controls" role="group" aria-label="Compare the group plans"><button type="button" data-plan-comparison="original" aria-pressed="${comparisonMode === 'original'}">Original plan</button><button type="button" data-plan-comparison="revised" aria-pressed="${comparisonMode === 'revised'}">Revised plan</button></div><p role="status">${comparisonMode === 'original' ? 'Original plan: Alex takes payments and pours; Sam restocks.' : 'Revised plan: Alex takes payments; Sam serves drinks. Restocking still needs attention.'}</p></div>`
+    : '';
+  const displayedBoard =
+    comparing && comparisonMode === 'original'
+      ? scenario.scenes.find((item) => item.id === 'spot-hole')?.board || scene.board
+      : scene.board;
+  const boardContent = (options.boardContent ?? '') + comparisonControls;
   const nextAction = !showingBoard
     ? 'reveal-board'
     : scene.choice && !showingQuestion
@@ -140,7 +149,7 @@ export function renderScene(scenario, scene, state, index, options = {}) {
         { label: 'Think it through', title: scene.board.title },
         { afterContent: renderChoices(scene.choice, answer) },
       )
-    : renderBoard(scene.board, {
+    : renderBoard(displayedBoard, {
         afterContent:
           boardContent +
           (isLast && options.showHandoff !== false

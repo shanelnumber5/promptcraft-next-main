@@ -26,6 +26,7 @@ const tests = [
   'architecture',
   'scenario-studio',
   'opening-route',
+  'reference-theme',
   'narration',
 ];
 for (const name of tests) {
