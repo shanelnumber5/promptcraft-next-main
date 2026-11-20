@@ -96,3 +96,5 @@ body[data-app-view] #app .focused-scene { display:flex !important; flex-directio
 body[data-app-view] #app .focused-scene:is(.focus--board,.focus--question) .classroom { flex:0 0 auto !important; }
 body[data-app-view] #app .focused-scene .dialogue { flex:0 0 auto !important; position:relative !important; inset:auto !important; }
 body[data-app-view] #app .focused-scene:is(.focus--board,.focus--question) .classroom { display:block !important; }
+body[data-app-view] #app .focused-scene:is(.focus--board,.focus--question) .classroom { height:max-content !important; }
+body[data-app-view] #app .focused-scene :is(.smartboard-stage,.smartboard-stage-board) { height:auto !important; min-height:0 !important; max-height:none !important; }
