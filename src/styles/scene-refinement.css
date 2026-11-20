@@ -1,0 +1,85 @@
+/* Shared narrative, board and workshop surfaces. Content is never height-clipped. */
+body[data-app-view] > header.app-header #site-menu-toggle { color: var(--reference-navy) !important; }
+.reference-art--workshop { overflow: hidden; border-radius: 48% 48% 0 0; margin: 16px 24px; }
+.reference-art--workshop .reference-room { position:absolute; width:100%; height:100%; object-fit:cover; }
+.reference-art--workshop .reference-workshop-pixel { position:relative; height:96%; width:75%; object-fit:contain; align-self:end; }
+.reference-art .reference-machine { width:min(100%,480px); overflow:visible; }
+body[data-app-view] #app .focused-scene:is(.focus--board,.focus--question) .classroom {
+  height:auto !important; min-height: min(62dvh, 660px); max-height:none !important;
+  padding:clamp(24px,4vw,56px) var(--editorial-gutter) !important;
+  overflow:visible !important; display:flex; align-items:center; background:var(--reference-navy) !important;
+}
+body[data-app-view] #app .focused-scene:is(.focus--board,.focus--question) .classroom::before { display:none !important; }
+body[data-app-view] #app .focused-scene .smartboard-stage {
+  width:100%; max-width:1440px; margin:auto; grid-template-columns:minmax(80px,160px) minmax(0,1080px) minmax(80px,160px); gap:20px; align-items:center;
+}
+body[data-app-view] #app .focused-scene .smartboard-stage:has(.choices,.smartboard--reading) { display:block !important; max-width:1100px; }
+body[data-app-view] #app .focused-scene .smartboard-stage:has(.choices,.smartboard--reading) .smartboard-cast { display:none !important; }
+body[data-app-view] #app .focused-scene .smartboard-cast { height:clamp(230px,35vw,420px); }
+body[data-app-view] #app .focused-scene .smartboard-cast .character img { bottom:0; left:50%; transform:translateX(-50%); width:100%; height:100%; object-fit:contain; }
+body[data-app-view] #app .focused-scene .smartboard {
+  height:auto !important; min-height:0 !important; max-height:none !important; overflow:visible !important; margin:0 auto; width:100%; max-width:1100px;
+}
+body[data-app-view] #app .focused-scene .smartboard .board-screen {
+  position:relative; display:block !important; height:auto !important; min-height:0 !important; max-height:none !important;
+  overflow:visible !important; padding:clamp(24px,3vw,44px) !important;
+  background:var(--reference-paper) !important; color:var(--reference-navy) !important;
+  border-top:4px solid var(--reference-gold) !important; border-radius:0 !important;
+}
+body[data-app-view] #app .focused-scene .smartboard .board-heading { margin:0 0 24px !important; width:100%; }
+body[data-app-view] #app .focused-scene .smartboard .board-heading h2 {
+  font-size:clamp(28px,3vw,44px) !important; line-height:1.15 !important; margin:0 !important; max-width:none; color:var(--reference-navy) !important;
+}
+body[data-app-view] #app .focused-scene .smartboard--reading .board-screen {
+  background:transparent !important; border:0 !important; text-align:center; padding:clamp(24px,5vw,64px) 0 !important;
+}
+body[data-app-view] #app .focused-scene .smartboard--reading .board-heading { margin:0 auto 28px !important; max-width:900px; }
+body[data-app-view] #app .focused-scene .smartboard--reading .board-heading h2 {
+  font-size:clamp(34px,4.8vw,68px) !important; text-align:center !important; color:var(--reference-paper) !important; text-wrap:balance;
+}
+body[data-app-view] #app .focused-scene .smartboard--reading :is(.board-text,.board-quote,.board-note) {
+  color:var(--reference-paper) !important; max-width:64ch; margin:20px auto !important; font-size:clamp(18px,2vw,26px) !important; line-height:1.55;
+}
+body[data-app-view] #app .focused-scene .smartboard .service-flow { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; padding:0; margin:16px 0 24px; }
+body[data-app-view] #app .focused-scene .smartboard .service-flow li { padding:0 16px 0 0 !important; border-right:1px solid var(--reference-rule) !important; }
+body[data-app-view] #app .focused-scene .smartboard .service-flow li:last-child { border-right:0 !important; }
+body[data-app-view] #app .focused-scene .smartboard .board-note { margin:24px 0 0; padding-top:18px; border-top:1px solid var(--reference-rule); }
+body[data-app-view] #app .focused-scene .smartboard .reference-comparison { margin-bottom:0; }
+body[data-app-view] #app .focused-scene .smartboard .reference-comparison p { margin:12px 0 0; }
+body[data-app-view] #app .focused-scene.focus--question .smartboard .board-screen { background:transparent !important; color:white !important; border:0 !important; padding:12px 0 !important; }
+body[data-app-view] #app .focused-scene.focus--question .smartboard .board-heading h2 { color:var(--reference-paper) !important; font-size:clamp(28px,3vw,40px) !important; }
+body[data-app-view] #app .focused-scene.focus--question .choices { width:100%; max-width:none; color:white; margin:0; padding:0; }
+body[data-app-view] #app .focused-scene.focus--question .choices legend { color:white !important; font:600 clamp(18px,1.8vw,24px)/1.5 var(--reference-body); padding:0; margin-bottom:24px; }
+body[data-app-view] #app .focused-scene.focus--question .smartboard .choice-list { display:grid; grid-template-columns:1fr; gap:0; }
+body[data-app-view] #app .focused-scene.focus--question .smartboard .choices .choice {
+  color:white !important; background:transparent !important; padding:18px 16px !important; border:0 !important; border-bottom:1px solid #ffffff40 !important; display:flex; gap:16px; align-items:flex-start; font-size:18px; line-height:1.5;
+}
+body[data-app-view] #app .focused-scene.focus--question .smartboard .choices .choice.is-selected { background:#ffffff12 !important; box-shadow:inset 4px 0 var(--reference-gold) !important; }
+body[data-app-view] #app .focused-scene.focus--question .choice input { flex:0 0 22px; width:22px; height:22px; margin-top:3px; accent-color:#f2c14e; }
+body[data-app-view] #app .focused-scene.focus--question .choice:focus-within { outline:2px solid #f2c14e !important; outline-offset:3px; }
+body[data-app-view] #app .focused-scene.focus--question :is(.feedback,.feedback-turn,.feedback-turn p,.feedback-turn strong) { color:white !important; }
+body[data-app-view] #app .focused-scene.focus--question .feedback:not(.has-feedback) { display:none; }
+body[data-app-view] #app .focused-scene.focus--question .feedback.has-feedback { margin:28px 0 0; padding:20px 0 0; border-top:1px solid #ffffff40 !important; }
+body[data-app-view] #app .focused-scene.focus--question .feedback-turn strong { color:#f2c14e !important; }
+/* Welcome aligns with the home introduction; Babbage no longer forces a tall empty header. */
+body[data-app-view='workspace'] #app #workspace-panel .workspace-page:has(.workspace-welcome-board) .design-page-heading { display:block; text-align:center; padding:40px 24px 12px !important; min-height:0 !important; }
+body[data-app-view='workspace'] #app #workspace-panel .workspace-page:has(.workspace-welcome-board) .design-page-heading h2 { max-width:22ch; margin:0 auto !important; text-wrap:balance; }
+body[data-app-view='workspace'] #app #workspace-panel .workspace-page:has(.workspace-welcome-board) .design-page-fields { display:block; padding-top:12px !important; }
+body[data-app-view='workspace'] #app .workspace-welcome-intro { max-width:68ch; margin:0 auto; text-align:center; }
+body[data-app-view='workspace'] #app .workspace-welcome-board { min-height:0 !important; display:block; }
+body[data-app-view='workspace'] #app .workspace-page:has(.workspace-welcome-board) .babbage-presence { display:none; }
+body[data-app-view] dialog { width:min(1180px,calc(100vw - 32px)); max-width:calc(100vw - 32px); max-height:calc(100dvh - 32px); padding:0; border:1px solid var(--reference-navy); background:var(--reference-paper); color:var(--reference-navy); }
+body[data-app-view] dialog > header { background:var(--reference-navy) !important; color:white !important; padding:20px 28px; border-bottom:3px solid var(--reference-gold); }
+body[data-app-view] dialog > header :is(h2,button) { color:white !important; }
+body[data-app-view] dialog > footer { padding:18px 28px; background:var(--reference-paper); border-top:1px solid var(--reference-rule); }
+@media(max-width:900px) {
+ body[data-app-view] #app .focused-scene .smartboard-stage { display:block; }
+ body[data-app-view] #app .focused-scene .smartboard-cast { display:none; }
+}
+@media(max-width:650px) {
+ body[data-app-view] #app .focused-scene .smartboard .service-flow { grid-template-columns:1fr; gap:20px; }
+ body[data-app-view] #app .focused-scene .smartboard .service-flow li { border-right:0 !important; border-bottom:1px solid var(--reference-rule) !important; padding:0 0 18px !important; }
+ body[data-app-view] #app .focused-scene.focus--question .smartboard .choices .choice { font-size:16px; padding:16px 12px !important; }
+ body[data-app-view] #app .focused-scene .scene-actions { padding:16px 20px !important; }
+ body[data-app-view] dialog > :is(header,footer) { padding:16px 20px; }
+}
