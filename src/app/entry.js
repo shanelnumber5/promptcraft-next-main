@@ -1,8 +1,9 @@
-import { campusSignature } from '../shared/lab-visuals.js';
 import { rememberPath } from '../features/workspace/storage.js';
 import { infoPages } from '../features/entry/info-screen.js';
 import { mountDropdowns } from '../shared/dropdown.js';
+import { mountPublicNavigation, syncPublicNavigation } from '../shared/public-navigation.js';
 mountDropdowns();
+mountPublicNavigation();
 const params = new URLSearchParams(window.location.search);
 const requested = params.get('view');
 const view = [
@@ -20,13 +21,7 @@ document.body.dataset.appView = view === 'scenario' ? 'workspace' : view;
 const app = document.getElementById('app');
 if (['home', 'guide', 'lab', ...infoPages.map(([id]) => id)].includes(view))
   document.body.dataset.infoReader = '';
-if (['home', 'guide', 'lab'].includes(view) || infoPages.some(([id]) => id === view)) {
-  document.querySelector('.header-actions').insertAdjacentHTML('beforeend', campusSignature());
-}
-document.querySelectorAll('#site-menu-panel a[href^="?"]').forEach((link) => {
-  if (new URL(link.href).searchParams.get('view') === view)
-    link.setAttribute('aria-current', 'page');
-});
+syncPublicNavigation(view);
 const restart = document.querySelector('[data-action="restart-module"]');
 if (params.get('mockBabbage') === '1')
   document.addEventListener('click', (event) => {
