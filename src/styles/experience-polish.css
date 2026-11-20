@@ -152,3 +152,6 @@ body[data-app-view] > header.app-header .brand { flex:0 0 auto; }
 body[data-app-view] > header.app-header .public-navigation { margin-left:auto; order:1; }
 body[data-app-view] > header.app-header .header-actions { order:2; margin-left:12px; }
 body[data-app-view='workspace'] #app #workspace-panel .workspace-check-item { padding:16px 0; }
+body[data-app-view] #app .focused-scene .scene-actions button.nav-button.nav-button--back { background:transparent !important; color:#12355b !important; }
+body[data-app-view] #app .focused-scene .scene-actions button.primary.nav-button.nav-button--next { background:#12355b !important; color:#fff !important; }
+body[data-app-view] #app .focused-scene .scene-actions button.nav-button span { color:inherit !important; -webkit-text-fill-color:inherit !important; }
