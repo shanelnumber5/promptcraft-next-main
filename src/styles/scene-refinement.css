@@ -90,3 +90,5 @@ body[data-app-view] #app .focused-scene .smartboard { aspect-ratio:auto !importa
 body[data-app-view] #app .focused-scene .smartboard .board-screen { flex:none !important; }
 body[data-app-view]:not([data-app-view='']):has(.focused-scene) #site-menu-toggle { color:var(--reference-navy) !important; }
 .reference-machine :is(.brass-cw,.brass-ccw) { transform-box:view-box; transform-origin:0 0; }
+body[data-app-view='workspace'] #app #workspace-panel .workspace-welcome-board { width:100%; max-width:760px; margin:0 auto !important; }
+body[data-app-view='workspace'] #app #workspace-panel .workspace-welcome-intro { max-width:68ch; margin:0 auto !important; }
