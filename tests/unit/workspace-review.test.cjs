@@ -180,17 +180,12 @@ const assert = require('node:assert/strict');
   );
 
   const checks = renderReview(state, { pending: false }, 'checks');
-  assert(checks.includes(state.design.revision) && checks.includes('id="check-activity"') && !checks.includes('href="#check-activity"'));
+  assert(checks.includes('data-workspace-view="preview"') && !checks.includes('id="check-activity"'), 'Directions open on demand instead of crowding final checks');
   assert(
     checks.includes('data-action="preview-guide"') &&
       checks.includes('data-action="download-guide"'),
   );
-  const checkFooter = checks.slice(checks.indexOf('<footer class="workspace-action-bar'));
-  assert(
-    checkFooter.includes('data-action="preview-guide"') &&
-      checkFooter.includes('data-action="download-guide"'),
-    'Guide controls are in the gold footer',
-  );
+  assert(checks.includes('Download Course Guide'), 'Download stays visible in the main review area');
   assert.equal((checks.match(/data-action="preview-guide"/g) || []).length, 1);
   assert.equal((checks.match(/data-action="download-guide"/g) || []).length, 1);
 
@@ -315,21 +310,14 @@ const assert = require('node:assert/strict');
     'A compiled draft proceeds to its rubric without another rewrite',
   );
   assert(draftPage.includes('data-action="compile-activity"'), 'A compiled draft can be rebuilt');
-  assert(
-    course.indexOf('id="daysAvailable"') < course.indexOf('workspace-course-long'),
-    'All short course fields are in the left column',
-  );
-  assert(
-    course.indexOf('id="learningGoal"') > course.indexOf('workspace-course-long'),
-    'Larger fields are on the right',
-  );
+  assert(course.includes('id="daysAvailable"') && !course.includes('id="learningGoal"'), 'Timing and learning goal have separate focused pages');
   assert(
     requirements.includes('name="aiUse"') && !requirements.includes('open-ai-use-popup'),
     'AI-use choices stay inside Build',
   );
   assert(
-    requirements.includes('data-rubric-preference'),
-    'Rubric preference is an inline optional choice',
+    !requirements.includes('data-rubric-preference'),
+    'Rubric drafting no longer requires another checkbox',
   );
   assert(
     renderPartner(buildState, { pending: true, configured: true }, 'work', '', {
@@ -656,9 +644,9 @@ const assert = require('node:assert/strict');
     showTeachingNotes: true,
   });
   assert(
-    noteUI.includes('data-review-page="rubric"') &&
+    !noteUI.includes('data-review-page="rubric"') &&
       !noteUI.includes('Create or edit assignment rubric'),
-    'Rubric has one secondary destination',
+    'Rubric destination stays hidden until a visual rubric exists',
   );
   assert(!noteUI.includes('Suggestions for your teaching notes'));
   assert.equal(JSON.stringify(notes), untouched, 'Offering suggestions never edits the project');
@@ -705,7 +693,7 @@ const assert = require('node:assert/strict');
   assert(guide.includes('<p>Reply to one classmate with evidence.</p>'));
   const finalUI = renderReview(notes, { pending: false }, 'checks');
   assert(
-    finalUI.includes(proposed.instructorPlan) && finalUI.includes('Edit instructor interaction'),
+    guide.includes(proposed.instructorPlan) && finalUI.includes('Edit instructor interaction'),
   );
   assert.equal(
     notes.design.revision,

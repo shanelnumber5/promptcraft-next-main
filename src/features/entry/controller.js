@@ -1,3 +1,4 @@
+import { mountHomeInteractions } from './home-interactions.js';
 import { renderHome } from './screen.js';
 import { infoPages, mountInfoPage } from './info-screen.js';
 import { resumePath } from '../workspace/storage.js';
@@ -11,8 +12,10 @@ export function mountInformation(app, view) {
     dispose?.();
     dispose = null;
     document.body.dataset.appView = nextView;
-    if (nextView === 'home') app.innerHTML = renderHome(resumePath());
-    else dispose = mountInfoPage(app, nextView);
+    if (nextView === 'home') {
+      app.innerHTML = renderHome(resumePath());
+      dispose = mountHomeInteractions(app);
+    } else dispose = mountInfoPage(app, nextView);
     syncPublicNavigation(nextView);
     const picker = infoNav.querySelector('.info-nav-select');
     if (picker) picker.value = nextView;

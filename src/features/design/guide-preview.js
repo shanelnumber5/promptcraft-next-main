@@ -6,7 +6,7 @@ export function openGuidePreview(state, app, { onClose = null } = {}) {
   dialog.className = 'guide-preview';
   dialog.setAttribute('aria-label', 'Course Guide preview');
   dialog.innerHTML =
-    '<header class="guide-preview-toolbar"><strong>Course Guide preview</strong><button type="button" data-guide-download>Download guide</button><button type="button" data-guide-close aria-label="Close assignment guide preview">Close</button></header><div class="guide-preview-section-picker"><label for="guide-section">Guide section</label><select id="guide-section" aria-controls="guide-preview-content"></select></div><iframe id="guide-preview-content" title="Your assignment guide" sandbox="allow-downloads allow-popups allow-popups-to-escape-sandbox"></iframe><footer class="guide-preview-actions"><button type="button" data-guide-back>Previous section</button><span data-guide-page aria-live="polite"></span><button type="button" data-guide-next>Next section</button></footer>';
+    '<header class="guide-preview-toolbar"><strong>Course Guide preview</strong><button type="button" data-guide-download>Download guide</button><button type="button" data-guide-close aria-label="Close assignment guide preview">Close</button></header><div class="guide-preview-section-picker"><label for="guide-section">Guide section</label><select id="guide-section" aria-controls="guide-preview-content"></select></div><nav class="guide-preview-index" aria-label="Guide contents"></nav><iframe id="guide-preview-content" title="Your assignment guide" sandbox="allow-downloads allow-popups allow-popups-to-escape-sandbox"></iframe><footer class="guide-preview-actions"><button type="button" data-guide-back>Previous section</button><span data-guide-page aria-live="polite"></span><button type="button" data-guide-next>Next section</button></footer>';
   // Use one immutable snapshot for every preview section and the complete download.
   const html = createGuide({ ...state.design }, guideOptions(state));
   dialog
@@ -24,6 +24,11 @@ export function openGuidePreview(state, app, { onClose = null } = {}) {
       section.querySelector('h2')?.textContent?.replace(/ · (Draft|Approved version)$/, '') ||
       'Section ' + (index + 1);
     picker.append(option);
+    const link = document.createElement('button');
+    link.type = 'button'; link.textContent = option.textContent;
+    link.dataset.guideSection = String(index);
+    link.addEventListener('click', () => { page = index; render(); });
+    dialog.querySelector('.guide-preview-index').append(link);
   });
   frame.addEventListener('load', () => {
     frame.dataset.ready = 'true';
@@ -31,10 +36,11 @@ export function openGuidePreview(state, app, { onClose = null } = {}) {
   function render() {
     delete frame.dataset.ready;
     picker.value = String(page);
+    dialog.querySelectorAll('[data-guide-section]').forEach((button) => { if (Number(button.dataset.guideSection) === page) button.setAttribute('aria-current', 'page'); else button.removeAttribute('aria-current'); });
     frame.srcdoc =
       '<!doctype html><html lang="en"><head><base href="about:srcdoc"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
       parsed.head.querySelector('style').outerHTML +
-      '<style>body{--gutter:clamp(20px,4vw,48px);padding:0;background:#fff}main{max-width:none;margin:0}.guide-section{margin:0}.guide-section>section,.assignment-content{padding:32px var(--gutter)}.guide-section>section.assignment{padding:0}</style></head><body class="workspace-guide"><main>' +
+      '<style>body{--gutter:clamp(20px,4vw,48px);padding:0;background:#fff}main{display:block;max-width:none;margin:0}.guide-section{margin:0}.guide-section>section,.assignment-content{padding:32px var(--gutter)}.guide-section>section.assignment{padding:0}</style></head><body class="workspace-guide"><main>' +
       sections[page].outerHTML +
       '</main></body></html>';
     dialog.querySelector('[data-guide-back]').disabled = page === 0;
