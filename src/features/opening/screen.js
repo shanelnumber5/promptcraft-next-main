@@ -98,7 +98,9 @@ export function renderChoices(choice, answer) {
     : option
       ? renderSingleFeedback(option.feedback)
       : '<div class="feedback feedback--narrative" aria-hidden="true"></div>';
-  return `<fieldset class="choices"><legend>${e(choice.question)}</legend><div class="choice-list">${choice.options.map((o) => `<label class="choice${o.id === answer ? ' is-selected' : ''}"><input type="radio" name="scene-choice" value="${e(o.id)}"${o.id === answer ? ' checked' : ''}><span>${e(o.label)}</span></label>`).join('')}</div>${option?.correct ? feedback.replace('has-feedback', 'has-feedback feedback--correct') : feedback}</fieldset>`;
+  const result = option ? `<p class="answer-result answer-result--${option.correct ? 'correct' : 'reconsider'}"><strong>${option.correct ? 'Correct' : 'Consider another response'}</strong><span>${option.correct ? 'This response examines the decision and its reasoning.' : 'Read Maya and Pixel’s feedback, then compare another choice.'}</span></p>` : '';
+  const markedFeedback = option ? feedback.replace('has-feedback', `has-feedback ${option.correct ? 'feedback--correct' : 'feedback--reconsider'}`).replace('<div class="feedback-turn', result + '<div class="feedback-turn') : feedback;
+  return `<fieldset class="choices"><legend>${e(choice.question)}</legend><div class="choice-list">${choice.options.map((o) => `<label class="choice${o.id === answer ? ' is-selected' : ''}"><input type="radio" name="scene-choice" value="${e(o.id)}"${o.id === answer ? ' checked' : ''}><span>${e(o.label)}</span></label>`).join('')}</div>${markedFeedback}</fieldset>`;
 }
 
 export function renderScene(scenario, scene, state, index, options = {}) {
