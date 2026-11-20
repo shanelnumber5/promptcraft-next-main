@@ -677,3 +677,60 @@ body[data-app-view] #app .focused-scene .scene-actions button.primary {
     animation: none;
   }
 }
+/* Keep the new public index and active task links typographic, not competing blocks. */
+body[data-app-view] .app-header .brand :is(strong, strong span) {
+  color: var(--reference-navy) !important;
+  -webkit-text-fill-color: var(--reference-navy) !important;
+}
+body[data-app-view] .app-header .public-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  background: transparent;
+  padding: 0;
+  margin-top: 16px;
+}
+body[data-app-view] .app-header .public-navigation a.public-nav-button {
+  background: transparent !important;
+  color: var(--reference-navy) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 8px 0 !important;
+  font: 400 14px/1.5 var(--reference-body);
+  text-decoration: none !important;
+  min-height: 40px;
+}
+body[data-app-view] .app-header .public-navigation a[aria-current='page'] {
+  font-weight: 700;
+  text-decoration: underline !important;
+  text-decoration-color: var(--reference-gold) !important;
+  text-decoration-thickness: 3px !important;
+  text-underline-offset: 6px !important;
+}
+body[data-app-view='workspace'] #app #workspace-panel .workspace-section-sidebar button,
+body[data-app-view='workspace']
+  #app
+  #workspace-panel
+  .workspace-section-sidebar
+  button[aria-current='page'] {
+  background: transparent !important;
+  border: 0 !important;
+}
+body[data-app-view='workspace']
+  #app
+  #workspace-panel
+  .workspace-section-sidebar
+  button[aria-current='page'],
+body[data-app-view='workspace'] #app .workspace-shell .workspace-tabs button[aria-selected='true'] {
+  text-decoration: underline !important;
+  text-decoration-color: var(--reference-gold) !important;
+  text-decoration-thickness: 3px !important;
+  text-underline-offset: 7px !important;
+}
+body[data-app-view='workspace'] #app #workspace-panel .studio-secondary-actions {
+  background: var(--reference-paper) !important;
+}
+body[data-app-view] #app .focused-scene:not(.focus--dialogue) .classroom:after {
+  display: none !important;
+}
