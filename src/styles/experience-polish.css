@@ -1,0 +1,154 @@
+/* A quieter shared frame, retaining the stable content and footer rows. */
+body[data-app-view]:not([data-app-view='']) > header.app-header { background:#202d56 !important; border-bottom:2px solid #d98f06 !important; color:white !important; }
+body[data-app-view]:not([data-app-view='']) > header.app-header .brand :is(strong,strong span),
+body[data-app-view]:not([data-app-view='']) > header.app-header #site-menu-toggle,
+body[data-app-view]:not([data-app-view='']):has(.focused-scene) #site-menu-toggle,
+body[data-app-view][data-info-reader] > header.app-header .public-navigation a.public-nav-button,
+body[data-app-view] > header.app-header .public-navigation a.public-nav-button { color:white !important; -webkit-text-fill-color:white !important; background:transparent !important; }
+body[data-app-view] > header.app-header .public-navigation { gap:28px; }
+body[data-app-view] > header.app-header .header-actions { margin-left:auto; }
+body[data-app-view] #site-menu-panel { background:#f6f1e7 !important; color:#202d56 !important; }
+body[data-app-view] #site-menu-panel :is(a,button) { color:#202d56 !important; -webkit-text-fill-color:#202d56 !important; }
+/* Narration is a quiet text control, separate from the classroom dialogue. */
+body[data-app-view] #app .focused-scene > .story-toolbar { background:#f6f1e7 !important; color:#202d56; }
+body[data-app-view] #app .focused-scene .story-identity strong { color:#202d56 !important; font-size:22px; }
+body[data-app-view] #app .focused-scene .narration-controls button { color:#202d56 !important; background:transparent !important; border:0 !important; box-shadow:none !important; text-decoration:underline; text-underline-offset:5px; font-size:15px; }
+body[data-app-view] #app .focused-scene .narration-status { color:#202d56; }
+body[data-app-view] #app .focused-scene > .classroom { background:linear-gradient(#12355b33,#12355b70),url('../../assets/backgrounds/classroom.webp') center/cover no-repeat !important; padding:16px 24px !important; }
+body[data-app-view] #app .focused-scene.focus--dialogue > .classroom { background:linear-gradient(90deg,#102647da 0%,#1026479c 45%,#10264726 75%),url('../../assets/backgrounds/classroom.webp') center/cover no-repeat !important; }
+body[data-app-view] #app .focused-scene.focus--dialogue .speaker-panel { grid-template-columns:minmax(0,1.1fr) minmax(260px,1fr); gap:48px; max-width:1440px; }
+body[data-app-view] #app .focused-scene.focus--dialogue .speaker-panel > .speech-bubble { background:transparent !important; padding:20px 12px !important; box-shadow:none; }
+body[data-app-view] #app .focused-scene.focus--dialogue .speaker-panel .character img { transform:scale(1.08) !important; transform-origin:center bottom; }
+body[data-app-view] #app .focused-scene .speech-bubble p { font-size:clamp(21px,2.1vw,31px) !important; line-height:1.5; max-width:36ch; text-wrap:pretty; }
+/* Maya and Pixel accompany the activity; their full-height frames share a baseline. */
+body[data-app-view] #app .focused-scene .smartboard-stage,
+body[data-app-view] #app .focused-scene .smartboard-stage:has(.choices,.smartboard--reading) { display:grid !important; grid-template-columns:clamp(140px,14vw,260px) minmax(0,1100px) clamp(140px,14vw,260px); align-items:end; gap:20px; width:100%; max-width:1720px; }
+body[data-app-view] #app .focused-scene .smartboard-cast,
+body[data-app-view] #app .focused-scene .smartboard-stage:has(.choices,.smartboard--reading) .smartboard-cast { display:block !important; height:100% !important; max-height:none; min-height:0; }
+body[data-app-view] #app .focused-scene .smartboard-cast .character img { object-fit:contain; object-position:center bottom; transform:translateX(-50%) scale(1.08) !important; transform-origin:center bottom; }
+/* Paper and fine rules replace the heavy blue board within a blue classroom. */
+body[data-app-view] #app .focused-scene .smartboard .board-screen { background:#f6f1e7f2 !important; border:1px solid #c1c5cc !important; border-top:3px solid #d98f06 !important; padding:26px 28px !important; color:#202d56 !important; }
+body[data-app-view] #app .focused-scene .smartboard :is(.board-heading h2,.board-text,.board-quote,.board-note,.facts,.service-flow,.service-flow strong,.service-flow span,.reference-comparison,.reference-comparison p,.handoff,.handoff strong,.handoff p,.closing-goal,.closing-goal strong) { color:#202d56 !important; text-shadow:none; }
+body[data-app-view] #app .focused-scene .smartboard .board-heading h2,
+body[data-app-view] #app .focused-scene .smartboard--reading .board-heading h2 { font-size:clamp(27px,2.3vw,38px) !important; line-height:1.2; text-align:left !important; max-width:32ch; margin:0 !important; }
+body[data-app-view] #app .focused-scene .smartboard--reading .board-screen { text-align:left; display:flex !important; flex-direction:column; justify-content:center; padding:32px !important; }
+body[data-app-view] #app .focused-scene .smartboard--reading :is(.board-heading,.board-text,.board-quote,.board-note) { width:100%; max-width:66ch; margin-left:0 !important; margin-right:0 !important; text-align:left; }
+body[data-app-view] #app .focused-scene .smartboard--reading :is(.board-text,.board-quote,.board-note) { font-size:20px !important; line-height:1.55; }
+body[data-app-view] #app .focused-scene .smartboard :is(.service-flow li,.board-note,.reference-comparison) { border-color:#aab4c3 !important; }
+body[data-app-view] #app .focused-scene .reference-comparison-controls button { color:#202d56 !important; }
+body[data-app-view] #app .focused-scene .choices legend { font-size:18px !important; line-height:1.45; color:#202d56 !important; }
+body[data-app-view] #app .focused-scene .smartboard .choices .choice { color:#202d56 !important; background:#fff8 !important; border-color:#aeb6c4 !important; font-size:16px; }
+body[data-app-view] #app .focused-scene .smartboard .choices .choice.is-selected { background:#f2c14e26 !important; }
+body[data-app-view] #app .focused-scene .choice input { accent-color:#12355b; }
+body[data-app-view] #app .focused-scene .feedback :is(p,strong) { color:#202d56 !important; }
+body[data-app-view] #app .focused-scene .smartboard .choices .feedback .answer-result { background:#e0f0e4 !important; border-left-color:#317249 !important; flex-wrap:wrap; gap:4px 12px; }
+body[data-app-view] #app .focused-scene .smartboard .choices .feedback .answer-result--reconsider { background:#fff0cb !important; border-left-color:#967017 !important; }
+body[data-app-view] #app .focused-scene .feedback-turn strong { color:#12355b !important; }
+body[data-app-view] #app .focused-scene .feedback-turn p { font-size:15px; }
+body[data-app-view] #app .focused-scene .smartboard .service-flow li > span:last-child { font-size:16px; }
+body[data-app-view] #app .focused-scene .smartboard .flow-number { color:#202d56 !important; }
+body[data-app-view] #app .focused-scene :is(.dialogue,.scene-actions) { background:#f6f1e7 !important; color:#202d56 !important; }
+body[data-app-view] #app .focused-scene .scene-actions :is(button,.navigation-hint,.navigation-progress,.navigation-guidance) { color:#202d56 !important; }
+body[data-app-view] #app .focused-scene .scene-actions .primary { background:#202d56 !important; color:white !important; border:1px solid #d98f06 !important; text-decoration:none; }
+body[data-app-view] #app .focused-scene .scene-progress li { background:#bbc1cd; }
+/* Waiting dialogs retain padding around the actual machine, bar and cancellation. */
+body[data-app-view] dialog.ai-waiting-dialog { width:min(760px,calc(100vw - 32px)) !important; max-height:calc(100dvh - 32px); padding:28px !important; overflow:auto !important; background:#f6f1e7 !important; color:#202d56 !important; border:4px solid #f2c14e !important; border-radius:6px; box-sizing:border-box; }
+body[data-app-view] .ai-waiting-dialog .babbage-loading { display:grid !important; grid-template-columns:170px minmax(0,1fr); align-items:center; gap:24px; padding:0 !important; margin:0; color:#202d56 !important; background:transparent !important; border:0; }
+body[data-app-view] .ai-waiting-dialog .babbage-engine { width:170px !important; height:auto !important; min-width:0; margin:0; padding:0; overflow:visible; }
+body[data-app-view] .ai-waiting-dialog .babbage-engine svg { width:100%; height:auto; }
+body[data-app-view] .ai-waiting-dialog .babbage-loading-copy { min-width:0; padding:0; color:#202d56; }
+body[data-app-view] .ai-waiting-dialog .babbage-loading-heading strong { color:#202d56 !important; font-size:27px; line-height:1.2; }
+body[data-app-view] .ai-waiting-dialog .babbage-loading-heading > span { display:none; }
+body[data-app-view] .ai-waiting-dialog .babbage-loading-copy :is(p,span) { color:#202d56; }
+body[data-app-view] .ai-waiting-dialog > button { display:block; margin:24px 0 0 auto !important; width:auto; max-width:100%; position:static !important; color:white !important; background:#202d56 !important; padding:12px 18px !important; border:1px solid #202d56 !important; min-height:48px; }
+/* The visual rubric occupies the full reading area; setup is no longer a separate maze. */
+body[data-app-view='workspace'] #app .workspace-section-frame:has(.rubric-builder) { grid-template-columns:minmax(0,1fr) !important; }
+body[data-app-view='workspace'] #app .workspace-section-frame:has(.rubric-builder) > .workspace-section-sidebar { display:none; }
+body[data-app-view='workspace'] #app .rubric-toolbar { display:flex; flex-wrap:wrap; gap:12px 20px; align-items:center; margin:0 0 24px; }
+body[data-app-view='workspace'] #app .rubric-toolbar p { flex:1 1 400px; margin:0; }
+body[data-app-view='workspace'] #app .rubric-toolbar button { border:1px solid #202d56 !important; padding:10px 16px; min-height:44px; }
+body[data-app-view] .assignment-rubric { width:100%; border-collapse:collapse; table-layout:fixed; font-size:16px; }
+body[data-app-view] .assignment-rubric caption { text-align:left; font:700 26px/1.3 var(--reference-display); margin:0 0 20px; }
+body[data-app-view] .assignment-rubric th,body[data-app-view] .assignment-rubric td { padding:18px !important; border:1px solid #aeb6c4; vertical-align:top; text-align:left; width:25%; }
+body[data-app-view] .assignment-rubric thead th { background:#202d56; color:white; }
+body[data-app-view] .assignment-rubric tbody th { background:#e9edf2; }
+body[data-app-view] .assignment-rubric tbody th p { font-weight:normal; margin-top:16px; }
+body[data-app-view] .rubric-score { display:table; padding:4px 0; margin-bottom:18px; border:0; border-bottom:2px solid #d98f06; border-radius:0; background:transparent; font-weight:bold; white-space:nowrap; }
+body[data-app-view='workspace'] #app #workspace-panel .assignment-rubric textarea { min-height:140px !important; height:180px; max-height:none; font-size:16px; background:white !important; }
+body[data-app-view] .rubric-table-scroll { overflow:auto; }
+body[data-app-view='workspace'] #app .workspace-final-review { display:block !important; }
+body[data-app-view='workspace'] #app .workspace-final-review .guide-download-actions { display:flex; flex-wrap:wrap; gap:12px; margin:24px 0; }
+body[data-app-view='workspace'] #app .guide-download-actions button { padding:10px 16px; border:1px solid #202d56 !important; min-height:44px; }
+body[data-app-view='workspace'] #app .workspace-course-short { display:grid; grid-template-columns:1fr 1fr; gap:16px 28px; }
+body[data-app-view='workspace'] #app .workspace-requirements { display:block; max-width:900px; }
+body[data-app-view='workspace'] #app .workspace-requirements fieldset { margin:20px 0; }
+body[data-app-view='workspace'] #app #workspace-panel textarea { max-width:100%; }
+/**** Course Guide preview mirrors the About page's left index and quiet reading pane. ****/
+body[data-app-view] dialog.guide-preview { display:grid; grid-template-columns:220px minmax(0,1fr); grid-template-rows:76px minmax(0,1fr) 80px; width:calc(100vw - 40px); max-width:1400px; height:calc(100dvh - 40px); max-height:1000px; padding:0; background:#f6f1e7; overflow:hidden; }
+body[data-app-view] dialog.guide-preview:not([open]) { display:none; }
+body[data-app-view] .guide-preview-toolbar { grid-column:1/-1; grid-row:1; display:flex; align-items:center; padding:16px 24px; gap:16px; }
+body[data-app-view] .guide-preview-toolbar strong { margin-right:auto; }
+body[data-app-view] .guide-preview-section-picker { display:none; }
+body[data-app-view] .guide-preview-index { grid-row:2; grid-column:1; padding:24px 16px; overflow:auto; background:#eae5da; }
+body[data-app-view] .guide-preview-index button { display:block; width:100%; text-align:left; padding:12px 8px; border:0 !important; background:transparent; color:#202d56; font-size:15px; line-height:1.4; }
+body[data-app-view] .guide-preview-index button[aria-current] { font-weight:bold; text-decoration:underline; text-decoration-color:#d98f06; text-underline-offset:6px; }
+body[data-app-view] .guide-preview iframe { grid-column:2; grid-row:2; width:100%; height:100%; min-height:0; border:0; background:white; }
+body[data-app-view] .guide-preview-actions { grid-row:3; grid-column:1/-1; display:flex; align-items:center; justify-content:space-between; padding:16px 24px; gap:16px; }
+body[data-app-view] .guide-entry-actions { display:flex; gap:16px; align-items:center; }
+/* About-style catalog: one topic index, three readable ideas per page. */
+body[data-app-view='lab'] { display:flex; flex-direction:column; height:100dvh; overflow:hidden; }
+body[data-app-view='lab'] > .app-footer { display:none; }
+body[data-app-view='lab'] #app { flex:1; min-height:0; overflow:hidden; }
+body[data-app-view='lab'] #app .lab-browser { height:100%; min-height:0; display:grid; grid-template-rows:auto minmax(0,1fr) 64px; background:#f6f1e7 !important; }
+body[data-app-view='lab'] #app .lab-heading { background:#f6f1e7 !important; color:#202d56; padding:24px 32px !important; border-bottom:1px solid #bfc2ca; }
+body[data-app-view='lab'] #app .lab-heading h1 { font-size:38px !important; margin:0 0 8px; }
+body[data-app-view='lab'] #app .lab-menu-layout { display:grid !important; grid-template-columns:220px minmax(0,1fr); min-height:0; padding:0 !important; gap:0 !important; }
+body[data-app-view='lab'] #app .lab-sidebar { display:block !important; padding:24px 20px; background:#eae5da; overflow:auto; }
+body[data-app-view='lab'] #app .lab-sidebar button { width:100%; text-align:left; display:block; margin:0 0 10px; padding:10px 4px; font-size:15px; }
+body[data-app-view='lab'] #app .lab-sidebar button[aria-current] { font-weight:bold; text-decoration:underline; text-decoration-color:#d98f06; text-underline-offset:6px; }
+body[data-app-view='lab'] #app .lab-listing { padding:20px 32px; overflow:auto; min-height:0; }
+body[data-app-view='lab'] #app .lab-filters { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; gap:16px; }
+body[data-app-view='lab'] #app .lab-filters > div:nth-child(2) { display:none; }
+body[data-app-view='lab'] #app .lab-grid { display:block !important; overflow:visible !important; height:auto !important; max-height:none !important; background:transparent; }
+body[data-app-view='lab'] #app .lab-card { display:grid !important; grid-template-columns:minmax(0,1fr) auto; padding:20px 0; gap:24px; background:transparent !important; }
+body[data-app-view='lab'] #app .lab-card > div { display:block !important; }
+body[data-app-view='lab'] #app .lab-card h2 { font-size:26px !important; margin:0 0 10px; }
+body[data-app-view='lab'] #app .lab-card p { max-width:78ch; margin:6px 0; }
+body[data-app-view='lab'] #app .lab-footer { padding:12px 32px; margin:0; min-height:64px; border-top:1px solid #bfc2ca; }
+body[data-app-view='lab'] #app .lab-detail { overflow:auto; padding:24px 32px; }
+@media(max-width:1100px) {
+ body[data-app-view] #app .focused-scene .smartboard-stage,
+ body[data-app-view] #app .focused-scene .smartboard-stage:has(.choices,.smartboard--reading) { grid-template-columns:110px minmax(0,1fr) 110px; gap:12px; }
+ body[data-app-view] #app .focused-scene .smartboard .board-screen { padding:20px !important; }
+}
+@media(max-width:800px) {
+ body[data-app-view] #app .focused-scene .smartboard-stage,
+ body[data-app-view] #app .focused-scene .smartboard-stage:has(.choices,.smartboard--reading) { display:block !important; width:100%; }
+ body[data-app-view] #app .focused-scene .smartboard-cast,
+ body[data-app-view] #app .focused-scene .smartboard-stage:has(.choices,.smartboard--reading) .smartboard-cast { display:none !important; }
+ body[data-app-view] #app .focused-scene.focus--dialogue .speaker-panel { grid-template-columns:minmax(0,1fr) 170px; gap:12px; }
+ body[data-app-view] dialog.guide-preview { grid-template-columns:minmax(0,1fr); grid-template-rows:76px 60px minmax(0,1fr) 72px; }
+ body[data-app-view] .guide-preview-index { display:none; }
+ body[data-app-view] .guide-preview-section-picker { display:block; grid-row:2; grid-column:1; padding:10px 20px; }
+ body[data-app-view] .guide-preview iframe { grid-row:3; grid-column:1; }
+ body[data-app-view] .guide-preview-actions { grid-row:4; }
+ body[data-app-view='lab'] #app .lab-menu-layout { display:block !important; overflow:auto; }
+ body[data-app-view='lab'] #app .lab-sidebar { display:none !important; }
+ body[data-app-view='lab'] #app .lab-filters { grid-template-columns:1fr; }
+ body[data-app-view='lab'] #app .lab-filters > div:nth-child(2) { display:block; }
+ body[data-app-view='workspace'] #app .workspace-course-short { grid-template-columns:1fr; }
+ body[data-app-view] .assignment-rubric { min-width:720px; }
+}
+@media(max-width:520px) {
+ body[data-app-view] .ai-waiting-dialog .babbage-loading { grid-template-columns:1fr; gap:8px; }
+ body[data-app-view] .ai-waiting-dialog .babbage-engine { width:130px !important; margin:0 auto; }
+ body[data-app-view] #app .focused-scene.focus--dialogue .speaker-panel { grid-template-columns:minmax(0,1fr) 100px; gap:8px; }
+ body[data-app-view] #app .focused-scene .speech-bubble p { font-size:18px !important; }
+ body[data-app-view] .guide-preview-toolbar { padding:12px; gap:8px; }
+ body[data-app-view] .guide-preview-toolbar button { padding:8px; font-size:14px; }
+}
+body[data-app-view]:not([data-app-view='']) > header.app-header { display:flex !important; align-items:center; gap:24px; }
+body[data-app-view] > header.app-header .brand { flex:0 0 auto; }
+body[data-app-view] > header.app-header .public-navigation { margin-left:auto; order:1; }
+body[data-app-view] > header.app-header .header-actions { order:2; margin-left:12px; }
+body[data-app-view='workspace'] #app #workspace-panel .workspace-check-item { padding:16px 0; }

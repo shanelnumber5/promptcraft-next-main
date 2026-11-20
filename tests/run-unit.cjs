@@ -16,6 +16,7 @@ const tests = [
   'repository',
   'workspace-review',
   'rubric',
+  'automatic-rubric',
   'workspace-project',
   'workspace-workflow',
   'babbage-cameo',
