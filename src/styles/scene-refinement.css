@@ -83,3 +83,10 @@ body[data-app-view] dialog > footer { padding:18px 28px; background:var(--refere
  body[data-app-view] #app .focused-scene .scene-actions { padding:16px 20px !important; }
  body[data-app-view] dialog > :is(header,footer) { padding:16px 20px; }
 }
+/* Neutralize the legacy 16:9 board and viewport locks at every breakpoint. */
+body[data-app-view]:has(.focused-scene) { height:auto !important; min-height:100dvh; overflow:auto !important; padding-bottom:0 !important; }
+body[data-app-view] #app .focused-scene { height:auto !important; overflow:visible !important; }
+body[data-app-view] #app .focused-scene .smartboard { aspect-ratio:auto !important; display:block !important; }
+body[data-app-view] #app .focused-scene .smartboard .board-screen { flex:none !important; }
+body[data-app-view]:not([data-app-view='']):has(.focused-scene) #site-menu-toggle { color:var(--reference-navy) !important; }
+.reference-machine :is(.brass-cw,.brass-ccw) { transform-box:view-box; transform-origin:0 0; }
