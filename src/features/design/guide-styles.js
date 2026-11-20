@@ -11,7 +11,7 @@ h3 { font-size:26px; margin:32px 0 16px; }
 h4 { font-size:22px; margin:24px 0 12px; }
 p { margin:0 0 18px; overflow-wrap:anywhere; white-space:normal; }
 li { margin:10px 0; overflow-wrap:anywhere; }
-a { color:#1e2d59; text-underline-offset:5px; overflow-wrap:anywhere; }
+a { display:inline-block; background:#1e2d59; color:#fff; padding:10px 16px; text-decoration:none; overflow-wrap:normal; word-break:normal; }
 a:focus-visible { outline:3px solid #1e2d59; outline-offset:4px; }
 ::selection { background:#f3bf4b; color:#1e2d59; }
 .guide-brand { display:flex; align-items:center; gap:16px; padding:24px var(--gutter); background:#1e2d59; color:#fff; }
@@ -25,7 +25,7 @@ a:focus-visible { outline:3px solid #1e2d59; outline-offset:4px; }
 .toc h2 { font-size:32px; margin-bottom:20px; }
 .toc ol { columns:2; column-gap:64px; margin:0; padding-left:24px; }
 .toc li { break-inside:avoid; padding-left:8px; margin:0 0 8px; }
-.toc a { display:inline-block; padding:5px 0; font-size:16px; }
+.toc a { display:inline-block; padding:10px 16px; font-size:16px; }
 .toc-topic,.toc ul { display:none; }
 .guide-section { scroll-margin-top:24px; background:#fff; }
 .guide-section > section { margin:0; padding:48px var(--gutter); }
@@ -80,7 +80,7 @@ blockquote { margin:24px 0; padding:0; font-size:20px; background:transparent; }
 .rubric-table-scroll { overflow-x:auto; }
 .rubric-score { display:block; margin-bottom:16px; font-weight:700; }
 .rubric-descriptor { line-height:1.6; }
-.rubric-download a { display:inline-block; padding:12px 0; font-weight:700; }
+.rubric-download a { display:inline-block; padding:12px 16px; font-weight:700; }
 .guide-preview-toolbar { flex-wrap:wrap; }
 @media(min-width:1000px) {
  .guide-section > section > :is(p,ul,ol,blockquote),.assignment-content > :is(p,.assignment-directions,.rationale) { margin-left:24%; }

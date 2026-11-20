@@ -1,6 +1,6 @@
 # PromptCraft editorial visual direction — November 19, 2026
 
-The subsequent [mockup review](mockup-audit-20261119.md) records the latest visual direction and supersedes the home composition, stage-band color, character fields, footer, and guide styling described in this earlier pass.
+The subsequent [mockup review](mockup-audit-20261119.md) records the visual direction and supersedes the home composition, stage-band color, character fields, footer, and guide styling described in this earlier pass. The [menu refinement](menu-refinement-20261119.md) records the latest correction to wide-screen typography, public navigation, button actions, and scroll guidance.
 
 PromptCraft is a playful teaching studio where Pixel, Maya, and Babbage help educators turn familiar discussions into purposeful learning experiences.
 

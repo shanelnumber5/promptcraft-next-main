@@ -10,7 +10,9 @@ module.exports = async ({
   scenarioMode = false,
 }) => {
   const choose = (selector) =>
-    evaluate(`(()=>{const el=document.querySelector(${JSON.stringify(selector)});const dropdown=el.closest('[data-dropdown]');if(dropdown?.querySelector('.dropdown-panel').hidden)dropdown.querySelector('[data-dropdown-toggle]').click();el.click();})()`);
+    evaluate(
+      `(()=>{const el=document.querySelector(${JSON.stringify(selector)});const dropdown=el.closest('[data-dropdown]');if(dropdown?.querySelector('.dropdown-panel').hidden)dropdown.querySelector('[data-dropdown-toggle]').click();el.click();})()`,
+    );
   if (scenarioMode) {
     await send('Page.navigate', { url: 'http://127.0.0.1:8783/?view=home' });
     await waitFor('document.readyState==="complete"');
@@ -89,20 +91,20 @@ module.exports = async ({
     ]);
     assert(
       await evaluate(
-        `(()=>{const selected=document.querySelector('.workspace-tabs [aria-selected=true]');const secondary=document.querySelector('.workspace-section-sidebar [aria-current=page]');return getComputedStyle(selected).backgroundColor==='rgba(0, 0, 0, 0)' && getComputedStyle(selected).textDecorationLine.includes('underline') && getComputedStyle(secondary).backgroundColor==='rgba(0, 0, 0, 0)' && !document.querySelector('details');})()`,
+        `(()=>{const selected=document.querySelector('.workspace-tabs [aria-selected=true]');const secondary=document.querySelector('.workspace-section-sidebar [aria-current=page]');return getComputedStyle(selected).backgroundColor==='rgb(243, 191, 75)' && getComputedStyle(selected).textDecorationLine==='none' && getComputedStyle(secondary).backgroundColor==='rgb(243, 191, 75)' && !document.querySelector('details');})()`,
       ),
       'One dominant stage system, quiet section navigation, and no accordions',
     );
     await keyboardReach('.site-menu > [data-dropdown-toggle]');
-    await key('Enter','Enter',13);
+    await key('Enter', 'Enter', 13);
     await keyboardReach('.header-actions a[href="?view=home"]');
     assert(
       await evaluate(
-        `getComputedStyle(document.activeElement).outlineColor==='rgb(255, 255, 255)' && parseFloat(getComputedStyle(document.activeElement).outlineWidth)>=3`,
+        `getComputedStyle(document.activeElement).outlineColor==='rgb(30, 45, 89)' && parseFloat(getComputedStyle(document.activeElement).outlineWidth)>=3`,
       ),
       'Quiet header controls retain visible keyboard focus',
     );
-    await key('Escape','Escape',27);
+    await key('Escape', 'Escape', 27);
     await keyboardReach('[data-workspace-panel=revision]');
     await key('ArrowRight', 'ArrowRight', 39);
     assert(

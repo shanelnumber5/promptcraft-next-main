@@ -22,7 +22,7 @@ export function renderHome(resume = '') {
   ];
   return `<section class="entry-shell home-shell menu-shell" aria-labelledby="entry-title">
     <div class="home-hero">
-      <header class="info-heading"><h1 id="entry-title" tabindex="-1">Rethink<br>teaching.</h1><p>Turn a familiar online discussion into a more purposeful learning experience. Explore ideas, question AI suggestions, and make the design your own.</p></header>
+      <header class="info-heading"><h1 id="entry-title" tabindex="-1"><span>Rethink</span> <span>teaching.</span></h1><div class="home-explore"><a class="home-jump" href="#home-paths">Choose your path</a><p>Scroll down for all four options.</p></div><p class="home-introduction">Turn a familiar online discussion into a more purposeful learning experience. Explore ideas, question AI suggestions, and make the design your own.</p></header>
       <div class="home-studio-intro">
         <figure class="home-classroom" aria-label="Maya and Professor Pixel in the PromptCraft classroom">
           <img class="home-pixel" src="${e(characterArt.pixel.explaining)}" alt="Professor Pixel" width="832" height="1177">
@@ -33,7 +33,7 @@ export function renderHome(resume = '') {
     </div>
     <div class="home-board menu-board home-studio">
       <div class="home-choices">
-        <nav class="home-paths" aria-label="Choose your experience">${resume ? `<a class="home-path home-path--resume" href="?view=${e(resume)}">Continue your saved work</a>` : ''}${paths.map(([view, title, description], i) => `<a class="home-path home-path--${['story', 'workspace', 'lab', 'guide'][i]}${i > 1 ? ' home-path--secondary' : ''}" href="?view=${e(view)}"><strong>${title}</strong><span class="home-path-description">${description}</span></a>`).join('')}</nav>
+        <nav class="home-paths" id="home-paths" tabindex="-1" aria-label="Choose your experience">${resume ? `<a class="home-action home-path--resume" href="?view=${e(resume)}">Continue your saved work</a>` : ''}${paths.map(([view, title, description], i) => `<section class="home-path${i > 1 ? ' home-path--secondary' : ''}" aria-labelledby="home-destination-${i}"><h2 id="home-destination-${i}">${title}</h2><div class="home-path-copy"><p class="home-path-description">${description}</p><a class="home-action home-path--${['story', 'workspace', 'lab', 'guide'][i]}" href="?view=${e(view)}">${['Start guided scenario', 'Open Creative Workspace', 'Browse ideas', 'Open Course Guide'][i]}</a></div></section>`).join('')}</nav>
       </div>
     </div>
   </section>`;
