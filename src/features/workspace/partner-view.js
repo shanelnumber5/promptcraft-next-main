@@ -178,7 +178,7 @@ export function renderPartner(state, ai, page, preview, ui = {}) {
       className: `workspace-context partner-card ai-panel${welcome ? ' partner-card--welcome' : ''}`,
       headingClass: 'partner-heading ai-panel-heading',
       headingExtra:
-        renderBabbagePresence() +
+        (welcome ? '<figure class="studio-welcome-engine" aria-hidden="true"><svg viewBox="0 0 480 430"><image href="assets/people/babbage-engine-repaired.webp" x="8" y="-110" width="464" height="657"/></svg></figure>' : renderBabbagePresence()) +
         (dev ? '<p class="partner-mode">Sample simulation · no AI call</p>' : ''),
       content: `${welcome ? '' : renderWorkspaceDisclosure(state)}${renderBabbageCameo(state, status)}<p class="ai-status" role="status" aria-live="polite">${e(status)}</p>${feedback}${content}`,
       bodyClass: 'partner-content',

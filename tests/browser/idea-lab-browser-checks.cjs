@@ -10,21 +10,18 @@ module.exports = async ({send,evaluate,waitFor,key,keyboardReach,accessibleScree
   for(const [device,width,height] of [['desktop',1440,1000],['short-desktop',1280,720],['tablet',768,1024],['phone',390,844],['small-phone',320,568]].filter(([name])=>!process.env.PC_BROWSER_DEVICE||process.env.PC_BROWSER_DEVICE.split(',').includes(name))) {
     await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<600});
     await go('?view=lab&mockBabbage=1');
-    assert.equal(await evaluate('document.querySelectorAll(".lab-card").length'),6);
-    assert(await evaluate('document.getElementById("idea-category").getClientRects().length>0 && getComputedStyle(document.querySelector(".lab-sidebar")).display==="none"'),'One visible learning-focus dropdown replaces the duplicate category sidebar');
+    assert.equal(await evaluate('document.querySelectorAll(".lab-card").length'),12);
+    assert(await evaluate('!!document.querySelector(".lab-category-filters") && !document.querySelector(".lab-sidebar,#lab-pagination,#idea-category")'),'Text filters replace the sidebar and pagination');
     const footer=await evaluate('(()=>{const r=document.querySelector(".lab-footer").getBoundingClientRect();return {top:r.top+scrollY,height:r.height,bottom:r.bottom+scrollY};})()');
-    assert.equal(footer.height,72);
-    if (height >= 650) assert(footer.bottom<=height,`${device}: footer stays in the viewport`);
-    else assert(await evaluate('document.querySelector(".lab-grid").clientHeight >= 120 && document.querySelector(".lab-footer").getBoundingClientRect().bottom <= document.documentElement.scrollHeight'), `${device}: short screens retain readable cards and reachable actions ${JSON.stringify(await evaluate('({grid:document.querySelector(".lab-grid").clientHeight,footer:document.querySelector(".lab-footer").getBoundingClientRect().bottom,doc:document.documentElement.scrollHeight})'))}`);
+    assert(footer.bottom > height, `${device}: the page scrolls through the complete catalog`);
+    assert(await evaluate('[".lab-browser",".lab-listing",".lab-grid"].every(selector=>{const el=document.querySelector(selector);return el.scrollHeight<=el.clientHeight+1 && getComputedStyle(el).overflowY==="visible"})'), 'The catalog has no nested scroll boxes');
+    await evaluate('document.querySelector(".lab-card:last-child").scrollIntoView()');
+    assert(await evaluate('document.querySelector(".lab-card:last-child").getBoundingClientRect().top<innerHeight'), 'The twelfth idea is reachable by scrolling the page');
+    await evaluate('scrollTo(0,0)');
     await accessibleScreen(device+' Idea Lab gallery');
     await shot('lab-'+device+'-gallery');
-    await evaluate(`document.querySelector('[data-lab-page="1"]').click()`);
-    assert.equal(await evaluate('document.querySelectorAll(".lab-card").length'),6);
-    assert.equal(await evaluate('new URL(location.href).searchParams.get("page")'),'1');
-    const nextFooter=await evaluate('document.querySelector(".lab-footer").getBoundingClientRect().top+scrollY');
-    assert(Math.abs(nextFooter-footer.top)<2,`${device}: paging does not move the footer`);
     await input('idea-search','workplace');
-    await input('idea-category','Workplace');
+    await follow('[data-lab-category="Workplace"]');
     assert(await evaluate(`!!document.querySelector('a[href*="idea=shift-change"]')`));
     await follow('a[href*="idea=shift-change"]');
     await waitFor('!!document.querySelector(".lab-detail")');
@@ -34,12 +31,12 @@ module.exports = async ({send,evaluate,waitFor,key,keyboardReach,accessibleScree
     await follow('.lab-footer a[href*="view=lab"]');
     await waitFor('!!document.getElementById("idea-search")');
     assert.equal(await evaluate('document.getElementById("idea-search").value'),'workplace');
-    assert.equal(await evaluate('document.getElementById("idea-category").value'),'Workplace');
+    assert(await evaluate(`document.querySelector('[data-lab-category="Workplace"]').getAttribute('aria-pressed')==='true'`));
     await input('idea-search','no-matching-idea-123');
     assert(await evaluate('!!document.querySelector(".lab-empty")'));
     await shot('lab-'+device+'-empty');
     await evaluate('document.querySelector(".lab-empty [data-lab-clear]").click()');
-    assert.equal(await evaluate('document.querySelectorAll(".lab-card").length'),6);
+    assert.equal(await evaluate('document.querySelectorAll(".lab-card").length'),12);
     await evaluate(`(async()=>{
       const {freshWorkspace,saveWorkspace}=await import('/src/features/workspace/storage.js');
       const state=freshWorkspace();
@@ -60,6 +57,6 @@ module.exports = async ({send,evaluate,waitFor,key,keyboardReach,accessibleScree
     assert.equal(saved.workspace.ideaId,'decision-clinic');
     assert.equal(saved.workspace.selectedDirection.title,'The Decision Clinic');
     await shot('lab-'+device+'-adapted');
-    console.log(`${device} PASS: Idea Lab paging, footer, filters, details, empty state, keyboard navigation, safe adaptation. Mocked service.`);
+    console.log(`${device} PASS: twelve ideas, natural page scrolling, text filters, details, empty state, keyboard navigation, safe adaptation. Mocked service.`);
   }
 };

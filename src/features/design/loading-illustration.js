@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 // Decorative mechanical computer inspired by the Analytical Engine reference.
 const gear = (x, y, r, reverse = false) =>
   `<g transform="translate(${x} ${y})"><g class="engine-gear${reverse ? ' engine-gear--reverse' : ''}"><circle r="${r}" fill="#172638" stroke="#d0ac62" stroke-width="4"/>${Array.from({ length: 12 }, (_, i) => `<path transform="rotate(${i * 30})" d="M-3 ${-r - 4}h6v8h-6Z" fill="#c3a166"/>`).join('')}<circle r="${r - 7}" fill="none" stroke="#705e43" stroke-width="2"/><path d="M${-r + 6} 0H${r - 6}M0 ${-r + 6}V${r - 6}" stroke="#c3a166" stroke-width="3"/><circle r="4" fill="#ecd69b"/></g></g>`;
@@ -17,4 +18,9 @@ export function renderBabbageEngine() {
  <path d="M216 119h12v-15" fill="none" stroke="#d0ac62" stroke-width="4" stroke-linecap="round"/>
  <rect x="88" y="146" width="64" height="9" rx="2" fill="#c3a166"/>
  </svg></div>`;
+=======
+// The waiting panel uses the production engine without decorative wheel overlays.
+export function renderBabbageEngine() {
+  return '<div class="babbage-engine babbage-engine--production" aria-hidden="true"><svg viewBox="0 0 480 430"><image href="assets/people/babbage-engine-repaired.webp" x="8" y="-110" width="464" height="657"/></svg></div>';
+>>>>>>> Stashed changes
 }

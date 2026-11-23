@@ -10,6 +10,20 @@ module.exports = async ({ send, evaluate, waitFor, shot, accessibleScreen }) => 
   const capture = async (label) => {
     await evaluate('window.scrollTo(0,0)');
     await evaluate('Promise.all([...document.images].map(image=>image.decode().catch(()=>{})))');
+<<<<<<< Updated upstream
+=======
+    if (label.includes('-public-') || label.endsWith('-guide-empty')) {
+      assert(await evaluate(`(()=>{const header=document.querySelector('.app-header');const visible=[...header.querySelectorAll('.brand,.public-navigation,.public-page-chooser')].map(el=>el.getBoundingClientRect()).filter(r=>r.width&&r.height);return visible.every((r,i)=>visible.slice(i+1).every(other=>r.right<=other.left+1||other.right<=r.left+1||r.bottom<=other.top+1||other.bottom<=r.top+1));})()`), label + ': public navigation does not overlap the brand or chooser');
+    }
+    if (label.includes('-story-') || label.includes('-closing-')) {
+      assert(await evaluate(`(()=>{const toolbar=document.querySelector('.story-toolbar');if(!toolbar)return true;const bounds=toolbar.getBoundingClientRect();return [...toolbar.querySelectorAll('button')].every(el=>{const r=el.getBoundingClientRect();return r.width>0&&r.height>=44&&r.left>=bounds.left&&r.right<=bounds.right+1&&r.top>=bounds.top&&r.bottom<=bounds.bottom+1;});})()`), label + ': narration controls remain visible inside the toolbar');
+    }
+    if (label.includes('-studio-')) {
+      assert(await evaluate(`(()=>{const bar=document.querySelector('.workspace-action-bar'),nav=bar?.querySelector('.studio-navigation');if(!nav)return true;const s=getComputedStyle(bar);return Math.abs(nav.getBoundingClientRect().width-(bar.clientWidth-parseFloat(s.paddingLeft)-parseFloat(s.paddingRight)))<2;})()`), label + ': task navigation spans the action bar');
+      assert(await evaluate(`(()=>{const header=document.querySelector('.app-header'),app=document.getElementById('app'),tabs=document.querySelector('.workspace-tabs');return [header,app,tabs].filter(Boolean).every(el=>Math.abs(el.getBoundingClientRect().right-innerWidth)<1);})()`), label + ': Studio chrome reaches the viewport edge without a reserved scrollbar strip');
+      assert(await evaluate(`(()=>{const nav=document.querySelector('.studio-navigation');if(!nav)return true;const bounds=nav.getBoundingClientRect();return [...nav.querySelectorAll('button')].every(el=>{const r=el.getBoundingClientRect();return r.left>=bounds.left-1&&r.right<=bounds.right+1;});})()`), label + ': Back and Continue stay inside the task navigation');
+    }
+>>>>>>> Stashed changes
     if(label.includes('-public-home-')) {
       assert(await evaluate(`(()=>{const frame=document.querySelector('.home-studio').getBoundingClientRect();return [...document.querySelectorAll('.home-choices a')].every(link=>{const r=link.getBoundingClientRect();return r.top>=frame.top && r.bottom<=frame.bottom && r.left>=frame.left && r.right<=frame.right;});})()`),'Main menu links remain inside the unclipped menu surface');
     }

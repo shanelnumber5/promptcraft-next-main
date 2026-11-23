@@ -62,7 +62,7 @@ export function renderUtility(state, ai, ui) {
         : ui.part === 'online'
           ? item.online
           : `${item.description}\n\n${item.experience}`;
-    body = `<nav class="workspace-part-nav workspace-project-actions" aria-label="Idea sections">${parts.map(([id, label]) => `<button type="button" data-idea-part="${id}"${ui.part === id ? ' aria-current="page"' : ''}>${label}</button>`).join('')}</nav>${renderReading(text)}<div class="workspace-project-actions"><button type="button" class="primary" data-develop-direction="${ui.index}"${ui.saved ? ' data-saved-direction' : ''}>Develop this idea</button>${!ui.saved ? `<button type="button" data-save-direction="${ui.index}">Save for later</button>` : ''}</div>`;
+    body = `<nav class="workspace-part-nav workspace-project-actions" aria-label="Idea sections">${parts.map(([id, label]) => `<button type="button" data-idea-part="${id}"${ui.part === id ? ' aria-current="page"' : ''}>${label}</button>`).join('')}</nav><div class="workspace-idea-layout"><div>${renderReading(text)}<div class="workspace-idea-actions"><button type="button" class="primary" data-develop-direction="${ui.index}"${ui.saved ? ' data-saved-direction' : ''}>Develop this idea</button>${!ui.saved ? `<button type="button" data-save-direction="${ui.index}">Save for later</button>` : ''}</div></div><aside class="workspace-idea-details" aria-label="Idea at a glance"><dl><div><dt>Learning goal</dt><dd>${e(item.learning)}</dd></div><div><dt>Creative core</dt><dd>${e(item.core)}</dd></div><div><dt>Online approach</dt><dd>${e(item.online)}</dd></div></dl></aside></div>`;
   } else if (ui.screen === 'saved') {
     title = 'Saved ideas';
     const start = Math.max(
@@ -98,6 +98,7 @@ export function renderUtility(state, ai, ui) {
   } else return null;
   return renderStudioPage({
     title,
+    className: ui.screen === 'idea' ? 'workspace-page--idea' : '',
     content: body,
     back: '<button type="button" data-workspace-view="work">Back</button>',
     actionClass: 'workspace-view-back',

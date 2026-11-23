@@ -1020,7 +1020,7 @@ body[data-app-view='workspace']:has(.workspace-section-frame) .app-footer { disp
 }
 
 /* A stable workspace frame: navigation, panel boundaries, and actions never follow content height. */
-html:has(.workspace-shell--focused) { scrollbar-gutter:stable; }
+html:has(.workspace-shell--focused) { scrollbar-gutter:auto; }
 body[data-app-view='workspace']:has(.workspace-shell--focused) .app-footer { display:none; }
 body[data-app-view='workspace'] .workspace-shell--focused { width:100%; max-width:1040px; }
 body[data-app-view='workspace'] .workspace-shell .workspace-heading { min-height:44px; margin-bottom:12px; }

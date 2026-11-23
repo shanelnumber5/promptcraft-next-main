@@ -44,7 +44,7 @@ export function renderClosing(state, stage, page = 0) {
         {
           title: 'Make feedback matter',
           detail:
-            'Name a peer’s contribution. Explain what changed—or why the decision stayed the same.',
+            'Name a peer’s contribution. Explain what changed or why the decision stayed the same.',
         },
       ],
       flowLabel: 'Three moves that make a discussion meaningful',
@@ -66,7 +66,7 @@ export function renderClosing(state, stage, page = 0) {
       : '') +
     '</div>';
   const lastPage = page >= dialogue.length - 1;
-  const navigation = `<nav class="scene-actions" aria-label="Module navigation"><button type="button" class="nav-button nav-button--back" data-action="${closingDialogue && page > 0 ? 'closing-previous' : 'return-assignment'}"><span>${closingDialogue && page > 0 ? 'Back' : workspace ? 'Your Course Guide' : 'Your assignment'}</span></button><span class="navigation-hint">${completion} · ${closingDialogue ? `Part ${page + 1} of ${dialogue.length}` : 'Take your learning into your course'}</span><button type="button" class="primary nav-button nav-button--next" data-action="${!closingDialogue ? 'closing-pixel' : !lastPage ? 'closing-next' : 'preview-guide'}"><span>${!closingDialogue ? 'Continue with Pixel' : !lastPage ? 'Continue' : 'View guide'}</span></button></nav>`;
+  const navigation = `<nav class="scene-actions" aria-label="Module navigation"><button type="button" class="nav-button nav-button--back" data-action="${closingDialogue && page > 0 ? 'closing-previous' : 'return-assignment'}"><span>${closingDialogue && page > 0 ? 'Back' : workspace ? 'Course Guide' : 'Your assignment'}</span></button><span class="navigation-hint">${completion} · ${closingDialogue ? `Part ${page + 1} of ${dialogue.length}` : 'Take your learning into your course'}</span><button type="button" class="primary nav-button nav-button--next" data-action="${!closingDialogue ? 'closing-pixel' : !lastPage ? 'closing-next' : 'preview-guide'}"><span>${!closingDialogue ? 'Hear Pixel' : !lastPage ? 'Continue' : 'View guide'}</span></button></nav>`;
   return renderScene(scenario, scene, state, 0, {
     className: 'closing-experience',
     audioTitle: workspace ? 'Activity complete' : 'Guided Scenario · complete',

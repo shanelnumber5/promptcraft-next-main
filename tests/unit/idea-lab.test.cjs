@@ -109,14 +109,23 @@ const assert = require('node:assert/strict');
   assert.equal(frameHeight,'676px');
   fitIdeaLab({querySelector:()=>null},{innerHeight:800,scrollY:0,getComputedStyle:()=>({marginBottom:'24px',paddingBottom:'0px'})});
   const firstPage=renderIdeaCards('', '', 0), secondPage=renderIdeaCards('', '', 1);
+<<<<<<< Updated upstream
   assert.equal(firstPage.count,12); assert.equal(firstPage.pages,2);
   assert.equal((firstPage.html.match(/class="lab-card"/g)||[]).length,6);
   for(const item of ideas) assert(firstPage.html.includes(item.title)!==secondPage.html.includes(item.title), 'Each idea appears once across pages');
   assert.equal(renderIdeaCards('', '', -5).page,0);
   assert.equal(renderIdeaCards('', '', 999).page,1);
+=======
+  assert.equal(firstPage.count,12); assert.equal(firstPage.pages,1);
+  assert.equal((firstPage.html.match(/class="lab-card"/g)||[]).length,12);
+  for (const item of ideas) assert(firstPage.html.includes(item.title), 'All twelve ideas appear together');
+  assert.equal(secondPage.html, firstPage.html, 'Legacy page URLs show the complete catalog');
+  assert.equal(renderIdeaCards('', '', -5).page,0);
+  assert.equal(renderIdeaCards('', '', 999).page,0);
+>>>>>>> Stashed changes
   assert(renderIdeaCards('zzzz').html.includes('data-lab-clear'));
   const filteredDetail=renderIdeaDetail('shift-change',true,{query:'workplace',tag:'Workplace',page:1});
-  assert(filteredDetail.includes('q=workplace') && filteredDetail.includes('category=Workplace') && filteredDetail.includes('page=1'));
+  assert(filteredDetail.includes('q=workplace') && filteredDetail.includes('category=Workplace') && !filteredDetail.includes('page=1'));
   assert(!renderGallery('<script>').includes('<script>'));
   const {adaptIdea}=await import('../../src/features/idea-lab/adapt.js');
   const switching=structuredClone(state);
