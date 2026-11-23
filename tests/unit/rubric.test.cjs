@@ -83,7 +83,7 @@ const assert = require('node:assert/strict');
   assert(guideWithRubric.includes('How PromptCraft uses this:'));
   assert(guideWithRubric.includes('attach the imported rubric to your assignment'));
   state.creative.rubric.requested = true;
-  assert(guideWithRubric.includes('Download rubric for Canvas import (.csv)'));
+  assert(guideWithRubric.includes('Download rubric (.csv)'));
   const encoded = guideWithRubric.match(/href="data:text\/csv;charset=utf-8,([^"]+)"/)[1];
   assert.equal(decodeURIComponent(encoded), rubricCSV(rubricForState(state)));
   assert(renderRubricEditor(rubricForState(state)).includes('Criterion 1 of'));

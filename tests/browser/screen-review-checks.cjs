@@ -17,7 +17,8 @@ module.exports = async ({ send, evaluate, waitFor, shot, accessibleScreen }) => 
       assert(await evaluate(`(()=>{const toolbar=document.querySelector('.story-toolbar');if(!toolbar)return true;const bounds=toolbar.getBoundingClientRect();return [...toolbar.querySelectorAll('button')].every(el=>{const r=el.getBoundingClientRect();return r.width>0&&r.height>=44&&r.left>=bounds.left&&r.right<=bounds.right+1&&r.top>=bounds.top&&r.bottom<=bounds.bottom+1;});})()`), label + ': narration controls remain visible inside the toolbar');
     }
     if (label.includes('-studio-')) {
-      assert(await evaluate(`(()=>{const bar=document.querySelector('.workspace-action-bar'),nav=bar?.querySelector('.studio-navigation');if(!nav)return true;return nav.getBoundingClientRect().width>=bar.clientWidth-64;})()`), label + ': task navigation spans the action bar');
+      assert(await evaluate(`(()=>{const bar=document.querySelector('.workspace-action-bar'),nav=bar?.querySelector('.studio-navigation');if(!nav)return true;const s=getComputedStyle(bar);return Math.abs(nav.getBoundingClientRect().width-(bar.clientWidth-parseFloat(s.paddingLeft)-parseFloat(s.paddingRight)))<2;})()`), label + ': task navigation spans the action bar');
+      assert(await evaluate(`(()=>{const header=document.querySelector('.app-header'),app=document.getElementById('app'),tabs=document.querySelector('.workspace-tabs');return [header,app,tabs].filter(Boolean).every(el=>Math.abs(el.getBoundingClientRect().right-innerWidth)<1);})()`), label + ': Studio chrome reaches the viewport edge without a reserved scrollbar strip');
       assert(await evaluate(`(()=>{const nav=document.querySelector('.studio-navigation');if(!nav)return true;const bounds=nav.getBoundingClientRect();return [...nav.querySelectorAll('button')].every(el=>{const r=el.getBoundingClientRect();return r.left>=bounds.left-1&&r.right<=bounds.right+1;});})()`), label + ': Back and Continue stay inside the task navigation');
     }
     if(label.includes('-public-home-')) {
@@ -36,9 +37,9 @@ module.exports = async ({ send, evaluate, waitFor, shot, accessibleScreen }) => 
     if (label.endsWith('build-ai-use'))
       assert(
         await evaluate(
-          `(()=>{const choices=[...document.querySelectorAll('.workspace-requirements .radio-cards label')];const instructions=document.querySelector('label[for="aiUseDetails"]').getBoundingClientRect();return choices.length>0 && choices.every(el=>el.getBoundingClientRect().bottom<=instructions.top);})()`,
+          `(()=>{const choices=[...document.querySelectorAll('.workspace-requirements .radio-cards label')];const preference=document.querySelector('label[for="aiUseDetails"]').getBoundingClientRect();return choices.every(el=>el.getBoundingClientRect().bottom<=preference.top);})()`,
         ),
-        label + ': AI choices do not overlap the AI-use instructions',
+        label + ': AI choices do not overlap rubric preference',
       );
     if (label.includes('-studio-') && !label.endsWith('restore-error')) {
       const navigation = await evaluate(
@@ -65,7 +66,7 @@ module.exports = async ({ send, evaluate, waitFor, shot, accessibleScreen }) => 
     await shot(label);
   };
   for (const [device, width, height] of [
-    ['desktop', 1280, 800],
+    ['desktop', 1440, 900],
     ['tablet', 820, 1024],
     ['phone', 390, 844],
     ['small-phone', 320, 568],

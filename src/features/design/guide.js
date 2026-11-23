@@ -9,6 +9,29 @@ import { scenarioGuideSections } from '../opening/guide-content.js';
 import { designRoute } from '../workspace/routes.js';
 import { designEvidence, renderDesignRationale } from '../../shared/design-evidence.js';
 
+// Bake the final guide theme into downloads so preview and offline HTML agree.
+// The theme is authored in editorial-fixes.css, not another inline override layer.
+function editorialGuideStyles() {
+  if (typeof document === 'undefined' || !document.styleSheets) return '';
+  const rules = [], seen = new Set();
+  const visit = (sheet) => {
+    if (!sheet || seen.has(sheet)) return;
+    seen.add(sheet);
+    try {
+      for (const rule of sheet.cssRules) {
+        if (rule.styleSheet) visit(rule.styleSheet);
+        else if (rule.cssText.includes('guide-export')) rules.push(rule.cssText);
+        else if (rule.type === 5 && /Fraunces|Manrope/.test(rule.style.fontFamily)) {
+          rules.push(rule.cssText.replace(/url\(["']?([^"')]+)["']?\)/g,
+            (_, url) => 'url' + '(' + JSON.stringify(new URL(url, sheet.href || document.baseURI).href) + ')'));
+        }
+      }
+    } catch { /* A third-party stylesheet is not part of the guide theme. */ }
+  };
+  [...document.styleSheets].forEach(visit);
+  return rules.join('\n');
+}
+
 export function renderConversationNotes(notes) {
   return (
     '<div class="guide-conversation-notes">' +
@@ -170,7 +193,7 @@ export function createGuide(
           : '') +
         '<p class="rubric-download"><a download="assignment-rubric-canvas.csv" href="data:text/csv;charset=utf-8,' +
         encodeURIComponent(rubricCSV(rubric)) +
-        '">Download rubric for Canvas import (.csv)</a></p><p>Import this CSV into Canvas Rubrics, then attach the imported rubric to your assignment. Review the criteria and points before using it with students.</p>' +
+        '">Download rubric (.csv)</a></p><p>Import this CSV into Canvas Rubrics, then attach the imported rubric to your assignment. Review the criteria and points before using it with students.</p>' +
         renderRubricTable(rubric) +
         '</section>',
     });
@@ -190,10 +213,10 @@ export function createGuide(
     .join('');
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${e(assignmentTitle || 'PromptCraft assignment guide')}</title>
-<style>${guideStyles}</style></head>
+<style>${guideStyles}${editorialGuideStyles()}</style></head>
 
 
-<body${workspace ? ' class="workspace-guide"' : ''}><main><header><div class="guide-brand">${logo ? `<img src="${e(logo)}" alt="PromptCraft Babbage emblem">` : ''}<div><div class="wordmark">Prompt<span>Craft</span></div><small>The Prompt Lab · Great Falls College MSU</small></div></div><div class="guide-heading"><h1>${isScenario ? 'Course Guide · Guided scenario' : workspace ? e(assignmentTitle || 'Course Guide · Your activity') : 'Discussion guide'}</h1><p>${approved ? 'Your approved version' : 'Draft preview · Not yet approved'}</p><p>${isScenario ? 'Your scenario example, teaching guidance, activity directions, and assessment rubric.' : 'Your activity directions and assessment rubric.'}</p></div></header>${`<nav class="toc" aria-labelledby="contents-title"><h2 id="contents-title">In this guide</h2><ol>${contents}</ol></nav>`}${sections.map((section) => `<div class="guide-section" id="${section.id}">${section.body}</div>`).join('')}</main></body></html>`;
+<body data-app-view="guide-export"${workspace ? ' class="workspace-guide"' : ''}><main><header><div class="guide-brand">${logo ? `<img src="${e(logo)}" alt="PromptCraft Babbage emblem">` : ''}<div><div class="wordmark">Prompt<span>Craft</span></div><small>The Prompt Lab · Great Falls College MSU</small></div></div><div class="guide-heading"><h1>${isScenario ? 'Course Guide · Guided scenario' : workspace ? e(assignmentTitle || 'Course Guide · Your activity') : 'Discussion guide'}</h1><p>${approved ? 'Your approved version' : 'Draft preview · Not yet approved'}</p><p>${isScenario ? 'Your scenario example, teaching guidance, activity directions, and assessment rubric.' : 'Your activity directions and assessment rubric.'}</p></div></header>${`<nav class="toc" aria-labelledby="contents-title"><h2 id="contents-title">In this guide</h2><ol>${contents}</ol></nav>`}${sections.map((section) => `<div class="guide-section" id="${section.id}">${section.body}</div>`).join('')}</main></body></html>`;
 }
 
 export function downloadGuide(design, options) {

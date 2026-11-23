@@ -1,31 +1,31 @@
 // Consistent helper colors and concrete objects explain the plan in both views.
-const ink = '#12264d',
-  alex = '#219eaa',
-  sam = '#e68265';
+const ink = '#1E2D59',
+  alex = '#1E2D59',
+  sam = '#D98F06';
 const helper = (x, y, color, skin = '#f3ceab') =>
   `<circle cx="${x}" cy="${y}" r="10" fill="${skin}" stroke="${ink}" stroke-width="2.5"/><path d="M${x - 15} ${y + 35}v-17q15-17 30 0v17z" fill="${color}" stroke="${ink}" stroke-width="2.5"/>`;
 const pitcher = (x, y) =>
-  `<path d="M${x} ${y}h22l-2 32h-18z" fill="#fff9dc" stroke="${ink}" stroke-width="2.5"/><path d="M${x + 3} ${y + 13}h16l-1 16h-14z" fill="#f4cf59"/><path d="M${x + 22} ${y + 5}h7v15h-8" fill="none" stroke="${ink}" stroke-width="2.5"/>`;
+  `<path d="M${x} ${y}h22l-2 32h-18z" fill="#fff9dc" stroke="${ink}" stroke-width="2.5"/><path d="M${x + 3} ${y + 13}h16l-1 16h-14z" fill="#D98F06"/><path d="M${x + 22} ${y + 5}h7v15h-8" fill="none" stroke="${ink}" stroke-width="2.5"/>`;
 const drink = (x, y) =>
-  `<path d="M${x} ${y}h14l-2 22h-10z" fill="#fff" stroke="${ink}" stroke-width="2.5"/><path d="M${x + 3} ${y + 10}h8l-1 9h-6z" fill="#f4cf59"/>`;
+  `<path d="M${x} ${y}h14l-2 22h-10z" fill="#fff" stroke="${ink}" stroke-width="2.5"/><path d="M${x + 3} ${y + 10}h8l-1 9h-6z" fill="#D98F06"/>`;
 const cash = (x, y) =>
-  `<rect x="${x}" y="${y}" width="26" height="17" rx="2" fill="#83c69a" stroke="${ink}" stroke-width="2.5"/><circle cx="${x + 13}" cy="${y + 8.5}" r="4" fill="#dff2e4" stroke="${ink}" stroke-width="2"/>`;
+  `<rect x="${x}" y="${y}" width="26" height="17" rx="2" fill="#D98F06" stroke="${ink}" stroke-width="2.5"/><circle cx="${x + 13}" cy="${y + 8.5}" r="4" fill="#f6f1e7" stroke="${ink}" stroke-width="2"/>`;
 const arm = (path) =>
   `<path d="${path}" fill="none" stroke="${ink}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
 const counter =
-  '<path d="M12 82h146v15H12z" fill="#e4d1b4" stroke="' + ink + '" stroke-width="2.5"/>';
+  '<path d="M12 82h146v15H12z" fill="#f6f1e7" stroke="' + ink + '" stroke-width="2.5"/>';
 export function lemonadeVisual(kind = 'stand') {
   let artwork;
   if (kind === 'customers')
     artwork =
-      '<ellipse cx="85" cy="85" rx="72" ry="10" fill="#e8e4f3"/>' +
-      helper(37, 33, '#a78cc6', '#dca875') +
-      helper(85, 23, '#e49bc0') +
-      helper(133, 33, '#8aa3d0', '#a97452');
+      '<ellipse cx="85" cy="85" rx="72" ry="10" fill="#f6f1e7"/>' +
+      helper(37, 33, '#152142', '#dca875') +
+      helper(85, 23, '#D98F06') +
+      helper(133, 33, '#1E2D59', '#a97452');
   else if (kind === 'payment')
     artwork =
       helper(30, 27, alex) +
-      helper(140, 27, '#a78cc6', '#dca875') +
+      helper(140, 27, '#152142', '#dca875') +
       counter +
       arm('M43 51l24 10 13-3') +
       arm('M127 51l-20 10-16-3') +
@@ -33,13 +33,13 @@ export function lemonadeVisual(kind = 'stand') {
   else if (kind === 'drinks')
     artwork =
       helper(30, 27, sam) +
-      helper(140, 27, '#a78cc6', '#dca875') +
+      helper(140, 27, '#152142', '#dca875') +
       counter +
       arm('M44 51l16 5 8-7') +
       arm('M126 52l-10 13h-11') +
       `<g transform="rotate(-20 80 46)">${pitcher(66, 27)}</g>` +
       drink(101, 59) +
-      '<path d="M92 44q10 2 14 15" fill="none" stroke="#d59e23" stroke-width="3" stroke-linecap="round"/>';
+      '<path d="M92 44q10 2 14 15" fill="none" stroke="#D98F06" stroke-width="3" stroke-linecap="round"/>';
   else if (kind === 'supplies')
     artwork =
       helper(35, 27, sam) +
@@ -65,12 +65,12 @@ export function lemonadeVisual(kind = 'stand') {
     artwork =
       '<path d="M13 76V8h144v68" fill="none" stroke="' +
       ink +
-      '" stroke-width="3"/><path d="M13 8h144v12H13z" fill="#f4cf59" stroke="' +
+      '" stroke-width="3"/><path d="M13 8h144v12H13z" fill="#D98F06" stroke="' +
       ink +
       '" stroke-width="2.5"/>' +
       helper(50, 35, alex) +
       helper(119, 35, sam) +
-      '<path d="M8 76h154v22H8z" fill="#d9edf7" stroke="' +
+      '<path d="M8 76h154v22H8z" fill="#f6f1e7" stroke="' +
       ink +
       '" stroke-width="3"/><path d="M85 76v22M19 98v8m132-8v8" stroke="' +
       ink +

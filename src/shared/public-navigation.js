@@ -1,12 +1,13 @@
 // The public header shares one page list across desktop links and the native chooser.
 export function syncPublicNavigation(view) {
   document.querySelectorAll('.public-navigation a, #site-menu-panel a').forEach((link) => {
-    if (new URL(link.href).searchParams.get('view') === view)
+    const destination = new URL(link.href).searchParams.get('view');
+    if (destination === view || (view === 'scenario' && destination === 'play'))
       link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
   });
   const chooser = document.getElementById('public-page');
-  if (chooser) chooser.value = view;
+  if (chooser) chooser.value = view === 'play' || view === 'scenario' ? 'play&story=1' : view;
 }
 
 export function mountPublicNavigation() {

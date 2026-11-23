@@ -19,6 +19,33 @@ export function mountDropdowns(root = document) {
   const open = (menu) => {
     const toggle = menu.querySelector('[data-dropdown-toggle]'),
       panel = menu.querySelector('.dropdown-panel');
+    if (panel.id === 'site-menu-panel') {
+      panel.querySelector('[data-current-activity-tools]')?.remove();
+      const actions = [...root.querySelectorAll('#app [data-activity-tools] button, #app [data-activity-tools] a')];
+      if (actions.length) {
+        const group = panel.ownerDocument.createElement('div');
+        group.className = 'site-menu-group site-menu-activity';
+        group.dataset.currentActivityTools = '';
+        group.setAttribute('role', 'group');
+        group.setAttribute('aria-label', 'Activity tools');
+        const heading = panel.ownerDocument.createElement('strong');
+        heading.textContent = 'Activity tools';
+        group.append(heading);
+        for (const action of actions) {
+          const proxy = action.cloneNode(true);
+          proxy.removeAttribute('id');
+          proxy.addEventListener('click', (event) => {
+            event.preventDefault();
+            action.click();
+            root.querySelector('dialog[open]')?.addEventListener('close', () => {
+              toggle.focus({ preventScroll: true });
+            }, { once: true });
+          });
+          group.append(proxy);
+        }
+        panel.append(group);
+      }
+    }
     toggle.setAttribute('aria-expanded', 'true');
     if (toggle.dataset.openLabel) toggle.textContent = toggle.dataset.openLabel;
     panel.hidden = false;
