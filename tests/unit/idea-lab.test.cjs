@@ -109,11 +109,12 @@ const assert = require('node:assert/strict');
   assert.equal(frameHeight,'676px');
   fitIdeaLab({querySelector:()=>null},{innerHeight:800,scrollY:0,getComputedStyle:()=>({marginBottom:'24px',paddingBottom:'0px'})});
   const firstPage=renderIdeaCards('', '', 0), secondPage=renderIdeaCards('', '', 1);
-  assert.equal(firstPage.count,12); assert.equal(firstPage.pages,2);
-  assert.equal((firstPage.html.match(/class="lab-card"/g)||[]).length,6);
-  for(const item of ideas) assert(firstPage.html.includes(item.title)!==secondPage.html.includes(item.title), 'Each idea appears once across pages');
+  assert.equal(firstPage.count,12); assert.equal(firstPage.pages,4);
+  assert.equal((firstPage.html.match(/class="lab-card"/g)||[]).length,3);
+  const pages = Array.from({length: firstPage.pages}, (_, i) => renderIdeaCards('', '', i).html);
+  for (const item of ideas) assert.equal(pages.filter(html => html.includes(item.title)).length, 1, 'Each idea appears on exactly one page');
   assert.equal(renderIdeaCards('', '', -5).page,0);
-  assert.equal(renderIdeaCards('', '', 999).page,1);
+  assert.equal(renderIdeaCards('', '', 999).page,3);
   assert(renderIdeaCards('zzzz').html.includes('data-lab-clear'));
   const filteredDetail=renderIdeaDetail('shift-change',true,{query:'workplace',tag:'Workplace',page:1});
   assert(filteredDetail.includes('q=workplace') && filteredDetail.includes('category=Workplace') && filteredDetail.includes('page=1'));
@@ -152,10 +153,10 @@ const assert = require('node:assert/strict');
   for (const section of ['start', 'subject', 'ai-use', 'intentions', 'presence', 'draft'])
     assert(build.includes('data-design-page="' + section + '"'), 'Every combined Build section is directly reachable');
   // Combining screens must retain all persisted form fields and editable IDs.
-  const subjectPage = renderWorkspace(empty, { configured: true }, '', 'subject');
+  const subjectPage = renderWorkspace(empty, { configured: true }, '', 'subject') + renderWorkspace(empty, { configured: true }, '', 'learning');
   for (const field of ['subject', 'learningGoal', 'learnerLevel', 'student-needs'])
     assert(subjectPage.includes(field), 'Combined course context retains ' + field);
-  const requirementsPage = renderWorkspace(empty, { configured: true }, '', 'ai-use');
+  const requirementsPage = renderWorkspace(empty, { configured: true }, '', 'ai-use') + renderWorkspace(empty, { configured: true }, '', 'requirements');
   for (const field of ['aiUse', 'mustStay', 'aiUseDetails'])
     assert(requirementsPage.includes(field), 'Combined activity decisions retain ' + field);
   const presencePage = renderWorkspace(empty, { configured: true }, '', 'presence');

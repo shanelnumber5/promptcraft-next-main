@@ -11,6 +11,7 @@ const assert = require('node:assert/strict');
     rubricIssue,
     renderAssessmentSetup,
     renderRubricEditor,
+    renderRubric,
   } = await import('../../src/features/workspace/rubric.js');
   const { createProjectFile, parseProjectFile } = await import(
     '../../src/features/workspace/project-file.js'
@@ -87,6 +88,9 @@ const assert = require('node:assert/strict');
   assert.equal(decodeURIComponent(encoded), rubricCSV(rubricForState(state)));
   assert(renderRubricEditor(rubricForState(state)).includes('Criterion 1 of'));
   assert(renderRubricTable(rubricForState(state)).includes('rubric-score'));
+  const visual = renderRubric(state);
+  assert(visual.includes('<table class="assignment-rubric">') && !visual.includes('<textarea'), 'Generated rubric opens as a visual table');
+  assert(renderRubric(state, false, {editing:true}).includes('data-rubric-row="0"'), 'Editing happens in that same table');
 
   assert(guideWithRubric.includes('<title>Staffing choices</title>'));
   assert(

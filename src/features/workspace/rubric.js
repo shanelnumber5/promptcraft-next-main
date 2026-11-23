@@ -1,10 +1,11 @@
+import { guideStyles } from '../design/guide-styles.js';
 import { escapeHTML as e } from '../../shared/html.js';
 import { postJSON } from '../../shared/json-request.js';
 import { BABBAGE_ENDPOINT, buildBabbageRequest } from '../design/babbage-client.js';
 
 export const emptyRubric = () => ({
   title: 'Assignment rubric',
-  requested: null,
+  requested: true,
   submission: '',
   criteria: '',
   total: '100',
@@ -174,9 +175,10 @@ export function renderRubricTable(rubric, { editable = false } = {}) {
       : e(text);
   return `<div class="rubric-table-scroll"><table class="assignment-rubric"><caption>${e(rubric.title)} · ${rubric.rows.reduce((n, r) => n + r.points, 0)} points</caption><thead><tr><th scope="col">Criterion</th>${ratingNames.map((name) => `<th scope="col">${name}</th>`).join('')}</tr></thead><tbody>${rubric.rows.map((row, i) => `<tr><th scope="row">${cell(row.name, i, 'name')}<p>${cell(row.description, i, 'description')}</p><div class="rubric-score">Maximum: ${row.points} points</div></th>${row.ratings.map((text, j) => `<td><div class="rubric-score">${j === 0 ? row.points : j === 1 ? row.points / 2 : 0} points</div><div class="rubric-descriptor">${cell(text, i, 'ratings', j)}</div></td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
-export function renderRubric(state, pending = false, { page = 0 } = {}) {
+export function renderRubric(state, pending = false, { editing = false } = {}) {
   const rubric = rubricForState(state);
-  return `<section class="rubric-builder"><p>Rubric for <strong>${e(assignmentName(state))}</strong>. The directions, learning goal, student work, and assessment criteria come from your Build pages.</p><p>Review each descriptor before using this rubric with students.</p><div class="guide-download-actions"><button type="button" data-action="rubric-edit-criteria">Customize criteria</button><button type="button" data-action="generate-rubric"${pending || !state.design.revision.trim() ? ' disabled' : ''}>${rubric.rows.length ? 'Regenerate rubric' : rubric.criteria.trim() ? 'Create rubric' : 'Draft rubric with Babbage'}</button></div>${!state.design.revision.trim() ? '<p>Build your activity draft first, then create its rubric.</p>' : ''}<p data-rubric-notice role="status"></p>${rubric.rows.length ? `${rubric.basis !== state.design.revision ? '<p class="rubric-stale">The assignment has changed since this rubric was created. Check the criteria and descriptors before using it.</p>' : ''}${renderRubricEditor(rubric, page)}<div class="guide-download-actions"><button type="button" data-action="download-rubric-csv">Download Canvas rubric CSV</button><button type="button" data-action="download-rubric-html">Download visual rubric</button></div>` : ''}</section>`;
+  if (!rubric.rows.length) return `<section class="rubric-builder rubric-empty"><p>${pending ? 'Babbage is preparing the visual rubric from your activity.' : 'Your visual rubric is not ready yet. Babbage can draft it from the assignment and learning goal.'}</p><p data-rubric-notice role="status"></p>${!pending && state.design.revision.trim() ? '<button type="button" class="primary" data-action="generate-rubric">Draft visual rubric</button>' : ''}</section>`;
+  return `<section class="rubric-builder"><div class="rubric-toolbar"><p>${editing ? 'Edit the criteria and performance descriptions in the table. Changes save as you type.' : 'Review the rubric alongside your assignment. Select Edit rubric to make changes.'}</p><button type="button" data-action="${editing ? 'view-rubric' : 'edit-rubric'}">${editing ? 'Done editing' : 'Edit rubric'}</button><button type="button" data-action="generate-rubric"${pending ? ' disabled' : ''}>Regenerate from assignment</button></div><p data-rubric-notice role="status"></p>${rubric.basis !== state.design.revision ? '<p class="rubric-stale">Your activity has changed. Review this rubric or regenerate it for the new directions.</p>' : ''}${renderRubricTable(rubric, { editable: editing })}<div class="guide-download-actions"><button type="button" data-action="download-rubric-csv">Download rubric for Canvas import (.csv)</button><button type="button" data-action="download-rubric-html">Download visual rubric</button></div><p class="rubric-import-help">Import the CSV into Canvas Rubrics, then attach the imported rubric to your assignment.</p></section>`;
 }
 
 const csvCell = (value) => '"' + String(value).replaceAll('"', '""') + '"';
@@ -208,7 +210,8 @@ export function rubricCSV(rubric) {
   );
 }
 export const rubricDocument = (rubric) =>
-  `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${e(rubric.title)}</title><style>body{font:16px/1.5 Arial,sans-serif;color:#12355b;padding:24px}table{border-collapse:collapse;table-layout:fixed;width:100%}th,td{width:25%}caption{font:bold 26px Georgia;padding:16px}th,td{border:1px solid #12355b;padding:14px;text-align:left;vertical-align:top}thead{background:#12355b;color:white}p{margin:8px 0}.rubric-score{display:block;width:fit-content;padding:6px 10px;margin:0 0 16px;background:#eef4f9;border:1px solid #12355b;border-radius:4px;font:bold 15px Arial;color:#12355b}.rubric-descriptor{line-height:1.6}.rubric-download a{display:inline-block;padding:12px;border:2px solid #12355b;border-radius:4px;font-weight:bold}.guide-preview-toolbar{flex-wrap:wrap}@media print{.rubric-download{display:none}}@media print{body{padding:0}tr{break-inside:avoid}}</style></head><body>${renderRubricTable(rubric)}</body></html>`;
+  `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${e(rubric.title)}</title><style>${guideStyles}</style></head><body class="rubric-document"><main><section class="guide-section"><section>${renderRubricTable(rubric)}</section></section></main></body></html>`;
+
 export function downloadRubric(rubric, format) {
   const link = document.createElement('a'),
     csv = format === 'csv';
