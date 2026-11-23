@@ -33,17 +33,21 @@ body[data-app-view] {
   --reference-paper: #f6f1e7;
   --reference-gold: #d98f06;
   --reference-ink: #182342;
-  --reference-muted: #4e5566;
+  --reference-muted: #3d4454;
   --reference-rule: #18234238;
   --reference-display: Fraunces, Georgia, serif;
   --reference-body: Manrope, Arial, sans-serif;
+  --font: var(--reference-body);
+  --font-body: var(--reference-body);
+  --font-heading: var(--reference-display);
   --editorial-gutter: clamp(20px, 4.5vw, 72px);
   font-family: var(--reference-body);
   color: var(--reference-ink);
   background: var(--reference-paper) !important;
 }
-body[data-app-view] :is(button, input, textarea, select) {
-  font-family: var(--reference-body);
+body[data-app-view] :is(button, input, textarea, select),
+body[data-app-view] #app :is(p, li, dt, dd, label, legend, th, td, button, input, textarea, select) {
+  font-family: var(--reference-body) !important;
 }
 body[data-app-view] :is(button, a, input, textarea, select):focus-visible {
   outline: 3px solid #b46d00 !important;
@@ -259,7 +263,7 @@ body[data-app-view='home'] #app .reference-path {
   left: 0;
   right: 0;
   text-align: center;
-  font-size: 14px;
+  font-size: 16px;
   color: var(--reference-muted);
 }
 .brass-cw,
@@ -323,7 +327,7 @@ body[data-app-view='workspace'] #app #workspace-panel .workspace-section-sidebar
   padding-top: 32px !important;
 }
 body[data-app-view='workspace'] #app #workspace-panel .workspace-section-sidebar button {
-  font: 400 15px/1.5 var(--reference-body);
+  font: 400 16px/1.5 var(--reference-body);
   min-height: 44px;
   padding: 10px 0;
   color: var(--reference-muted) !important;
@@ -367,7 +371,7 @@ body[data-app-view='workspace'] #app #workspace-panel :is(label, legend) {
   line-height: 1.5;
 }
 body[data-app-view='workspace'] #app #workspace-panel :is(.workspace-field-help, .field-help) {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.5;
   color: var(--reference-muted);
 }
@@ -421,11 +425,11 @@ body[data-app-view='workspace'] #app #workspace-panel .studio-navigation .studio
   padding: 12px 0;
 }
 body[data-app-view='workspace'] #app #workspace-panel .workspace-save-status {
-  font: 400 14px/1.4 var(--reference-body);
+  font: 400 16px/1.4 var(--reference-body);
   color: var(--reference-muted);
 }
 body[data-app-view='workspace'] #app #workspace-panel .workspace-ai-disclosure {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.5;
   background: transparent !important;
   border: 0 !important;
@@ -449,6 +453,10 @@ body[data-app-view]
     .info-book,
     .info-reading,
     .info-page,
+    .guide-library,
+    .guide-library-intro,
+    .guide-entry,
+    .guide-empty,
     .lab-browser,
     .lab-menu-layout,
     .lab-listing,
@@ -469,7 +477,7 @@ body[data-app-view] .info-topic-number {
 }
 body[data-app-view] .info-shell .info-sidebar button {
   display: block !important;
-  font-size: 15px;
+  font-size: 16px;
 }
 body[data-app-view='lab'] #app .lab-card {
   display: grid;
@@ -698,7 +706,7 @@ body[data-app-view] .app-header .public-navigation a.public-nav-button {
   border-radius: 0 !important;
   box-shadow: none !important;
   padding: 8px 0 !important;
-  font: 400 14px/1.5 var(--reference-body);
+  font: 400 16px/1.5 var(--reference-body);
   text-decoration: none !important;
   min-height: 40px;
 }

@@ -58,18 +58,18 @@ module.exports = async ({
       const before = await evaluate(saves);
       assert.equal(
         await evaluate(
-          'document.querySelectorAll(".home-path--story,.home-path--workspace").length',
+          `document.querySelectorAll('a[data-home-plate="1"],a[data-home-plate="2"]').length`,
         ),
         2,
       );
       assert(
         await evaluate(
-          '!!document.querySelector(".home-classroom img[src*=maya]") && !!document.querySelector(".home-classroom img[src*=pixel]")',
+          `!!document.querySelector('[data-workshop-plate="1"] img[src*=maya]') && !!document.querySelector('[data-workshop-plate="1"] img[src*=pixel]')`,
         ),
       );
       await accessibleScreen(device + '-returning-home');
       await shot(device + '-' + phase + '-returning-home');
-      await keyboardReach('a.home-path--story');
+      await keyboardReach('a[data-home-plate="1"]');
       await key('Enter', 'Enter', 13);
       await waitFor('!!document.querySelector(".speech-bubble")');
       const geometry = await evaluate(`(()=>{

@@ -245,7 +245,8 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       })()`);
       const collectIssues = process.env.PC_BROWSER_COLLECT_ISSUES === '1';
       if(process.env.PC_EDITORIAL_AUDIT==='1') {
-        const framed=await evaluate(`(()=>{const issues=[];for(const el of document.querySelectorAll('.home-path,.home-studio,.workspace-shell,.workspace-page,.workspace-section-main,.workspace-section-sidebar,.info-book,.info-art,.lab-card,.guide-entry,.smartboard,.board-screen,.feedback-turn,.speech-bubble,.maya-dialogue')){const r=el.getBoundingClientRect();if(!r.width||!r.height||el.closest('[hidden]'))continue;const s=getComputedStyle(el);if(s.boxShadow!=='none'||parseFloat(s.borderTopLeftRadius)>0||['Top','Right','Bottom','Left'].some(side=>parseFloat(s['border'+side+'Width'])>0))issues.push('Framed surface: '+el.className+' '+JSON.stringify({shadow:s.boxShadow,radius:s.borderRadius,border:s.border}));}return issues;})()`);
+        // One divider rule is not a frame; multiple edges, rounding and shadows are.
+        const framed=await evaluate(`(()=>{const issues=[];for(const el of document.querySelectorAll('.home-path,.home-studio,.workspace-shell,.workspace-page,.workspace-section-main,.workspace-section-sidebar,.info-book,.info-art,.lab-card,.guide-entry,.smartboard,.board-screen,.feedback-turn,.speech-bubble,.maya-dialogue')){const r=el.getBoundingClientRect();if(!r.width||!r.height||el.closest('[hidden]'))continue;const s=getComputedStyle(el);const borders=['Top','Right','Bottom','Left'].filter(side=>parseFloat(s['border'+side+'Width'])>0);if(s.boxShadow!=='none'||parseFloat(s.borderTopLeftRadius)>0||borders.length>1)issues.push('Framed surface: '+el.className+' '+JSON.stringify({shadow:s.boxShadow,radius:s.borderRadius,borders}));}return issues;})()`);
         layoutIssues.push(...framed);
       }
       if (!collectIssues) assert.deepEqual(layoutIssues, [], label + ' formatting audit');
