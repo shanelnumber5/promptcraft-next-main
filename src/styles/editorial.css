@@ -1101,8 +1101,8 @@ body[data-app-view] #app .focused-scene .navigation-hint {
     max-width: none;
     left: -25%;
     height: 100%;
-    object-fit: cover;
-    object-position: center 20%;
+    object-fit: contain;
+    object-position: center bottom;
   }
 }
 
