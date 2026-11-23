@@ -54,7 +54,7 @@ export function mountCourseGuide(app, storage = window.localStorage) {
           .join(
             '',
           )}</div><footer class="guide-library-note"><p>Saved in this browser. Download a finished HTML guide from your workspace to keep a separate copy.</p></footer>`
-      : `<div class="guide-empty"><h3>A place for your next idea</h3><p>Choose Guided Scenario or Creative Workspace from Menu. Your saved work will appear here.</p></div>`
+      : `<div class="guide-empty"><h3>A place for your next idea</h3><p>Choose Home to start Guided Scenario or Creative Workspace. Your saved work will appear here.</p></div>`
   }<p role="status" data-guide-notice></p></div></section>`;
   app.querySelector('[data-guide-notice]').textContent = [notice, workspace.error]
     .filter(Boolean)

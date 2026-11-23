@@ -1221,3 +1221,63 @@ body[data-app-view='workspace'] #app #workspace-panel {
   max-width: none;
   margin-inline: 0;
 }
+
+/* Live narrow-browser review: use one page scroll and one consistent reading gutter. */
+body[data-app-view][data-info-reader] #entry-title:focus:not(:focus-visible) {
+  outline: none;
+}
+body[data-app-view][data-info-reader] #entry-title {
+  outline: none;
+}
+body[data-app-view='guide'] #app :is(.guide-library-intro, .guide-empty, .guide-library-note) {
+  padding-inline: var(--editorial-gutter);
+  margin-inline: 0;
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+}
+body[data-app-view='guide'] #app .guide-entry {
+  background: transparent !important;
+  margin-inline: 0;
+  padding-inline: 0;
+}
+body[data-app-view='lab'] #app .lab-browser {
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+}
+body[data-app-view='lab']
+  #app
+  .lab-browser
+  :is(.lab-menu-layout, .lab-listing, .lab-grid, .lab-detail) {
+  height: auto;
+  max-height: none;
+  min-height: 0;
+  overflow: visible;
+  flex: none;
+}
+body[data-app-view]:has(.focused-scene) {
+  padding-bottom: 0 !important;
+  background: #1e2d59;
+}
+body[data-app-view]:has(.focused-scene) #app {
+  background: #1e2d59;
+}
+body[data-app-view='guide'] #app .guide-library {
+  display: block;
+  height: auto;
+  min-height: 0;
+  padding: 0;
+}
+body[data-app-view='guide'] #app :is(.guide-library-intro, .guide-empty, .guide-library-note) {
+  padding-block: 24px;
+  border: 0;
+}
+body[data-app-view]:has(.focused-scene) #app > .focused-scene {
+  min-height: calc(100svh - 64px);
+}
+@media (max-width: 760px) {
+  body[data-app-view]:has(.focused-scene) #app > .focused-scene {
+    min-height: calc(100svh - 56px);
+  }
+}
