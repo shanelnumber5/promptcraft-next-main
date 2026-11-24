@@ -39,12 +39,16 @@ export function renderReview(state, ai, page, preview, ui = {}) {
   const sections = [
     ['rationale', 'Feedback'],
     ['reasoning', 'Your reasoning'],
-    ...(state.creative.rubric?.rows.length ? [['rubric', 'Assessment rubric']] : []),
+    ['rubric', 'Rubric (optional)'],
     ['checks', 'Final checks & guide'],
   ];
   if (page === 'rubric') {
     title = 'Assessment rubric';
-    content = renderRubric(state, pending, { editing: ui.rubricPart === 'edit' });
+    content =
+      ui.rubricPart === 'criteria'
+        ? renderAssessmentSetup(state) +
+          '<button type="button" data-action="view-rubric">Back to rubric</button>'
+        : renderRubric(state, pending, { page: ui.rubricCriterion || 0 });
     actions = `<button type="button" class="primary" data-action="rubric-continue"${!state.creative.rubric?.rows.length || pending ? ' disabled' : ''}>Continue to review</button>`;
   } else if (page === 'checks') {
     title = 'Final checks & Course Guide';
@@ -78,19 +82,19 @@ export function renderReview(state, ai, page, preview, ui = {}) {
     actions = '';
   } else if (page === 'reasoning') {
     back = '<button type="button" data-review-page="rationale">Back</button>';
-    next = `<button type="button" class="primary" data-review-page="${state.creative.rubric.rows.length ? 'rubric' : 'checks'}"${pending ? ' disabled' : ''}>Continue</button>`;
+    next = `<button type="button" class="primary" data-review-page="${state.creative.rubric.requested || state.creative.rubric.rows.length ? 'rubric' : 'checks'}"${pending ? ' disabled' : ''}>Continue</button>`;
     actions = '';
   } else if (page === 'rubric') {
     back = '<button type="button" data-review-page="reasoning">Back</button>';
     next = '<button type="button" class="primary" data-review-page="checks">Continue</button>';
     actions = '';
   } else if (page === 'checks') {
-    back = `<button type="button" data-review-page="${state.creative.rubric.rows.length ? 'rubric' : 'reasoning'}">Back</button>`;
+    back = `<button type="button" data-review-page="${state.creative.rubric.requested || state.creative.rubric.rows.length ? 'rubric' : 'reasoning'}">Back</button>`;
     next =
       state.finalCheck.approved && ready
         ? '<button type="button" class="primary" data-action="finish-workspace">Continue with Pixel</button>'
         : `<button type="button" class="primary" data-action="approve-version"${!ready ? ' disabled' : ''}>Save final design</button>`;
-    actions = ''; // Downloads stay visible in the content, outside a tools menu.
+    actions = ''; // Guide actions stay in the visible download group.
   } else {
     back = '<button type="button" data-review-page="checks">Back</button>';
   }

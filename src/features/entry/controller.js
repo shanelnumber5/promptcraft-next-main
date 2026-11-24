@@ -15,7 +15,8 @@ export function mountInformation(app, view) {
     if (nextView === 'home') {
       app.innerHTML = renderHome(resumePath());
       dispose = mountHomeInteractions(app);
-    } else dispose = mountInfoPage(app, nextView);
+    }
+    else dispose = mountInfoPage(app, nextView);
     syncPublicNavigation(nextView);
     const picker = infoNav.querySelector('.info-nav-select');
     if (picker) picker.value = nextView;

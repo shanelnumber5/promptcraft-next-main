@@ -179,7 +179,7 @@ export function createGuide(
           : '') +
         '<p class="rubric-download"><a download="assignment-rubric-canvas.csv" href="data:text/csv;charset=utf-8,' +
         encodeURIComponent(rubricCSV(rubric)) +
-        '">Download rubric (.csv)</a></p><p>Import this CSV into Canvas Rubrics, then attach the imported rubric to your assignment. Review the criteria and points before using it with students.</p>' +
+        '">Download rubric for Canvas import (.csv)</a></p><p>Import this CSV into Canvas Rubrics, then attach the imported rubric to your assignment. Review the criteria and points before using it with students.</p>' +
         renderRubricTable(rubric) +
         '</section>',
     });

@@ -5,8 +5,8 @@ export function renderFinalChecks(state, ready) {
   const route = state.experience === 'scenario' ? 'scenario' : 'workspace';
   const destinations = {
     instructions: ['draft', 'design-page-title'],
-    learning: ['learning', 'learningGoal'],
-    requirements: ['requirements', 'mustStay'],
+    learning: ['subject', 'learningGoal'],
+    requirements: ['ai-use', 'mustStay'],
   };
   const checks = finalCheckItems
     .map((item, index) => {

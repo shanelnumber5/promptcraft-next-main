@@ -1,3 +1,4 @@
+import { renderDropdown } from '../../shared/dropdown.js';
 import { STORAGE_KEY } from '../../app/storage.js';
 import { readScenarioStudio } from '../workspace/scenario-storage.js';
 import { discussionOpening } from '../opening/content.js';
@@ -48,7 +49,7 @@ export function mountCourseGuide(app, storage = window.localStorage) {
                 ? 'Your discussion design and the reasoning behind it.'
                 : 'Your work from Scenario 1 · Give the discussion a job.');
             const options = `<button type="button" data-guide-index="${index}" aria-label="${approved ? 'Open' : 'Preview'} ${e(entry.title)} guide">${approved ? 'Open guide' : 'Preview draft'}</button><a href="?view=${entry.path}" aria-label="Continue designing in ${e(entry.title)}">Continue designing</a>`;
-            return `<article class="guide-entry" aria-labelledby="guide-entry-${index}"><div class="guide-entry-copy"><h3 id="guide-entry-${index}">${e(title)}</h3><p class="guide-entry-status${approved ? ' is-approved' : ''}">${e(entry.title)} · ${approved ? 'Approved version' : 'In progress'}</p><p>${e(summary.slice(0, 180))}${summary.length > 180 ? '…' : ''}</p></div><div class="guide-entry-actions">${options}</div></article>`;
+            return `<article class="guide-entry" aria-labelledby="guide-entry-${index}"><div class="guide-entry-copy"><h3 id="guide-entry-${index}">${e(title)}</h3><p class="guide-entry-status${approved ? ' is-approved' : ''}">${e(entry.title)} · ${approved ? 'Approved version' : 'In progress'}</p><p>${e(summary.slice(0, 180))}${summary.length > 180 ? '…' : ''}</p></div><div class="guide-entry-actions">${renderDropdown({ id: `guide-options-${index}`, label: 'Guide options', content: options })}</div></article>`;
           })
           .join(
             '',

@@ -169,7 +169,7 @@ export function renderPartner(state, ai, page, preview, ui = {}) {
     '<button type="button" class="primary" data-workspace-panel="revision">Continue</button>';
   const notesBack = feedback ? actions.match(/<button\b[^>]*data-feedback-page="[^"]+"[^>]*>[\s\S]*?<\/button>/)?.[0] || '' : '';
   actions = actions.replace(notesBack, '');
-  const inlineAction = `<div class="studio-content-actions">${notesBack}${next}</div>`;
+  const inlineAction = `<div class="studio-content-actions">${notesBack}${next}${!ai.pending ? '<span class="workspace-save-status">Saved in this browser.</span>' : ''}</div>`;
   const chosen = state.workspace.selectedDirection && !feedback && !utilityPage && !welcome && !ai.pending && !conversation.questions.length;
   const body = chosen
     ? `<div class="explore-feature"><div class="explore-intro"><p>Build on the idea you chose. Keep the parts that serve your learning goal.</p>${renderWorkspaceDisclosure(state, { compact: true })}</div><div>${content}${inlineAction}</div></div>`
