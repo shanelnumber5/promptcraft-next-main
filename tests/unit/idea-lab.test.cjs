@@ -153,10 +153,10 @@ const assert = require('node:assert/strict');
   for (const section of ['start', 'subject', 'ai-use', 'intentions', 'presence', 'draft'])
     assert(build.includes('data-design-page="' + section + '"'), 'Every combined Build section is directly reachable');
   // Combining screens must retain all persisted form fields and editable IDs.
-  const subjectPage = renderWorkspace(empty, { configured: true }, '', 'subject');
+  const subjectPage = renderWorkspace(empty, { configured: true }, '', 'subject') + renderWorkspace(empty, { configured: true }, '', 'learning');
   for (const field of ['subject', 'learningGoal', 'learnerLevel', 'student-needs'])
     assert(subjectPage.includes(field), 'Combined course context retains ' + field);
-  const requirementsPage = renderWorkspace(empty, { configured: true }, '', 'ai-use');
+  const requirementsPage = renderWorkspace(empty, { configured: true }, '', 'ai-use') + renderWorkspace(empty, { configured: true }, '', 'requirements');
   for (const field of ['aiUse', 'mustStay', 'aiUseDetails'])
     assert(requirementsPage.includes(field), 'Combined activity decisions retain ' + field);
   const presencePage = renderWorkspace(empty, { configured: true }, '', 'presence');

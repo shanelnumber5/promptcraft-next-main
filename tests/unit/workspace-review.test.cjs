@@ -315,14 +315,9 @@ const assert = require('node:assert/strict');
     'A compiled draft proceeds to its rubric without another rewrite',
   );
   assert(draftPage.includes('data-action="compile-activity"'), 'A compiled draft can be rebuilt');
-  assert(
-    course.indexOf('id="daysAvailable"') < course.indexOf('workspace-course-long'),
-    'All short course fields are in the left column',
-  );
-  assert(
-    course.indexOf('id="learningGoal"') > course.indexOf('workspace-course-long'),
-    'Larger fields are on the right',
-  );
+  assert(course.includes('id="daysAvailable"') && !course.includes('id="learningGoal"'), 'Short course context has its own step');
+  const goalPage = renderWorkspace(buildState, { pending: false, configured: true }, '', 'learning');
+  assert(goalPage.includes('id="learningGoal"') && goalPage.includes('student-needs'), 'Learning goal and access remain editable');
   assert(
     requirements.includes('name="aiUse"') && !requirements.includes('open-ai-use-popup'),
     'AI-use choices stay inside Build',

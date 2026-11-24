@@ -305,14 +305,16 @@ const assert = require('node:assert/strict');
   const { buildPages } = await import('../../src/features/workspace/views.js');
   assert.deepEqual(
     buildPages.map(([id]) => id),
-    ['start', 'subject', 'ai-use', 'sharing', 'intentions', 'presence', 'draft'],
+    ['start', 'subject', 'learning', 'ai-use', 'requirements', 'sharing', 'intentions', 'presence', 'draft'],
   );
   for (const [page, ids] of [
     [
       'subject',
-      ['subject', 'learningGoal', 'learnerLevel', 'student-needs', 'workTime', 'daysAvailable'],
+      ['subject', 'learnerLevel', 'workTime', 'daysAvailable'],
     ],
-    ['ai-use', ['mustStay', 'aiUseDetails']],
+    ['learning', ['learningGoal', 'student-needs']],
+    ['requirements', ['mustStay']],
+    ['ai-use', ['aiUseDetails']],
     ['presence', ['instructor-plan', 'open-questions']],
   ]) {
     const html = renderWorkspace(presenceState, { configured: true, pending: false }, '', page);

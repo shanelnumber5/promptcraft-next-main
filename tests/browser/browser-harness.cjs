@@ -263,7 +263,9 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     await send('Page.addScriptToEvaluateOnNewDocument', {
       source: `(()=>{const original=window.fetch.bind(window);window.fetch=(url,options)=>original(String(url).startsWith('https://promptcraft-discussion.netlify.app/.netlify/functions/babbage')?'/api/babbage':url,options);})()`,
     });
-    if (process.env.PC_BROWSER_FEATURE === 'menus') {
+    if (process.env.PC_BROWSER_FEATURE === 'visual-flow') {
+      await require('./visual-flow-checks.cjs')({send,evaluate,waitFor,shot});
+    } else if (process.env.PC_BROWSER_FEATURE === 'menus') {
       await require('./menu-navigation-checks.cjs')({send,evaluate,waitFor,shot,key,keyboardReach,accessibleScreen});
     } else if (process.env.PC_BROWSER_FEATURE === 'story-audio') {
       await require('./story-audio-checks.cjs')({send,evaluate,waitFor,shot,key,keyboardReach,accessibleScreen});
