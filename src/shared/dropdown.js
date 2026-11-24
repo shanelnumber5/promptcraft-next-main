@@ -6,11 +6,19 @@ export function renderDropdown({ id, label, content, className = '' }) {
 }
 
 export function mountDropdowns(root = document) {
+  const suspended = new Map();
+  const restorePage = () => {
+    for (const [element, inert] of suspended) element.inert = inert;
+    suspended.clear();
+    document.body.classList.remove('site-menu-open');
+  };
   const close = (menu, focus = false) => {
+    if (!menu) return;
     const toggle = menu.querySelector('[data-dropdown-toggle]');
     toggle.setAttribute('aria-expanded', 'false');
     if (toggle.dataset.closedLabel) toggle.textContent = toggle.dataset.closedLabel;
     const panel = menu.querySelector('.dropdown-panel');
+    if (panel.id === 'site-menu-panel') restorePage();
     if (panel.isConnected && panel.matches(':popover-open')) panel.hidePopover();
     panel.hidden = true;
     if (focus) toggle.focus({ preventScroll: true });
@@ -19,7 +27,11 @@ export function mountDropdowns(root = document) {
   const open = (menu) => {
     const toggle = menu.querySelector('[data-dropdown-toggle]'),
       panel = menu.querySelector('.dropdown-panel');
+    if (!panel.hidden) return;
     if (panel.id === 'site-menu-panel') {
+      const navigation = root.querySelector('.public-navigation');
+      panel.querySelector('.site-menu-journeys').hidden =
+        navigation && getComputedStyle(navigation).display !== 'none';
       panel.querySelector('[data-current-activity-tools]')?.remove();
       const actions = [...root.querySelectorAll('#app [data-activity-tools] button, #app [data-activity-tools] a')];
       if (actions.length) {
@@ -36,6 +48,8 @@ export function mountDropdowns(root = document) {
           proxy.removeAttribute('id');
           proxy.addEventListener('click', (event) => {
             event.preventDefault();
+            event.stopPropagation();
+            close(menu);
             action.click();
             root.querySelector('dialog[open]')?.addEventListener('close', () => {
               toggle.focus({ preventScroll: true });
@@ -51,6 +65,23 @@ export function mountDropdowns(root = document) {
     panel.hidden = false;
     panel.style.maxHeight = '';
     panel.showPopover?.();
+    if (panel.id === 'site-menu-panel') {
+      const header = toggle.closest('.app-header');
+      const top = Math.max(0, header.getBoundingClientRect().bottom);
+      panel.style.left = '0px';
+      panel.style.top = top + 'px';
+      panel.style.height = Math.max(0, innerHeight - top) + 'px';
+      panel.style.maxHeight = panel.style.height;
+      for (const element of [...document.body.children, ...header.children]) {
+        if (element === header || element.contains(toggle)) continue;
+        suspended.set(element, element.inert);
+        element.inert = true;
+      }
+      document.body.classList.add('site-menu-open');
+      [...panel.querySelectorAll('a,button')]
+        .find((el) => !el.disabled && el.getClientRects().length)?.focus();
+      return;
+    }
     const r = toggle.getBoundingClientRect();
     const below = innerHeight - r.bottom - 12,
       above = r.top - 12,
@@ -65,6 +96,19 @@ export function mountDropdowns(root = document) {
   };
   root.addEventListener('click', (event) => {
     if (event.target.closest('dialog')) return;
+    // Header actions may open a modal in their own handlers before bubbling here.
+    if (root.querySelector('dialog[open]')) {
+      menus().filter((menu) => {
+        const panel = menu.querySelector('.dropdown-panel');
+        return panel.id === 'site-menu-panel' && !panel.hidden;
+      }).forEach((menu) => {
+        root.querySelector('dialog[open]').addEventListener('close', () => {
+          menu.querySelector('[data-dropdown-toggle]').focus({ preventScroll: true });
+        }, { once: true });
+        close(menu);
+      });
+      return;
+    }
     const toggle = event.target.closest('[data-dropdown-toggle]');
     const current = toggle?.closest('[data-dropdown]');
     for (const menu of menus()) if (menu !== current && !menu.contains(event.target)) close(menu);
@@ -87,6 +131,18 @@ export function mountDropdowns(root = document) {
     if (!menu) return;
     const toggle = menu.querySelector('[data-dropdown-toggle]');
     const panel = menu.querySelector('.dropdown-panel');
+    if (event.key === 'Tab' && panel.id === 'site-menu-panel' && !panel.hidden) {
+      const targets = [toggle, ...panel.querySelectorAll('a,button')]
+        .filter((el) => !el.disabled && el.getClientRects().length);
+      const first = targets[0], last = targets.at(-1);
+      if (event.shiftKey && event.target === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && event.target === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
     if (event.key === 'Escape' && !panel.hidden) {
       event.preventDefault();
       close(menu, true);

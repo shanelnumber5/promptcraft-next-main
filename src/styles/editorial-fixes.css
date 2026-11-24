@@ -334,47 +334,62 @@
 :root:root body[data-app-view] #app .closing-experience .scene-actions { grid-template-columns: minmax(140px,220px) minmax(0,1fr) minmax(140px,240px); }
 :root:root body[data-app-view] #app .closing-experience .scene-actions .nav-button { width: 100%; white-space: nowrap; }
 
-/* Guide contents are a slim unboxed index, with an edge-to-edge reading area. */
+/* Preview chrome shares the guide's responsive reading gutter. */
 :root:root body[data-app-view] dialog.guide-preview {
+  --preview-gutter: clamp(20px, 4.5cqw, 72px);
+  container-type: inline-size;
   width: calc(100vw - 32px);
   max-width: 1600px;
   height: calc(100dvh - 32px);
   max-height: none;
   display: grid;
-  grid-template-columns: minmax(190px,240px) minmax(0,1fr);
-  grid-template-rows: 76px minmax(0,1fr) 76px;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
   padding: 0;
   border: 0;
   border-radius: 0;
   outline: none;
   background: #f6f1e7;
+  overflow: hidden;
 }
 :root:root body[data-app-view] dialog.guide-preview:not([open]) { display: none; }
-:root:root body[data-app-view] .guide-preview-toolbar { grid-column: 1/-1; grid-row: 1; padding: 16px 24px; border: 0 !important; background: #1e2d59 !important; }
-:root:root body[data-app-view] .guide-preview-toolbar :is(strong,button) { color: white !important; -webkit-text-fill-color: white !important; font-size: 18px; }
+:root:root body[data-app-view] .guide-preview-toolbar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px;
+  grid-column: 1; grid-row: 1; padding: 24px var(--preview-gutter);
+  border: 0 !important; background: #f6f1e7 !important;
+}
+:root:root body[data-app-view] .guide-preview-toolbar strong {
+  flex: 1 0 100%; font: 700 44px/1.15 var(--reference-display);
+  color: #1e2d59 !important; -webkit-text-fill-color: #1e2d59 !important;
+}
 :root:root body[data-app-view] .guide-preview-section-picker { display: none !important; }
-:root:root body[data-app-view] .guide-preview-index { display: flex !important; flex-direction: column; align-items: flex-start; grid-column: 1; grid-row: 2; gap: 12px; padding: 24px; margin: 0; min-height: 0; overflow: auto; background: transparent !important; }
-:root:root body[data-app-view] .guide-preview-index button { display: block; width: auto; text-align: left; padding: 8px 0 !important; color: #1e2d59 !important; line-height: 1.5; white-space: normal; }
-:root:root body[data-app-view] .guide-preview iframe { grid-column: 2; grid-row: 2; width: 100%; height: 100%; min-height: 0; border: 0; }
-:root:root body[data-app-view] .guide-preview-actions { grid-column: 1/-1; grid-row: 3; padding: 12px 24px; border: 0; background: #f6f1e7; }
-:root:root body[data-app-view] .guide-preview :is(.guide-preview-toolbar,.guide-preview-actions) button { border: 0 !important; border-radius: 0; background: transparent !important; padding: 8px 0; font-size: 18px; }
-:root:root body[data-app-view] .guide-preview button:focus-visible { outline: none !important; text-decoration: underline !important; text-decoration-color: #d98f06 !important; text-decoration-thickness: 4px !important; text-underline-offset: 7px !important; }
-
-/* These rules are also embedded into the guide's standalone HTML snapshot. */
-:root:root body[data-app-view='guide-export'] { --gutter: clamp(20px,4vw,65px); margin: 0; background: #f6f1e7; color: #1e2d59; font: 18px/1.65 Manrope,Arial,sans-serif; }
-:root:root body[data-app-view='guide-export'] :is(h1,h2,h3,h4) { font-family: Fraunces,Georgia,serif; }
-:root:root body[data-app-view='guide-export'] h2 { font-size: clamp(32px,4vw,48px); }
-:root:root body[data-app-view='guide-export'] main { gap: 48px; padding-inline: var(--gutter); }
-:root:root body[data-app-view='guide-export'][data-guide-preview] main { display: block; padding: 0; max-width: none; margin: 0; }
-:root:root body[data-app-view='guide-export'] .guide-section { background: transparent; border: 0; margin: 0 0 40px; }
-:root:root body[data-app-view='guide-export'] .guide-section > section,
-:root:root body[data-app-view='guide-export'] .assignment-content { padding: 32px var(--gutter); }
-:root:root body[data-app-view='guide-export'] .toc { background: transparent; padding-inline: 0; }
-:root:root body[data-app-view='guide-export'] .toc a,
-:root:root body[data-app-view='guide-export'] .rubric-download a { font-size: 18px; }
-:root:root body[data-app-view='guide-export'] .rubric-download a { border: 0; padding: 0; background: transparent; text-decoration: underline; text-decoration-color: #d98f06; text-decoration-thickness: 4px; text-underline-offset: 7px; }
-:root:root body[data-app-view='guide-export'] a:focus-visible { outline: none; text-decoration: underline; text-decoration-color: #d98f06; text-decoration-thickness: 4px; text-underline-offset: 7px; }
-:root:root body[data-app-view='guide-export'] .guide-section:target { outline: none; }
+:root:root body[data-app-view] .guide-preview-index {
+  display: flex !important; flex-direction: row; flex-wrap: wrap; align-items: start;
+  grid-column: 1; grid-row: 2; gap: 8px 28px; padding: 0 var(--preview-gutter) 20px;
+  margin: 0; min-height: 0; max-height: 22dvh; overflow: auto; background: transparent !important;
+}
+:root:root body[data-app-view] .guide-preview-index button {
+  display: block; width: auto; text-align: left; padding: 8px 0 !important;
+  color: #1e2d59 !important; line-height: 1.5; white-space: normal;
+}
+:root:root body[data-app-view] .guide-preview iframe {
+  grid-column: 1; grid-row: 3; width: 100%; height: 100%; min-height: 0; border: 0;
+}
+:root:root body[data-app-view] .guide-preview-actions {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-column: 1; grid-row: 4; align-items: center; gap: 16px;
+  padding: 16px var(--preview-gutter); border: 0; background: #f6f1e7;
+}
+:root:root body[data-app-view] .guide-preview-actions [data-guide-back] { justify-self: start; text-align: left; }
+:root:root body[data-app-view] .guide-preview-actions [data-guide-next] { justify-self: end; text-align: right; }
+:root:root body[data-app-view] .guide-preview :is(.guide-preview-toolbar,.guide-preview-actions) button {
+  width: auto; min-width: 0; border: 0 !important; border-radius: 0; background: transparent !important;
+  color: #1e2d59 !important; -webkit-text-fill-color: #1e2d59 !important;
+  padding: 8px 0; font: 400 18px/1.5 var(--reference-body);
+}
+:root:root body[data-app-view] .guide-preview button:focus-visible {
+  outline: 3px solid #d98f06 !important; outline-offset: 4px;
+}
 
 @media (max-width: 900px) {
   :root:root body[data-app-view] #app .focused-scene .smartboard-stage,
@@ -406,16 +421,370 @@
   :root:root body[data-app-view] .ai-waiting-dialog .babbage-loading { grid-template-columns: minmax(0,1fr); gap: 16px; }
   :root:root body[data-app-view] .ai-waiting-dialog .babbage-engine { width: 170px !important; margin: 0 auto; }
   :root:root body[data-app-view] #app .closing-experience .scene-actions { grid-template-columns: repeat(2,minmax(0,1fr)); }
-  :root:root body[data-app-view] dialog.guide-preview { grid-template-columns: minmax(0,1fr); grid-template-rows: 96px 120px minmax(0,1fr) 96px; }
-  :root:root body[data-app-view] .guide-preview-toolbar { padding: 12px 20px; gap: 12px; flex-wrap: wrap; }
-  :root:root body[data-app-view] .guide-preview-toolbar strong { flex: 1 0 100%; }
-  :root:root body[data-app-view] .guide-preview-index { grid-column: 1; grid-row: 2; display: flex !important; flex-direction: row; align-items: flex-start; flex-wrap: wrap; gap: 8px 20px; padding: 12px 20px; }
-  :root:root body[data-app-view] .guide-preview-index button { flex: 0 1 auto; }
-  :root:root body[data-app-view] .guide-preview iframe { grid-column: 1; grid-row: 3; }
-  :root:root body[data-app-view] .guide-preview-actions { grid-column: 1; grid-row: 4; padding: 12px 20px; gap: 12px; flex-wrap: wrap; }
 }
 @media (max-height: 500px) {
-  :root:root body[data-app-view] .guide-preview-index { padding-block: 8px; gap: 4px; }
-  :root:root body[data-app-view] dialog.guide-preview { grid-template-rows: 64px minmax(0,1fr) 64px; }
   :root:root body[data-app-view] #app .focused-scene .smartboard-stage-board { height: calc(100% - 16px) !important; max-height: calc(100% - 16px); }
+}
+
+/* The global menu is a single overlay, independent of the scene beneath it. */
+body.site-menu-open { overflow: hidden !important; }
+:root:root body[data-app-view] #site-menu-panel:not([hidden]) {
+  display: flex !important; flex-direction: column; align-items: stretch;
+  width: 100%; max-width: none; min-width: 0; margin: 0 !important;
+  padding: 28px var(--header-gutter) 48px !important; gap: 0;
+  border: 0 !important; border-top: 4px solid #d98f06 !important;
+  border-radius: 0; box-shadow: none; background: #1e2d59 !important; color: white !important;
+  overflow: auto; overscroll-behavior: contain;
+}
+:root:root body[data-app-view] #site-menu-panel .site-menu-group {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 0;
+  width: 100%; padding: 0; margin: 0; border: 0; flex-shrink: 0;
+}
+:root:root body[data-app-view] #site-menu-panel [hidden][hidden] { display: none !important; }
+:root:root body[data-app-view] #site-menu-panel .site-menu-group :is(a,button) {
+  display: block !important; width: fit-content; max-width: 100%; min-height: 44px;
+  padding: 10px 0 !important; margin: 0; border: 0 !important; border-radius: 0;
+  background: transparent !important; color: white !important; -webkit-text-fill-color: white !important;
+  font: 400 20px/1.5 var(--reference-body); text-align: left; white-space: normal;
+}
+:root:root body[data-app-view] #site-menu-panel :is(a,button):is([aria-current='page'],:hover) {
+  text-decoration: underline !important; text-decoration-color: #d98f06 !important;
+  text-decoration-thickness: 4px !important; text-underline-offset: 8px !important;
+}
+:root:root body[data-app-view] #site-menu-panel :is(a,button):focus-visible {
+  outline: 3px solid #d98f06 !important; outline-offset: 4px !important;
+}
+:root:root body[data-app-view] #site-menu-panel .site-menu-activity {
+  border-top: 1px solid #ffffff60; margin-top: 20px; padding-top: 20px;
+}
+:root:root body[data-app-view] #site-menu-panel .site-menu-activity strong { font: 600 18px/1.5 var(--reference-body); padding-bottom: 8px; }
+:root:root body[data-app-view] #site-menu-panel .site-menu-journeys { border-bottom: 1px solid #ffffff60; padding-bottom: 20px; margin-bottom: 20px; }
+
+/* One gutter anchors the logo, page navigation, and Help/Close on every route. */
+:root:root body[data-app-view] { --header-gutter: var(--editorial-gutter); }
+:root:root body[data-app-view] > header.app-header { padding-inline: var(--header-gutter) !important; }
+:root:root body[data-app-view] > header.app-header .header-actions { margin-right: 0; padding-right: 0; }
+:root:root body[data-app-view] #site-menu-toggle { padding-inline: 0 !important; min-width: 0; font-family: var(--reference-body); }
+
+/* Explore copy and footer actions use a consistent readable size. */
+:root:root body[data-app-view='workspace'] #app #workspace-panel .partner-card :is(p,li,label,legend,dd,dt,button,input,textarea,select,.workspace-ai-disclosure,.workspace-save-status,.studio-progress) {
+  font-size: 18px !important; line-height: 1.6;
+}
+:root:root body[data-app-view='workspace'] #app #workspace-panel .studio-next { flex: 0 0 auto; min-width: max-content; }
+:root:root body[data-app-view='workspace'] #app #workspace-panel .studio-next button { width: auto; min-width: max-content; white-space: nowrap; }
+:root:root body[data-app-view='workspace'] #app #workspace-panel .studio-welcome-engine img { display: block; width: 100%; height: 100%; max-height: 100%; object-fit: contain; }
+:root:root body[data-app-view='guide'] #app .course-guide-shell--empty #entry-title { font-size: 56px !important; }
+:root:root body[data-app-view='guide'] #app .guide-empty { padding-block: 24px 64px; }
+:root:root body[data-app-view='guide'] #app .guide-empty p { max-width: 62ch; font-size: 18px; }
+:root:root body[data-app-view='guide'] #app .guide-empty-actions { display: flex; flex-wrap: wrap; gap: 16px 32px; }
+:root:root body[data-app-view='guide'] #app .guide-empty-actions a {
+  display: inline-block; padding: 8px 0; background: transparent !important; color: #1e2d59 !important;
+  text-decoration: underline !important; text-decoration-color: #d98f06 !important;
+  text-decoration-thickness: 3px !important; text-underline-offset: 6px; font-size: 18px;
+}
+@media (max-width: 1100px) {
+  :root:root body[data-app-view] #site-menu-panel .site-menu-journeys a { font-size: 24px; }
+  :root:root body[data-app-view] #site-menu-panel :is(.site-menu-project,.site-menu-information,.site-menu-activity) :is(a,button) { font-size: 18px; }
+}
+@media (max-width: 600px) {
+  :root:root body[data-app-view] dialog.guide-preview { width: 100vw; height: 100dvh; margin: 0; }
+  :root:root body[data-app-view] .guide-preview-toolbar { padding-block: 16px 8px; gap: 8px 24px; }
+  :root:root body[data-app-view] .guide-preview-actions { gap: 10px; padding-block: 12px; }
+  :root:root body[data-app-view] .guide-preview-actions [data-guide-page] { max-width: 7ch; text-align: center; font-size: 16px; }
+  :root:root body[data-app-view='workspace'] #app #workspace-panel .studio-next { min-width: 0; }
+  :root:root body[data-app-view='workspace'] #app #workspace-panel .studio-back { flex: 0 0 auto; }
+  :root:root body[data-app-view='workspace'] #app #workspace-panel .studio-navigation .studio-progress { display: none; }
+}
+
+/* Screen-sized story beats and Studio reading steps. */
+:root:root:root body[data-app-view]:is([data-app-view='workspace'], :has(.focused-scene)) {
+  height: 100dvh; min-height: 0; overflow: hidden; padding-bottom: 0 !important;
+}
+:root:root:root body[data-app-view] > header.app-header {
+  height: 76px !important; min-height: 76px !important; flex: 0 0 76px;
+  padding: 8px var(--header-gutter) !important;
+}
+:root:root:root body[data-app-view] > header.app-header .public-page-chooser { display: none !important; }
+:root:root:root body[data-app-view]:is([data-app-view='workspace'], :has(.focused-scene)) #app {
+  flex: 1 1 0; height: calc(100dvh - 76px); min-height: 0; max-height: none;
+  width: 100%; margin: 0; padding: 0; overflow: visible;
+}
+:root:root:root body[data-app-view] #app .focused-scene {
+  display: grid; grid-template-rows: 48px minmax(0, 1fr) 80px;
+  height: 100%; min-height: 0 !important; margin: 0; padding: 0; overflow: visible;
+}
+:root:root:root body[data-app-view] #app .focused-scene > .story-toolbar {
+  height: 48px; min-height: 0; padding: 4px var(--header-gutter); gap: 16px;
+}
+:root:root:root body[data-app-view] #app .focused-scene .story-identity { margin: 0; min-width: 0; }
+:root:root:root body[data-app-view] #app .focused-scene .story-identity strong { font-size: 18px; }
+:root:root:root body[data-app-view] #app .focused-scene .scene-actions {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center; height: 80px; min-height: 0;
+  padding: 10px var(--header-gutter); gap: 16px;
+}
+:root:root:root body[data-app-view] #app .focused-scene .scene-actions :is(.nav-button,.navigation-hint) {
+  min-width: 0; width: auto; margin: 0; font-size: 18px !important; line-height: 1.4;
+}
+:root:root:root body[data-app-view] #app .focused-scene .scene-actions .nav-button { min-height: 44px; white-space: nowrap; }
+:root:root:root body[data-app-view] #app .focused-scene .navigation-hint { text-align: center; }
+:root:root:root body[data-app-view] #app .focused-scene .navigation-guidance { font-size: 18px; }
+
+/* Bring both narrators and their words into the same central composition. */
+:root:root:root body[data-app-view] #app .focused-scene.focus--dialogue .speaker-panel {
+  width: min(1100px, 100%); margin-inline: auto;
+  grid-template-columns: minmax(0, 55fr) minmax(0, 45fr);
+  padding-inline: var(--header-gutter); gap: 24px;
+}
+:root:root:root body[data-app-view] #app .focused-scene.focus--dialogue.camera--left .speaker-panel { grid-template-columns: minmax(0, 45fr) minmax(0, 55fr); }
+:root:root:root body[data-app-view] #app .focused-scene.focus--dialogue .speech-bubble {
+  width: 100%; max-width: 36ch; justify-self: end; padding: 0 !important;
+}
+:root:root:root body[data-app-view] #app .focused-scene.focus--dialogue.camera--left .speech-bubble { justify-self: start; }
+:root:root:root body[data-app-view] #app .focused-scene .speech-bubble p { font-size: clamp(24px, 2.1vw, 30px) !important; line-height: 1.45; margin: 12px 0 0; }
+
+/* Boards occupy the reading area. Feedback replaces the answer list. */
+:root:root:root body[data-app-view] #app .focused-scene .smartboard-stage,
+:root:root:root body[data-app-view] #app .focused-scene .smartboard-stage:has(.choices,.smartboard--reading) {
+  display: block !important; height: 100% !important; padding: 16px var(--header-gutter) !important;
+}
+:root:root:root body[data-app-view] #app .focused-scene .smartboard-stage .smartboard-cast,
+:root:root:root body[data-app-view] #app .focused-scene .smartboard-stage:has(.choices,.smartboard--reading) .smartboard-cast { display: none !important; }
+:root:root:root body[data-app-view] #app .focused-scene .smartboard-stage-board {
+  height: 100% !important; min-height: 0; max-height: none; width: min(1120px, 100%); margin-inline: auto;
+}
+:root:root:root body[data-app-view] #app .focused-scene .smartboard { min-height: 0; max-width: none; }
+:root:root:root body[data-app-view] #app .focused-scene .smartboard .board-screen {
+  display: flex !important; flex-direction: column; justify-content: center;
+  height: 100% !important; min-height: 0; padding: 24px !important; gap: 16px;
+  overflow: visible !important; border: 0 !important;
+}
+:root:root:root body[data-app-view] #app .focused-scene .smartboard .board-heading { display: block; margin: 0 !important; }
+:root:root:root body[data-app-view] #app .focused-scene .smartboard .board-heading h2 {
+  text-align: center !important; font-size: clamp(32px, 3.1vw, 46px) !important; line-height: 1.1 !important;
+}
+:root:root:root body[data-app-view] #app .focused-scene .smartboard :is(.board-text,.board-quote,.board-note,.reference-comparison,.handoff) {
+  margin: 0 !important; padding: 0 !important; font-size: 18px !important; line-height: 1.45;
+}
+:root:root:root body[data-app-view] #app .focused-scene .smartboard .service-flow {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px;
+  width: 100%; margin: 0; padding: 0; align-items: start;
+}
+:root:root:root body[data-app-view] #app .focused-scene .smartboard .service-flow li {
+  display: grid; grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto;
+  justify-items: start; align-items: start; gap: 8px; min-width: 0; margin: 0; padding: 0 !important;
+}
+:root:root:root body[data-app-view] #app .focused-scene .smartboard .service-flow .lemonade-visual { width: 140px !important; height: 86px !important; margin: 0 !important; object-fit: contain; }
+:root:root:root body[data-app-view] #app .focused-scene .smartboard .service-flow .flow-number {
+  position: static !important; inset: auto !important; display: block; height: auto; margin: 0; padding: 0;
+  font: 700 40px/1 var(--reference-display) !important;
+}
+:root:root:root body[data-app-view] #app .focused-scene .smartboard .service-flow strong { font-size: 22px !important; line-height: 1.25; margin: 0; }
+:root:root:root body[data-app-view] #app .focused-scene .smartboard .service-flow li > span:last-child { font-size: 18px !important; line-height: 1.4; margin: 0; }
+:root:root:root body[data-app-view] #app .focused-scene .reference-comparison-controls { margin: 0 0 12px !important; gap: 24px; }
+:root:root:root body[data-app-view] #app .focused-scene .choices legend { padding: 0; margin-bottom: 16px; font-size: 18px !important; line-height: 1.4; }
+:root:root:root body[data-app-view] #app .focused-scene .choice-list { display: grid; gap: 16px; }
+:root:root:root body[data-app-view] #app .focused-scene .smartboard .choices .choice { padding: 4px 0 4px 12px !important; font-size: 18px !important; line-height: 1.4; }
+:root:root:root body[data-app-view] #app .focused-scene .smartboard .choice span { font-size: inherit; }
+:root:root:root body[data-app-view] #app .focused-scene .smartboard .choice input { margin-top: 5px; }
+:root:root:root body[data-app-view] #app .focused-scene .selected-answer { border-left: 4px solid #d98f06; padding-left: 16px; margin: 0 0 20px; font-size: 18px; line-height: 1.4; }
+:root:root:root body[data-app-view] #app .focused-scene .selected-answer > strong { display: block; margin-bottom: 8px; }
+:root:root:root body[data-app-view] #app .focused-scene .feedback.has-feedback { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 32px; padding: 0; margin: 0; }
+:root:root:root body[data-app-view] #app .focused-scene .feedback .answer-result { grid-column: 1 / -1; margin: 0; }
+:root:root:root body[data-app-view] #app .focused-scene .answer-result strong { display: inline-block; border-bottom: 4px solid #d98f06; margin-right: 16px; }
+:root:root:root body[data-app-view] #app .focused-scene .feedback-turn p { margin: 8px 0 0; font-size: 18px !important; line-height: 1.4; }
+:root:root:root body[data-app-view] #app .focused-scene .choice-response .text-action { margin-top: 16px; }
+.choice-label-brief, .choice-response-next { display: none; }
+
+/* Shared text links and reading controls, without panel or pill styling. */
+:root:root:root body[data-app-view] #app :is(.text-action,.reading-page-nav button,.local-tabs button,.workspace-section-tabs button,.final-tool-links button) {
+  width: auto; min-height: 44px; padding: 8px 0 !important; border: 0 !important; border-radius: 0 !important;
+  background: transparent !important; color: #1e2d59 !important; font: 400 18px/1.4 var(--reference-body) !important;
+}
+:root:root:root body[data-app-view] #app :is(.text-action,.reading-page-nav button,.local-tabs button,.workspace-section-tabs button,.final-tool-links button):is(:focus-visible,[aria-current],[aria-selected='true']),
+:root:root:root body[data-app-view] #app .workspace-check-item a {
+  outline: none !important; text-decoration: underline !important; text-decoration-color: #d98f06 !important;
+  text-decoration-thickness: 4px !important; text-underline-offset: 7px;
+}
+:root:root:root body[data-app-view] #app .reading-page-nav { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 16px; }
+:root:root:root body[data-app-view] #app .reading-pages { width: 100%; min-width: 0; margin: 0; padding: 0; }
+:root:root:root body[data-app-view] #app .reading-page { margin: 0; padding: 0; min-width: 0; outline: none; }
+:root:root:root body[data-app-view] #app [data-reading-page][hidden] { display: none !important; }
+:root:root:root body[data-app-view] #app .local-tabs { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-bottom: 16px; }
+
+/* Studio uses one reading gutter and content-sized action groups. */
+:root:root:root body[data-app-view='workspace'] #app .workspace-shell { height: 100% !important; min-height: 0 !important; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-page {
+  grid-template-rows: auto minmax(0, 1fr) 70px !important; height: 100% !important; min-height: 0 !important; overflow: visible !important;
+}
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-page > .design-page-heading {
+  padding: 24px var(--header-gutter) 16px !important; min-height: 0; margin: 0;
+}
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-page > .design-page-heading h2 { font-size: clamp(32px, 3.3vw, 48px) !important; line-height: 1.1 !important; margin: 0; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-page > .design-page-fields {
+  display: block; height: auto !important; min-height: 0; padding: 8px var(--header-gutter) 16px !important;
+  margin: 0; overflow: visible !important; max-width: none;
+}
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .partner-card--welcome > :is(.design-page-heading,.design-page-fields) { padding-right: calc(40% + var(--header-gutter)) !important; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-action-bar {
+  height: 70px !important; min-height: 70px !important; max-height: 70px !important;
+  padding: 0 var(--header-gutter) !important;
+}
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .studio-navigation { height: 70px; padding: 8px 0 !important; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .studio-navigation button { height: 48px; min-height: 44px !important; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .studio-navigation .studio-progress { display: block; font-size: 18px; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .partner-content :is(p,li,dd,label,button),
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-ai-disclosure p { font-size: 18px !important; line-height: 1.5; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-ai-disclosure { padding: 0 !important; margin: 0 0 20px !important; max-width: 62ch; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .partner-content :is(.babbage-feedback,.feedback-prose,.partner-suggestion) {
+  display: block; width: 100%; max-width: none; margin: 0 !important; padding: 0 !important; text-align: left; grid-column: auto;
+}
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .partner-content .feedback-prose :is(p,ul,ol) { margin-left: 0 !important; max-width: 70ch; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .partner-content h3 { font: 700 28px/1.2 var(--reference-display) !important; margin: 0 0 16px; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .studio-content-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; margin-top: 24px; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .studio-content-actions button { min-height: 48px; width: auto; max-width: 100%; padding: 10px 20px; white-space: normal; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .explore-feature { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 64px; align-items: start; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .explore-chosen-idea h3 { font-size: 40px !important; margin: 0 0 20px; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .explore-chosen-idea .eyebrow { margin: 0 0 12px; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .explore-chosen-idea { margin: 0; padding: 0; }
+
+/* Drafts share a baseline, heading scale, and two explicit decisions. */
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .draft-comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; align-items: start; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .draft-comparison > [data-local-panel] { display: block !important; min-width: 0; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .draft-comparison .comparison-tabs { display: none; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .draft-comparison :is(h3,h4) { font: 700 24px/1.2 var(--reference-display) !important; margin: 0 0 12px; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .draft-comparison .reading-page :is(h4) { font-size: 20px !important; margin-top: 12px; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .draft-comparison .reading-page :is(p,li) { margin-top: 0; margin-bottom: 12px; }
+
+/* Review uses visible tabs, grouped tools, and links to the checked fields. */
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-section-frame--tabs {
+  display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); height: 100%; min-height: 0; overflow: visible;
+}
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-section-tabs { display: flex; flex-wrap: wrap; gap: 4px 28px; padding: 0 var(--header-gutter); }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-section-frame--tabs .workspace-section-main { min-height: 0; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-final-review { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 48px; height: auto; overflow: visible; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-final-review > [data-local-panel] { display: block !important; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .final-tools-tabs { display: none; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-check-tools { grid-column: 1 / -1; order: 1; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .final-tool-group h3 { font: 700 26px/1.2 var(--reference-display); margin: 0 0 8px; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .final-tool-links { display: flex; flex-wrap: wrap; column-gap: 24px; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-checks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-check-item { padding: 8px 0; border: 0; background: transparent; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-check-item :is(strong,span,p) { font-size: 18px; line-height: 1.4; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-check-item a { margin: 8px 0 0 34px; }
+
+/* Waiting obscures every background control and never claims measured progress. */
+body.ai-waiting-open > :not(.ai-waiting-dialog) { visibility: hidden !important; }
+:root:root:root body[data-app-view] dialog.ai-waiting-dialog {
+  display: grid; align-content: center; gap: 24px;
+  width: 100vw !important; height: 100dvh !important; min-height: 0; max-height: 100dvh !important;
+  margin: 0; padding: 32px var(--header-gutter) !important; overflow: visible !important;
+}
+:root:root:root body[data-app-view] dialog.ai-waiting-dialog:not([open]) { display: none; }
+:root:root:root body[data-app-view] dialog.ai-waiting-dialog::backdrop { background: #1e2d59; opacity: 1; }
+:root:root:root body[data-app-view] .ai-waiting-dialog .babbage-loading-heading strong { font-size: clamp(32px, 3.6vw, 52px) !important; }
+:root:root:root body[data-app-view] .babbage-progress { position: relative; overflow: hidden; }
+:root:root:root body[data-app-view] .babbage-progress span {
+  display: block; width: 35% !important; height: 100%; border-radius: 0;
+  animation: promptcraft-wait 1.7s ease-in-out infinite !important; will-change: transform;
+}
+:root:root:root body[data-app-view] .babbage-progress.is-complete span { width: 100% !important; animation: none !important; transform: none !important; }
+@keyframes promptcraft-wait { 0% { transform: translateX(-110%); } 100% { transform: translateX(400%); } }
+:root:root:root body[data-app-view] .ai-waiting-dialog > button {
+  justify-self: start; border: 0 !important; outline: none !important; border-radius: 0; box-shadow: none !important;
+  background: transparent !important; min-height: 44px; padding: 8px 0 !important;
+  color: white !important; -webkit-text-fill-color: white !important; font-size: 18px;
+}
+:root:root:root body[data-app-view] .ai-waiting-dialog > button:focus-visible {
+  outline: none !important; text-decoration: underline !important; text-decoration-color: #d98f06 !important;
+  text-decoration-thickness: 4px !important; text-underline-offset: 8px;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root:root:root body[data-app-view] .babbage-progress span { animation: none !important; transform: translateX(90%) !important; }
+}
+
+@media (max-width: 900px) {
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .explore-feature { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .partner-card--welcome > :is(.design-page-heading,.design-page-fields) { padding-right: var(--header-gutter) !important; }
+}
+@media (max-width: 700px) {
+  :root:root:root body[data-app-view] { --editorial-gutter: 20px; --header-gutter: 20px; }
+  :root:root:root body[data-app-view] > header.app-header { height: 64px !important; min-height: 64px !important; flex-basis: 64px; }
+  :root:root:root body[data-app-view] > header.app-header .brand small { display: none; }
+  :root:root:root body[data-app-view]:is([data-app-view='workspace'], :has(.focused-scene)) #app { height: calc(100dvh - 64px); }
+  :root:root:root body[data-app-view] #app .focused-scene { grid-template-rows: 48px minmax(0, 1fr) 76px; }
+  :root:root:root body[data-app-view] #app .focused-scene .scene-actions { height: 76px; gap: 12px; }
+  :root:root:root body[data-app-view] #app .focused-scene .scene-actions .nav-button { font-size: 18px !important; padding: 8px !important; }
+  :root:root:root body[data-app-view] #app .focused-scene .navigation-guidance { display: none !important; }
+  :root:root:root body[data-app-view] #app .focused-scene .narration-controls [data-action='repeat-narration'] { display: none; }
+  :root:root:root body[data-app-view] #app .focused-scene.focus--dialogue .speaker-panel,
+  :root:root:root body[data-app-view] #app .focused-scene.focus--dialogue.camera--left .speaker-panel { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 12px; padding-block: 24px 0; }
+  :root:root:root body[data-app-view] #app .focused-scene.focus--dialogue .speech-bubble { grid-column: 1; grid-row: 1; width: 100%; max-width: none; align-self: start; }
+  :root:root:root body[data-app-view] #app .focused-scene .speech-bubble p { font-size: 20px !important; line-height: 1.4; }
+  :root:root:root body[data-app-view] #app .focused-scene.focus--dialogue .speaker-panel .cast { grid-column: 1; grid-row: 2; height: 100% !important; }
+  :root:root:root body[data-app-view] #app .focused-scene.focus--dialogue .speaker-panel .character { height: 43cqh !important; width: calc(43cqh * .707) !important; left: 65% !important; bottom: 0 !important; }
+  :root:root:root body[data-app-view] #app .focused-scene .smartboard-stage { padding: 12px !important; }
+  :root:root:root body[data-app-view] #app .focused-scene .smartboard .board-screen { padding: 16px !important; gap: 12px; }
+  :root:root:root body[data-app-view] #app .focused-scene .smartboard .board-heading h2 { font-size: 30px !important; }
+  :root:root:root body[data-app-view] #app .focused-scene .choice-list { gap: 12px; }
+  :root:root:root body[data-app-view] #app .focused-scene .choice-label-full:has(+ .choice-label-brief) { display: none; }
+  :root:root:root body[data-app-view] #app .focused-scene .choice-label-brief { display: inline; }
+  :root:root:root body[data-app-view] #app .focused-scene .choice-response .feedback-turn { display: none !important; }
+  :root:root:root body[data-app-view] #app .focused-scene .choice-response-next { display: block; margin-top: 16px; font-size: 18px; }
+  :root:root:root body[data-app-view] #app .focused-scene .smartboard .service-flow { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  :root:root:root body[data-app-view] #app .focused-scene .smartboard .service-flow li { grid-template-columns: 72px minmax(0, 1fr); gap: 4px 12px; }
+  :root:root:root body[data-app-view] #app .focused-scene .smartboard .service-flow .lemonade-visual { grid-column: 1; grid-row: 1 / span 3; width: 72px !important; height: 60px !important; }
+  :root:root:root body[data-app-view] #app .focused-scene .smartboard .service-flow :is(.flow-number,strong,li > span:last-child) { grid-column: 2; }
+  :root:root:root body[data-app-view] #app .focused-scene .smartboard .service-flow .flow-number { font-size: 24px !important; }
+  :root:root:root body[data-app-view] #app .focused-scene .smartboard .service-flow strong { font-size: 18px !important; }
+  :root:root:root body[data-app-view] #app .focused-scene .reference-comparison > p { display: none; }
+  :root:root:root body[data-app-view] #app .focused-scene .reference-comparison-controls { margin-bottom: 0 !important; }
+  :root:root:root body[data-app-view] #app .focused-scene .handoff p { display: none; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-page > .design-page-heading { padding-block: 16px 12px !important; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-page > .design-page-heading h2 { font-size: 32px !important; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .explore-chosen-idea h3 { font-size: 30px !important; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .explore-intro > p { display: none; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-ai-disclosure { margin-bottom: 12px !important; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .studio-content-actions { margin-top: 16px; gap: 12px 20px; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .draft-comparison { display: block; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .draft-comparison > [data-local-panel][hidden] { display: none !important; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .draft-comparison .comparison-tabs { display: flex; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .draft-comparison > [data-local-panel] > h3 { display: none; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .draft-comparison :is(p,li) { line-height: 1.4; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-section-tabs { gap: 0 20px; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-final-review { display: block; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-final-review > [data-local-panel][hidden] { display: none !important; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .final-tools-tabs { display: flex; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .final-tool-links { flex-direction: column; align-items: flex-start; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-checks { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-check-item { padding: 0; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-check-item .workspace-check > span { gap: 4px; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-check-item a { min-height: 36px; padding-block: 4px !important; margin-top: 0; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .final-check-status { margin-block: 8px; }
+  :root:root:root body[data-app-view] .ai-waiting-dialog .babbage-loading { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  :root:root:root body[data-app-view] .ai-waiting-dialog .babbage-engine { width: 180px !important; margin: 0 auto; }
+  :root:root:root body[data-app-view] .ai-waiting-dialog .babbage-loading-heading strong { font-size: 32px !important; }
+}
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-checks > [data-reading-page] { display: block !important; }
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .final-check-pager { display: none; }
+:root:root:root body[data-app-view] #app .focused-scene .smartboard--facts .board-screen { display: grid !important; grid-template-columns: 140px minmax(0, 1fr); align-content: center; }
+:root:root:root body[data-app-view] #app .focused-scene .smartboard--facts :is(.board-heading,.board-note) { grid-column: 1 / -1; }
+:root:root:root body[data-app-view] #app .focused-scene .board-stand-visual { width: 140px; height: 100px; margin: 0; }
+:root:root:root body[data-app-view] #app .focused-scene .board-stand-visual svg { width: 100%; height: 100%; }
+:root:root:root body[data-app-view] #app .focused-scene .smartboard--facts .facts { margin: 0; padding-left: 20px; font-size: 18px; }
+@media (max-width: 700px) {
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-checks > [data-reading-page][hidden] { display: none !important; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .final-check-pager { display: flex; margin-top: 8px; }
+  :root:root:root body[data-app-view] #app .focused-scene .smartboard--facts .board-screen { grid-template-columns: 72px minmax(0, 1fr); }
+  :root:root:root body[data-app-view] #app .focused-scene .board-stand-visual { width: 72px; height: 72px; }
+  :root:root:root body[data-app-view] #app .focused-scene .service-flow:not(:has(.lemonade-visual)) li { grid-template-columns: 32px minmax(0, 1fr); }
+  :root:root:root body[data-app-view] #app .focused-scene .service-flow:not(:has(.lemonade-visual)) li .flow-number { grid-column: 1; grid-row: 1 / span 2; }
+}
+:root:root:root body[data-app-view] .guide-preview-index { max-height: none; overflow: visible; }
+:root:root:root body[data-app-view] .guide-preview-actions [data-guide-page] { max-width: none; font-size: 18px; text-align: center; }
+@media (max-width: 700px) {
+  :root:root:root body[data-app-view] .guide-preview-index { display: none !important; }
+  :root:root:root body[data-app-view] .guide-preview-section-picker { display: grid !important; grid-row: 2; gap: 4px; padding: 0 20px 12px; font-size: 18px; }
+  :root:root:root body[data-app-view] .guide-preview-section-picker select { width: 100%; min-width: 0; font-size: 18px; }
+  :root:root:root body[data-app-view] .guide-preview-actions { grid-template-columns: auto minmax(0,1fr) auto; }
 }

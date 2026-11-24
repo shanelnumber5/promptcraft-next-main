@@ -11,6 +11,7 @@ import { openReferences } from '../../shared/reference-dialog.js';
 import { createNarrator } from '../../shared/narration.js';
 import { updateNarrationControls as updateAudio } from '../../shared/narration-controls.js';
 import { storyNarration } from './narration.js';
+import { transitionStory } from './flow.js';
 
 // The scenario owns its story only. All design forms and AI work are mounted by
 // the shared studio after this single handoff.
@@ -98,12 +99,13 @@ export function mountOpening(
       comparisonMode,
     });
     const current = app.firstElementChild;
-    if (current?.classList.contains('focus--dialogue') && state.storyStage === 'dialogue') {
+    if (current?.classList.contains('focus--dialogue') && ['dialogue', 'response-maya', 'response-pixel'].includes(state.storyStage)) {
       // Retain the classroom, cast and speech panel between consecutive lines.
       const template = document.createElement('template');
       template.innerHTML = markup;
       const incoming = template.content.firstElementChild;
       current.className = incoming.className;
+      current.dataset.storyStage = incoming.dataset.storyStage;
       for (const selector of [
         '.chapter-line',
         '#scene-title',
@@ -125,30 +127,6 @@ export function mountOpening(
       updateDialoguePortrait(image, nextImage.getAttribute('src'));
       current.querySelector('.speech-bubble').className =
         incoming.querySelector('.speech-bubble').className;
-    } else if (choice && current?.classList.contains('focus--question')) {
-      // Keep the board and decoded cast mounted while an answer changes.
-      const template = document.createElement('template');
-      template.innerHTML = markup;
-      const incoming = template.content.firstElementChild;
-      current.className = incoming.className;
-      const boardScreen = current.querySelector('.board-screen');
-      const scrollTop = boardScreen?.scrollTop;
-      for (const input of current.querySelectorAll('input[name="scene-choice"]')) {
-        input.checked = input.value === choice;
-        input.closest('.choice').classList.toggle('is-selected', input.checked);
-      }
-      for (const selector of ['.choices > .feedback', '.scene-actions', '.save-notice']) {
-        const existing = current.querySelector(selector);
-        const replacement = incoming.querySelector(selector);
-        if (existing && replacement) existing.replaceWith(replacement);
-      }
-      if (boardScreen) boardScreen.scrollTop = scrollTop;
-      for (const image of current.querySelectorAll('.smartboard-cast img')) {
-        const nextImage = incoming.querySelector(
-          `img[data-character="${image.dataset.character}"]`,
-        );
-        if (nextImage) updateDialoguePortrait(image, nextImage.getAttribute('src'));
-      }
     } else {
       app.innerHTML = markup;
     }
@@ -169,7 +147,11 @@ export function mountOpening(
     const next = app.querySelector('.scene-actions button.primary:not(:disabled)');
     next?.classList.add('suggested-next');
     next?.setAttribute('aria-description', 'Suggested next action');
-    if (choice) app.querySelector(`input[value="${choice}"]`)?.focus({ preventScroll: true });
+    if (choice) {
+      const result = app.querySelector('.answer-result');
+      result?.setAttribute('tabindex', '-1');
+      result?.focus({ preventScroll: true });
+    }
     else if (focus) document.getElementById('scene-title')?.focus({ preventScroll: true });
   }
   app.addEventListener(
@@ -196,6 +178,7 @@ export function mountOpening(
       }
       const action = event.target.closest('[data-action]')?.dataset.action;
       const scene = discussionOpening.scenes[index()];
+      if (action === 'restart-scenario') { void restartScenario(); return; }
       if (action === 'toggle-narration') {
         narrator.toggle(storyNarration(discussionOpening, scene, state));
         return;
@@ -208,22 +191,7 @@ export function mountOpening(
         if (index() === discussionOpening.scenes.length - 1 && sceneReady(scene, state)) studio();
         return;
       }
-      if (action === 'reveal-board' || action === 'reveal-question')
-        state.storyStage = action === 'reveal-board' ? 'board' : 'question';
-      else if (action === 'next') {
-        if (!sceneReady(scene, state)) return;
-        state.sceneId =
-          discussionOpening.scenes[Math.min(index() + 1, discussionOpening.scenes.length - 1)].id;
-        state.storyStage = 'dialogue';
-      } else if (action === 'back') {
-        if (state.storyStage === 'question') state.storyStage = 'board';
-        else if (state.storyStage === 'board') state.storyStage = 'dialogue';
-        else {
-          const prior = discussionOpening.scenes[Math.max(0, index() - 1)];
-          state.sceneId = prior.id;
-          state.storyStage = prior.choice ? 'question' : 'board';
-        }
-      } else return;
+      if (!transitionStory(discussionOpening, state, action)) return;
       save();
       render(true);
       preloadDialoguePortraits(
@@ -235,35 +203,27 @@ export function mountOpening(
     { signal: life.signal },
   );
   const restart = document.querySelector('[data-action="restart-module"]');
+  async function restartScenario() {
+    if (!(await confirmRestart({
+      title: replay ? 'Replay from the beginning?' : 'Restart scenario?',
+      description: replay ? 'This restarts the story replay. Your saved design stays in this browser.' : 'This clears scenario progress and its design. Your Creative Workspace stays saved.',
+      confirmLabel: 'Restart scenario',
+    }))) return;
+    if (!replay && !resetScenarioStudio(storage)) {
+      state.saveNotice = 'Scenario progress could not be reset.';
+      render();
+      return;
+    }
+    state = initialState(discussionOpening);
+    save();
+    render(true);
+  }
   if (restart) {
     restart.hidden = false;
-    restart.textContent = replay ? 'Replay from beginning' : 'Restart scenario';
+    restart.textContent = 'Restart scenario';
     restart.addEventListener(
       'click',
-      async () => {
-        if (replay) {
-          state = initialState(discussionOpening);
-          render(true);
-          return;
-        }
-        if (
-          !(await confirmRestart({
-            title: 'Restart Scenario 1?',
-            description:
-              'This clears Scenario 1 progress and its design. Your Creative Workspace stays saved.',
-            confirmLabel: 'Restart scenario',
-          }))
-        )
-          return;
-        if (!resetScenarioStudio(storage)) {
-          state.saveNotice = 'Scenario progress could not be reset.';
-          render();
-          return;
-        }
-        state = initialState(discussionOpening);
-        save();
-        render(true);
-      },
+      restartScenario,
       { signal: life.signal },
     );
   }

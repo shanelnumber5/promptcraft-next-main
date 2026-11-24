@@ -2,8 +2,14 @@ import { rememberPath } from '../features/workspace/storage.js';
 import { infoPages } from '../features/entry/info-screen.js';
 import { mountDropdowns } from '../shared/dropdown.js';
 import { mountPublicNavigation, syncPublicNavigation } from '../shared/public-navigation.js';
+import { openReferences } from '../shared/reference-dialog.js';
+import { mountReadingControls } from '../shared/reading-pages.js';
 mountDropdowns();
 mountPublicNavigation();
+mountReadingControls();
+document.querySelector('[data-site-resources]')?.addEventListener('click', () => {
+  openReferences(document.getElementById('site-menu-toggle'));
+});
 const params = new URLSearchParams(window.location.search);
 const requested = params.get('view');
 const view = [
@@ -56,8 +62,6 @@ if (view === 'play') {
   const { mountWorkspace } = await import('../features/workspace/controller.js');
   mountWorkspace(app, params, { scenario: view === 'scenario' });
 } else {
-  const references = document.querySelector('[data-action="open-references"]');
-  if (references) references.hidden = true;
   if (view === 'guide') {
     const { mountCourseGuide } = await import('../features/entry/guide-screen.js');
     mountCourseGuide(app);

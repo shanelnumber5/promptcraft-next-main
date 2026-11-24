@@ -4,7 +4,6 @@ import { discussionOpening } from '../opening/content.js';
 import { readWorkspace } from '../workspace/storage.js';
 import { openGuidePreview } from '../design/guide-preview.js';
 import { escapeHTML as e } from '../../shared/html.js';
-import { renderDropdown } from '../../shared/dropdown.js';
 
 // Read existing snapshots only. Visiting the guide never changes progress or the resume path.
 export function mountCourseGuide(app, storage = window.localStorage) {
@@ -34,7 +33,7 @@ export function mountCourseGuide(app, storage = window.localStorage) {
   const workspace = readWorkspace(storage);
   if (workspace.exists)
     entries.push({ path: 'workspace', title: 'Creative Workspace', state: workspace.state });
-  app.innerHTML = `<section class="entry-shell menu-shell course-guide-shell" aria-labelledby="entry-title"><header class="info-heading"><h1 id="entry-title" tabindex="-1">Course Guide</h1></header><div class="menu-board guide-board guide-library"><header class="guide-library-intro"><h2>Your design notebook</h2><p>Revisit your ideas, teaching decisions, and work in progress.</p></header>${
+  app.innerHTML = `<section class="entry-shell menu-shell course-guide-shell${entries.length ? '' : ' course-guide-shell--empty'}" aria-labelledby="entry-title"><header class="info-heading"><h1 id="entry-title" tabindex="-1">${entries.length ? 'Course Guide' : 'Your design notebook'}</h1></header><div class="menu-board guide-board guide-library">${entries.length ? '<header class="guide-library-intro"><h2>Your design notebook</h2><p>Revisit your ideas, teaching decisions, and work in progress.</p></header>' : ''}${
     entries.length
       ? `<div class="guide-list" aria-label="Saved designs">${entries
           .map((entry, index) => {
@@ -54,7 +53,7 @@ export function mountCourseGuide(app, storage = window.localStorage) {
           .join(
             '',
           )}</div><footer class="guide-library-note"><p>Saved in this browser. Download a finished HTML guide from your workspace to keep a separate copy.</p></footer>`
-      : `<div class="guide-empty"><h3>A place for your next idea</h3><p>Start a Guided Scenario or open Creative Workspace. Your saved work will appear here.</p></div>`
+      : `<div class="guide-empty"><p>Start a Guided Scenario or open Creative Workspace. Your saved work will appear here.</p><nav class="guide-empty-actions" aria-label="Start designing"><a href="?view=play&amp;story=1">Start a Guided Scenario</a><a href="?view=workspace">Open Creative Workspace</a></nav></div>`
   }<p role="status" data-guide-notice></p></div></section>`;
   app.querySelector('[data-guide-notice]').textContent = [notice, workspace.error]
     .filter(Boolean)

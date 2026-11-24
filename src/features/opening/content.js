@@ -94,11 +94,13 @@ export const discussionOpening = {
       board: firstPlan,
       choice: {
         allowAnyResponse: true,
+        checkIn: 'What assumption about the two helpers would you ask the group to test?',
         question: 'Which reply best helps the group examine its reasoning before changing the plan?',
         options: [
           {
             id: 'roles',
             label: 'If several customers arrive while supplies are full, what happens when Alex handles both payment and pouring? How could Sam help?',
+            shortLabel: 'Ask how Alex can take payments and pour during a rush, and how Sam could help.',
             correct: true,
             feedback:
               'This tests a specific choice against the supplied facts. The group must explain whether its division of work can handle a rush. The discussion has a job: examine the reasoning behind a decision.',
@@ -109,6 +111,7 @@ export const discussionOpening = {
           },
           {
             id: 'drink',
+            shortLabel: 'Tell Alex to take payments and Sam to pour, assuming this will be faster.',
             label: 'Have Alex take payments and Sam pour drinks. That division of work will make service faster.',
             feedback:
               'Maya: “I’d move Sam to pouring like you suggested. I’m still not sure what we’d do when the cups run out.” Pixel: What question would help the group test the new roles before committing to them?',
@@ -119,6 +122,7 @@ export const discussionOpening = {
           },
           {
             id: 'length',
+            shortLabel: 'Ask for more detail about payments, pouring, and restocking.',
             label: 'Explain the payment, pouring, and restocking steps in more detail so readers can understand the plan.',
             feedback:
               'Maya: “I’d spell out each step, but I’d still leave Alex doing both jobs. I haven’t thought about what happens if three people arrive at once.” Pixel: What could you ask that would help the group think through that rush?',
@@ -145,11 +149,13 @@ export const discussionOpening = {
           '“If three customers arrive together, Alex has to take each payment and pour each drink. Could Sam help serve while the supplies are full?”',
       },
       choice: {
+        checkIn: 'What would students need to explain to show they used the peer question?',
         question: 'Which follow-up requirement would make students use this peer question to deepen their reasoning?',
         options: [
           {
             id: 'roles',
             label: 'Summarize the peer question and describe why feedback is useful when planning a stand.',
+            shortLabel: 'Summarize the question and describe why feedback is useful.',
             feedback:
               'A summary shows students read the question, but they can still avoid examining their own plan. Require them to connect the concern to their decision and explain their response.',
             narrative: {
@@ -159,6 +165,7 @@ export const discussionOpening = {
           },
           {
             id: 'words',
+            shortLabel: 'Use the rush concern to revise or defend the roles, and explain why.',
             label: 'Use the concern about a customer rush to revise or defend the helper roles, explaining the reasons for that decision.',
             correct: true,
             feedback:
@@ -170,6 +177,7 @@ export const discussionOpening = {
           },
           {
             id: 'agree',
+            shortLabel: 'Change the roles to match the peer suggestion and describe the new plan.',
             label: 'Change the helper roles to match the peer suggestion and describe the new plan.',
             feedback:
               'Following a suggestion is not enough to show learning. Students need to evaluate it and explain why they changed the plan. Keeping the original roles can also be worthwhile if their reasons address the concern.',
@@ -191,10 +199,12 @@ export const discussionOpening = {
         'They propose different roles and explain why. This is a plan to test, not proof that service will be faster. A group could also defend its original choice if it addresses the concern.',
       board: revisedPlan,
       choice: {
+        checkIn: 'What evidence would help the group decide whether its revised plan works?',
         question: 'Which response best shows that the group used peer input to examine its decision?',
         options: [
           {
             id: 'changed',
+            shortLabel: 'We changed the roles because our peers suggested it.',
             label: 'We moved Sam to pouring because the other group recommended sharing service work. Our revised plan uses their suggestion.',
             feedback:
               'This names the suggestion and a change, but leaves the reasoning unstated. Why does the change address the rush, and what still needs testing?',
@@ -205,6 +215,7 @@ export const discussionOpening = {
           },
           {
             id: 'proven',
+            shortLabel: 'We shared service work after the rush question, so we know it will be faster.',
             label: 'We split payment and pouring after the peer raised the rush. Both helpers now serve customers, so we know the line will move faster.',
             feedback:
               'This connects the change to the concern, but treats an untested plan as proof. The group still needs to consider the order handoff and what happens when supplies run low.',
@@ -215,6 +226,7 @@ export const discussionOpening = {
           },
           {
             id: 'reasoned',
+            shortLabel: 'The rush question exposed a delay. We split the roles and will test handoffs and restocking.',
             label: 'The peer’s rush question exposed a possible delay: Alex does both service steps. We split the roles to let both helpers serve, and will test the order handoff and restocking during a rush.',
             correct: true,
             feedback:

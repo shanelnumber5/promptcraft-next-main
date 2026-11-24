@@ -182,7 +182,7 @@ export function loadState(scenario, storage = window.localStorage, workspace = n
       ...fresh,
       phase,
       sceneId: saved.sceneId,
-      storyStage: ['board', 'question'].includes(saved.storyStage) ? saved.storyStage : 'dialogue',
+      storyStage: ['board', 'question', 'response-maya', 'response-pixel'].includes(saved.storyStage) ? saved.storyStage : 'dialogue',
       answers,
       completed: saved.completed === true,
       setupStep,

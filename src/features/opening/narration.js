@@ -1,5 +1,10 @@
 // Keep speech tied to the same authored content as the visible story and guide.
 export function storyNarration(scenario, scene, state) {
+  if (state.storyStage?.startsWith('response-')) {
+    const speaker = state.storyStage.slice('response-'.length);
+    const answer = scene.choice?.options.find((option) => option.id === state.answers[scene.id]);
+    if (answer) return [{ speaker, text: `${scenario.characters[speaker].name}. ${answer.narrative?.[speaker] || answer.feedback}${speaker === 'pixel' ? ' ' + scene.choice.checkIn : ''}` }];
+  }
   if (state.storyStage === 'dialogue')
     return [
       {

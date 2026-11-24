@@ -13,6 +13,8 @@ import { renderQuestion } from '../design/conversation-view.js';
 import { renderLoading } from '../design/loading.js';
 import { renderDesignRationale } from '../../shared/design-evidence.js';
 import { escapeHTML as e } from '../../shared/html.js';
+import { renderDraftComparison } from './draft-comparison.js';
+import { renderReadingPages } from '../../shared/reading-pages.js';
 
 export function renderPartner(state, ai, page, preview, ui = {}) {
   const conversation = state.babbage;
@@ -30,6 +32,7 @@ export function renderPartner(state, ai, page, preview, ui = {}) {
     !state.workspace.selectedDirection &&
     !state.design.revision.trim();
   const utilityPage = page === 'history' || page === 'options';
+  if (ai.suggestion && !ai.pending && !utilityPage && page !== 'rationale') return renderDraftComparison(state, ai.suggestion);
   let content,
     actions = '',
     welcome = false;
@@ -85,7 +88,7 @@ export function renderPartner(state, ai, page, preview, ui = {}) {
     content = questions.replace(/<div class="question-actions">[\s\S]*?<\/div>/, '');
     actions = (questionActions?.[1] || '') + '';
   } else if (state.workspace.selectedDirection) {
-    content = `<h3>Build on your chosen idea</h3><p>${e(state.workspace.selectedDirection.title)}</p><p>${e(state.workspace.creativeCore || state.workspace.selectedDirection.core)}</p>`;
+    content = `<section class="explore-chosen-idea"><p class="eyebrow">Your chosen idea</p><h3>${e(state.workspace.selectedDirection.title)}</h3>${renderReadingPages(state.workspace.creativeCore || state.workspace.selectedDirection.core, { label: 'Chosen idea', limit: typeof window !== 'undefined' && window.matchMedia('(max-width: 700px)').matches ? 240 : 650 })}</section>`;
     actions = `<button type="button" class="primary" data-action="consult-babbage"${available ? '' : ' disabled'}>Consult Babbage</button><button type="button" data-partner-page="ideas">Other ideas</button>`;
   } else if ((conversation.ready || hasIdeas) && !dev) {
     content = renderPossibilities(state, ai, '', false);
@@ -143,7 +146,7 @@ export function renderPartner(state, ai, page, preview, ui = {}) {
     const pages = babbageFeedbackPages(feedbackMessage);
     const index = Math.max(0, Math.min(ui.feedbackPage || 0, pages.length - 1));
     if (!ui.clarifyNow) {
-      feedback = `<section class="babbage-feedback" aria-label="Babbage feedback"><p class="feedback-page-count">Babbage’s notes · ${index + 1} of ${pages.length}</p>${renderBabbageMessage(pages[index])}</section>`;
+      feedback = `<section class="babbage-feedback" aria-labelledby="babbage-notes-title"><h3 id="babbage-notes-title">Babbage’s notes</h3>${pages.length > 1 ? `<p class="feedback-page-count">Part ${index + 1} of ${pages.length}</p>` : ''}${renderReadingPages(pages[index], { label: 'Babbage notes', render: renderBabbageMessage })}</section>`;
       content = '';
       actions = `${index ? `<button type="button" data-feedback-page="${index - 1}">Previous notes</button>` : ''}${index < pages.length - 1 ? `<button type="button" class="primary" data-feedback-page="${index + 1}">Next notes</button>` : '<button type="button" class="primary" data-clarify-now>Continue to question</button>'}`;
     } else {
@@ -164,6 +167,13 @@ export function renderPartner(state, ai, page, preview, ui = {}) {
   const next =
     primary ||
     '<button type="button" class="primary" data-workspace-panel="revision">Continue</button>';
+  const notesBack = feedback ? actions.match(/<button\b[^>]*data-feedback-page="[^"]+"[^>]*>[\s\S]*?<\/button>/)?.[0] || '' : '';
+  actions = actions.replace(notesBack, '');
+  const inlineAction = `<div class="studio-content-actions">${notesBack}${next}</div>`;
+  const chosen = state.workspace.selectedDirection && !feedback && !utilityPage && !welcome && !ai.pending && !conversation.questions.length;
+  const body = chosen
+    ? `<div class="explore-feature"><div class="explore-intro"><p>Build on the idea you chose. Keep the parts that serve your learning goal.</p>${renderWorkspaceDisclosure(state, { compact: true })}</div><div>${content}${inlineAction}</div></div>`
+    : `${welcome || feedback ? '' : renderWorkspaceDisclosure(state)}${renderBabbageCameo(state, status)}${status ? `<p class="ai-status" role="status" aria-live="polite">${e(status)}</p>` : ''}${feedback}${content}${inlineAction}`;
   return `<div class="workspace-design workspace-design--focused partner-layout partner-layout--focused${utilityPage ? ' partner-layout--utility' : ''}">${renderStudioPage(
     {
       title: welcome
@@ -175,19 +185,19 @@ export function renderPartner(state, ai, page, preview, ui = {}) {
             : 'Explore with Babbage',
       titleId: 'ai-title',
       titleClass: 'workspace-build-title',
-      className: `workspace-context partner-card ai-panel${welcome ? ' partner-card--welcome' : ''}`,
+      className: `workspace-context partner-card ai-panel${welcome || offline ? ' partner-card--welcome' : ''}`,
       headingClass: 'partner-heading ai-panel-heading',
       headingExtra:
-        (welcome ? '<figure class="studio-welcome-engine" aria-hidden="true"><svg viewBox="0 0 480 430"><image href="assets/people/babbage-engine-repaired.webp" x="8" y="-110" width="464" height="657"/></svg></figure>' : renderBabbagePresence()) +
+        (welcome || offline ? '<figure class="studio-welcome-engine" aria-hidden="true"><img src="assets/people/babbage-engine-repaired.webp" alt=""></figure>' : renderBabbagePresence()) +
         (dev ? '<p class="partner-mode">Sample simulation · no AI call</p>' : ''),
-      content: `${welcome ? '' : renderWorkspaceDisclosure(state)}${renderBabbageCameo(state, status)}<p class="ai-status" role="status" aria-live="polite">${e(status)}</p>${feedback}${content}`,
+      content: body,
       bodyClass: 'partner-content',
       actions,
-      next,
+      next: '',
       back: previous,
       step: 'Explore · Stage 1 of 3',
       actionClass: 'partner-actions',
-      saveStatus: !ai.pending,
+      saveStatus: false,
     },
   )}</div>`;
 }

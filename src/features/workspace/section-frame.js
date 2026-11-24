@@ -3,6 +3,9 @@ import { escapeHTML as e } from '../../shared/html.js';
 // One visible section chooser. Hidden buttons keep the existing controller's
 // event path intact, so page navigation and saved edits behave as before.
 export function renderSectionFrame(items, current, attribute, content, label) {
+  if (attribute === 'data-review-page') {
+    return `<div class="workspace-section-frame workspace-section-frame--tabs"><nav class="workspace-section-tabs" aria-label="${e(label)}">${items.map(([id, title]) => `<button type="button" ${attribute}="${e(id)}"${id === current ? ' aria-current="page"' : ''}>${e(title)}</button>`).join('')}</nav><div class="workspace-section-main">${content}</div></div>`;
+  }
   if (attribute === 'data-design-page' || attribute === 'data-review-page') {
     const buttons = items
       .map(

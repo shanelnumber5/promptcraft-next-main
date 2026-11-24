@@ -22,7 +22,8 @@
     "format:check": "prettier --check index.html package.json README.md docs src server tests",
     "test:scenario-studio": "node tests/browser/scenario-studio.test.cjs",
     "test:workspace-layout": "node tests/browser/workspace-layout.test.cjs",
-    "test:unit": "node tests/run-unit.cjs"
+    "test:unit": "node tests/run-unit.cjs",
+    "test:flow": "node --test tests/unit/screen-flow.test.mjs"
   },
   "devDependencies": {
     "prettier": "3.6.2"

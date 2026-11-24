@@ -7,6 +7,7 @@ import { renderBuildPage } from './build-view.js';
 import { workspaceStages } from './config.js';
 import { escapeHTML as e } from '../../shared/html.js';
 import { renderStudioPage } from './page-frame.js';
+import { renderReadingPages } from '../../shared/reading-pages.js';
 
 export function renderWorkspace(
   state,
@@ -76,5 +77,5 @@ export function renderWorkspacePreview(state, designPage, ui = {}) {
     .map(([label, text]) => `<div><dt>${e(label)}</dt><dd>${e(text)}</dd></div>`)
     .join(
       '',
-    )}</dl></aside><section class="workspace-draft-document" aria-label="${e(model.label)}"><h3>Activity directions</h3><div class="workspace-reading-preview" data-live-preview>${renderDraftPreview(model.text, 'No working draft yet. Your setup is saved; select Build my activity to put your choices together with Babbage.')}</div></section></div>`;
+    )}</dl></aside><section class="workspace-draft-document" aria-label="${e(model.label)}"><h3>Activity directions</h3><div class="workspace-reading-preview" data-live-preview>${renderReadingPages(model.text || 'No working draft yet. Return to Build to develop your activity.', { label: 'Activity directions' })}</div></section></div>`;
 }

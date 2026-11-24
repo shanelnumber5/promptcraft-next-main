@@ -1164,25 +1164,6 @@ body[data-app-view] #app .focused-scene .scene-actions {
   margin: 0;
   box-shadow: none;
 }
-/* A gold menu remains visibly distinct against the navy introduction and story. */
-body[data-app-view]:is([data-app-view='home'], :has(.focused-scene)) #site-menu-panel {
-  background: #f3bf4b !important;
-  color: #1e2d59;
-}
-body[data-app-view]:is([data-app-view='home'], :has(.focused-scene))
-  #site-menu-panel
-  :is(a, button),
-body[data-app-view]:is([data-app-view='home'], :has(.focused-scene))
-  #site-menu-panel
-  a[aria-current='page'] {
-  color: #1e2d59 !important;
-}
-body[data-app-view]:is([data-app-view='home'], :has(.focused-scene))
-  #site-menu-panel
-  :is(a, button):focus-visible {
-  outline-color: #1e2d59 !important;
-}
-
 /* Wide screens must grow their outer page, rather than just enlarging its type. */
 body[data-app-view] #app > :is(.entry-shell, .lab-browser, .workspace-shell) {
   width: 100%;

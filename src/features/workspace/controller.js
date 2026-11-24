@@ -25,7 +25,7 @@ import {
   workspacePlanningFields,
   workspacePanelIds,
 } from './config.js';
-import { workspaceViews } from './views.js';
+import { workspaceViews, buildPages } from './views.js';
 import { downloadProjectFile, parseProjectFile, MAX_PROJECT_BYTES } from './project-file.js';
 import { combineDirections } from './creative.js';
 import { exploreWorkspace } from './exploration-controller.js';
@@ -87,7 +87,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
   ];
   let closingStage = scenario ? 'board' : 'dialogue';
   let closingPage = 0;
-  if (['start', 'draft'].includes(params.get('build'))) {
+  if (buildPages.some(([id]) => id === params.get('build'))) {
     state.designPanel = 'revision';
     designPage = params.get('build');
     showingWrapUp = false;
@@ -998,12 +998,13 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     }
     const page = event.target.closest('[data-design-page]');
     if (page) {
+      if (page.tagName === 'A') event.preventDefault();
       ui = workspaceViews();
       state.designPanel = 'revision';
       designPage = page.dataset.designPage;
       saveSafely();
       render();
-      document.getElementById('design-page-title')?.focus({ preventScroll: true });
+      document.getElementById(page.dataset.focusField || 'design-page-title')?.focus({ preventScroll: true });
       return;
     }
     const tab = event.target.closest('[data-workspace-panel]');
@@ -1408,12 +1409,12 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       target?.focus();
     }
   });
-  const projectTools = document.querySelector('.header-actions [data-action="open-references"]');
+  const projectTools = document.querySelector('[data-site-project-tools]');
   if (projectTools) {
-    projectTools.removeAttribute('data-action');
+    projectTools.hidden = false;
     projectTools.dataset.workspaceView = 'options';
     projectTools.id = 'workspace-project-tools';
-    projectTools.textContent = 'Project';
+    projectTools.textContent = 'Activity tools';
     projectTools.setAttribute('aria-label', route.options);
     projectTools.addEventListener('click', () => {
       if (readError) return;
@@ -1424,7 +1425,9 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
   }
   const restart = document.querySelector('[data-action="restart-module"]');
   if (restart) {
-    restart.hidden = true;
+    restart.hidden = false;
+    restart.textContent = scenario ? 'Restart scenario' : 'Restart workspace';
+    restart.addEventListener('click', reset);
   }
   document.addEventListener('click', (event) => {
     if (event.target.closest('a[href^="?"]') && !readError && !saveSafely()) {

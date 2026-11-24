@@ -1,12 +1,13 @@
 import { createGuide, guideOptions, downloadGuideHTML } from './guide.js';
 import { showModal } from '../../shared/modal.js';
+import { guidePreviewPages } from './guide-preview-pages.js';
 
 export function openGuidePreview(state, app, { onClose = null } = {}) {
   const dialog = document.createElement('dialog');
   dialog.className = 'guide-preview';
   dialog.setAttribute('aria-label', 'Course Guide preview');
   dialog.innerHTML =
-    '<header class="guide-preview-toolbar"><strong>Course Guide preview</strong><button type="button" data-guide-download>Download guide</button><button type="button" data-guide-close aria-label="Close assignment guide preview">Close</button></header><div class="guide-preview-section-picker"><label for="guide-section">Guide section</label><select id="guide-section" aria-controls="guide-preview-content"></select></div><nav class="guide-preview-index" aria-label="Guide contents"></nav><iframe id="guide-preview-content" title="Your assignment guide" sandbox="allow-downloads allow-popups allow-popups-to-escape-sandbox"></iframe><footer class="guide-preview-actions"><button type="button" data-guide-back>Previous section</button><span data-guide-page aria-live="polite"></span><button type="button" data-guide-next>Next section</button></footer>';
+    '<header class="guide-preview-toolbar"><strong>Course Guide preview</strong><button type="button" data-guide-download>Download guide</button><button type="button" data-guide-close aria-label="Close assignment guide preview">Close</button></header><div class="guide-preview-section-picker"><label for="guide-section">Guide section</label><select id="guide-section" aria-controls="guide-preview-content"></select></div><nav class="guide-preview-index" aria-label="Guide contents"></nav><iframe id="guide-preview-content" title="Your assignment guide" sandbox="allow-downloads allow-popups allow-popups-to-escape-sandbox"></iframe><footer class="guide-preview-actions"><button type="button" data-guide-back>Previous</button><span data-guide-page aria-live="polite"></span><button type="button" data-guide-next>Next section</button></footer>';
   // Use one immutable snapshot for every preview section and the complete download.
   const html = createGuide({ ...state.design }, guideOptions(state));
   dialog
@@ -16,6 +17,7 @@ export function openGuidePreview(state, app, { onClose = null } = {}) {
   const sections = [...parsed.querySelectorAll('.guide-section')];
   const picker = dialog.querySelector('select');
   const frame = dialog.querySelector('iframe');
+  let pages = guidePreviewPages(sections);
   let page = 0;
   sections.forEach((section, index) => {
     const option = document.createElement('option');
@@ -27,7 +29,7 @@ export function openGuidePreview(state, app, { onClose = null } = {}) {
     const link = document.createElement('button');
     link.type = 'button'; link.textContent = option.textContent;
     link.dataset.guideSection = String(index);
-    link.addEventListener('click', () => { page = index; render(); });
+    link.addEventListener('click', () => { page = pages.findIndex((item) => item.sectionIndex === index); render(); });
     dialog.querySelector('.guide-preview-index').append(link);
   });
   frame.addEventListener('load', () => {
@@ -35,22 +37,23 @@ export function openGuidePreview(state, app, { onClose = null } = {}) {
   });
   function render() {
     delete frame.dataset.ready;
-    picker.value = String(page);
-    dialog.querySelectorAll('[data-guide-section]').forEach((button) => { if (Number(button.dataset.guideSection) === page) button.setAttribute('aria-current', 'page'); else button.removeAttribute('aria-current'); });
+    const current = pages[page];
+    picker.value = String(current.sectionIndex);
+    dialog.querySelectorAll('[data-guide-section]').forEach((button) => { if (Number(button.dataset.guideSection) === current.sectionIndex) button.setAttribute('aria-current', 'page'); else button.removeAttribute('aria-current'); });
     frame.srcdoc =
       '<!doctype html><html lang="en"><head><base href="about:srcdoc"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
       parsed.head.querySelector('style').outerHTML +
-      '<style>body{--gutter:clamp(20px,4vw,48px);padding:0;background:#fff}main{display:block;max-width:none;margin:0}.guide-section{margin:0}.guide-section>section,.assignment-content{padding:32px var(--gutter)}.guide-section>section.assignment{padding:0}</style></head><body class="workspace-guide" data-app-view="guide-export" data-guide-preview><main>' +
-      sections[page].outerHTML +
+      '</head><body class="workspace-guide" data-app-view="guide-export" data-guide-preview><main>' +
+      current.html +
       '</main></body></html>';
     dialog.querySelector('[data-guide-back]').disabled = page === 0;
     dialog.querySelector('[data-guide-next]').textContent =
-      page === sections.length - 1 ? 'Close' : 'Next section';
+      page === pages.length - 1 ? 'Close' : 'Next';
     dialog.querySelector('[data-guide-page]').textContent =
-      'Section ' + (page + 1) + ' of ' + sections.length;
+      'Section ' + (current.sectionIndex + 1) + ' of ' + sections.length + (current.parts > 1 ? ' · Page ' + (current.part + 1) + ' of ' + current.parts : '');
   }
   picker.addEventListener('change', () => {
-    page = Number(picker.value);
+    page = pages.findIndex((item) => item.sectionIndex === Number(picker.value));
     render();
   });
   dialog.querySelector('[data-guide-back]').addEventListener('click', () => {
@@ -60,14 +63,23 @@ export function openGuidePreview(state, app, { onClose = null } = {}) {
     }
   });
   dialog.querySelector('[data-guide-next]').addEventListener('click', () => {
-    if (page < sections.length - 1) {
+    if (page < pages.length - 1) {
       page++;
       render();
     } else dialog.close();
   });
   dialog.querySelector('[data-guide-close]').addEventListener('click', () => dialog.close());
   if (onClose) dialog.addEventListener('close', onClose, { once: true });
-  render();
   showModal(dialog, { fallback: () => app.querySelector('[data-action="preview-guide"]') });
+  function fitPages() {
+    const sectionIndex = pages[page]?.sectionIndex || 0;
+    const characters = Math.max(100, Math.min(innerWidth < 700 ? 240 : 650, Math.floor((frame.clientHeight - 180) / 27) * Math.floor((frame.clientWidth - 40) / 10)));
+    pages = guidePreviewPages(sections, characters);
+    page = Math.max(0, pages.findIndex((item) => item.sectionIndex === sectionIndex));
+    render();
+  }
+  fitPages();
+  window.addEventListener('resize', fitPages);
+  dialog.addEventListener('close', () => window.removeEventListener('resize', fitPages), { once: true });
   dialog.querySelector('[data-guide-close]').focus();
 }

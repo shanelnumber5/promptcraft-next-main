@@ -10,8 +10,9 @@ import { reviewFingerprint, reviewEligible } from './review-ai.js';
 import { renderSectionFrame } from './section-frame.js';
 import { separateRationaleReferences } from '../../shared/design-evidence.js';
 import { renderGuideHelp } from '../../shared/guide-help.js';
-import { finalCheckItems, finalCheckReady } from '../design/content.js';
+import { finalCheckReady } from '../design/content.js';
 import { escapeHTML as e } from '../../shared/html.js';
+import { renderFinalChecks } from './final-checks.js';
 
 export function renderReview(state, ai, page, preview, ui = {}) {
   if (page === 'guide') page = 'checks'; // Preserve existing navigation targets and saved approval flow.
@@ -47,7 +48,7 @@ export function renderReview(state, ai, page, preview, ui = {}) {
     actions = `<button type="button" class="primary" data-action="rubric-continue"${!state.creative.rubric?.rows.length || pending ? ' disabled' : ''}>Continue to review</button>`;
   } else if (page === 'checks') {
     title = 'Final checks & Course Guide';
-    content = `<div class="workspace-final-review"><section class="workspace-check-tools"><p>Confirm these three points before saving your design.</p><div class="workspace-checks">${finalCheckItems.map((item) => `<div class="workspace-check-item"><label class="workspace-check"><input type="checkbox" data-final-check="${item.id}"${state.finalCheck[item.id] ? ' checked' : ''}${!state.design.revision.trim() || (item.id === 'learning' && !state.teacher.learningGoal.trim()) ? ' disabled' : ''}><span><strong>${e(item.title)}</strong><span>${e(item.id === 'instructions' ? 'Students can tell what to do and what to submit.' : item.id === 'learning' ? 'The work gives students practice with the learning goal.' : item.label)}</span></span></label></div>`).join('')}</div><p class="final-check-status" role="status">${state.finalCheck.approved ? 'This version is saved and ready to download.' : ready ? 'Ready to save this design.' : 'Complete the three checks, learning goal and reasoning.'}</p><div class="guide-download-actions"><button type="button" data-workspace-view="preview">Review activity directions</button><button type="button" data-design-page="presence">Edit instructor interaction</button>${state.creative.rubric?.rows.length ? '<button type="button" data-review-page="rubric">Review visual rubric</button><button type="button" data-action="download-rubric-csv">Download rubric for Canvas import (.csv)</button>' : '<p data-rubric-notice role="status">The rubric is prepared automatically with your draft.</p>'}<button type="button" data-action="preview-guide">Preview Course Guide</button><button type="button" data-action="download-guide">Download Course Guide</button></div></section></div>`;
+    content = renderFinalChecks(state, ready);
     actions =
       state.finalCheck.approved && ready
         ? '<button type="button" class="primary" data-action="finish-workspace">Finish with Pixel</button><button type="button" data-action="download-guide">Download guide</button><button type="button" data-action="preview-guide">Preview guide</button>'
@@ -109,6 +110,7 @@ export function renderReview(state, ai, page, preview, ui = {}) {
       bodyClass: `review-content${page === 'reasoning' ? ' review-content--reasoning' : page === 'checks' ? ' review-content--final' : ''}`,
       actionClass: 'design-page-nav review-actions',
       actionLabel: 'Review actions',
+      saveStatus: false,
     },
   )}</div>`;
   return renderSectionFrame(sections, page, 'data-review-page', contentView, 'Review sections');
