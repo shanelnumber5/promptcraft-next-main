@@ -34,11 +34,7 @@ export function openGuidePreview(state, app, { onClose = null } = {}) {
     frame.srcdoc =
       '<!doctype html><html lang="en"><head><base href="about:srcdoc"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
       parsed.head.querySelector('style').outerHTML +
-<<<<<<< Updated upstream
-      '<style>body{--gutter:clamp(20px,4vw,48px);padding:0;background:#fff}main{max-width:none;margin:0}.guide-section{margin:0}.guide-section>section,.assignment-content{padding:32px var(--gutter)}.guide-section>section.assignment{padding:0}</style></head><body class="workspace-guide"><main>' +
-=======
       '<style>body{--gutter:clamp(20px,4vw,48px);padding:0;background:#fff}main{display:block;max-width:none;margin:0}.guide-section{margin:0}.guide-section>section,.assignment-content{padding:32px var(--gutter)}.guide-section>section.assignment{padding:0}</style></head><body class="workspace-guide" data-app-view="guide-export" data-guide-preview><main>' +
->>>>>>> Stashed changes
       sections[page].outerHTML +
       '</main></body></html>';
     dialog.querySelector('[data-guide-back]').disabled = page === 0;
