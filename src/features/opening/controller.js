@@ -87,16 +87,11 @@ export function mountOpening(
   const observer =
     typeof ResizeObserver === 'function' ? new ResizeObserver(positionPixelTag) : null;
   observer?.observe(app);
-  let comparisonMode = 'revised';
   function render(focus = false, choice = null) {
     const scene = discussionOpening.scenes[index()];
     document.querySelector('.skip-link')?.setAttribute('href', '#scene-title');
     const className = `scene-${scene.id}${scene.choice && state.answers[scene.id] ? ' answer-selected' : ''}`;
-    const markup = renderScene(discussionOpening, scene, state, index(), {
-      className,
-      replay,
-      comparisonMode,
-    });
+    const markup = renderScene(discussionOpening, scene, state, index(), { className, replay });
     const current = app.firstElementChild;
     if (current?.classList.contains('focus--dialogue') && state.storyStage === 'dialogue') {
       // Retain the classroom, cast and speech panel between consecutive lines.
@@ -187,13 +182,6 @@ export function mountOpening(
   app.addEventListener(
     'click',
     (event) => {
-      const comparison = event.target.closest('[data-plan-comparison]');
-      if (comparison?.dataset.planComparison) {
-        comparisonMode = comparison.dataset.planComparison === 'original' ? 'original' : 'revised';
-        render(false);
-        app.querySelector('[data-plan-comparison="' + comparisonMode + '"]')?.focus();
-        return;
-      }
       const action = event.target.closest('[data-action]')?.dataset.action;
       const scene = discussionOpening.scenes[index()];
       if (action === 'toggle-narration') {

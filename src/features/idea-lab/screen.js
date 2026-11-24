@@ -26,7 +26,12 @@ export const categoryColors = {
 };
 const categoryFor = item => item.tags.find(tag=>tag!=='Discussion') || 'Discussion';
 const categoryStyle = item => `--lab-category-color:${categoryColors[categoryFor(item)] || '#F2F2F2'}`;
+<<<<<<< Updated upstream
+const PAGE_SIZE = 6;
+const labSidebar = tag => `<aside class="lab-sidebar"><nav aria-label="Learning focus"><button type="button" data-lab-category=""${!tag?' aria-current="true"':''}>All ideas</button>${ideaTags.filter(item=>item!=='Discussion').map(item=>`<button type="button" data-lab-category="${e(item)}"${item===tag?' aria-current="true"':''}>${e(item)}</button>`).join('')}</nav></aside>`;
+=======
 const labFilters = tag => `<nav class="lab-category-filters" aria-label="Learning focus"><span>Learning focus</span>${['', ...ideaTags.filter(item=>item!=='Discussion')].map(item=>`<button type="button" data-lab-category="${e(item)}" aria-pressed="${item===tag}">${e(item || 'All ideas')}</button>`).join('')}</nav>`;
+>>>>>>> Stashed changes
 
 const browseURL = (query, tag, page=0, id='') => '?'+new URLSearchParams({view:'lab',...(id?{idea:id}:{}),...(query?{q:query}:{}),...(tag?{category:tag}:{})}).toString();
 export function renderIdeaCards(query = '', tag = '', page = 0) {

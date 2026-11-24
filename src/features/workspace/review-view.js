@@ -38,16 +38,20 @@ export function renderReview(state, ai, page, preview, ui = {}) {
   const sections = [
     ['rationale', 'Feedback'],
     ['reasoning', 'Your reasoning'],
-    ...(state.creative.rubric?.rows.length ? [['rubric', 'Assessment rubric']] : []),
+    ['rubric', 'Rubric (optional)'],
     ['checks', 'Final checks & guide'],
   ];
   if (page === 'rubric') {
     title = 'Assessment rubric';
-    content = renderRubric(state, pending, { editing: ui.rubricPart === 'edit' });
+    content =
+      ui.rubricPart === 'criteria'
+        ? renderAssessmentSetup(state) +
+          '<button type="button" data-action="view-rubric">Back to rubric</button>'
+        : renderRubric(state, pending, { page: ui.rubricCriterion || 0 });
     actions = `<button type="button" class="primary" data-action="rubric-continue"${!state.creative.rubric?.rows.length || pending ? ' disabled' : ''}>Continue to review</button>`;
   } else if (page === 'checks') {
     title = 'Final checks & Course Guide';
-    content = `<div class="workspace-final-review"><section class="workspace-check-tools"><p>Confirm these three points before saving your design.</p><div class="workspace-checks">${finalCheckItems.map((item) => `<div class="workspace-check-item"><label class="workspace-check"><input type="checkbox" data-final-check="${item.id}"${state.finalCheck[item.id] ? ' checked' : ''}${!state.design.revision.trim() || (item.id === 'learning' && !state.teacher.learningGoal.trim()) ? ' disabled' : ''}><span><strong>${e(item.title)}</strong><span>${e(item.id === 'instructions' ? 'Students can tell what to do and what to submit.' : item.id === 'learning' ? 'The work gives students practice with the learning goal.' : item.label)}</span></span></label></div>`).join('')}</div><p class="final-check-status" role="status">${state.finalCheck.approved ? 'This version is saved and ready to download.' : ready ? 'Ready to save this design.' : 'Complete the three checks, learning goal and reasoning.'}</p><div class="guide-download-actions"><button type="button" data-workspace-view="preview">Review activity directions</button><button type="button" data-design-page="presence">Edit instructor interaction</button>${state.creative.rubric?.rows.length ? '<button type="button" data-review-page="rubric">Review visual rubric</button><button type="button" data-action="download-rubric-csv">Download rubric for Canvas import (.csv)</button>' : '<p data-rubric-notice role="status">The rubric is prepared automatically with your draft.</p>'}<button type="button" data-action="preview-guide">Preview Course Guide</button><button type="button" data-action="download-guide">Download Course Guide</button></div></section></div>`;
+    content = `<div class="workspace-final-review"><section class="workspace-check-reference" aria-label="Activity reference"><h3 id="check-activity" tabindex="-1">Your activity</h3>${renderAssignmentDirections(state.design.revision)}<h3 id="check-goal" tabindex="-1">Learning goal</h3><p>${e(state.teacher.learningGoal || 'Add a learning goal in Build.')}</p><h3 id="check-instructor-plan" tabindex="-1">Instructor interaction</h3><p>${e(state.workspace.instructorPlan || 'No instructor interaction recorded.')}</p><button type="button" data-design-page="presence">Edit instructor interaction</button><h3 id="check-requirements" tabindex="-1">What must stay the same?</h3><p>${e(state.teacher.mustStay || 'No protected requirements recorded. Confirm whether this is intentional.')}</p><h3 id="check-reason" tabindex="-1">Why this design?</h3>${renderAssignmentDirections(separateRationaleReferences(state.design.reason).prose || 'Add your reasoning before saving.')}</section><section class="workspace-check-tools" aria-label="Checks and guide"><div class="workspace-checks">${finalCheckItems.map((item) => `<div class="workspace-check-item"><label class="workspace-check"><input type="checkbox" data-final-check="${item.id}"${state.finalCheck[item.id] ? ' checked' : ''}${!state.design.revision.trim() || (item.id === 'learning' && !state.teacher.learningGoal.trim()) ? ' disabled' : ''}><span><strong>${e(item.title)}</strong><span>${e(item.id === 'instructions' ? 'Students can tell what to do, what to produce, and how to complete the activity.' : item.id === 'learning' ? 'The tasks give students practice with the learning goal.' : item.label)}</span></span></label></div>`).join('')}</div><p class="final-check-status" role="status" aria-live="polite">${state.finalCheck.approved ? 'This version is saved and ready to download.' : ready ? 'Ready to save this design.' : 'Include a draft, learning goal, rationale, and all three checks.'}</p><div class="workspace-project-actions"><button type="button" data-review-page="reasoning">Edit your reasoning</button></div></section></div>`;
     actions =
       state.finalCheck.approved && ready
         ? '<button type="button" class="primary" data-action="finish-workspace">Finish with Pixel</button><button type="button" data-action="download-guide">Download guide</button><button type="button" data-action="preview-guide">Preview guide</button>'
@@ -77,19 +81,19 @@ export function renderReview(state, ai, page, preview, ui = {}) {
     actions = '';
   } else if (page === 'reasoning') {
     back = '<button type="button" data-review-page="rationale">Back</button>';
-    next = `<button type="button" class="primary" data-review-page="${state.creative.rubric.rows.length ? 'rubric' : 'checks'}"${pending ? ' disabled' : ''}>Continue</button>`;
+    next = `<button type="button" class="primary" data-review-page="${state.creative.rubric.requested || state.creative.rubric.rows.length ? 'rubric' : 'checks'}"${pending ? ' disabled' : ''}>Continue</button>`;
     actions = '';
   } else if (page === 'rubric') {
     back = '<button type="button" data-review-page="reasoning">Back</button>';
     next = '<button type="button" class="primary" data-review-page="checks">Continue</button>';
     actions = '';
   } else if (page === 'checks') {
-    back = `<button type="button" data-review-page="${state.creative.rubric.rows.length ? 'rubric' : 'reasoning'}">Back</button>`;
+    back = `<button type="button" data-review-page="${state.creative.rubric.requested || state.creative.rubric.rows.length ? 'rubric' : 'reasoning'}">Back</button>`;
     next =
       state.finalCheck.approved && ready
         ? '<button type="button" class="primary" data-action="finish-workspace">Continue with Pixel</button>'
         : `<button type="button" class="primary" data-action="approve-version"${!ready ? ' disabled' : ''}>Save final design</button>`;
-    actions = ''; // Downloads stay visible in the content, outside a tools menu.
+    actions = `<button type="button" data-action="preview-guide">Preview guide</button><button type="button" data-action="download-guide"${!state.design.revision.trim() ? ' disabled' : ''}>${state.finalCheck.approved ? 'Download guide' : 'Download draft guide'}</button>`;
   } else {
     back = '<button type="button" data-review-page="checks">Back</button>';
   }

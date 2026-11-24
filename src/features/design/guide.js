@@ -23,7 +23,7 @@ function editorialGuideStyles() {
         else if (rule.cssText.includes('guide-export')) rules.push(rule.cssText);
         else if (rule.type === 5 && /Fraunces|Manrope/.test(rule.style.fontFamily)) {
           rules.push(rule.cssText.replace(/url\(["']?([^"')]+)["']?\)/g,
-            (_, url) => 'url' + '(' + JSON.stringify(new URL(url, sheet.href || document.baseURI).href) + ')'));
+            (_, url) => `url("${new URL(url, sheet.href || document.baseURI).href}")`));
         }
       }
     } catch { /* A third-party stylesheet is not part of the guide theme. */ }
@@ -147,7 +147,7 @@ export function createGuide(
     sections.push({
       id: 'your-assignment',
       title: chosenTitle,
-      body: `<section class="assignment"><div class="assignment-banner"><h2>${e(chosenTitle)} · ${approved ? 'Approved version' : 'Draft'}</h2></div><div class="assignment-content">${teacher?.learningGoal ? `<p><strong>Learning goal:</strong> ${e(teacher.learningGoal)}</p>` : ''}${design.revision.trim() ? `${workspace ? '' : '<h3 id="revised-directions">Discussion-board directions</h3>'}<div class="assignment-directions"${workspace ? ' id="revised-directions"' : ''}>${renderAssignmentDirections(design.revision, { approved })}</div>` : ''}${workspace?.instructorPlan?.trim() ? `<aside class="rationale"><h3>Instructor interaction</h3><p>${e(workspace.instructorPlan)}</p></aside>` : ''}${!workspace && design.instructorPlan?.trim() ? `<aside class="rationale"><h3>Instructor interaction</h3><p>${e(design.instructorPlan)}</p></aside>` : ''}${design.reason.trim() && !workspace ? `<aside class="rationale"><h3 id="change-reason">Why I made this change</h3><div class="design-rationale">${renderDesignRationale(design.reason, { showSources: false, paragraphBreaks: true })}</div></aside>` : ''}</div></section>`,
+      body: `<section class="assignment"><div class="assignment-banner"><h2>${e(chosenTitle)} · ${approved ? 'Approved version' : 'Draft'}</h2></div><div class="assignment-content">${teacher?.learningGoal ? `<p><strong>Learning goal:</strong> ${e(teacher.learningGoal)}</p>` : ''}${design.revision.trim() ? `${workspace ? '' : '<h3 id="revised-directions">Discussion-board directions</h3>'}<div class="assignment-directions"${workspace ? ' id="revised-directions"' : ''}>${renderAssignmentDirections(design.revision, { approved })}</div>` : ''}${!workspace && design.instructorPlan?.trim() ? `<aside class="rationale"><h3>Instructor interaction</h3><p>${e(design.instructorPlan)}</p></aside>` : ''}${design.reason.trim() && !workspace ? `<aside class="rationale"><h3 id="change-reason">Why I made this change</h3><div class="design-rationale">${renderDesignRationale(design.reason, { showSources: false, paragraphBreaks: true })}</div></aside>` : ''}</div></section>`,
     });
   sections.push({
     id: 'design-sources',

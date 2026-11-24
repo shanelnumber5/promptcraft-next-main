@@ -1,0 +1,778 @@
+const assert = require('node:assert/strict');
+(async () => {
+  const { freshWorkspace, saveWorkspace, readWorkspace } = await import(
+    '../../src/features/workspace/storage.js'
+  );
+  const {
+    reviewFingerprint,
+    reviewNeedsCheck,
+    requestWorkspaceReview,
+    restoreReview,
+    shouldOpenMaya,
+  } = await import('../../src/features/workspace/review-ai.js');
+  const { renderReview } = await import('../../src/features/workspace/review-view.js');
+  const { createProjectFile, parseProjectFile } = await import(
+    '../../src/features/workspace/project-file.js'
+  );
+  const { renderPartner } = await import('../../src/features/workspace/partner-view.js');
+  const { clarificationChoices, renderQuestion } = await import(
+    '../../src/features/design/conversation-view.js'
+  );
+  const choiceText =
+    'Which approach fits? (a) Credit two purposeful replies, or (b) Credit extra optional replies?';
+  assert.deepEqual(clarificationChoices(choiceText), {
+    prompt: 'Which approach fits?',
+    choices: ['Credit two purposeful replies', 'Credit extra optional replies'],
+  });
+  const radioView = renderQuestion(
+    {
+      questions: [{ id: 'reply', text: choiceText }],
+      answers: { reply: 'Credit two purposeful replies' },
+    },
+    true,
+    false,
+    false,
+    '',
+    { workspace: true },
+  );
+  assert.equal((radioView.match(/type="radio"/g) || []).length, 3);
+  assert(radioView.includes('Let me clarify'));
+  assert(radioView.includes('value="Credit two purposeful replies" checked'));
+  assert(radioView.includes('data-clarification-custom="reply" hidden'));
+  const { renderConversationNotes } = await import('../../src/features/design/guide.js');
+  const noteView = renderConversationNotes(
+    'Maya: What if nobody replies?\nEducator: Use the alternative case.\n\nPixel: Who chooses?\nEducator: I do.',
+  );
+  assert.equal((noteView.match(/class="guide-decision"/g) || []).length, 2);
+  assert(noteView.includes('<strong>Your decision</strong>'));
+  assert(
+    !renderConversationNotes('Maya: <script>bad</script>\nEducator: Fine.').includes('<script>'),
+  );
+  const { renderLoading } = await import('../../src/features/design/loading.js');
+  const waiting = renderLoading({ stage: 'working', intent: 'revise' });
+  assert(!waiting.includes('Step 2 of 4'));
+  assert(waiting.indexOf('class="babbage-loading-note"') < waiting.indexOf('Your work is saved'));
+  const downloadHelp = renderReview(freshWorkspace(), { pending: false }, 'help');
+  assert(downloadHelp.includes('guide-download-actions'));
+  assert(downloadHelp.includes('data-action="download-guide"'));
+  assert(!downloadHelp.includes('<details'));
+  const clarification = freshWorkspace();
+  clarification.teacher.directions = 'Compare case evidence.';
+  clarification.babbage.questions = [
+    { id: 'instructor', text: 'How will you respond?', field: '' },
+  ];
+  clarification.babbage.history = [
+    {
+      role: 'assistant',
+      display:
+        'Three changes: 1. **Evidence sort.** Compare claims. 2. **One reply.** Test a choice. <script>alert(1)</script>',
+      content: '',
+    },
+  ];
+  const clarificationView = renderPartner(
+    clarification,
+    { pending: false, configured: true, error: '' },
+    'work',
+    null,
+    { task: 'draft' },
+  );
+  assert(clarificationView.includes('<strong>Evidence sort.</strong>'));
+  assert(clarificationView.includes('<ol class="assignment-steps">'));
+  assert(!clarificationView.includes('**Evidence sort.**'));
+  assert(!clarificationView.includes('<script>'));
+  assert(clarificationView.includes('&lt;script&gt;'));
+  const { renderBabbageMessage } = await import('../../src/shared/babbage-feedback.js');
+  const { renderInlineProse } = await import('../../src/shared/directions.js');
+  const message = 'Keep **the decision**. Ask a useful question. Consider the tradeoff.';
+  const formatted = renderBabbageMessage(message);
+  assert(formatted.includes('<strong>the decision</strong>'));
+  assert(formatted.includes('</p><p>'));
+  assert.equal(
+    renderBabbageMessage(JSON.stringify({ version: 1, tone: 'serious', message, aside: '' })),
+    formatted,
+    'Saved structured feedback uses the same formatting',
+  );
+  assert.equal(
+    renderInlineProse('**Decision** <img src=x onerror=alert(1)>'),
+    '<strong>Decision</strong> &lt;img src=x onerror=alert(1)&gt;',
+    'Dialogue emphasis is escaped safely',
+  );
+  const fs = require('node:fs');
+  for (const file of [
+    'index.html',
+    'src/features/entry/info-screen.js',
+    'src/features/workspace/disclosure.js',
+    'src/features/design/conversation-view.js',
+    'src/features/design/maya-dialog.js',
+  ]) {
+    const source = fs.readFileSync(require('node:path').join(__dirname, '../..', file), 'utf8');
+    assert(!/Open\s?AI/.test(source), file + ' must use Chat MT AI in visible copy');
+    assert(source.includes('Chat MT AI'), file + ' includes the requested provider name');
+  }
+  const state = freshWorkspace();
+  state.design.revision = 'Students compare evidence and revise a recommendation.';
+  state.design.reason = 'Support reasoning.';
+  const first = reviewFingerprint(state);
+  assert(reviewNeedsCheck(state));
+  let sent;
+  const feedback = await requestWorkspaceReview(state, null, {
+    fetchImpl: async (_, options) => {
+      sent = JSON.parse(options.body);
+      return {
+        ok: true,
+        json: async () => ({
+          analysis: {
+            feedback_summary:
+              'You ask students to compare evidence. How will they know what counts as a stronger reason? You could model one example.',
+          },
+        }),
+      };
+    },
+  });
+  assert.equal(sent.analysis_type, 'scenario1');
+  assert.equal(JSON.parse(sent.messages.at(-1).content).workspace_review, true);
+  assert(!sent.system.includes('Return Markdown text'));
+  state.creative.review = {
+    fingerprint: first,
+    feedback,
+    status: 'complete',
+    error: '',
+    offeredMaya: '',
+  };
+  assert(!reviewNeedsCheck(state));
+  state.designPanel = 'reason';
+  state.babbage.mode = 'live';
+  assert(shouldOpenMaya(state), 'Successful current review automatically offers Maya');
+  state.creative.review.perspectivesComplete = true;
+  assert(!shouldOpenMaya(state), 'Completed perspectives are not repeated automatically');
+  assert(
+    restoreReview(state.creative.review).perspectivesComplete,
+    'Perspective completion survives reload',
+  );
+  state.creative.review.perspectivesComplete = false;
+  state.creative.review.offeredMaya = first;
+  assert(!shouldOpenMaya(state), 'Each reviewed version opens Maya once');
+  state.creative.review.offeredMaya = '';
+  state.creative.mayaPaused = true;
+  assert(!shouldOpenMaya(state));
+  state.creative.mayaPaused = false;
+  state.designPanel = 'revision';
+  assert(!shouldOpenMaya(state));
+  state.designPanel = 'reason';
+  state.babbage.mode = 'dev';
+  assert(!shouldOpenMaya(state), 'Dev simulation makes no automatic live student request');
+  state.babbage.mode = 'live';
+  let html = renderReview(state, { pending: false }, 'rationale');
+  assert(!html.includes('id="reason"'), 'Rationale editor is separate from feedback');
+  const humorous = structuredClone(state);
+  humorous.creative.review.feedback = JSON.stringify({
+    version: 1,
+    tone: 'playful',
+    message: 'Students must reconsider a decision.',
+    aside: 'The chair has an impressive paper trail.',
+  });
+  const humorousView = renderReview(humorous, { pending: false }, 'rationale');
+  assert(humorousView.includes('Students must reconsider a decision.'));
+  assert(humorousView.includes('data-babbage-cameo="The chair has an impressive paper trail."'));
+  assert(
+    !humorousView.includes('&quot;version&quot;'),
+    'Feedback renders prose rather than the encoded dialogue object',
+  );
+
+  const checks = renderReview(state, { pending: false }, 'checks');
+  assert(checks.includes(state.design.revision) && checks.includes('id="check-activity"') && !checks.includes('href="#check-activity"'));
+  assert(
+    checks.includes('data-action="preview-guide"') &&
+      checks.includes('data-action="download-guide"'),
+  );
+  const checkFooter = checks.slice(checks.indexOf('<footer class="workspace-action-bar'));
+  assert(
+    checkFooter.includes('data-action="preview-guide"') &&
+      checkFooter.includes('data-action="download-guide"'),
+    'Guide controls are in the gold footer',
+  );
+  assert.equal((checks.match(/data-action="preview-guide"/g) || []).length, 1);
+  assert.equal((checks.match(/data-action="download-guide"/g) || []).length, 1);
+
+  assert(!checks.includes('data-review-page="guide"'), 'Guide tools share the final checks page');
+  assert.equal(
+    renderReview(state, { pending: false }, 'guide'),
+    checks,
+    'Old guide destination remains compatible',
+  );
+  const reasoning = renderReview(state, { pending: false }, 'reasoning');
+  assert(reasoning.includes('id="reason"') && !reasoning.includes('id="babbage-review-title"'));
+  assert(
+    html.includes('Babbage’s perspective') && html.includes('Hear Maya and Pixel’s perspectives'),
+  );
+  assert.equal((html.match(/Babbage[’']s perspective/g) || []).length, 1, 'One Babbage heading');
+  assert(!html.includes('Check My Revision'));
+  state.design.revision += ' Students discuss responses with the instructor.';
+  assert(reviewNeedsCheck(state));
+  html = renderReview(state, { pending: false }, 'rationale');
+  assert(html.includes('Check My Revision') && html.includes('Earlier draft'));
+  assert(!renderReview(state, { pending: true }, 'rationale').includes('Check My Revision'));
+  state.creative.review.status = 'pending';
+  html = renderReview(state, { pending: false }, 'rationale');
+  assert(html.includes('Babbage is working'), 'Review-specific pending state is visible');
+  assert(
+    html.includes('babbage-engine') && html.includes('babbage-progress'),
+    'Review uses the shared loading animation',
+  );
+  assert(html.includes('aria-busy="true"'));
+  assert(!html.includes('data-action="check-workspace-revision"'));
+  assert(!html.includes('data-action="continue-to-maya"'), 'Maya waits for the review request');
+  assert(!html.includes('Your first review will begin automatically.'));
+  assert(html.includes('data-design-page="draft"'), 'Back returns to the working draft');
+  assert(html.indexOf('workspace-ai-disclosure') < html.indexOf('workspace-review-feedback'));
+  state.babbage.mode = 'dev';
+  assert(
+    renderReview(state, { pending: false }, 'rationale').includes('No AI analysis or API call.'),
+  );
+  state.babbage.mode = 'live';
+  state.creative.review.status = 'complete';
+  const { renderWorkspaceDisclosure } = await import('../../src/features/workspace/disclosure.js');
+  for (const page of ['history', 'options', 'ideas']) {
+    const partner = renderPartner(state, { pending: false, configured: true }, page);
+    assert.equal((partner.match(/<footer/g) || []).length, 1, `${page} has one footer`);
+    assert(partner.includes(renderWorkspaceDisclosure(state)), `${page} uses the same disclosure`);
+    assert(
+      !partner.includes('workspace-view-actions'),
+      `${page} actions stay outside scrolling content`,
+    );
+    if (page === 'ideas')
+      assert(partner.indexOf('</div><footer class="workspace-action-bar partner-actions"') > 0);
+  }
+  const { renderWorkspace } = await import('../../src/features/workspace/screen.js');
+  const { buildPages, renderUtility } = await import('../../src/features/workspace/views.js');
+  state.designPanel = 'revision';
+  for (const [id] of buildPages)
+    assert.equal(
+      (
+        renderWorkspace(state, { pending: false, configured: true }, '', id).match(
+          /class="workspace-action-bar /g,
+        ) || []
+      ).length,
+      1,
+      `${id} has one anchored footer`,
+    );
+  for (const id of ['rationale', 'clarify', 'reasoning', 'checks', 'guide', 'help']) {
+    const markup = renderReview(state, { pending: false }, id);
+    assert.equal((markup.match(/class="workspace-action-bar /g) || []).length, 1);
+    assert(
+      !markup.includes('class="course-guide-actions"'),
+      'Guide tools do not create a second gold band',
+    );
+  }
+  assert(
+    renderUtility(state, { pending: false }, { screen: 'options' }).includes(
+      'workspace-action-bar workspace-view-back',
+    ),
+  );
+  assert(
+    renderPartner(state, { pending: true, configured: true }, 'work').includes(
+      'workspace-action-bar partner-actions',
+    ),
+    'Loading retains the footer',
+  );
+  state.designPanel = 'reason';
+  const buildState = structuredClone(state);
+  buildState.designPanel = 'revision';
+  const requirements = renderWorkspace(
+    buildState,
+    { pending: false, configured: true },
+    '',
+    'ai-use',
+  );
+  assert(requirements.includes('workspace-requirements'), 'Requirements span the two-column grid');
+  const course = renderWorkspace(buildState, { pending: false, configured: true }, '', 'subject');
+  for (const id of ['workTime', 'daysAvailable']) {
+    assert(course.includes(`id="${id}"`), `${id} is on Course & learners`);
+    assert(!requirements.includes(`id="${id}"`), `${id} is removed from requirements`);
+  }
+  assert(requirements.includes('AI-use instructions and limits'));
+  const draftPage = renderWorkspace(buildState, { pending: false, configured: true }, '', 'draft');
+  assert(
+    draftPage.includes('contenteditable="true"') &&
+      draftPage.includes('data-editor-command="bold"') &&
+      draftPage.includes('data-editor-style'),
+    'Workspace uses the rich text editor',
+  );
+  assert(
+    !draftPage.includes('<textarea id="revision"'),
+    'Raw markup is not displayed in a draft textarea',
+  );
+  const noDraft = structuredClone(buildState);
+  noDraft.design.revision = '';
+  const emptyActivity = renderWorkspace(noDraft, { pending: false, configured: true }, '', 'draft');
+  assert(
+    emptyActivity.includes('Build my activity') &&
+      !emptyActivity.includes('contenteditable="true"'),
+    'Empty activity compiles choices instead of requiring manual drafting',
+  );
+  assert(
+    draftPage.includes('data-workspace-panel="reason">Review my activity'),
+    'A compiled draft proceeds to its rubric without another rewrite',
+  );
+  assert(draftPage.includes('data-action="compile-activity"'), 'A compiled draft can be rebuilt');
+  assert(
+    course.indexOf('id="daysAvailable"') < course.indexOf('workspace-course-long'),
+    'All short course fields are in the left column',
+  );
+  assert(
+    course.indexOf('id="learningGoal"') > course.indexOf('workspace-course-long'),
+    'Larger fields are on the right',
+  );
+  assert(
+    requirements.includes('name="aiUse"') && !requirements.includes('open-ai-use-popup'),
+    'AI-use choices stay inside Build',
+  );
+  assert(
+    requirements.includes('data-rubric-preference'),
+    'Rubric preference is an inline optional choice',
+  );
+  assert(
+    renderPartner(buildState, { pending: true, configured: true }, 'work', '', {
+      task: 'draft',
+    }).includes('Develop your activity with Babbage'),
+  );
+  const creative = renderWorkspace(
+    buildState,
+    { pending: false, configured: true },
+    '',
+    'intentions',
+  );
+  assert(creative.includes('workspace-stacked-fields'));
+  assert(
+    creative.indexOf('id="creative-core"') < creative.indexOf('id="concern"'),
+    'Optional improvement follows creative core',
+  );
+  const presence = renderWorkspace(
+    buildState,
+    { pending: false, configured: true },
+    '',
+    'presence',
+  );
+  assert(presence.includes('workspace-stacked-fields'));
+  assert(presence.indexOf('id="instructor-plan"') < presence.indexOf('id="open-questions"'));
+  const explore = renderPartner(state, { pending: false, configured: true }, 'work');
+  assert(
+    explore.includes('<h2 class="workspace-build-title" id="ai-title"'),
+    'Explore has a visible page heading',
+  );
+  const options = renderUtility(state, { pending: false, configured: true }, { screen: 'options' });
+  assert(!options.includes('Workspace options'));
+  assert(!options.includes('Shortcuts for your workspace'));
+  assert(
+    options.includes('aria-labelledby="workspace-view-title"') && options.includes('Project tools'),
+  );
+  assert(
+    !options.includes('data-review-page="guide"'),
+    'Guide remains in Review rather than duplicating options',
+  );
+  assert(
+    !options.includes('data-workspace-view="sections"') && !options.includes('href="?view=lab"'),
+    'Routine navigation is not duplicated',
+  );
+  assert(!options.includes('<details'), 'Options has no accordion');
+  const mainOptions = options
+    .split('<section class="workspace-welcome-choices"')[1]
+    .split('</section>')[0];
+  assert.equal(
+    (mainOptions.match(/data-action=/g) || []).length,
+    2,
+    'Only download and open project buttons are prominent',
+  );
+  assert(!options.includes('Save and leave'), 'Home is the single leave action');
+  assert(
+    options.includes('workspace-project-menu'),
+    'Project options follow the main menu structure',
+  );
+  assert(
+    !options.includes('href="?view=guide"'),
+    'Workspace guide does not route to the separate guide library',
+  );
+  for (const action of ['save-project-file', 'open-project-file'])
+    assert(options.includes(`data-action="${action}"`), 'Backup controls remain available');
+  const welcome = renderPartner(freshWorkspace(), { pending: false, configured: true }, 'work');
+  assert(welcome.includes('workspace-welcome-board'));
+  assert.equal(
+    (welcome.match(/data-action="edit-context"/g) || []).length,
+    1,
+    'One starting-point action on the welcome menu',
+  );
+  const chosen = freshWorkspace();
+  chosen.teacher.directions = 'Test a case-based decision.';
+  chosen.workspace.selectedDirection = { title: 'Compare evidence', core: 'Revise a decision.' };
+  chosen.babbage.ready = false;
+  const chosenHtml = renderPartner(chosen, { pending: false, configured: true }, 'work');
+  assert(
+    chosenHtml.includes('data-action="consult-babbage"'),
+    'Chosen ideas offer consultation before clarification is complete',
+  );
+  const loading = renderPartner(
+    chosen,
+    { pending: true, configured: true, stage: 'working' },
+    'work',
+  );
+  assert(loading.includes('babbage-loading'));
+  assert(
+    !loading.includes('workspace-request-status'),
+    'Loading is not repeated above the illustration',
+  );
+  assert(
+    !loading.includes('data-workspace-view="preview"'),
+    'Loading cannot open the unchanged draft',
+  );
+  const questioning = structuredClone(chosen);
+  questioning.design.revision = 'Existing draft';
+  questioning.babbage.questions = [{ id: 'one', text: 'Which constraint matters?', field: '' }];
+  const questionHtml = renderPartner(questioning, { pending: false, configured: true }, 'work');
+  assert(
+    !questionHtml.includes('data-workspace-view="preview"'),
+    'Clarification does not imply a finished draft',
+  );
+  assert(
+    questionHtml.indexOf('data-action="send-clarification"') > questionHtml.indexOf('<footer'),
+    'Draft action is in the footer',
+  );
+  assert(
+    questionHtml.includes('Clarify your activity') && questionHtml.includes('Question 1 of 1'),
+  );
+  assert(!questionHtml.includes('You will not need to confirm each question separately'));
+  assert(
+    questionHtml.indexOf('workspace-ai-disclosure') < questionHtml.indexOf('class="ai-status"'),
+    'Disclosure precedes Babbage commentary',
+  );
+  questioning.design.revision = '';
+  delete questioning.workspace.selectedDirection;
+  assert(
+    renderPartner(questioning, { pending: false, configured: true }, 'work', '', {
+      task: 'draft',
+    }).includes('data-action="send-clarification"'),
+    'An empty draft must not hide pending questions behind the welcome menu',
+  );
+  const draftBefore = chosen.design.revision;
+  const suggested = renderPartner(
+    chosen,
+    {
+      pending: false,
+      configured: true,
+      suggestion: {
+        revision: 'Use two case facts and reconsider a tradeoff.',
+        reason: 'Support reasoning.',
+      },
+    },
+    'work',
+  );
+  assert(
+    suggested.includes('data-action="apply-ai"') && suggested.includes('Select Use this draft'),
+  );
+  assert.equal(
+    chosen.design.revision,
+    draftBefore,
+    'Displaying a suggestion does not silently replace the draft',
+  );
+  chosen.designPanel = 'revision';
+  assert(
+    renderWorkspace(chosen, { pending: false, configured: true }, '', 'draft').includes(
+      'data-action="compile-activity"',
+    ),
+  );
+  assert(
+    renderWorkspace(chosen, { pending: false, configured: true }, '', 'presence').includes(
+      'data-design-page="draft"',
+    ),
+  );
+  const { createDesignController } = await import('../../src/features/design/controller.js');
+  const { assignmentContext } = await import('../../src/features/design/babbage-client.js');
+  const simulated = freshWorkspace();
+  simulated.teacher.directions = 'Compare two staffing schedules using evidence.';
+  simulated.teacher.learningGoal = 'Justify a decision with evidence.';
+  simulated.teacher.aiUse = 'No student AI use';
+  simulated.design.sourceDirections = simulated.teacher.directions;
+  simulated.babbage.mode = 'dev';
+  simulated.babbage.ready = true;
+  simulated.babbage.context = assignmentContext(simulated);
+  const simulatedAi = { pending: false, configured: true };
+  let callbackDraft = '',
+    loadingVisible = false;
+  const simulatedController = createDesignController({
+    app: { querySelector: () => null },
+    getState: () => simulated,
+    ai: simulatedAi,
+    render: () => {
+      if (simulatedAi.pending) loadingVisible = true;
+    },
+    saveSafely: () => true,
+    syncFinalCheck: () => {},
+    onSuggestion: (source, suggestion) => {
+      assert.equal(source, simulated);
+      callbackDraft = suggestion.revision;
+      return true;
+    },
+  });
+  await simulatedController.askBabbage('revise');
+  assert(loadingVisible, 'Generation renders its loading state');
+  assert(callbackDraft.trim(), 'Completed generation delivers the reworked draft');
+  assert.equal(simulatedAi.pending, false);
+  const { renderWorkspacePreview } = await import('../../src/features/workspace/screen.js');
+  chosen.teacher.subject = 'Management';
+  chosen.teacher.learningGoal = 'Justify a staffing decision';
+  chosen.design.revision = 'Use two case facts and revisit the decision.';
+  chosen.designPanel = 'reason';
+  const preview = renderWorkspacePreview(chosen, 'draft');
+  assert(preview.includes(chosen.design.revision) && preview.includes(chosen.teacher.learningGoal));
+  assert(
+    preview.indexOf('workspace-draft-context') < preview.indexOf('workspace-draft-document'),
+    'Context appears before activity directions',
+  );
+  assert(
+    preview.includes('Design context') &&
+      preview.includes('separate from the student-facing directions'),
+  );
+  const { purposefulRedesign } = await import('../../src/shared/purposeful-redesign.js');
+  const { buildBabbageRequest } = await import('../../src/features/design/babbage-client.js');
+  const guided = structuredClone(chosen);
+  delete guided.workspace;
+  for (const source of [chosen, guided]) {
+    const request = buildBabbageRequest(source, 'revise');
+    assert(
+      request.system.includes(purposefulRedesign),
+      'Both experiences receive purposeful redesign instructions',
+    );
+    assert.equal(request.analysis_type, 'scenario1');
+    const context = JSON.parse(request.messages[0].content);
+    assert.equal(context.teacher.learningGoal, chosen.teacher.learningGoal);
+    assert.equal(context.design.revision, chosen.design.revision);
+  }
+  const { fitWorkspace } = await import('../../src/features/workspace/layout.js');
+  let measuredHeight;
+  const shell = {
+    getBoundingClientRect: () => ({ top: 30 }),
+    style: {
+      setProperty: (key, value) => {
+        assert.equal(key, '--workspace-available-height');
+        measuredHeight = value;
+      },
+    },
+  };
+  fitWorkspace(
+    { querySelector: () => shell },
+    {
+      innerHeight: 900,
+      scrollY: 90,
+      getComputedStyle: () => ({ marginBottom: '24px', paddingBottom: '0px' }),
+    },
+  );
+  assert.equal(
+    measuredHeight,
+    '756px',
+    'Frame accounts for header offset and existing page scroll',
+  );
+  shell.getBoundingClientRect = () => ({ top: 120 });
+  fitWorkspace(
+    { querySelector: () => shell },
+    {
+      innerHeight: 900,
+      scrollY: 0,
+      getComputedStyle: () => ({ marginBottom: '24px', paddingBottom: '0px' }),
+    },
+  );
+  assert.equal(measuredHeight, '756px', 'Scrolling does not change the frame height');
+  fitWorkspace(
+    { querySelector: () => shell },
+    {
+      innerHeight: 768,
+      scrollY: 0,
+      getComputedStyle: () => ({ marginBottom: '24px', paddingBottom: '0px' }),
+    },
+  );
+  assert.equal(measuredHeight, '624px', 'Fullscreen/resize recomputes available height');
+  fitWorkspace(
+    { querySelector: () => null },
+    {
+      innerHeight: 768,
+      scrollY: 0,
+      getComputedStyle: () => ({ marginBottom: '24px', paddingBottom: '0px' }),
+    },
+  );
+  const screen = renderWorkspace(state, { pending: false, configured: true });
+  assert(
+    screen.indexOf('class="workspace-messages"') < screen.indexOf('id="workspace-panel"'),
+    'Notices have a reserved row above the panel',
+  );
+  const store = new Map();
+  assert(saveWorkspace(state, { setItem: (k, v) => store.set(k, v) }));
+  const saved = readWorkspace({ getItem: (k) => store.get(k) }).state;
+  assert.equal(saved.creative.review.feedback, feedback);
+  assert.equal(parseProjectFile(createProjectFile(state)).creative.review.feedback, feedback);
+  assert.equal(restoreReview({ ...state.creative.review, status: 'pending' }).status, 'complete');
+  await assert.rejects(
+    requestWorkspaceReview(state, null, {
+      fetchImpl: async () => ({ ok: true, json: async () => ({ analysis: {} }) }),
+    }),
+    /incomplete/,
+  );
+  const { teachingNoteSuggestions, applyTeachingNoteSuggestion } = await import(
+    '../../src/features/workspace/teaching-notes.js'
+  );
+  const { createGuide } = await import('../../src/features/design/guide.js');
+  const notes = freshWorkspace();
+  Object.assign(notes.teacher, {
+    directions: 'Analyze a geopolitical claim.',
+    learningGoal: 'Online discourse with angry people.',
+    learningGoalUnsure: true,
+  });
+  Object.assign(notes.design, {
+    sourceDirections: notes.teacher.directions,
+    revision: 'Reply to one classmate with evidence.',
+    reason: 'Practice evaluating evidence.',
+  });
+  notes.workspace.instructorPlan = 'I avoid students because they smell.';
+  const proposed = {
+    learningGoal: 'Evaluate a claim and compose an evidence-based response.',
+    instructorPlan: 'Ask a content-specific question and respond to an emerging misconception.',
+  };
+  notes.creative.review = {
+    fingerprint: reviewFingerprint(notes),
+    status: 'complete',
+    error: '',
+    offeredMaya: '',
+    feedback: JSON.stringify({
+      version: 1,
+      tone: 'sarcastic',
+      aside: '',
+      message: 'Consider more concrete teaching notes.',
+      teaching_notes: proposed,
+    }),
+  };
+  const untouched = JSON.stringify(notes);
+  assert.deepEqual(teachingNoteSuggestions(notes), proposed);
+  const compactUI = renderReview(notes, { pending: false }, 'rationale');
+  assert(!compactUI.includes('toggle-teaching-notes'));
+  assert(!compactUI.includes('data-teaching-note-proposal='));
+  const noteUI = renderReview(notes, { pending: false }, 'rationale', '', {
+    showTeachingNotes: true,
+  });
+  assert(
+    noteUI.includes('data-review-page="rubric"') &&
+      !noteUI.includes('Create or edit assignment rubric'),
+    'Rubric has one secondary destination',
+  );
+  assert(!noteUI.includes('Suggestions for your teaching notes'));
+  assert.equal(JSON.stringify(notes), untouched, 'Offering suggestions never edits the project');
+  const importedNotes = parseProjectFile(createProjectFile(notes));
+  assert.deepEqual(
+    teachingNoteSuggestions(importedNotes),
+    proposed,
+    'Optional proposals survive the existing project backup',
+  );
+  const outdated = structuredClone(notes);
+  outdated.design.revision += ' Changed task.';
+  assert.deepEqual(teachingNoteSuggestions(outdated), {});
+  assert(!applyTeachingNoteSuggestion(outdated, 'learningGoal', 'New goal.'));
+  assert(!applyTeachingNoteSuggestion(notes, 'learningGoal', '  '));
+  assert(!applyTeachingNoteSuggestion(notes, 'directions', 'Replace the assignment.'));
+  assert(!applyTeachingNoteSuggestion(notes, 'instructorPlan', 'x'.repeat(2001)));
+  const editedGoal = 'Evaluate evidence and write a qualified response.';
+  notes.finalCheck.approved = true;
+  assert(applyTeachingNoteSuggestion(notes, 'learningGoal', editedGoal));
+  assert.equal(notes.teacher.learningGoalUnsure, false);
+  assert.equal(
+    notes.finalCheck.approved,
+    false,
+    'An accepted teaching note requires fresh final checks',
+  );
+  assert.equal(
+    notes.workspace.instructorPlan,
+    'I avoid students because they smell.',
+    'Other notes remain the educator’s wording until individually accepted',
+  );
+  assert(!Object.hasOwn(teachingNoteSuggestions(notes), 'learningGoal'));
+  assert(
+    applyTeachingNoteSuggestion(notes, 'instructorPlan', proposed.instructorPlan),
+    'Second note remains independently applicable',
+  );
+  const guide = createGuide(notes.design, {
+    teacher: notes.teacher,
+    workspace: notes.workspace,
+    approved: false,
+  });
+  assert(guide.includes(editedGoal));
+  assert(!guide.includes('Design decisions') && !guide.includes('Conversation decisions'));
+  assert(!guide.includes('because they smell'));
+  assert(guide.includes('<p>Reply to one classmate with evidence.</p>'));
+  const finalUI = renderReview(notes, { pending: false }, 'checks');
+  assert(
+    finalUI.includes(proposed.instructorPlan) && finalUI.includes('Edit instructor interaction'),
+  );
+  assert.equal(
+    notes.design.revision,
+    'Reply to one classmate with evidence.',
+    'Applying teaching notes preserves student directions',
+  );
+  assert.deepEqual(
+    teachingNoteSuggestions({
+      ...notes,
+      creative: {
+        ...notes.creative,
+        review: { ...notes.creative.review, feedback: 'Old prose review.' },
+      },
+    }),
+    {},
+  );
+  const { feedbackQuestions, clarificationNotes } = await import(
+    '../../src/features/workspace/feedback-questions.js'
+  );
+  const dialogue = {
+    maya: { text: 'I see what to post. Which source should I use?' },
+    pixel: { text: 'What would show a change in students’ reasoning?' },
+  };
+  const questions = feedbackQuestions(dialogue);
+  assert.deepEqual(questions, [
+    { speaker: 'Maya', text: 'Which source should I use?' },
+    { speaker: 'Pixel', text: 'What would show a change in students’ reasoning?' },
+  ]);
+  assert.deepEqual(
+    feedbackQuestions({ maya: { text: 'The directions are clear.' } }),
+    [],
+    'Do not invent questions when the characters did not ask any',
+  );
+  const answers = {
+    0: 'Use the supplied course reading.',
+    1: 'Compare the first claim to the revision.',
+    other: 'Keep it asynchronous.',
+  };
+  const answerNotes = clarificationNotes(questions, answers);
+  assert(
+    answerNotes.includes('Maya: Which source should I use?') && answerNotes.includes(answers['0']),
+  );
+  assert(answerNotes.includes('Pixel: What would show') && answerNotes.includes(answers.other));
+  assert.throws(() => clarificationNotes(questions, {}), /Add an answer/);
+  assert.throws(() => clarificationNotes(questions, { other: 'x'.repeat(1001) }), /1,000/);
+  notes.workspace.openQuestions = answerNotes;
+  const restoredAnswers = parseProjectFile(createProjectFile(notes));
+  assert.equal(
+    restoredAnswers.workspace.openQuestions,
+    answerNotes,
+    'Submitted clarifications use existing portable project notes',
+  );
+  assert(
+    JSON.parse(
+      buildBabbageRequest(notes, 'revise').messages[0].content,
+    ).workspace.openQuestions.includes(answers['0']),
+    'Revision requests receive the educator’s clarifications',
+  );
+  const clarifyUI = renderReview(notes, { pending: false }, 'clarify');
+  assert(
+    clarifyUI.includes('data-feedback-answer="other"') &&
+      clarifyUI.includes('data-action="revise-from-feedback"'),
+  );
+  console.log(
+    'PASS: automatic review request contract, fingerprint, stale feedback, manual revision UI, persistence, import, errors. Mock only.',
+  );
+})().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

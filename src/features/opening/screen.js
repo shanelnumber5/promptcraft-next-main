@@ -98,9 +98,7 @@ export function renderChoices(choice, answer) {
     : option
       ? renderSingleFeedback(option.feedback)
       : '<div class="feedback feedback--narrative" aria-hidden="true"></div>';
-  const result = option ? `<p class="answer-result answer-result--${option.correct ? 'correct' : 'reconsider'}"><strong>${option.correct ? 'Correct' : 'Consider another response'}</strong><span>${option.correct ? 'This response examines the decision and its reasoning.' : 'Read Maya and Pixel’s feedback, then compare another choice.'}</span></p>` : '';
-  const markedFeedback = option ? feedback.replace('has-feedback', `has-feedback ${option.correct ? 'feedback--correct' : 'feedback--reconsider'}`).replace('<div class="feedback-turn', result + '<div class="feedback-turn') : feedback;
-  return `<fieldset class="choices"><legend>${e(choice.question)}</legend><div class="choice-list">${choice.options.map((o) => `<label class="choice${o.id === answer ? ' is-selected' : ''}"><input type="radio" name="scene-choice" value="${e(o.id)}"${o.id === answer ? ' checked' : ''}><span>${e(o.label)}</span></label>`).join('')}</div>${markedFeedback}</fieldset>`;
+  return `<fieldset class="choices"><legend>${e(choice.question)}</legend><div class="choice-list">${choice.options.map((o) => `<label class="choice${o.id === answer ? ' is-selected' : ''}"><input type="radio" name="scene-choice" value="${e(o.id)}"${o.id === answer ? ' checked' : ''}><span>${e(o.label)}</span></label>`).join('')}</div>${option?.correct ? feedback.replace('has-feedback', 'has-feedback feedback--correct') : feedback}</fieldset>`;
 }
 
 export function renderScene(scenario, scene, state, index, options = {}) {
@@ -110,16 +108,7 @@ export function renderScene(scenario, scene, state, index, options = {}) {
   const answer = state.answers[scene.id];
   const ready = !showingQuestion || sceneReady(scene, state);
   const isLast = index === scenario.scenes.length - 1;
-  const comparing = scene.id === 'revised-plan' && !showingQuestion;
-  const comparisonMode = options.comparisonMode === 'original' ? 'original' : 'revised';
-  const comparisonControls = comparing
-    ? `<div class="reference-comparison"><p>Compare how the group’s roles change after the peer question.</p><div class="reference-comparison-controls" role="group" aria-label="Compare the group plans"><button type="button" data-plan-comparison="original" aria-pressed="${comparisonMode === 'original'}">Original plan</button><button type="button" data-plan-comparison="revised" aria-pressed="${comparisonMode === 'revised'}">Revised plan</button></div><p role="status">${comparisonMode === 'original' ? 'Original plan: Alex takes payments and pours; Sam restocks.' : 'Revised plan: Alex takes payments; Sam serves drinks. Restocking still needs attention.'}</p></div>`
-    : '';
-  const displayedBoard =
-    comparing && comparisonMode === 'original'
-      ? scenario.scenes.find((item) => item.id === 'spot-hole')?.board || scene.board
-      : scene.board;
-  const boardContent = (options.boardContent ?? '') + comparisonControls;
+  const boardContent = options.boardContent ?? '';
   const nextAction = !showingBoard
     ? 'reveal-board'
     : scene.choice && !showingQuestion
@@ -151,7 +140,7 @@ export function renderScene(scenario, scene, state, index, options = {}) {
         { label: 'Think it through', title: scene.board.title },
         { afterContent: renderChoices(scene.choice, answer) },
       )
-    : renderBoard(displayedBoard, {
+    : renderBoard(scene.board, {
         afterContent:
           boardContent +
           (isLast && options.showHandoff !== false

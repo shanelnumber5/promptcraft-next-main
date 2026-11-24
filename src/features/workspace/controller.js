@@ -1,4 +1,3 @@
-import { createAutomaticRubric } from './automatic-rubric.js';
 import { aiUseOptions, mountWorkspacePopup } from './popups.js';
 import { emptyRubric, generateRubric, downloadRubric, rubricForState } from './rubric.js';
 import { requestConversationRevision } from './conversation-revision.js';
@@ -158,7 +157,6 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
       state.babbage.mode === 'dev',
     );
     if (focus) document.getElementById('setup-title')?.focus({ preventScroll: true });
-    rubricAuto.schedule();
   };
   function focusTask() {
     const target =
@@ -566,7 +564,7 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
         title: rubricForState(snapshot).title,
         submission: rubricForState(snapshot).submission,
       });
-      ui.rubricPart = 'preview';
+      ui.rubricPart = 'rubric';
       state.creative.rubric.rows = rows;
       if (!snapshot.creative.rubric.criteria.trim())
         state.creative.rubric.criteria = rows.map((row) => row.name).join('\n');
@@ -594,22 +592,22 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
     }
     return;
   }
-  const rubricAuto = createAutomaticRubric({
-    getState: () => state,
-    isBusy: () => ai.pending || reviews.pending,
-    canStart: () => !showingWrapUp && !readError && !document.querySelector('.maya-dialog[open]') && ((state.designPanel === 'revision' && designPage === 'draft') || state.designPanel === 'reason'),
-    request: () => createRubric(),
-  });
   function showRubricAutomatically(force = false) {
     if (force) {
       ui = workspaceViews();
       state.designPanel = 'reason';
-      reviewPage = state.creative.rubric.rows.length ? 'rubric' : 'checks';
+      reviewPage = 'rubric';
       render();
       focusTask();
       return;
     }
-    rubricAuto.schedule();
+    if (
+      state.creative.rubric.requested === true &&
+      !state.creative.rubric.rows.length &&
+      !ai.pending &&
+      !reviews.pending
+    )
+      void createRubric();
   }
   async function startCompilation(action) {
     if (ai.pending || reviews.pending || !state.teacher.directions.trim()) return;
@@ -1435,7 +1433,6 @@ export function mountWorkspace(app, params, { scenario = false } = {}) {
   window.addEventListener('resize', () => fitWorkspace(app));
   document.fonts?.ready.then(() => fitWorkspace(app));
   window.addEventListener('pagehide', () => {
-    rubricAuto.cancel();
     narrator.dispose();
     ai.requestController?.abort();
     reviews.cancel();

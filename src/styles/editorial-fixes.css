@@ -256,7 +256,7 @@
 :root:root body[data-app-view='workspace'] #app #workspace-panel .studio-welcome-engine {
   display: flex;
   position: absolute;
-  z-index: 0;
+  z-index: -1;
   inset: 24px var(--editorial-gutter) calc(var(--task-footer-height) + 24px) auto;
   width: 36%;
   margin: 0;

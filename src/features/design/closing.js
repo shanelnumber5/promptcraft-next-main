@@ -75,7 +75,7 @@ export function renderClosing(state, stage, page = 0) {
     titleId: 'setup-title',
     progressLabel: completion,
     showHandoff: false,
-    boardContent: '',
+    boardContent: recap,
     navigation,
     designNotice: true,
   });
