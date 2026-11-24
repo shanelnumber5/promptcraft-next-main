@@ -788,3 +788,15 @@ body.ai-waiting-open > :not(.ai-waiting-dialog) { visibility: hidden !important;
   :root:root:root body[data-app-view] .guide-preview-section-picker select { width: 100%; min-width: 0; font-size: 18px; }
   :root:root:root body[data-app-view] .guide-preview-actions { grid-template-columns: auto minmax(0,1fr) auto; }
 }
+
+/* Smaller Build tasks retain every field without a tall intake form. */
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-course-short {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 32px;
+}
+:root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-course-columns {
+  display: block; width: 100%;
+}
+@media (max-width: 700px) {
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-course-short { gap: 12px; }
+  :root:root:root body[data-app-view='workspace'] #app #workspace-panel .workspace-course-short .field-help { display: none; }
+}

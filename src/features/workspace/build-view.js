@@ -57,14 +57,16 @@ export const buildSections = [
     id: 'subject',
     title: 'Course & learners',
     render: (state) =>
-      `<div class="workspace-combined-fields workspace-course-columns"><div class="workspace-course-short" data-setup-form>${teacherField(state, 'subject')}${teacherField(state, 'learnerLevel')}${teacherField(state, 'workTime')}${teacherField(state, 'daysAvailable')}</div><div class="workspace-course-long"><div data-setup-form>${teacherField(state, 'learningGoal')}</div><div>${metaField('student-needs', 'studentNeeds', 'Learner access needs (optional; no identifying details)', state.workspace.studentNeeds)}</div></div></div>`,
+      `<div class="workspace-combined-fields workspace-course-columns"><div class="workspace-course-short" data-setup-form>${teacherField(state, 'subject')}${teacherField(state, 'learnerLevel')}${teacherField(state, 'workTime')}${teacherField(state, 'daysAvailable')}</div></div>`,
   },
+  { id: 'learning', title: 'Learning goal & access', render: state => `<div data-setup-form>${teacherField(state, 'learningGoal')}</div>${metaField('student-needs', 'studentNeeds', 'Learner access needs (optional; no identifying details)', state.workspace.studentNeeds)}` },
   {
     id: 'ai-use',
-    title: 'Activity requirements',
+    title: 'Student AI use',
     render: (state) =>
-      `<div class="workspace-requirements" data-setup-form><p>Choose what students may use AI for. Add any disclosure, verification, or limits below.</p>${renderField({ id: 'aiUse', type: 'radio', label: 'Student AI use', help: '', options: aiUseOptions }, { aiUse: state.workspace.aiUseChoice || state.teacher.aiUse })}<label class="studio-rubric-choice"><input type="checkbox" data-rubric-preference${state.creative.rubric.requested === true ? ' checked' : ''}> Automatically draft an assessment rubric (optional)</label><div data-setup-form>${renderField({ id: 'aiUseDetails', type: 'textarea', rows: 3, label: 'AI-use instructions and limits (optional)', help: '' }, { aiUseDetails: state.teacher.aiUse })}${teacherField(state, 'mustStay')}</div></div>`,
+      `<div class="workspace-requirements" data-setup-form><p>Choose what students may use AI for. Add any disclosure, verification, or limits below.</p>${renderField({ id: 'aiUse', type: 'radio', label: 'Student AI use', help: '', options: aiUseOptions }, { aiUse: state.workspace.aiUseChoice || state.teacher.aiUse })}<label class="studio-rubric-choice"><input type="checkbox" data-rubric-preference${state.creative.rubric.requested === true ? ' checked' : ''}> Automatically draft an assessment rubric (optional)</label><div data-setup-form>${renderField({ id: 'aiUseDetails', type: 'textarea', rows: 3, label: 'AI-use instructions and limits (optional)', help: '' }, { aiUseDetails: state.teacher.aiUse })}</div></div>`,
   },
+  { id: 'requirements', title: 'Required elements', render: state => `<div data-setup-form>${teacherField(state, 'mustStay')}</div><p>Check the elements your revised activity must retain.</p>` },
   {
     id: 'sharing',
     title: 'Student work & sharing',

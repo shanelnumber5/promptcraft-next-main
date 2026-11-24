@@ -145,8 +145,8 @@ test('Final checks link to the corresponding Build fields and use section tabs',
   assert(html.includes('Review and edit'));
   assert(html.includes('Preview and download'));
   assert.equal((html.match(/>Review this<\/a>/g) || []).length, 3);
-  assert(html.includes('data-design-page="subject" data-focus-field="learningGoal"'));
-  assert(html.includes('data-design-page="ai-use" data-focus-field="mustStay"'));
+  assert(html.includes('data-design-page="learning" data-focus-field="learningGoal"'));
+  assert(html.includes('data-design-page="requirements" data-focus-field="mustStay"'));
   assert(!html.includes('Saved in this browser.'));
 });
 
